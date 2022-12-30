@@ -1,3 +1,6 @@
+#define DLL_EXPORT
+
+#define SDL_MAIN_HANDLED
 #include <SDL.h>
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
@@ -350,7 +353,7 @@ static void inline fixedloop(void)
     }
 }
 
-static void inline deltaloop(void);
+extern "C" DECLSPEC void SDLCALL deltaloop(void);
 
 static void cleanup(void);
 
@@ -363,6 +366,7 @@ static void emscriptenloop(void)
 }
 #endif
 
+<<<<<<< HEAD
 static void keep_console_open(const bool open_console)
 {
     if (!open_console)
@@ -380,7 +384,7 @@ static void keep_console_open(const bool open_console)
     while (c != '\n' && c != EOF);
 }
 
-int main(int argc, char *argv[])
+extern "C" DECLSPEC int SDLCALL mainLoop(int argc, char *argv[])
 {
     char* baseDir = NULL;
     char* assetsPath = NULL;
@@ -862,7 +866,7 @@ int main(int argc, char *argv[])
 #ifdef __EMSCRIPTEN__
     emscripten_set_main_loop(emscriptenloop, 0, 0);
 #else
-    while (true)
+    /*while (true)
     {
         f_time = SDL_GetTicks64();
 
@@ -883,7 +887,7 @@ int main(int argc, char *argv[])
         deltaloop();
     }
 
-    cleanup();
+    cleanup();*/
 #endif
 
     return 0;
@@ -917,7 +921,44 @@ SDL_NORETURN void VVV_exit(const int exit_code)
     exit(exit_code);
 }
 
-static void inline deltaloop(void)
+extern "C" DECLSPEC void SDLCALL deltaupdate(void)
+{
+    enum IndexCode index_code = increment_func_index();
+
+    if (index_code == Index_end)
+    {
+        loop_assign_active_funcs();
+    }
+
+    graphics.renderfixedpost();
+
+    fixedloop();
+}
+
+extern "C" DECLSPEC void SDLCALL deltadraw(float delta)
+{
+    graphics.alpha = delta;
+
+    if (active_func_index == NULL
+        || *active_func_index == -1
+        || active_funcs == NULL)
+    {
+        /* Somehow the first deltatime has been too small and things haven't
+         * initialized. We'll just no-op for now.
+         */
+    }
+    else
+    {
+        const struct ImplFunc* implfunc = &(*active_funcs)[*active_func_index];
+
+        if (implfunc->type == Func_delta && implfunc->func != NULL)
+        {
+            implfunc->func();
+        }
+    }
+}
+
+extern "C" DECLSPEC void SDLCALL deltaloop(void)
 {
     //timestep limit to 30
     const float rawdeltatime = static_cast<float>(time_ - timePrev);
@@ -925,8 +966,8 @@ static void inline deltaloop(void)
 
     Uint32 timesteplimit = game.get_timestep();
 
-    while (accumulator >= timesteplimit)
-    {
+    //while (accumulator >= timesteplimit)
+    //{
         enum IndexCode index_code = increment_func_index();
 
         if (index_code == Index_end)
@@ -940,7 +981,7 @@ static void inline deltaloop(void)
         graphics.renderfixedpost();
 
         fixedloop();
-    }
+    //}
     const float alpha = game.over30mode ? static_cast<float>(accumulator) / timesteplimit : 1.0f;
     graphics.alpha = alpha;
 
