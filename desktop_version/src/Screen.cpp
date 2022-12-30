@@ -1,4 +1,5 @@
 #define GAMESCREEN_DEFINITION
+#define DLL_EXPORT
 #include "Screen.h"
 
 #include <SDL.h>
@@ -27,6 +28,13 @@ void ScreenSettings_default(struct ScreenSettings* _this)
     _this->scalingMode = SCALING_INTEGER;
     _this->linearFilter = false;
     _this->badSignal = false;
+}
+
+void* screenbufferPointer;
+
+extern "C" DECLSPEC void SDLCALL setScreenbufferPointer(void* ptr)
+{
+    screenbufferPointer = ptr;
 }
 
 void Screen::init(const struct ScreenSettings* settings)
@@ -311,8 +319,8 @@ void Screen::toggleLinearFilter(void)
 
     graphics.gameTexture = SDL_CreateTexture(
         m_renderer,
-        SDL_PIXELFORMAT_ARGB8888,
-        SDL_TEXTUREACCESS_TARGET,
+        SDL_PIXELFORMAT_ABGR8888,
+        SDL_TEXTUREACCESS_STREAMING,
         SCREEN_WIDTH_PIXELS,
         SCREEN_HEIGHT_PIXELS
     );

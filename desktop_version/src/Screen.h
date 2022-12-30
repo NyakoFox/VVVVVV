@@ -5,6 +5,8 @@
 
 #include "ScreenSettings.h"
 
+extern "C" DECLSPEC void SDLCALL setScreenbufferPointer(void* ptr);
+
 class Screen
 {
 public:
