@@ -147,6 +147,8 @@ if(BUNDLE_DEPENDENCIES)
         ../third_party/c-hashmap
         ../third_party/FAudio/include
         ../third_party/FAudio/src
+        ../third_party/enet/include
+        ../third_party/enet
     )
 else()
     target_include_directories(
@@ -157,6 +159,7 @@ else()
         ../third_party/physfs/extras
         ../third_party/c-hashmap
         ../third_party/FAudio/src
+        ../third_party/enet
     )
 endif()
 
@@ -194,6 +197,19 @@ set(PFS_SRC
     ../third_party/physfs/src/physfs_platform_haiku.cpp
     ../third_party/physfs/src/physfs_platform_android.c
 )
+
+set(ENET_SRC
+    ../third_party/enet/callbacks.c
+    ../third_party/enet/compress.c
+    ../third_party/enet/host.c
+    ../third_party/enet/list.c
+    ../third_party/enet/packet.c
+    ../third_party/enet/peer.c
+    ../third_party/enet/protocol.c
+    ../third_party/enet/unix.c
+    ../third_party/enet/win32.c
+)
+
 if(APPLE)
     # Are you noticing a pattern with this Apple crap yet?
     set(PFS_SRC ${PFS_SRC} ../third_party/physfs/src/physfs_platform_apple.m)
@@ -318,12 +334,24 @@ target_compile_definitions(lodepng-static PRIVATE
 add_library(c-hashmap-static STATIC ${CHM_SRC})
 
 if(BUNDLE_DEPENDENCIES)
-    list(APPEND STATIC_LIBRARIES physfs-static tinyxml2-static lodepng-static c-hashmap-static faudio-static)
+    list(APPEND STATIC_LIBRARIES physfs-static tinyxml2-static lodepng-static c-hashmap-static faudio-static enet-static)
 else()
     list(APPEND STATIC_LIBRARIES lodepng-static c-hashmap-static)
 endif()
 
 if(BUNDLE_DEPENDENCIES)
+    add_library(enet-static STATIC ${ENET_SRC})
+    target_compile_definitions(enet-static PRIVATE -DENET_DLL=1)
+    target_include_directories(
+        enet-static PRIVATE
+        ../third_party/enet/include
+        ../third_party/enet
+    )
+
+	if (WIN32)
+		target_link_libraries(enet-static PRIVATE ws2_32.lib winmm.lib)
+    endif()
+
     add_library(tinyxml2-static STATIC ${XML2_SRC})
     add_library(physfs-static STATIC ${PFS_SRC})
     target_compile_definitions(physfs-static PRIVATE
@@ -339,7 +367,7 @@ if(BUNDLE_DEPENDENCIES)
 
     target_link_libraries(VVVVVV ${STATIC_LIBRARIES})
 else()
-    target_link_libraries(VVVVVV ${STATIC_LIBRARIES} physfs tinyxml2 FAudio)
+    target_link_libraries(VVVVVV ${STATIC_LIBRARIES} physfs tinyxml2 FAudio enet)
 endif()
 
 

@@ -13,3 +13,7 @@
 [submodule "third_party/c-hashmap"]
 	path = third_party/c-hashmap
 	url = https://github.com/Mashpoe/c-hashmap
+[submodule "third_party/enet"]
+	path = third_party/enet
+	url = https://github.com/lsalzman/enet
+	branch = master

@@ -3,6 +3,7 @@
 #include <emscripten.h>
 #include <emscripten/html5.h>
 #endif
+#include <enet/enet.h>
 
 #include "ButtonGlyphs.h"
 #include "CustomLevels.h"
@@ -562,6 +563,12 @@ int main(int argc, char *argv[])
         VVV_exit(1);
     }
 
+    if (enet_initialize() != 0)
+    {
+        vlog_error("Unable to initialize ENet!");
+        VVV_exit(1);
+    }
+
     SDL_Init(
         SDL_INIT_VIDEO |
         SDL_INIT_AUDIO |
@@ -848,6 +855,7 @@ static void cleanup(void)
     loc::resettext(true);
     SDL_Quit();
     FILESYSTEM_deinit();
+    enet_deinitialize();
 }
 
 SDL_NORETURN void VVV_exit(const int exit_code)
