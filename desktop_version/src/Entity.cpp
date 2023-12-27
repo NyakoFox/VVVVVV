@@ -11,6 +11,7 @@
 #include "Localization.h"
 #include "Map.h"
 #include "Maths.h"
+#include "Multiplayer.h"
 #include "Music.h"
 #include "Script.h"
 #include "UtilityClass.h"
@@ -4715,7 +4716,8 @@ void entityclass::entitycollisioncheck(void)
     }
 
     //can't have the player being stuck...
-    stuckprevention(getplayer());
+    if (!multiplayer::is_server())
+        stuckprevention(getplayer());
 
     //Can't have the supercrewmate getting stuck either!
     if (game.supercrewmate)

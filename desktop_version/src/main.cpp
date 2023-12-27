@@ -25,6 +25,7 @@
 #include "LocalizationStorage.h"
 #include "Logic.h"
 #include "Map.h"
+#include "Multiplayer.h"
 #include "Music.h"
 #include "Network.h"
 #include "preloader.h"
@@ -363,7 +364,7 @@ static void emscriptenloop(void)
 }
 #endif
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     char* baseDir = NULL;
     char* assetsPath = NULL;
@@ -408,17 +409,17 @@ int main(int argc, char *argv[])
         }
         else if (ARG("-addresses"))
         {
-            printf("cl         : %p\n", (void*) &cl);
-            printf("ed         : %p\n", (void*) &ed);
-            printf("game       : %p\n", (void*) &game);
-            printf("gameScreen : %p\n", (void*) &gameScreen);
-            printf("graphics   : %p\n", (void*) &graphics);
-            printf("help       : %p\n", (void*) &help);
-            printf("key        : %p\n", (void*) &key);
-            printf("map        : %p\n", (void*) &map);
-            printf("music      : %p\n", (void*) &music);
-            printf("obj        : %p\n", (void*) &obj);
-            printf("script     : %p\n", (void*) &script);
+            printf("cl         : %p\n", (void*)&cl);
+            printf("ed         : %p\n", (void*)&ed);
+            printf("game       : %p\n", (void*)&game);
+            printf("gameScreen : %p\n", (void*)&gameScreen);
+            printf("graphics   : %p\n", (void*)&graphics);
+            printf("help       : %p\n", (void*)&help);
+            printf("key        : %p\n", (void*)&key);
+            printf("map        : %p\n", (void*)&map);
+            printf("music      : %p\n", (void*)&music);
+            printf("obj        : %p\n", (void*)&obj);
+            printf("script     : %p\n", (void*)&script);
 
             VVV_exit(0);
         }
@@ -427,35 +428,35 @@ int main(int argc, char *argv[])
             ARG_INNER({
                 i++;
                 SDL_SetHintWithPriority(SDL_HINT_RENDER_DRIVER, argv[i], SDL_HINT_OVERRIDE);
-            })
+                })
         }
         else if (ARG("-basedir"))
         {
             ARG_INNER({
                 i++;
                 baseDir = argv[i];
-            })
+                })
         }
         else if (ARG("-assets"))
         {
             ARG_INNER({
                 i++;
                 assetsPath = argv[i];
-            })
+                })
         }
         else if (ARG("-langdir"))
         {
             ARG_INNER({
                 i++;
                 langDir = argv[i];
-            })
+                })
         }
         else if (ARG("-fontsdir"))
         {
             ARG_INNER({
                 i++;
                 fontsDir = argv[i];
-            })
+                })
         }
         else if (ARG("-playing") || ARG("-p"))
         {
@@ -465,15 +466,15 @@ int main(int argc, char *argv[])
                 playtestname = std::string("levels/");
                 playtestname.append(argv[i]);
                 playtestname.append(std::string(".vvvvvv"));
-            })
+                })
         }
         else if (ARG("-playx") || ARG("-playy") ||
-        ARG("-playrx") || ARG("-playry") ||
-        ARG("-playgc") || ARG("-playmusic"))
+            ARG("-playrx") || ARG("-playry") ||
+            ARG("-playgc") || ARG("-playmusic"))
         {
             ARG_INNER({
                 savefileplaytest = true;
-                int v = help.Int(argv[i+1]);
+                int v = help.Int(argv[i + 1]);
                 if (ARG("-playx")) savex = v;
                 else if (ARG("-playy")) savey = v;
                 else if (ARG("-playrx")) saverx = v;
@@ -481,15 +482,15 @@ int main(int argc, char *argv[])
                 else if (ARG("-playgc")) savegc = v;
                 else if (ARG("-playmusic")) savemusic = v;
                 i++;
-            })
+                })
         }
         else if (ARG("-playassets"))
         {
             ARG_INNER({
                 i++;
-                // Even if this is a directory, FILESYSTEM_mountAssets() expects '.vvvvvv' on the end
-                playassets = "levels/" + std::string(argv[i]) + ".vvvvvv";
-            })
+            // Even if this is a directory, FILESYSTEM_mountAssets() expects '.vvvvvv' on the end
+            playassets = "levels/" + std::string(argv[i]) + ".vvvvvv";
+                })
         }
         else if (ARG("-leveldebugger"))
         {
@@ -537,6 +538,24 @@ int main(int argc, char *argv[])
         {
             seed_use_sdl_getticks = true;
         }
+        else if (ARG("-server"))
+        {
+            multiplayer::set_server(true);
+        }
+        else if (ARG("-host"))
+        {
+            ARG_INNER({
+                i++;
+                multiplayer::set_server_ip(argv[i]);
+            })
+        }
+        else if (ARG("-port"))
+        {
+            ARG_INNER({
+                i++;
+                multiplayer::set_server_port(SDL_atoi(argv[i]));
+            })
+        }
 #undef ARG_INNER
 #undef ARG
         else
@@ -557,7 +576,7 @@ int main(int argc, char *argv[])
     }
 #endif
 
-    if(!FILESYSTEM_init(argv[0], baseDir, assetsPath, langDir, fontsDir))
+    if (!FILESYSTEM_init(argv[0], baseDir, assetsPath, langDir, fontsDir))
     {
         vlog_error("Unable to initialize filesystem!");
         VVV_exit(1);
@@ -569,11 +588,13 @@ int main(int argc, char *argv[])
         VVV_exit(1);
     }
 
+    multiplayer::update_host();
+
     SDL_Init(
-        SDL_INIT_VIDEO |
-        SDL_INIT_AUDIO |
-        SDL_INIT_JOYSTICK |
-        SDL_INIT_GAMECONTROLLER
+        multiplayer::is_server() ? SDL_INIT_VIDEO : (SDL_INIT_VIDEO |
+            SDL_INIT_AUDIO |
+            SDL_INIT_JOYSTICK |
+            SDL_INIT_GAMECONTROLLER)
     );
     if (SDL_IsTextInputActive() == SDL_TRUE)
     {
@@ -625,21 +646,19 @@ int main(int argc, char *argv[])
     graphics.titlebg.colstate = 10;
     map.nexttowercolour();
 
-    map.ypos = (700-29) * 8;
+    map.ypos = (700 - 29) * 8;
     map.oldypos = map.ypos;
     map.setbgobjlerp(graphics.towerbg);
     map.setbgobjlerp(graphics.titlebg);
 
-    {
-        // Prioritize unlock.vvv first (2.2 and below),
-        // but settings have been migrated to settings.vvv (2.3 and up)
-        struct ScreenSettings screen_settings;
-        SDL_zero(screen_settings);
-        ScreenSettings_default(&screen_settings);
-        game.loadstats(&screen_settings);
-        game.loadsettings(&screen_settings);
-        gameScreen.init(&screen_settings);
-    }
+    // Prioritize unlock.vvv first (2.2 and below),
+    // but settings have been migrated to settings.vvv (2.3 and up)
+    struct ScreenSettings screen_settings;
+    SDL_zero(screen_settings);
+    ScreenSettings_default(&screen_settings);
+    game.loadstats(&screen_settings);
+    game.loadsettings(&screen_settings);
+    gameScreen.init(&screen_settings);
 
     BUTTONGLYPHS_init();
     font::load_main();
@@ -648,7 +667,7 @@ int main(int argc, char *argv[])
     if (!graphics.reloadresources())
     {
         /* Something wrong with the default assets? We can't use them to
-         * display the error message, and we have to bail. */
+            * display the error message, and we have to bail. */
         const char* message;
         if (FILESYSTEM_levelDirHasError())
         {
@@ -671,6 +690,7 @@ int main(int argc, char *argv[])
 
     if (game.skipfakeload)
         game.gamestate = TITLEMODE;
+
     if (game.slowdown == 0) game.slowdown = 30;
 
     if (!loc::lang_set && !loc::languagelist.empty())
@@ -683,13 +703,13 @@ int main(int argc, char *argv[])
     }
 
     //Check to see if you've already unlocked some achievements here from before the update
-    if (game.swnbestrank > 0){
-        if(game.swnbestrank >= 1) game.unlockAchievement("vvvvvvsupgrav5");
-        if(game.swnbestrank >= 2) game.unlockAchievement("vvvvvvsupgrav10");
-        if(game.swnbestrank >= 3) game.unlockAchievement("vvvvvvsupgrav15");
-        if(game.swnbestrank >= 4) game.unlockAchievement("vvvvvvsupgrav20");
-        if(game.swnbestrank >= 5) game.unlockAchievement("vvvvvvsupgrav30");
-        if(game.swnbestrank >= 6) game.unlockAchievement("vvvvvvsupgrav60");
+    if (game.swnbestrank > 0) {
+        if (game.swnbestrank >= 1) game.unlockAchievement("vvvvvvsupgrav5");
+        if (game.swnbestrank >= 2) game.unlockAchievement("vvvvvvsupgrav10");
+        if (game.swnbestrank >= 3) game.unlockAchievement("vvvvvvsupgrav15");
+        if (game.swnbestrank >= 4) game.unlockAchievement("vvvvvvsupgrav20");
+        if (game.swnbestrank >= 5) game.unlockAchievement("vvvvvvsupgrav30");
+        if (game.swnbestrank >= 6) game.unlockAchievement("vvvvvvsupgrav60");
     }
 
     if (game.unlock[UnlockTrophy_GAME_COMPLETE])
@@ -746,6 +766,30 @@ int main(int argc, char *argv[])
     }
 
     obj.init();
+
+    if (multiplayer::is_server())
+    {
+        script.startgamemode(Start_MAINGAME);
+
+        if (!multiplayer::create_server())
+        {
+            vlog_error("An error occurred while trying to create an ENet server host.");
+            VVV_exit(1);
+        }
+    }
+    else
+    {
+        if (!multiplayer::create_client())
+        {
+            vlog_error("An error occurred while trying to create an ENet client host.");
+            VVV_exit(1);
+        }
+
+        if (!multiplayer::connect_to_server())
+        {
+            vlog_error("Couldn't connect to server.");
+        }
+    }
 
     if (startinplaytest) {
         game.levelpage = 0;
@@ -855,6 +899,7 @@ static void cleanup(void)
     loc::resettext(true);
     SDL_Quit();
     FILESYSTEM_deinit();
+    multiplayer::cleanup();
     enet_deinitialize();
 }
 
@@ -922,6 +967,8 @@ static enum LoopCode loop_begin(void)
     {
         key.Poll();
     }
+
+    multiplayer::update();
 
     // Update network per frame.
     NETWORK_update();
@@ -1007,7 +1054,10 @@ static enum LoopCode loop_end(void)
         game.musicmutebutton--;
     }
 
-    music.updatemutestate();
+    if (!multiplayer::is_server())
+    {
+        music.updatemutestate();
+    }
 
     if (key.resetWindow)
     {

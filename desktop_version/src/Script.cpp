@@ -19,6 +19,7 @@
 #include "LocalizationMaint.h"
 #include "LocalizationStorage.h"
 #include "Map.h"
+#include "Multiplayer.h"
 #include "Music.h"
 #include "Unreachable.h"
 #include "UtilityClass.h"
@@ -2955,7 +2956,9 @@ void scriptclass::startgamemode(const enum StartMode mode)
     }
 
     obj.entities.clear();
-    obj.createentity(game.savex, game.savey, 0, 0);
+    if (!multiplayer::is_server())
+        obj.createentity(game.savex, game.savey, 0, 0);
+
     if (player_hitbox.initialized)
     {
         /* Restore player hitbox */

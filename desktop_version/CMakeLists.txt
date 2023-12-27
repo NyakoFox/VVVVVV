@@ -90,6 +90,7 @@ set(VVV_SRC
     src/LocalizationStorage.cpp
     src/Logic.cpp
     src/Map.cpp
+    src/Multiplayer.cpp
     src/Music.cpp
     src/Otherlevel.cpp
     src/preloader.cpp
