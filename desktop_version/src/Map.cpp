@@ -855,6 +855,9 @@ void mapclass::resetplayer(const bool player_died)
             game.scmprogress = game.roomx - 40;
         }
     }
+
+    multiplayer::update_player_position();
+    multiplayer::update_player_state();
 }
 
 void mapclass::warpto(int rx, int ry , int t, int tx, int ty)

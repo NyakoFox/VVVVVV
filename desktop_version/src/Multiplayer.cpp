@@ -13,6 +13,8 @@
 #include "Script.h"
 #include "Vlogging.h"
 
+#include "UtilityClass.h"
+
 // UUIDs...
 #ifdef _WIN32
 #pragma comment(lib, "rpcrt4.lib")  // UuidCreate - Minimum supported OS Win 2000
@@ -36,6 +38,9 @@ namespace multiplayer
 
     std::string last_uuid_hack;
 
+    bool should_update_player = false;
+    bool should_update_player_movement = false;
+
     std::string generate_uuid(void)
     {
 #ifdef _WIN32
@@ -53,6 +58,45 @@ namespace multiplayer
         uuid_unparse(uuid, s);
         return std::string(s);
 #endif
+    }
+
+    void send_player_update_packet()
+    {
+        should_update_player = false;
+
+        int i = obj.getplayer();
+        if (INBOUNDS_VEC(i, obj.entities))
+        {
+            Packet packet = Packet("player_update", 0);
+            packet.write_int(obj.entities[i].colour);
+            packet.write_int(obj.entities[i].invis);
+            packet.write_int(game.deathseq);
+
+            multiplayer::send_to_server(&packet);
+        }
+    }
+
+    void send_player_movement_packet()
+    {
+        should_update_player_movement = false;
+
+        int i = obj.getplayer();
+        if (INBOUNDS_VEC(i, obj.entities))
+        {
+            Packet packet = Packet("player_movement", 0);
+            packet.write_int(obj.entities[i].xp);
+            packet.write_int(obj.entities[i].yp);
+            packet.write_int(game.roomx);
+            packet.write_int(game.roomy);
+            packet.write_int(game.gravitycontrol);
+            packet.write_int(obj.entities[i].dir);
+            packet.write_float(obj.entities[i].ax);
+            packet.write_float(obj.entities[i].ay);
+            packet.write_float(obj.entities[i].vx);
+            packet.write_float(obj.entities[i].vy);
+
+            multiplayer::send_to_server(&packet);
+        }
     }
 
     void update_player_entities()
@@ -79,6 +123,10 @@ namespace multiplayer
                             obj.entities[i].colour = it->colour;
                             obj.entities[i].invis = it->invis;
                             obj.entities[i].para = it->deathseq; // para is our deathseq attribute
+                            obj.entities[i].ax = it->ax;
+                            obj.entities[i].ay = it->ay;
+                            obj.entities[i].vx = it->vx;
+                            obj.entities[i].vy = it->vy;
                             break;
                         }
                     }
@@ -95,6 +143,10 @@ namespace multiplayer
                             {
                                 obj.entities[i].colour = it->colour;
                                 obj.entities[i].dir = it->dir;
+                                obj.entities[i].ax = it->ax;
+                                obj.entities[i].ay = it->ay;
+                                obj.entities[i].vx = it->vx;
+                                obj.entities[i].vy = it->vy;
                                 break;
                             }
                         }
@@ -155,6 +207,8 @@ namespace multiplayer
 
     bool create_server(void)
     {
+        vlog_info("Creating server, listening on %s:%d", server_ip.c_str(), server_port);
+
         host_instance = enet_host_create(&server_address /* the address to bind the server host to */,
             32      /* allow up to 32 clients and/or outgoing connections */,
             2      /* allow up to 2 channels to be used, 0 and 1 */,
@@ -301,6 +355,10 @@ namespace multiplayer
                                     packet.write_int(player->room_y);
                                     packet.write_int(player->x);
                                     packet.write_int(player->y);
+                                    packet.write_int(player->ax);
+                                    packet.write_int(player->ay);
+                                    packet.write_int(player->vx);
+                                    packet.write_int(player->vy);
                                     packet.write_int(player->gravity);
                                     packet.write_int(player->invis);
                                     packet.write_int(player->deathseq);
@@ -321,6 +379,10 @@ namespace multiplayer
                                     packet.write_int(it->room_y);
                                     packet.write_int(it->x);
                                     packet.write_int(it->y);
+                                    packet.write_int(it->ax);
+                                    packet.write_int(it->ay);
+                                    packet.write_int(it->vx);
+                                    packet.write_int(it->vy);
                                     packet.write_int(it->gravity);
                                     packet.write_int(it->invis);
                                     packet.write_int(it->deathseq);
@@ -343,6 +405,10 @@ namespace multiplayer
                             player->room_y = packet.read_int();
                             player->gravity = packet.read_int();
                             player->dir = packet.read_int();
+                            player->ax = packet.read_float();
+                            player->ay = packet.read_float();
+                            player->vx = packet.read_float();
+                            player->vy = packet.read_float();
 
                             vlog_info("Received player movement from %s.", player->name.c_str());
 
@@ -352,7 +418,7 @@ namespace multiplayer
                             {
                                 if (it->peer != event.peer)
                                 {
-                                    Packet packet = Packet("player_movement", ENET_PACKET_FLAG_RELIABLE);
+                                    Packet packet = Packet("player_movement", 0);
                                     packet.write_string(player->uuid);
                                     packet.write_int(player->x);
                                     packet.write_int(player->y);
@@ -360,6 +426,39 @@ namespace multiplayer
                                     packet.write_int(player->room_y);
                                     packet.write_int(player->gravity);
                                     packet.write_int(player->dir);
+                                    packet.write_float(player->ax);
+                                    packet.write_float(player->ay);
+                                    packet.write_float(player->vx);
+                                    packet.write_float(player->vy);
+                                    packet.send(it->peer);
+                                }
+                            }
+                        }
+                        else if (SDL_strcmp(packet.id, "player_update") == 0)
+                        {
+                            if (player == NULL)
+                            {
+                                vlog_info("Received player update from unknown player.");
+                                break;
+                            }
+
+                            player->colour = packet.read_int();
+                            player->invis = packet.read_int();
+                            player->deathseq = packet.read_int();
+
+                            vlog_info("Received player update from %s.", player->name.c_str());
+
+                            // Tell all players about the player's update
+
+                            for (std::vector<Player>::iterator it = players.begin(); it != players.end(); ++it)
+                            {
+                                if (it->peer != event.peer)
+                                {
+                                    Packet packet = Packet("player_update", 0);
+                                    packet.write_string(player->uuid);
+                                    packet.write_int(player->colour);
+                                    packet.write_int(player->invis);
+                                    packet.write_int(player->deathseq);
                                     packet.send(it->peer);
                                 }
                             }
@@ -405,6 +504,10 @@ namespace multiplayer
                             player.room_y = packet.read_int();
                             player.x = packet.read_int();
                             player.y = packet.read_int();
+                            player.ax = packet.read_float();
+                            player.ay = packet.read_float();
+                            player.vx = packet.read_float();
+                            player.vy = packet.read_float();
                             player.gravity = packet.read_int();
                             player.invis = packet.read_int();
                             player.deathseq = packet.read_int();
@@ -454,6 +557,10 @@ namespace multiplayer
                                     it->room_y = packet.read_int();
                                     it->gravity = packet.read_int();
                                     it->dir = packet.read_int();
+                                    it->ax = packet.read_float();
+                                    it->ay = packet.read_float();
+                                    it->vx = packet.read_float();
+                                    it->vy = packet.read_float();
                                     found = true;
                                     break;
                                 }
@@ -461,6 +568,31 @@ namespace multiplayer
                             if (!found)
                             {
                                 vlog_info("Received player movement from unknown player.");
+                                break;
+                            }
+                            else
+                            {
+                                update_player_entities();
+                            }
+                        }
+                        else if (SDL_strcmp(packet.id, "player_update") == 0)
+                        {
+                            std::string uuid = packet.read_string();
+                            bool found = false;
+                            for (std::vector<Player>::iterator it = players.begin(); it != players.end(); ++it)
+                            {
+                                if (it->uuid == uuid)
+                                {
+                                    it->colour = packet.read_int();
+                                    it->invis = packet.read_int();
+                                    it->deathseq = packet.read_int();
+                                    found = true;
+                                    break;
+                                }
+                            }
+                            if (!found)
+                            {
+                                vlog_info("Received player update from unknown player.");
                                 break;
                             }
                             else
@@ -501,6 +633,11 @@ namespace multiplayer
                 }
             }
         }
+
+        if (should_update_player)
+            send_player_update_packet();
+        if (should_update_player_movement)
+            send_player_movement_packet();
     }
 
     void cleanup(void)
@@ -518,6 +655,24 @@ namespace multiplayer
 
     void gotoroom()
     {
+        // Ok, we changed rooms, tell the server in case they stayed at the exact same position while changing rooms (like a gotoroom)
+        update_player_position();
         update_player_entities();
+    }
+
+    void update_player_state()
+    {
+        if (!multiplayer::is_server())
+        {
+            should_update_player = true;
+        }
+    }
+
+    void update_player_position()
+    {
+        if (!multiplayer::is_server())
+        {
+            should_update_player_movement = true;
+        }
     }
 }

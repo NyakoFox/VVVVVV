@@ -864,6 +864,7 @@ void scriptclass::run(void)
                     obj.entities[i].cy = 12+80;// 2;
                     obj.entities[i].h = 126-80;// 21;
                 }
+                multiplayer::update_player_state();
             }
             else if (words[0] == "undovvvvvvman")
             {
@@ -879,6 +880,7 @@ void scriptclass::run(void)
                     obj.entities[i].cy = 2;
                     obj.entities[i].h = 21;
                 }
+                multiplayer::update_player_state();
             }
             else if (words[0] == "createentity")
             {
@@ -1366,6 +1368,7 @@ void scriptclass::run(void)
                 {
                     obj.entities[player].invis = true;
                 }
+                multiplayer::update_player_state();
             }
             else if (words[0] == "showplayer")
             {
@@ -1374,6 +1377,7 @@ void scriptclass::run(void)
                 {
                     obj.entities[player].invis = false;
                 }
+                multiplayer::update_player_state();
             }
             else if (words[0] == "teleportscript")
             {
@@ -1777,6 +1781,7 @@ void scriptclass::run(void)
                 {
                     obj.entities[i].colour = 0;
                 }
+                multiplayer::update_player_state();
             }
             else if (words[0] == "changeplayercolour")
             {
@@ -1786,6 +1791,7 @@ void scriptclass::run(void)
                 {
                     obj.entities[i].colour = getcolorfromname(words[1]);
                 }
+                multiplayer::update_player_state();
             }
             else if (words[0] == "changerespawncolour")
             {

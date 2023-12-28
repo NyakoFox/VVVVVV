@@ -23,6 +23,7 @@
 #include "KeyPoll.h"
 #include "MakeAndPlay.h"
 #include "Map.h"
+#include "Multiplayer.h"
 #include "Music.h"
 #include "Network.h"
 #include "RoomnameTranslator.h"
@@ -423,6 +424,8 @@ void Game::lifesequence(void)
         {
             obj.entities[i].invis = false;
         }
+
+        multiplayer::update_player_state();
     }
 }
 
@@ -2274,6 +2277,8 @@ void Game::updatestate(void)
                 obj.entities[i].tile = 1;
                 obj.entities[i].colour = 101;
             }
+
+            multiplayer::update_player_state();
             break;
         }
         case 2503:
@@ -2459,6 +2464,8 @@ void Game::updatestate(void)
                 obj.entities[i].tile = 1;
                 obj.entities[i].colour = 100;
             }
+
+            multiplayer::update_player_state();
             break;
         }
 
@@ -3068,6 +3075,8 @@ void Game::updatestate(void)
             flashlight = 5;
             screenshake = 90;
             music.playef(Sound_FLASH);
+
+            multiplayer::update_player_state();
             break;
         }
         case 3512:
@@ -3109,6 +3118,8 @@ void Game::updatestate(void)
             //we're done here!
             music.playef(Sound_TELEPORT);
             setstatedelay(60);
+
+            multiplayer::update_player_state();
             break;
         }
         case 3516:
@@ -3197,6 +3208,8 @@ void Game::updatestate(void)
                 obj.entities[i].tile = 1;
                 obj.entities[i].colour = 100;
             }
+
+            multiplayer::update_player_state();
             break;
         }
         case 4003:
@@ -3250,6 +3263,8 @@ void Game::updatestate(void)
                 obj.entities[i].vy = -6;
                 obj.entities[i].vx = 6;
             }
+
+            multiplayer::update_player_state();
             break;
         }
         case 4013:
@@ -3381,6 +3396,8 @@ void Game::updatestate(void)
                 obj.entities[i].vy = -6;
                 obj.entities[i].vx = 6;
             }
+
+            multiplayer::update_player_state();
             break;
         }
         case 4023:
@@ -3494,6 +3511,8 @@ void Game::updatestate(void)
                 obj.entities[i].vy = -6;
                 obj.entities[i].vx = -6;
             }
+
+            multiplayer::update_player_state();
             break;
         }
         case 4033:
@@ -3607,6 +3626,8 @@ void Game::updatestate(void)
                 obj.entities[i].vy = -6;
                 obj.entities[i].vx = 6;
             }
+
+            multiplayer::update_player_state();
             break;
         }
         case 4043:
@@ -3725,6 +3746,8 @@ void Game::updatestate(void)
                 obj.entities[i].vy = -6;
                 obj.entities[i].vx = 6;
             }
+
+            multiplayer::update_player_state();
             break;
         }
         case 4053:
@@ -3843,6 +3866,8 @@ void Game::updatestate(void)
                 obj.entities[i].vy = -6;
                 obj.entities[i].vx = -6;
             }
+
+            multiplayer::update_player_state();
             break;
         }
         case 4063:
@@ -3959,6 +3984,8 @@ void Game::updatestate(void)
                 obj.entities[i].vy = -6;
                 obj.entities[i].vx = 6;
             }
+
+            multiplayer::update_player_state();
             break;
         }
         case 4073:
@@ -4072,6 +4099,8 @@ void Game::updatestate(void)
                 obj.entities[i].vy = -6;
                 obj.entities[i].vx = 6;
             }
+
+            multiplayer::update_player_state();
             break;
         }
         case 4083:
@@ -4185,6 +4214,8 @@ void Game::updatestate(void)
                 obj.entities[i].vy = -6;
                 obj.entities[i].vx = 6;
             }
+
+            multiplayer::update_player_state();
             break;
         }
         case 4093:
@@ -5100,6 +5131,8 @@ void Game::deathsequence(void)
     {
         gameoverdelay--;
     }
+
+    multiplayer::update_player_state();
 }
 
 void Game::startspecial( int t )

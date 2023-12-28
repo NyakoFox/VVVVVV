@@ -26,11 +26,15 @@ public:
     int room_y;
 
     int dir;
-
     int invis;
     int deathseq;
     int gravity;
     int colour;
+
+    float ax;
+    float ay;
+    float vx;
+    float vy;
 
     std::string uuid;
 

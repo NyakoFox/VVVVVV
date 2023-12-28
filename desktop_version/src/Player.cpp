@@ -18,6 +18,9 @@ Player::Player(ENetPeer* peer, std::string name, int connection_type, std::strin
     x = -1;
     y = -1;
 
+    ax = 0;
+    ay = 0;
+
     dir = 0;
 
     invis = 0;
@@ -38,6 +41,9 @@ Player::Player(const Player& other)
     room_y = other.room_y;
     x = other.x;
     y = other.y;
+
+    ax = other.ax;
+    ay = other.ay;
 
     dir = other.dir;
 
@@ -62,6 +68,11 @@ Player& Player::operator=(const Player& other)
     room_y = other.room_y;
     x = other.x;
     y = other.y;
+
+    ax = other.ax;
+    ay = other.ay;
+    vx = other.vx;
+    vy = other.vy;
 
     dir = other.dir;
 

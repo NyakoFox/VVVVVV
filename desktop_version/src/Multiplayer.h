@@ -29,7 +29,11 @@ namespace multiplayer
 
     void send_to_server(Packet* packet);
 
-    void gotoroom();
+    void gotoroom(void);
+
+    void update_player_state(void);
+
+    void update_player_position(void);
 }
 
 #endif /* MULTIPLAYER_H */

@@ -19,6 +19,7 @@
 #include "LocalizationStorage.h"
 #include "MakeAndPlay.h"
 #include "Map.h"
+#include "Multiplayer.h"
 #include "Music.h"
 #include "RoomnameTranslator.h"
 #include "Screen.h"
@@ -2727,11 +2728,13 @@ void gameinput(void)
                 {
                     obj.entities[ie].ax = -3;
                     obj.entities[ie].dir = 0;
+                    multiplayer::update_player_position();
                 }
                 else if (game.press_right)
                 {
                     obj.entities[ie].ax = 3;
                     obj.entities[ie].dir = 1;
+                    multiplayer::update_player_position();
                 }
             }
         }
@@ -2754,6 +2757,7 @@ void gameinput(void)
                         if (obj.entities[ie].vx < 0.0f)
                         {
                             obj.entities[ie].vx = 0.0f;
+                            multiplayer::update_player_position();
                         }
                     }
                 }
@@ -2775,6 +2779,7 @@ void gameinput(void)
                         if (obj.entities[ie].vx > 0.0f)
                         {
                             obj.entities[ie].vx = 0.0f;
+                            multiplayer::update_player_position();
                         }
                     }
                 }
@@ -2823,6 +2828,7 @@ void gameinput(void)
                     {
                         obj.entities[e].vy = -4;
                         obj.entities[e].ay = -3;
+                        multiplayer::update_player_position();
                     }
                 }
                 music.playef(Sound_FLIP);
@@ -2839,6 +2845,7 @@ void gameinput(void)
                     {
                         obj.entities[e].vy = 4;
                         obj.entities[e].ay = 3;
+                        multiplayer::update_player_position();
                     }
                 }
                 music.playef(Sound_UNFLIP);
@@ -3152,6 +3159,7 @@ static void mapmenuactionpress(const bool version2_2)
         game.setstate(4000);
         game.setstatedelay(0);
         game.lockstate();
+        multiplayer::update_player_state();
     }
         break;
     case 3:
@@ -3379,6 +3387,8 @@ void teleporterinput(void)
                 //which teleporter script do we use? it depends on the companion!
                 game.setstate(4000);
                 game.setstatedelay(0);
+
+                multiplayer::update_player_state();
             }
         }
     }
