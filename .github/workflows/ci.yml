@@ -22,7 +22,8 @@ jobs:
         submodules: true
 
     - name: Install dependencies
-      run: brew install ninja sdl2
+      run: |
+        brew install ninja sdl2 ossp-uuid
 
     - name: CMake configure (default version)
       run: |
@@ -62,7 +63,7 @@ jobs:
         submodules: true
 
     - name: Install dependencies
-      run: yum -y install uuid-devel
+      run: yum -y install libuuid libuuid-devel
 
     - name: CMake configure (default version)
       run: |
