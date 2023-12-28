@@ -71,6 +71,7 @@ namespace multiplayer
             packet.write_int(obj.entities[i].colour);
             packet.write_int(obj.entities[i].invis);
             packet.write_int(game.deathseq);
+            packet.write_int(obj.entities[i].tile);
 
             multiplayer::send_to_server(&packet);
         }
@@ -165,6 +166,27 @@ namespace multiplayer
                         }
                     }
                 }
+            }
+        }
+        // Okay, now loop through all entities and see if any IDs match any players. If not, remove them.
+        for (int i = 0; i < obj.entities.size(); i++)
+        {
+            if (obj.entities[i].uuid == "") continue;
+            if (obj.entities[i].rule != 999) continue;
+
+            bool found = false;
+            for (std::vector<Player>::iterator it = players.begin(); it != players.end(); ++it)
+            {
+                if (it->uuid == "") continue;
+                if (it->uuid == obj.entities[i].uuid)
+                {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found)
+            {
+                obj.disableentity(i);
             }
         }
     }
@@ -410,8 +432,6 @@ namespace multiplayer
                             player->vx = packet.read_float();
                             player->vy = packet.read_float();
 
-                            vlog_info("Received player movement from %s.", player->name.c_str());
-
                             // Tell all players about the player's movement
 
                             for (std::vector<Player>::iterator it = players.begin(); it != players.end(); ++it)
@@ -446,8 +466,6 @@ namespace multiplayer
                             player->invis = packet.read_int();
                             player->deathseq = packet.read_int();
 
-                            vlog_info("Received player update from %s.", player->name.c_str());
-
                             // Tell all players about the player's update
 
                             for (std::vector<Player>::iterator it = players.begin(); it != players.end(); ++it)
@@ -459,6 +477,7 @@ namespace multiplayer
                                     packet.write_int(player->colour);
                                     packet.write_int(player->invis);
                                     packet.write_int(player->deathseq);
+                                    packet.write_int(player->tile);
                                     packet.send(it->peer);
                                 }
                             }
@@ -586,6 +605,7 @@ namespace multiplayer
                                     it->colour = packet.read_int();
                                     it->invis = packet.read_int();
                                     it->deathseq = packet.read_int();
+                                    it->tile = packet.read_int();
                                     found = true;
                                     break;
                                 }
@@ -642,6 +662,34 @@ namespace multiplayer
 
     void cleanup(void)
     {
+        // If we're connected, gracefully disconnect.
+
+        if (peer != NULL)
+        {
+            enet_peer_disconnect(peer, 0);
+
+            // Wait 3 seconds for a response
+            ENetEvent event;
+            bool force_kill = true;
+            while (enet_host_service(host_instance, &event, 3000) > 0)
+            {
+                switch (event.type)
+                {
+                case ENET_EVENT_TYPE_RECEIVE:
+                    enet_packet_destroy(event.packet);
+                    break;
+                case ENET_EVENT_TYPE_DISCONNECT:
+                    force_kill = false;
+                    break;
+                }
+            }
+
+            if (force_kill)
+            {
+                enet_peer_reset(peer);
+            }
+        }
+
         if (host_instance != NULL)
         {
             enet_host_destroy(host_instance);

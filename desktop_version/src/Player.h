@@ -30,6 +30,7 @@ public:
     int deathseq;
     int gravity;
     int colour;
+    int tile;
 
     float ax;
     float ay;

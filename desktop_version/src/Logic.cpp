@@ -209,6 +209,7 @@ void gamelogic(void)
                 obj.entities[i].tile = 144;
             }
             music.playef(Sound_CRY);
+            multiplayer::update_player_state();
         }
         if (obj.upset > 301) obj.upset = 301;
     }
@@ -225,6 +226,7 @@ void gamelogic(void)
             {
                 obj.entities[i].tile = 0;
             }
+            multiplayer::update_player_state();
         }
     }
     else
@@ -801,6 +803,7 @@ void gamelogic(void)
                         obj.entities[i].tile = 144;
                     }
                     music.playef(Sound_CRY);
+                    multiplayer::update_player_state();
                 }
             }
         }

@@ -1099,6 +1099,7 @@ void Game::updatestate(void)
                 obj.entities[obj.getplayer()].tile = 0;
             }
             setstate(0);
+            multiplayer::update_player_state();
             break;
         }
         case 16:
@@ -1111,6 +1112,7 @@ void Game::updatestate(void)
                 music.playef(Sound_CRY);
             }
             setstate(0);
+            multiplayer::update_player_state();
             break;
         }
 

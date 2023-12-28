@@ -968,6 +968,7 @@ void scriptclass::run(void)
                 {
                     obj.entities[i].tile = 144;
                 }
+                multiplayer::update_player_state();
             }
             else if (words[0] == "changecustommood")
             {
@@ -1025,6 +1026,7 @@ void scriptclass::run(void)
                 {
                     obj.entities[i].tile = 144;
                 }
+                multiplayer::update_player_state();
             }
             else if (words[0] == "changetile")
             {
@@ -1035,6 +1037,7 @@ void scriptclass::run(void)
                 {
                     obj.entities[i].tile = ss_toi(words[2]);
                 }
+                multiplayer::update_player_state();
             }
             else if (words[0] == "flipgravity")
             {
@@ -1043,6 +1046,7 @@ void scriptclass::run(void)
                 {
                     game.gravitycontrol = !game.gravitycontrol;
                     ++game.totalflips;
+                    multiplayer::update_player_position();
                 }
                 else
                 {
@@ -1071,6 +1075,7 @@ void scriptclass::run(void)
                 {
                     obj.entities[i].tile +=12;
                 }
+                multiplayer::update_player_state();
             }
             else if (words[0] == "changedir")
             {
@@ -1085,6 +1090,7 @@ void scriptclass::run(void)
                 {
                     obj.entities[i].dir = 1;
                 }
+                multiplayer::update_player_state();
             }
             else if (words[0] == "alarmon")
             {
@@ -1151,6 +1157,7 @@ void scriptclass::run(void)
                 {
                     obj.entities[i].colour = getcolorfromname(words[2]);
                 }
+                multiplayer::update_player_state();
             }
             else if (words[0] == "squeak")
             {
@@ -1572,6 +1579,7 @@ void scriptclass::run(void)
                 {
                     obj.entities[i].dir = 0;
                 }
+                multiplayer::update_player_state();
             }
             else if (words[0] == "jukebox")
             {
@@ -1692,6 +1700,7 @@ void scriptclass::run(void)
                         }
                     }
                 }
+                multiplayer::update_player_state();
             }
             else if (words[0] == "createactivityzone")
             {
@@ -1917,6 +1926,7 @@ void scriptclass::run(void)
                         obj.entities[i].tile = 144;
                     }
                 }
+                multiplayer::update_player_state();
             }
             else if (words[0] == "startintermission2")
             {
