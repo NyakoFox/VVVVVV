@@ -68,6 +68,8 @@ void entclass::clear(void)
     SDL_zero(realcol);
     lerpoldxp = 0;
     lerpoldyp = 0;
+
+    uuid = "";
 }
 
 bool entclass::outside(void)

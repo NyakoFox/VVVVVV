@@ -1,358 +1,29 @@
 #include <enet/enet.h>
 #include <string>
+#include <vector>
+
+#include <SDL.h>
 
 #include "Multiplayer.h"
 
-#include "Script.h"
+#include "Entity.h"
 #include "Game.h"
+#include "Packet.h"
+#include "Player.h"
+#include "Script.h"
 #include "Vlogging.h"
+
+// UUIDs...
+#ifdef _WIN32
+#pragma comment(lib, "rpcrt4.lib")  // UuidCreate - Minimum supported OS Win 2000
+#include <windows.h>
+#include <iostream>
+#else
+#include <uuid/uuid.h>
+#endif
 
 namespace multiplayer
 {
-    Packet::Packet(char* id, int flags)
-    {
-        should_free_packet = false;
-        packet = enet_packet_create(id, SDL_strlen(id) + 1, flags);
-        this->id = id;
-    }
-
-    Packet::Packet(ENetPacket* packet)
-    {
-        should_free_packet = false;
-        this->packet = packet;
-
-        // Okay, this is an incoming packet. Extract the ID (first string), set our id to that, and resize the packet to remove the ID
-
-        char* id = (char*)packet->data;
-        size_t id_length = SDL_strlen(id);
-        this->id = (char*)SDL_malloc(id_length);
-        SDL_memcpy(this->id, id, id_length);
-
-        enet_packet_resize(packet, packet->dataLength - id_length - 1);
-        packet->data += id_length + 1;
-    }
-
-    Packet::Packet(const Packet& other)
-    {
-        // copy constructor
-        packet = enet_packet_create(other.packet->data, other.packet->dataLength, other.packet->flags);
-        should_free_packet = true;
-        id = SDL_strdup(other.id);
-    }
-
-    Packet::Packet(Packet&& other) noexcept
-    {
-        packet = other.packet;
-        other.packet = NULL;
-        should_free_packet = other.should_free_packet;
-        id = other.id;
-        other.id = NULL;
-    }
-
-    Packet::~Packet(void)
-    {
-        if (packet != NULL && should_free_packet)
-        {
-            enet_packet_destroy(packet);
-        }
-
-        if (id != NULL)
-        {
-            SDL_free(id);
-        }
-    }
-
-    Packet& Packet::operator=(const Packet& other)
-    {
-        if (packet != NULL)
-        {
-            enet_packet_destroy(packet);
-        }
-        packet = enet_packet_create(other.packet->data, other.packet->dataLength, other.packet->flags);
-        return *this;
-    }
-
-    Packet& Packet::operator=(Packet&& other) noexcept
-    {
-        if (packet != NULL)
-        {
-            enet_packet_destroy(packet);
-        }
-        packet = other.packet;
-        other.packet = NULL;
-        return *this;
-    }
-
-    void* Packet::get_data(void)
-    {
-        return packet->data;
-    }
-
-    size_t Packet::get_data_size(void)
-    {
-        return packet->dataLength;
-    }
-
-    int Packet::get_flags(void)
-    {
-        return packet->flags;
-    }
-
-    void Packet::send(ENetPeer* peer)
-    {
-        enet_peer_send(peer, 0, packet);
-    }
-
-    void Packet::write_string(std::string str)
-    {
-        // Write the string with a null terminator
-        enet_packet_resize(packet, packet->dataLength + str.length() + 1);
-        memcpy(packet->data + packet->dataLength - str.length() - 1, str.c_str(), str.length() + 1);
-    }
-
-    void Packet::write_int(int i)
-    {
-        enet_packet_resize(packet, packet->dataLength + sizeof(int));
-        memcpy(packet->data + packet->dataLength - sizeof(int), &i, sizeof(int));
-    }
-
-    void Packet::write_float(float f)
-    {
-        enet_packet_resize(packet, packet->dataLength + sizeof(float));
-        memcpy(packet->data + packet->dataLength - sizeof(float), &f, sizeof(float));
-    }
-
-    void Packet::write_double(double d)
-    {
-        enet_packet_resize(packet, packet->dataLength + sizeof(double));
-        memcpy(packet->data + packet->dataLength - sizeof(double), &d, sizeof(double));
-    }
-
-    void Packet::write_bool(bool b)
-    {
-        enet_packet_resize(packet, packet->dataLength + sizeof(bool));
-        memcpy(packet->data + packet->dataLength - sizeof(bool), &b, sizeof(bool));
-    }
-
-    void Packet::write_char(char c)
-    {
-        enet_packet_resize(packet, packet->dataLength + sizeof(char));
-        memcpy(packet->data + packet->dataLength - sizeof(char), &c, sizeof(char));
-    }
-
-    void Packet::write_unsigned_char(unsigned char uc)
-    {
-        enet_packet_resize(packet, packet->dataLength + sizeof(unsigned char));
-        memcpy(packet->data + packet->dataLength - sizeof(unsigned char), &uc, sizeof(unsigned char));
-    }
-
-    void Packet::write_short(short s)
-    {
-        enet_packet_resize(packet, packet->dataLength + sizeof(short));
-        memcpy(packet->data + packet->dataLength - sizeof(short), &s, sizeof(short));
-    }
-
-    void Packet::write_unsigned_short(unsigned short us)
-    {
-        enet_packet_resize(packet, packet->dataLength + sizeof(unsigned short));
-        memcpy(packet->data + packet->dataLength - sizeof(unsigned short), &us, sizeof(unsigned short));
-    }
-
-    void Packet::write_long(long l)
-    {
-        enet_packet_resize(packet, packet->dataLength + sizeof(long));
-        memcpy(packet->data + packet->dataLength - sizeof(long), &l, sizeof(long));
-    }
-
-    void Packet::write_unsigned_long(unsigned long ul)
-    {
-        enet_packet_resize(packet, packet->dataLength + sizeof(unsigned long));
-        memcpy(packet->data + packet->dataLength - sizeof(unsigned long), &ul, sizeof(unsigned long));
-    }
-
-    void Packet::write_long_long(long long ll)
-    {
-        enet_packet_resize(packet, packet->dataLength + sizeof(long long));
-        memcpy(packet->data + packet->dataLength - sizeof(long long), &ll, sizeof(long long));
-    }
-
-    void Packet::write_unsigned_long_long(unsigned long long ull)
-    {
-        enet_packet_resize(packet, packet->dataLength + sizeof(unsigned long long));
-        memcpy(packet->data + packet->dataLength - sizeof(unsigned long long), &ull, sizeof(unsigned long long));
-    }
-
-    std::string Packet::read_string(void)
-    {
-        // Read the string, ending at the null terminator
-
-        void* data_copy = SDL_malloc(packet->dataLength);
-        memcpy(data_copy, packet->data, packet->dataLength);
-
-        std::string str = (char*)data_copy;
-        enet_packet_resize(packet, packet->dataLength - str.length() - 1);
-        memcpy(packet->data, (char*)data_copy + str.length() + 1, packet->dataLength);
-
-        SDL_free(data_copy);
-        return str;
-    }
-
-    int Packet::read_int(void)
-    {
-        void* data_copy = SDL_malloc(packet->dataLength);
-        memcpy(data_copy, packet->data, packet->dataLength);
-
-        int i = *(int*)data_copy;
-        enet_packet_resize(packet, packet->dataLength - sizeof(int));
-        memcpy(packet->data, (char*)data_copy + sizeof(int), packet->dataLength);
-
-        SDL_free(data_copy);
-        return i;
-    }
-
-    float Packet::read_float(void)
-    {
-        void* data_copy = SDL_malloc(packet->dataLength);
-        memcpy(data_copy, packet->data, packet->dataLength);
-
-        float f = *(float*)data_copy;
-        enet_packet_resize(packet, packet->dataLength - sizeof(float));
-        memcpy(packet->data, (char*)data_copy + sizeof(float), packet->dataLength);
-
-        SDL_free(data_copy);
-        return f;
-    }
-
-    double Packet::read_double(void)
-    {
-        void* data_copy = SDL_malloc(packet->dataLength);
-        memcpy(data_copy, packet->data, packet->dataLength);
-
-        double d = *(double*)data_copy;
-        enet_packet_resize(packet, packet->dataLength - sizeof(double));
-        memcpy(packet->data, (char*)data_copy + sizeof(double), packet->dataLength);
-
-        SDL_free(data_copy);
-        return d;
-    }
-
-    bool Packet::read_bool(void)
-    {
-        void* data_copy = SDL_malloc(packet->dataLength);
-        memcpy(data_copy, packet->data, packet->dataLength);
-
-        bool b = *(bool*)data_copy;
-        enet_packet_resize(packet, packet->dataLength - sizeof(bool));
-        memcpy(packet->data, (char*)data_copy + sizeof(bool), packet->dataLength);
-
-        SDL_free(data_copy);
-        return b;
-    }
-
-    char Packet::read_char(void)
-    {
-        void* data_copy = SDL_malloc(packet->dataLength);
-        memcpy(data_copy, packet->data, packet->dataLength);
-
-        char c = *(char*)data_copy;
-        enet_packet_resize(packet, packet->dataLength - sizeof(char));
-        memcpy(packet->data, (char*)data_copy + sizeof(char), packet->dataLength);
-
-        SDL_free(data_copy);
-        return c;
-    }
-
-    unsigned char Packet::read_unsigned_char(void)
-    {
-        void* data_copy = SDL_malloc(packet->dataLength);
-        memcpy(data_copy, packet->data, packet->dataLength);
-
-        unsigned char uc = *(unsigned char*)data_copy;
-        enet_packet_resize(packet, packet->dataLength - sizeof(unsigned char));
-        memcpy(packet->data, (char*)data_copy + sizeof(unsigned char), packet->dataLength);
-
-        SDL_free(data_copy);
-        return uc;
-    }
-
-    short Packet::read_short(void)
-    {
-        void* data_copy = SDL_malloc(packet->dataLength);
-        memcpy(data_copy, packet->data, packet->dataLength);
-
-        short s = *(short*)data_copy;
-        enet_packet_resize(packet, packet->dataLength - sizeof(short));
-        memcpy(packet->data, (char*)data_copy + sizeof(short), packet->dataLength);
-
-        SDL_free(data_copy);
-        return s;
-    }
-
-    unsigned short Packet::read_unsigned_short(void)
-    {
-        void* data_copy = SDL_malloc(packet->dataLength);
-        memcpy(data_copy, packet->data, packet->dataLength);
-
-        unsigned short us = *(unsigned short*)data_copy;
-        enet_packet_resize(packet, packet->dataLength - sizeof(unsigned short));
-        memcpy(packet->data, (char*)data_copy + sizeof(unsigned short), packet->dataLength);
-
-        SDL_free(data_copy);
-        return us;
-    }
-
-    long Packet::read_long(void)
-    {
-        void* data_copy = SDL_malloc(packet->dataLength);
-        memcpy(data_copy, packet->data, packet->dataLength);
-
-        long l = *(long*)data_copy;
-        enet_packet_resize(packet, packet->dataLength - sizeof(long));
-        memcpy(packet->data, (char*)data_copy + sizeof(long), packet->dataLength);
-
-        SDL_free(data_copy);
-        return l;
-    }
-
-    unsigned long Packet::read_unsigned_long(void)
-    {
-        void* data_copy = SDL_malloc(packet->dataLength);
-        memcpy(data_copy, packet->data, packet->dataLength);
-
-        unsigned long ul = *(unsigned long*)data_copy;
-        enet_packet_resize(packet, packet->dataLength - sizeof(unsigned long));
-        memcpy(packet->data, (char*)data_copy + sizeof(unsigned long), packet->dataLength);
-
-        SDL_free(data_copy);
-        return ul;
-    }
-
-    long long Packet::read_long_long(void)
-    {
-        void* data_copy = SDL_malloc(packet->dataLength);
-        memcpy(data_copy, packet->data, packet->dataLength);
-
-        long long ll = *(long long*)data_copy;
-        enet_packet_resize(packet, packet->dataLength - sizeof(long long));
-        memcpy(packet->data, (char*)data_copy + sizeof(long long), packet->dataLength);
-
-        SDL_free(data_copy);
-        return ll;
-    }
-
-    unsigned long long Packet::read_unsigned_long_long(void)
-    {
-        void* data_copy = SDL_malloc(packet->dataLength);
-        memcpy(data_copy, packet->data, packet->dataLength);
-
-        unsigned long long ull = *(unsigned long long*)data_copy;
-        enet_packet_resize(packet, packet->dataLength - sizeof(unsigned long long));
-        memcpy(packet->data, (char*)data_copy + sizeof(unsigned long long), packet->dataLength);
-
-        SDL_free(data_copy);
-        return ull;
-    }
-
     bool server = false;
     std::string server_ip = "localhost";
     int server_port = 65432;
@@ -361,6 +32,90 @@ namespace multiplayer
     ENetHost* host_instance;
     ENetPeer* peer;
 
+    std::vector<Player> players;
+
+    std::string last_uuid_hack;
+
+    std::string generate_uuid(void)
+    {
+#ifdef _WIN32
+        UUID uuid;
+        UuidCreate(&uuid);
+        unsigned char* str;
+        UuidToStringA(&uuid, &str);
+        std::string uuid_str = (char*)str;
+        RpcStringFreeA(&str);
+        return uuid_str;
+#else
+        uuid_t uuid;
+        uuid_generate_random(uuid);
+        char s[37];
+        uuid_unparse(uuid, s);
+        return std::string(s);
+#endif
+    }
+
+    void update_player_entities()
+    {
+        for (std::vector<Player>::iterator it = players.begin(); it != players.end(); ++it)
+        {
+            if (it->peer != peer)
+            {
+                // Check if this player is in the room we're now in
+                if (it->room_x == game.roomx && it->room_y == game.roomy)
+                {
+                    // Do they have an entity? If not, create one.
+                    bool found = false;
+                    for (int i = 0; i < obj.entities.size(); i++)
+                    {
+                        // if it's disabled, continue
+                        if (obj.entities[i].uuid == it->uuid)
+                        {
+                            found = true;
+                            obj.entities[i].xp = it->x;
+                            obj.entities[i].yp = it->y;
+                            obj.entities[i].dir = it->dir;
+                            obj.entities[i].behave = it->gravity; // behave is our gravity attribute
+                            obj.entities[i].colour = it->colour;
+                            obj.entities[i].invis = it->invis;
+                            obj.entities[i].para = it->deathseq; // para is our deathseq attribute
+                            break;
+                        }
+                    }
+                    if (!found)
+                    {
+                        // Ugh, VVVVVV STILL doesn't return the entity index when you create one.
+                        last_uuid_hack = it->uuid;
+                        obj.createentity(it->x, it->y, 999, it->invis, it->gravity, it->deathseq);
+
+                        // Now, find the entity we just created
+                        for (int i = 0; i < obj.entities.size(); i++)
+                        {
+                            if (obj.entities[i].uuid == last_uuid_hack)
+                            {
+                                obj.entities[i].colour = it->colour;
+                                obj.entities[i].dir = it->dir;
+                                break;
+                            }
+                        }
+
+                        last_uuid_hack = "";
+                    }
+                }
+                else
+                {
+                    // They're not. Do we have an entity for them? If so, remove them.
+                    for (int i = 0; i < obj.entities.size(); i++)
+                    {
+                        if (obj.entities[i].uuid == it->uuid)
+                        {
+                            obj.disableentity(i);
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     bool is_server(void)
     {
@@ -424,7 +179,7 @@ namespace multiplayer
         peer = enet_host_connect(host_instance, &server_address, 2, 0);
         if (peer == NULL)
         {
-            vlog_info("No available peers for initiating an ENet connection.\n");
+            vlog_info("No available peers for initiating an ENet connection.");
             return false;
         }
 
@@ -432,12 +187,12 @@ namespace multiplayer
         if (enet_host_service(host_instance, &event, 5000) > 0 &&
             event.type == ENET_EVENT_TYPE_CONNECT)
         {
-            vlog_info("Connection to %s:%d succeeded.\n", server_ip.c_str(), server_port);
+            vlog_info("Connection to %s:%d succeeded.", server_ip.c_str(), server_port);
             return true;
         }
         else
         {
-            vlog_info("Connection to %s:%d failed.\n", server_ip.c_str(), server_port);
+            vlog_info("Connection to %s:%d failed.", server_ip.c_str(), server_port);
             enet_peer_reset(peer);
             return false;
         }
@@ -451,50 +206,299 @@ namespace multiplayer
             switch (event.type)
             {
             case ENET_EVENT_TYPE_CONNECT:
-                vlog_info("A new client connected from %x:%u.\n",
+                vlog_info("A new client connected from %x:%u.",
                     event.peer->address.host,
                     event.peer->address.port);
 
                 /* Store any relevant client information here. */
-                event.peer->data = "Client information";
+                //event.peer->data = "Client information";
 
                 // If we're the server, send the client the current game state
                 if (is_server())
                 {
+                    Player player = Player(event.peer, "?", CONNECTING, "?");
+                    players.push_back(player);
+
                     Packet packet = Packet("connection", ENET_PACKET_FLAG_RELIABLE);
                     packet.write_int(1); // version 1
-                    packet.send(event.peer);
+                    packet.write_string("Test Server");
+                    player.send(&packet);
                 }
 
                 break;
             case ENET_EVENT_TYPE_RECEIVE:
-                /* Clean up the packet now that we're done using it. */
+                // We got a packet, create our fancy packet class (which will free the packet when it's done)
                 {
                     Packet packet = Packet(event.packet);
-
-                    if (SDL_strcmp(packet.id, "connection") == 0)
+                    Player* player = NULL;
+                    for (std::vector<Player>::iterator it = players.begin(); it != players.end(); ++it)
                     {
-                        if (packet.read_int() != 1)
+                        if (it->peer == event.peer)
                         {
-                            vlog_info("Client version mismatch.\n");
-                            enet_peer_disconnect(event.peer, 0);
+                            player = &(*it);
                             break;
                         }
-                        else
-                        {
-                            vlog_info("Client version match.\n");
-                        }
+                    }
 
-                        script.startgamemode(Start_SERVER);
+                    if (is_server())
+                    {
+                        if (SDL_strcmp(packet.id, "message") == 0)
+                        {
+                            if (player == NULL)
+                            {
+                                vlog_info("Received message from unknown player.");
+                                break;
+                            }
+
+                            vlog_info("[MESSAGE] <%s> %s", player->name.c_str(), packet.read_string().c_str());
+                        }
+                        else if (SDL_strcmp(packet.id, "client_info") == 0)
+                        {
+                            if (player == NULL)
+                            {
+                                vlog_info("Received client info from unknown player.");
+                                break;
+                            }
+
+                            std::string name = packet.read_string();
+                            std::string uuid = packet.read_string();
+
+                            player->name = name;
+
+                            // Check for conflicting UUIDs
+                            bool conflicting = false;
+                            for (std::vector<Player>::iterator it = players.begin(); it != players.end(); ++it)
+                            {
+                                if (it->uuid == uuid)
+                                {
+                                    vlog_info("Player %s has a conflicting UUID with player %s.", name.c_str(), it->name.c_str());
+                                    enet_peer_disconnect(event.peer, 0);
+                                    conflicting = true;
+                                    break;
+                                }
+                            }
+
+                            if (conflicting)
+                            {
+                                break;
+                            }
+
+                            player->connection_type = CONNECTED;
+                            player->uuid = uuid;
+
+                            vlog_info("Received client info from %s, UUID for this session is %s", player->name.c_str(), player->uuid.c_str());
+
+
+                            // Send a player_add packet to all players except the new player
+                            for (std::vector<Player>::iterator it = players.begin(); it != players.end(); ++it)
+                            {
+                                if (it->peer != event.peer)
+                                {
+                                    Packet packet = Packet("player_add", ENET_PACKET_FLAG_RELIABLE);
+                                    packet.write_string(player->name);
+                                    packet.write_string(player->uuid);
+                                    packet.write_int(player->room_x);
+                                    packet.write_int(player->room_y);
+                                    packet.write_int(player->x);
+                                    packet.write_int(player->y);
+                                    packet.write_int(player->gravity);
+                                    packet.write_int(player->invis);
+                                    packet.write_int(player->deathseq);
+                                    packet.write_int(player->colour);
+                                    packet.send(it->peer);
+                                }
+                            }
+
+                            // Send a player_add packet to the new player for all players, except the new player
+                            for (std::vector<Player>::iterator it = players.begin(); it != players.end(); ++it)
+                            {
+                                if (it->peer != event.peer)
+                                {
+                                    Packet packet = Packet("player_add", ENET_PACKET_FLAG_RELIABLE);
+                                    packet.write_string(it->name);
+                                    packet.write_string(it->uuid);
+                                    packet.write_int(it->room_x);
+                                    packet.write_int(it->room_y);
+                                    packet.write_int(it->x);
+                                    packet.write_int(it->y);
+                                    packet.write_int(it->gravity);
+                                    packet.write_int(it->invis);
+                                    packet.write_int(it->deathseq);
+                                    packet.write_int(it->colour);
+                                    packet.send(event.peer);
+                                }
+                            }
+                        }
+                        else if (SDL_strcmp(packet.id, "player_movement") == 0)
+                        {
+                            if (player == NULL)
+                            {
+                                vlog_info("Received player movement from unknown player.");
+                                break;
+                            }
+
+                            player->x = packet.read_int();
+                            player->y = packet.read_int();
+                            player->room_x = packet.read_int();
+                            player->room_y = packet.read_int();
+                            player->gravity = packet.read_int();
+                            player->dir = packet.read_int();
+
+                            vlog_info("Received player movement from %s.", player->name.c_str());
+
+                            // Tell all players about the player's movement
+
+                            for (std::vector<Player>::iterator it = players.begin(); it != players.end(); ++it)
+                            {
+                                if (it->peer != event.peer)
+                                {
+                                    Packet packet = Packet("player_movement", ENET_PACKET_FLAG_RELIABLE);
+                                    packet.write_string(player->uuid);
+                                    packet.write_int(player->x);
+                                    packet.write_int(player->y);
+                                    packet.write_int(player->room_x);
+                                    packet.write_int(player->room_y);
+                                    packet.write_int(player->gravity);
+                                    packet.write_int(player->dir);
+                                    packet.send(it->peer);
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (SDL_strcmp(packet.id, "connection") == 0)
+                        {
+                            if (packet.read_int() != 1)
+                            {
+                                vlog_info("Client version mismatch.");
+                                enet_peer_disconnect(event.peer, 0);
+                                break;
+                            }
+                            else
+                            {
+                                vlog_info("Client version match.");
+                            }
+
+                            vlog_info("Connected to server %s.", packet.read_string().c_str());
+
+                            // We got server information, so send client information!
+
+                            Packet packet = Packet("client_info", ENET_PACKET_FLAG_RELIABLE);
+                            packet.write_string("Ally");
+                            packet.write_string(generate_uuid());
+                            packet.send(event.peer);
+
+                            //script.startgamemode(Start_SERVER);
+                        }
+                        else if (SDL_strcmp(packet.id, "message") == 0)
+                        {
+                            vlog_info("[MESSAGE] <%s> %s", packet.read_string().c_str(), packet.read_string().c_str());
+                        }
+                        else if (SDL_strcmp(packet.id, "player_add") == 0)
+                        {
+                            std::string name = packet.read_string();
+                            std::string uuid = packet.read_string();
+
+                            Player player = Player(NULL, name, CONNECTED, uuid);
+                            player.room_x = packet.read_int();
+                            player.room_y = packet.read_int();
+                            player.x = packet.read_int();
+                            player.y = packet.read_int();
+                            player.gravity = packet.read_int();
+                            player.invis = packet.read_int();
+                            player.deathseq = packet.read_int();
+                            player.colour = packet.read_int();
+                            players.push_back(player);
+
+                            vlog_info("Player %s added, UUID %s", player.name.c_str(), player.uuid.c_str());
+                            update_player_entities();
+                        }
+                        else if (SDL_strcmp(packet.id, "player_remove") == 0)
+                        {
+                            std::string uuid = packet.read_string();
+
+                            bool found = false;
+                            for (std::vector<Player>::iterator it = players.begin(); it != players.end(); ++it)
+                            {
+                                if (it->uuid == uuid)
+                                {
+                                    found = true;
+                                    vlog_info("Removing player %s.", it->name.c_str());
+                                    players.erase(it);
+                                    break;
+                                }
+                            }
+                            if (!found)
+                            {
+                                vlog_info("Received player remove from unknown player.");
+                                break;
+                            }
+                            else
+                            {
+                                update_player_entities();
+                            }
+                        }
+                        else if (SDL_strcmp(packet.id, "player_movement") == 0)
+                        {
+                            std::string uuid = packet.read_string();
+
+                            bool found = false;
+                            for (std::vector<Player>::iterator it = players.begin(); it != players.end(); ++it)
+                            {
+                                if (it->uuid == uuid)
+                                {
+                                    it->x = packet.read_int();
+                                    it->y = packet.read_int();
+                                    it->room_x = packet.read_int();
+                                    it->room_y = packet.read_int();
+                                    it->gravity = packet.read_int();
+                                    it->dir = packet.read_int();
+                                    found = true;
+                                    break;
+                                }
+                            }
+                            if (!found)
+                            {
+                                vlog_info("Received player movement from unknown player.");
+                                break;
+                            }
+                            else
+                            {
+                                update_player_entities();
+                            }
+                        }
                     }
                 }
 
                 break;
 
             case ENET_EVENT_TYPE_DISCONNECT:
-                vlog_info("%s disconnected.\n", event.peer->data);
+                vlog_info("Peer disconnected.");
                 /* Reset the peer's client information. */
                 event.peer->data = NULL;
+
+                // Remove the player from the list
+                for (std::vector<Player>::iterator it = players.begin(); it != players.end(); ++it)
+                {
+                    if (it->peer == event.peer)
+                    {
+                        vlog_info("Removing player %s, UUID %s", it->name.c_str(), it->uuid.c_str());
+
+                        // Send a player_remove packet to all players
+
+                        for (std::vector<Player>::iterator it2 = players.begin(); it2 != players.end(); ++it2)
+                        {
+                            Packet packet = Packet("player_remove", ENET_PACKET_FLAG_RELIABLE);
+                            packet.write_string(it->uuid);
+                            packet.send(it2->peer);
+                        }
+
+                        players.erase(it);
+
+                        break;
+                    }
+                }
             }
         }
     }
@@ -505,5 +509,15 @@ namespace multiplayer
         {
             enet_host_destroy(host_instance);
         }
+    }
+
+    void send_to_server(Packet* packet)
+    {
+        packet->send(peer);
+    }
+
+    void gotoroom()
+    {
+        update_player_entities();
     }
 }

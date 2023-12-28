@@ -11,6 +11,7 @@
 #include "Localization.h"
 #include "MakeAndPlay.h"
 #include "Maths.h"
+#include "Multiplayer.h"
 #include "Music.h"
 #include "Script.h"
 #include "Unused.h"
@@ -1059,6 +1060,8 @@ void mapclass::gotoroom(int rx, int ry)
         //We've changed room? Let's bring our companion along!
         spawncompanion();
     }
+
+    multiplayer::gotoroom();
 }
 
 void mapclass::spawncompanion(void)

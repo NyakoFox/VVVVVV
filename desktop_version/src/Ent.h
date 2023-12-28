@@ -2,6 +2,7 @@
 #define ENT_H
 
 #include <SDL.h>
+#include <string>
 
 #define        rn( rx,  ry) ((rx) + ((ry) * 100))
 
@@ -55,6 +56,8 @@ public:
 
     SDL_Color realcol;
     int lerpoldxp, lerpoldyp;
+
+    std::string uuid;
 };
 
 #endif /* ENT_H */

@@ -93,6 +93,8 @@ set(VVV_SRC
     src/Multiplayer.cpp
     src/Music.cpp
     src/Otherlevel.cpp
+    src/Packet.cpp
+    src/Player.cpp
     src/preloader.cpp
     src/Render.cpp
     src/RenderFixed.cpp
@@ -479,4 +481,11 @@ endif()
 if(EMSCRIPTEN)
     # 256MB is enough for everybody
     target_link_libraries(VVVVVV -sFORCE_FILESYSTEM=1 -sTOTAL_MEMORY=256MB)
+endif()
+
+# UUIDs
+if(NOT WIN32)
+    # probably not a good idea, but whatever
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -luuid")
+    target_link_libraries(VVVVVV uuid)
 endif()

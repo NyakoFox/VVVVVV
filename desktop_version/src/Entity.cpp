@@ -1137,6 +1137,7 @@ bool entityclass::disableentity(int t)
     entities[t].type = -1;
     entities[t].rule = -1;
     entities[t].isplatform = false;
+    entities[t].uuid = "";
 
     return true;
 }
@@ -2138,6 +2139,29 @@ void entityclass::createentity(int xp, int yp, int t, int meta1, int meta2, int 
 
         entityclonefix(&entity);
         break;
+      case 999: // Multiplayer player
+          entity.rule = 999; // Multiplayer player
+          entity.type = 999;
+          entity.tile = 0;
+          entity.colour = 0;
+          entity.cx = 6;
+          entity.cy = 2;
+          entity.w = 12;
+          entity.h = 21;
+          entity.dir = 1;
+          entity.uuid = multiplayer::last_uuid_hack;
+
+          entity.behave = meta2; // gravitycontrol
+          entity.para = p1;      // deathseq
+
+          /* Fix wrong y-position if spawning in on conveyor */
+          entity.newxp = xp;
+          entity.newyp = yp;
+
+          if (meta1 == 1) entity.invis = true;
+
+          entity.gravity = true;
+          break;
     }
 
     entity.lerpoldxp = entity.xp;
@@ -3782,6 +3806,55 @@ void entityclass::animateentities( int _i )
                 entities[_i].drawframe += entities[_i].walkingframe;
             }
             break;
+        case 999:
+            entities[_i].framedelay--;
+            if (entities[_i].dir == 1)
+            {
+                entities[_i].drawframe = entities[_i].tile;
+            }
+            else
+            {
+                entities[_i].drawframe = entities[_i].tile + 3;
+            }
+
+            if (entities[_i].visualonground > 0 || entities[_i].visualonroof > 0)
+            {
+                if (entities[_i].vx > 0.00f || entities[_i].vx < -0.00f)
+                {
+                    //Walking
+                    if (entities[_i].framedelay <= 1)
+                    {
+                        entities[_i].framedelay = 4;
+                        entities[_i].walkingframe++;
+                    }
+                    if (entities[_i].walkingframe >= 2) entities[_i].walkingframe = 0;
+                    entities[_i].drawframe += entities[_i].walkingframe + 1;
+                }
+
+                if (entities[_i].visualonroof > 0) entities[_i].drawframe += 6;
+                // Stuck in a wall? Then default to gravitycontrol
+                if (entities[_i].visualonground > 0 && entities[_i].visualonroof > 0
+                    && entities[_i].behave == 0)
+                {
+                    entities[_i].drawframe -= 6;
+                }
+            }
+            else
+            {
+                entities[_i].drawframe++;
+                if (entities[_i].behave == 1)
+                {
+                    entities[_i].drawframe += 6;
+                }
+            }
+
+            if (entities[_i].para > -1)
+            {
+                entities[_i].drawframe = 13;
+                if (entities[_i].dir == 1) entities[_i].drawframe = 12;
+                if (entities[_i].behave == 1) entities[_i].drawframe += 2;
+            }
+            break;
         default:
             entities[_i].drawframe = entities[_i].tile;
             break;
@@ -4581,6 +4654,17 @@ void entityclass::updateentitylogic( int t )
         else if (entities[t].rule == 7)
         {
             entities[t].ay = -3;
+        }
+        else if (entities[t].rule == 999)
+        {
+            if (entities[t].behave == 0)
+            {
+                entities[t].ay = 3;
+            }
+            else
+            {
+                entities[t].ay = -3;
+            }
         }
         else
         {

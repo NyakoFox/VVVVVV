@@ -7,8 +7,10 @@
 #include "Graphics.h"
 #include "LevelDebugger.h"
 #include "Map.h"
+#include "Multiplayer.h"
 #include "Music.h"
 #include "Network.h"
+#include "Packet.h"
 #include "Script.h"
 #include "UtilityClass.h"
 
@@ -1400,6 +1402,30 @@ void gamelogic(void)
         if (roomchange)
         {
             map.twoframedelayfix();
+        }
+
+        // Okay, did the player move or switch rooms?
+        // First, check if there IS a player
+        int i = obj.getplayer();
+        if (INBOUNDS_VEC(i, obj.entities))
+        {
+            //Second, check if the player moved
+            if (obj.entities[i].xp != obj.entities[i].oldxp || obj.entities[i].yp != obj.entities[i].oldyp)
+            {
+                // If so, send a movement packet
+                if (!multiplayer::is_server())
+                {
+                    Packet packet = Packet("player_movement", ENET_PACKET_FLAG_RELIABLE);
+                    packet.write_int(obj.entities[i].xp);
+                    packet.write_int(obj.entities[i].yp);
+                    packet.write_int(game.roomx);
+                    packet.write_int(game.roomy);
+                    packet.write_int(game.gravitycontrol);
+                    packet.write_int(obj.entities[i].dir);
+
+                    multiplayer::send_to_server(&packet);
+                }
+            }
         }
     }
 
