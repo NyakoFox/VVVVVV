@@ -1,6 +1,8 @@
 #ifndef INPUT_H
 #define INPUT_H
 
+#include "Script.h"
+
 extern bool fadetomode;
 
 void titleinput(void);
