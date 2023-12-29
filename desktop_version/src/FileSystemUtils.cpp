@@ -940,7 +940,6 @@ bool FILESYSTEM_loadBinaryBlob(binaryBlob* blob, const char* filename)
 
         // Read the headers
         SDL_memcpy((void*) blob->m_headers, (void*) multiplayer::assets_data[filename].first, sizeof(blob->m_headers));
-
     }
     else
     {
@@ -1031,16 +1030,24 @@ bool FILESYSTEM_loadBinaryBlob(binaryBlob* blob, const char* filename)
         if (from_memory)
         {
             int bytes_read = 0;
+
+            unsigned char* data = multiplayer::assets_data[filename].first;
+
             for (unsigned int j = 0; j < header->size; j++)
             {
-                if (old_offset + j >= multiplayer::assets_data[filename].second)
+                if (old_offset + j >= size)
                 {
                     vlog_warn("Unexpected EOF");
                     break;
                 }
-                (*memblock)[j] = multiplayer::assets_data[filename].first[old_offset + j];
+                (*memblock)[j] = data[old_offset + j];
                 bytes_read++;
             }
+
+            // Faster, but less safe:
+            //SDL_memcpy((void*) *memblock, (void*) &multiplayer::assets_data[filename].first[old_offset], header->size);
+            //bytes_read = header->size;
+
 
             header->size = bytes_read;
         }
