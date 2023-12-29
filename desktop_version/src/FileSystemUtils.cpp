@@ -1024,18 +1024,21 @@ bool FILESYSTEM_loadBinaryBlob(binaryBlob* blob, const char* filename)
         {
             VVV_exit(1); /* Oh god we're out of memory, just bail */
         }
+
+        int old_offset = offset;
+
         offset += header->size;
         if (from_memory)
         {
             int bytes_read = 0;
             for (unsigned int j = 0; j < header->size; j++)
             {
-                if (offset + j >= multiplayer::assets_data[filename].second)
+                if (old_offset + j >= multiplayer::assets_data[filename].second)
                 {
                     vlog_warn("Unexpected EOF");
                     break;
                 }
-                (*memblock)[j] = multiplayer::assets_data[filename].first[offset + j];
+                (*memblock)[j] = multiplayer::assets_data[filename].first[old_offset + j];
                 bytes_read++;
             }
 
