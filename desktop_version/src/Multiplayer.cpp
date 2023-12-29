@@ -6,10 +6,18 @@
 
 #include "Multiplayer.h"
 
+#include "Constants.h"
+#include "CustomLevels.h"
 #include "Entity.h"
+#include "Font.h"
 #include "Game.h"
+#include "Graphics.h"
+#include "Input.h"
+#include "Map.h"
+#include "Music.h"
 #include "Packet.h"
 #include "Player.h"
+#include "RenderFixed.h"
 #include "Script.h"
 #include "Vlogging.h"
 
@@ -30,6 +38,14 @@ namespace multiplayer
     std::string server_ip = "localhost";
     int server_port = 65432;
 
+    bool connected = false;
+    bool connecting = false;
+    bool did_startmode = false;
+    bool should_start = false;
+
+    int total_rooms = 0;
+    int waiting_for_rooms = -1;
+
     ENetAddress server_address;
     ENetHost* host_instance;
     ENetPeer* peer;
@@ -37,6 +53,9 @@ namespace multiplayer
     std::vector<Player> players;
 
     std::string last_uuid_hack;
+
+    int timeout = 5 * 30; // 5 seconds
+    int viridian_position = 160;
 
     bool should_update_player = false;
     bool should_update_player_movement = false;
@@ -89,12 +108,12 @@ namespace multiplayer
             packet.write_int(obj.entities[i].yp);
             packet.write_int(game.roomx);
             packet.write_int(game.roomy);
-            packet.write_int(game.gravitycontrol);
-            packet.write_int(obj.entities[i].dir);
             packet.write_float(obj.entities[i].ax);
             packet.write_float(obj.entities[i].ay);
             packet.write_float(obj.entities[i].vx);
             packet.write_float(obj.entities[i].vy);
+            packet.write_int(game.gravitycontrol);
+            packet.write_int(obj.entities[i].dir);
 
             multiplayer::send_to_server(&packet);
         }
@@ -252,26 +271,35 @@ namespace multiplayer
 
     bool connect_to_server(void)
     {
-        peer = enet_host_connect(host_instance, &server_address, 2, 0);
+        if (peer == NULL)
+        {
+            peer = enet_host_connect(host_instance, &server_address, 2, 0);
+        }
+        else
+        {
+            vlog_info("Tried to connect while already connected!");
+            return false;
+        }
+
+        script.hardreset();
+
+        timeout = 5 * 30; // 5 seconds
+        viridian_position = 160;
+        connected = false;
+        connecting = true;
+        did_startmode = false;
+        should_start = false;
+
+        total_rooms = 0;
+        waiting_for_rooms = -1;
+
         if (peer == NULL)
         {
             vlog_info("No available peers for initiating an ENet connection.");
             return false;
         }
 
-        ENetEvent event;
-        if (enet_host_service(host_instance, &event, 5000) > 0 &&
-            event.type == ENET_EVENT_TYPE_CONNECT)
-        {
-            vlog_info("Connection to %s:%d succeeded.", server_ip.c_str(), server_port);
-            return true;
-        }
-        else
-        {
-            vlog_info("Connection to %s:%d failed.", server_ip.c_str(), server_port);
-            enet_peer_reset(peer);
-            return false;
-        }
+        return true;
     }
 
     void update(void)
@@ -282,6 +310,10 @@ namespace multiplayer
             switch (event.type)
             {
             case ENET_EVENT_TYPE_CONNECT:
+
+                connecting = false;
+                connected = true;
+
                 vlog_info("A new client connected from %x:%u.",
                     event.peer->address.host,
                     event.peer->address.port);
@@ -295,7 +327,7 @@ namespace multiplayer
                     Player player = Player(event.peer, "?", CONNECTING, "?");
                     players.push_back(player);
 
-                    Packet packet = Packet("connection", ENET_PACKET_FLAG_RELIABLE);
+                    Packet packet = Packet("server_info", ENET_PACKET_FLAG_RELIABLE);
                     packet.write_int(1); // version 1
                     packet.write_string("Test Server");
                     player.send(&packet);
@@ -382,6 +414,7 @@ namespace multiplayer
                                     packet.write_int(player->vx);
                                     packet.write_int(player->vy);
                                     packet.write_int(player->gravity);
+                                    packet.write_int(player->dir);
                                     packet.write_int(player->invis);
                                     packet.write_int(player->deathseq);
                                     packet.write_int(player->colour);
@@ -406,11 +439,71 @@ namespace multiplayer
                                     packet.write_int(it->vx);
                                     packet.write_int(it->vy);
                                     packet.write_int(it->gravity);
+                                    packet.write_int(it->dir);
                                     packet.write_int(it->invis);
                                     packet.write_int(it->deathseq);
                                     packet.write_int(it->colour);
                                     packet.send(event.peer);
                                 }
+                            }
+
+                            // Send the player general level information
+                            Packet packet = Packet("level_info", ENET_PACKET_FLAG_RELIABLE);
+
+                            packet.write_bool(map.custommode);
+
+                            packet.write_string(cl.title);
+                            packet.write_string(cl.creator);
+                            packet.write_string(cl.website);
+                            packet.write_string(cl.Desc1);
+                            packet.write_string(cl.Desc2);
+                            packet.write_string(cl.Desc3);
+
+                            packet.write_int(map.getwidth());
+                            packet.write_int(map.getheight());
+
+                            packet.send(event.peer);
+
+                            // Send the player all of the rooms
+
+                            for (int i = 0; i < map.getwidth() * map.getheight(); i++)
+                            {
+                                int x = i % map.getwidth();
+                                int y = floor(i / map.getwidth());
+
+                                Packet packet = Packet("room_info", ENET_PACKET_FLAG_RELIABLE);
+
+                                packet.write_int(x);
+                                packet.write_int(y);
+
+                                // get the room properties
+                                const RoomProperty* properties = cl.getroomprop(x, y);
+
+                                packet.write_int(properties->tileset);
+                                packet.write_int(properties->tilecol);
+                                packet.write_int(properties->platx1);
+                                packet.write_int(properties->platy1);
+                                packet.write_int(properties->platx2);
+                                packet.write_int(properties->platy2);
+                                packet.write_int(properties->platv);
+                                packet.write_int(properties->enemyx1);
+                                packet.write_int(properties->enemyy1);
+                                packet.write_int(properties->enemyx2);
+                                packet.write_int(properties->enemyy2);
+                                packet.write_int(properties->enemytype);
+                                packet.write_int(properties->directmode);
+                                packet.write_int(properties->warpdir);
+                                packet.write_string(properties->roomname);
+
+                                // Send the map contents
+                                for (int i = 0; i < SCREEN_WIDTH_TILES * SCREEN_HEIGHT_TILES; i++)
+                                {
+                                    int x2 = i % SCREEN_WIDTH_TILES;
+                                    int y2 = floor(i / SCREEN_WIDTH_TILES);
+                                    packet.write_int(cl.gettile(x, y, x2, y2));
+                                }
+
+                                packet.send(event.peer);
                             }
                         }
                         else if (SDL_strcmp(packet.id, "player_movement") == 0)
@@ -425,12 +518,12 @@ namespace multiplayer
                             player->y = packet.read_int();
                             player->room_x = packet.read_int();
                             player->room_y = packet.read_int();
-                            player->gravity = packet.read_int();
-                            player->dir = packet.read_int();
                             player->ax = packet.read_float();
                             player->ay = packet.read_float();
                             player->vx = packet.read_float();
                             player->vy = packet.read_float();
+                            player->gravity = packet.read_int();
+                            player->dir = packet.read_int();
 
                             // Tell all players about the player's movement
 
@@ -444,12 +537,12 @@ namespace multiplayer
                                     packet.write_int(player->y);
                                     packet.write_int(player->room_x);
                                     packet.write_int(player->room_y);
-                                    packet.write_int(player->gravity);
-                                    packet.write_int(player->dir);
                                     packet.write_float(player->ax);
                                     packet.write_float(player->ay);
                                     packet.write_float(player->vx);
                                     packet.write_float(player->vy);
+                                    packet.write_int(player->gravity);
+                                    packet.write_int(player->dir);
                                     packet.send(it->peer);
                                 }
                             }
@@ -485,7 +578,7 @@ namespace multiplayer
                     }
                     else
                     {
-                        if (SDL_strcmp(packet.id, "connection") == 0)
+                        if (SDL_strcmp(packet.id, "server_info") == 0)
                         {
                             if (packet.read_int() != 1)
                             {
@@ -528,6 +621,7 @@ namespace multiplayer
                             player.vx = packet.read_float();
                             player.vy = packet.read_float();
                             player.gravity = packet.read_int();
+                            player.dir = packet.read_int();
                             player.invis = packet.read_int();
                             player.deathseq = packet.read_int();
                             player.colour = packet.read_int();
@@ -574,12 +668,12 @@ namespace multiplayer
                                     it->y = packet.read_int();
                                     it->room_x = packet.read_int();
                                     it->room_y = packet.read_int();
-                                    it->gravity = packet.read_int();
-                                    it->dir = packet.read_int();
                                     it->ax = packet.read_float();
                                     it->ay = packet.read_float();
                                     it->vx = packet.read_float();
                                     it->vy = packet.read_float();
+                                    it->gravity = packet.read_int();
+                                    it->dir = packet.read_int();
                                     found = true;
                                     break;
                                 }
@@ -620,6 +714,63 @@ namespace multiplayer
                                 update_player_entities();
                             }
                         }
+                        else if (SDL_strcmp(packet.id, "level_info") == 0)
+                        {
+                            map.custommode = packet.read_bool();
+                            map.custommodeforreal = map.custommode;
+                            cl.title = packet.read_string();
+                            cl.creator = packet.read_string();
+                            cl.website = packet.read_string();
+                            cl.Desc1 = packet.read_string();
+                            cl.Desc2 = packet.read_string();
+                            cl.Desc3 = packet.read_string();
+
+                            int width = packet.read_int();
+                            int height = packet.read_int();
+
+                            cl.mapwidth = width;
+                            cl.mapheight = height;
+
+                            waiting_for_rooms = width * height;
+                        }
+                        else if (SDL_strcmp(packet.id, "room_info") == 0)
+                        {
+                            int x = packet.read_int();
+                            int y = packet.read_int();
+
+                            // get the room properties
+                            const RoomProperty* properties = cl.getroomprop(x, y);
+                            cl.setroomtileset(x, y, packet.read_int());
+                            cl.setroomtilecol(x, y, packet.read_int());
+                            cl.setroomplatx1(x, y, packet.read_int());
+                            cl.setroomplaty1(x, y, packet.read_int());
+                            cl.setroomplatx2(x, y, packet.read_int());
+                            cl.setroomplaty2(x, y, packet.read_int());
+                            cl.setroomplatv(x, y, packet.read_int());
+                            cl.setroomenemyx1(x, y, packet.read_int());
+                            cl.setroomenemyy1(x, y, packet.read_int());
+                            cl.setroomenemyx2(x, y, packet.read_int());
+                            cl.setroomenemyy2(x, y, packet.read_int());
+                            cl.setroomenemytype(x, y, packet.read_int());
+                            cl.setroomdirectmode(x, y, packet.read_int());
+                            cl.setroomwarpdir(x, y, packet.read_int());
+                            cl.setroomroomname(x, y, packet.read_string());
+
+                            // Get the map contents
+
+                            for (int i = 0; i < SCREEN_WIDTH_TILES * SCREEN_HEIGHT_TILES; i++)
+                            {
+                                int x2 = i % SCREEN_WIDTH_TILES;
+                                int y2 = floor(i / SCREEN_WIDTH_TILES);
+                                cl.settile(x, y, x2, y2, packet.read_int());
+                            }
+
+                            total_rooms++;
+                            if (total_rooms >= waiting_for_rooms && waiting_for_rooms != -1)
+                            {
+                                should_start = true;
+                            }
+                        }
                     }
                 }
 
@@ -658,6 +809,21 @@ namespace multiplayer
             send_player_update_packet();
         if (should_update_player_movement)
             send_player_movement_packet();
+
+        if (!connected && connecting)
+        {
+            timeout--;
+            if (timeout <= 0)
+            {
+                vlog_info("Connection to %s:%d timed out.", server_ip.c_str(), server_port);
+                enet_peer_reset(peer);
+                //enet_host_destroy(host_instance);
+                peer = NULL;
+                connected = false;
+                connecting = false;
+                return;
+            }
+        }
     }
 
     void cleanup(void)
@@ -721,6 +887,112 @@ namespace multiplayer
         if (!multiplayer::is_server())
         {
             should_update_player_movement = true;
+        }
+    }
+}
+
+void connectingrender(void)
+{
+    graphics.clear();
+
+    if (!game.colourblindmode) graphics.drawtowerbackground(graphics.titlebg);
+
+    int tr = graphics.col_tr;
+    int tg = graphics.col_tg;
+    int tb = graphics.col_tb;
+
+    tr = int(tr * .8f);
+    tg = int(tg * .8f);
+    tb = int(tb * .8f);
+    if (tr < 0) tr = 0;
+    if (tr > 255) tr = 255;
+    if (tg < 0) tg = 0;
+    if (tg > 255) tg = 255;
+    if (tb < 0) tb = 0;
+    if (tb > 255) tb = 255;
+
+    graphics.draw_rect(64, 128, 192, 16, tr, tg, tb);
+
+    font::print(PR_2X | PR_CEN, -1, 65, "Connecting...", tr, tg, tb);
+    if (multiplayer::connected)
+    {
+        font::print(PR_CEN, -1, 95, "Joining server...", tr, tg, tb);
+
+        int progress = ((float)multiplayer::total_rooms / (float)multiplayer::waiting_for_rooms) * 188;
+
+        graphics.fill_rect(66, 130, progress, 12, tr, tg, tb);
+    }
+    else
+    {
+        font::print(PR_CEN, -1, 95, "Connecting to the server...", tr, tg, tb);
+    }
+
+    graphics.draw_sprite(multiplayer::viridian_position, 240 / 2 + 64, graphics.crewframe, graphics.col_crewcyan);
+    graphics.draw_sprite(multiplayer::viridian_position - 320, 240 / 2 + 64, graphics.crewframe, graphics.col_crewcyan);
+
+    graphics.drawfade();
+
+    graphics.renderwithscreeneffects();
+}
+
+void connectingrenderfixed(void)
+{
+    if (!game.colourblindmode)
+    {
+        graphics.updatetowerbackground(graphics.titlebg);
+    }
+
+    titleupdatetextcol();
+
+    graphics.updatetitlecolours();
+
+    multiplayer::viridian_position += 6;
+    if (multiplayer::viridian_position > 320)
+    {
+        multiplayer::viridian_position -= 320;
+    }
+
+    graphics.crewframedelay--;
+    if (graphics.crewframedelay <= 0)
+    {
+        graphics.crewframedelay = 4;
+        graphics.crewframe = (graphics.crewframe + 1) % 2;
+    }
+}
+
+void connectinginput(void)
+{
+    // Press R to cancel maybe?
+
+    if (fadetomode)
+    {
+        handlefadetomode();
+    }
+}
+
+void connectinglogic(void)
+{
+    help.updateglow();
+
+    graphics.titlebg.bypos -= 2;
+    graphics.titlebg.bscroll = -2;
+
+    // If we're no longer trying to connect
+    if (!multiplayer::connecting)
+    {
+        if (!multiplayer::connected)
+        {
+            // We didn't connect, so probably a timeout
+            map.nexttowercolour();
+            music.playef(Sound_CRY);
+            game.createmenu(Menu::connectiontimeout, false);
+            game.gamestate = TITLEMODE;
+        }
+        else if (!multiplayer::did_startmode && multiplayer::should_start)
+        {
+            multiplayer::did_startmode = true;
+            // We did connect, so fade out the screen
+            startmode(Start_SERVER);
         }
     }
 }

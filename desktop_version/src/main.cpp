@@ -190,6 +190,13 @@ static const inline struct ImplFunc* get_gamestate_funcs(
         {Func_delta, preloaderrender},
     FUNC_LIST_END
 
+    FUNC_LIST_BEGIN(CONNECTINGMODE)
+        {Func_input, connectinginput},
+        {Func_fixed, connectingrenderfixed},
+        {Func_delta, connectingrender},
+        {Func_fixed, connectinglogic},
+    FUNC_LIST_END
+
 #undef FUNC_LIST_END
 #undef FUNC_LIST_BEGIN
 
@@ -783,11 +790,6 @@ int main(int argc, char* argv[])
         {
             vlog_error("An error occurred while trying to create an ENet client host.");
             VVV_exit(1);
-        }
-
-        if (!multiplayer::connect_to_server())
-        {
-            vlog_error("Couldn't connect to server.");
         }
     }
 

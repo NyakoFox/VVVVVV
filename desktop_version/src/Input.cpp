@@ -286,11 +286,11 @@ static void toggleflipmode(void)
     }
 }
 
-static bool fadetomode = false;
+bool fadetomode = false;
 static int fadetomodedelay = 0;
 static enum StartMode gotomode = Start_MAINGAME;
 
-static void startmode(const enum StartMode mode)
+void startmode(const enum StartMode mode)
 {
     gotomode = mode;
     graphics.fademode = FADE_START_FADEOUT;
@@ -298,7 +298,7 @@ static void startmode(const enum StartMode mode)
     fadetomodedelay = 19;
 }
 
-static void handlefadetomode(void)
+void handlefadetomode(void)
 {
     if (game.ingame_titlemode)
     {
@@ -394,14 +394,13 @@ static void menuactionpress(void)
 #if !defined(MAKEANDPLAY)
         OPTION_ID(0) /* play */
 #endif
-        OPTION_ID(1) /* levels */
-        OPTION_ID(2) /* options */
+        OPTION_ID(1) /* options */
         if (loc::show_translator_menu)
         {
-            OPTION_ID(3) /* translator */
+            OPTION_ID(2) /* translator */
         }
-        OPTION_ID(4) /* credits */
-        OPTION_ID(5) /* quit */
+        OPTION_ID(3) /* credits */
+        OPTION_ID(4) /* quit */
 
 #undef OPTION_ID
 
@@ -411,47 +410,31 @@ static void menuactionpress(void)
 #if !defined(MAKEANDPLAY)
         case 0:
             //Play
-            if (!game.save_exists() && !game.anything_unlocked())
-            {
-                //No saves exist, just start a new game
-                music.playef(Sound_VIRIDIAN);
-                startmode(Start_MAINGAME);
-            }
-            else
-            {
-                //Bring you to the normal playmenu
-                music.playef(Sound_VIRIDIAN);
-                game.createmenu(Menu::play);
-                map.nexttowercolour();
-            }
+            //Bring you to the normal playmenu
+            music.playef(Sound_VIRIDIAN);
+            game.createmenu(Menu::serverselect);
+            map.nexttowercolour();
             break;
 #endif
         case 1:
-            //Bring you to the normal playmenu
-            music.playef(Sound_VIRIDIAN);
-            game.editor_disabled = !BUTTONGLYPHS_keyboard_is_available();
-            game.createmenu(Menu::playerworlds);
-            map.nexttowercolour();
-            break;
-        case 2:
             //Options
             music.playef(Sound_VIRIDIAN);
             game.createmenu(Menu::options);
             map.nexttowercolour();
             break;
-        case 3:
+        case 2:
             //Translator
             music.playef(Sound_VIRIDIAN);
             game.createmenu(Menu::translator_main);
             map.nexttowercolour();
             break;
-        case 4:
+        case 3:
             //Credits
             music.playef(Sound_VIRIDIAN);
             game.createmenu(Menu::credits);
             map.nexttowercolour();
             break;
-        case 5:
+        case 4:
             music.playef(Sound_VIRIDIAN);
             game.createmenu(Menu::youwannaquit);
             map.nexttowercolour();
@@ -2247,6 +2230,50 @@ static void menuactionpress(void)
         music.playef(Sound_VIRIDIAN);
         game.returnmenu();
         map.nexttowercolour();
+        break;
+    case Menu::serverselect:
+        music.playef(Sound_VIRIDIAN);
+        map.nexttowercolour();
+
+        switch (game.currentmenuoption)
+        {
+        case 0:
+            if (!multiplayer::connect_to_server())
+            {
+                game.createmenu(Menu::nopeers);
+            }
+            else
+            {
+                game.gamestate = CONNECTINGMODE;
+            }
+            break;
+        case 1:
+            game.returnmenu();
+            break;
+        }
+        break;
+    case Menu::connectiontimeout:
+    case Menu::nopeers:
+        music.playef(Sound_VIRIDIAN);
+        map.nexttowercolour();
+
+        switch (game.currentmenuoption)
+        {
+            case 0:
+                game.returnmenu();
+                break;
+            case 1:
+                game.returnmenu();
+                if (!multiplayer::connect_to_server())
+                {
+                    game.createmenu(Menu::nopeers);
+                }
+                else
+                {
+                    game.gamestate = CONNECTINGMODE;
+                }
+                break;
+        }
         break;
     default:
         break;

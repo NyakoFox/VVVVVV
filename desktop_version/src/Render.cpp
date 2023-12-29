@@ -1811,6 +1811,20 @@ static void menurender(void)
         font::print_wrap(PR_CEN, -1, 65, message, tr, tg, tb);
         break;
     }
+    case Menu::serverselect:
+        font::print(PR_2X | PR_CEN | PR_CJK_HIGH, -1, 30, loc::gettext("Select Server"), tr, tg, tb);
+        font::print_wrap(PR_CEN, -1, 65, loc::gettext("Select a server to connect to."), tr, tg, tb);
+
+        font::print_wrap(PR_CEN, -1, 95, loc::gettext("For now, pressing ACTION will connect you to the server you entered in -host, or localhost if not specified."), tr, tg, tb);
+        break;
+    case Menu::connectiontimeout:
+        font::print(PR_2X | PR_CEN | PR_CJK_HIGH, -1, 30, loc::gettext("Connection Timeout"), tr, tg, tb);
+        font::print_wrap(PR_CEN, -1, 65, loc::gettext("The connection to the server timed out. The server might be down."), tr, tg, tb);
+        break;
+    case Menu::nopeers:
+        font::print(PR_2X | PR_CEN | PR_CJK_HIGH, -1, 30, loc::gettext("Connection Error"), tr, tg, tb);
+        font::print_wrap(PR_CEN, -1, 65, loc::gettext("No peers available to initiate a connection."), tr, tg, tb);
+        break;
     default:
         break;
     }

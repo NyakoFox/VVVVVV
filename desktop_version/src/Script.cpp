@@ -2675,7 +2675,11 @@ void scriptclass::startgamemode(const enum StartMode mode)
         break;
     }
 
-    hardreset();
+    // Don't hardreset if we're connecting to a server, because we already did!
+    if (mode != Start_SERVER)
+    {
+        hardreset();
+    }
 
     if (mode == Start_EDITOR)
     {
@@ -2689,6 +2693,12 @@ void scriptclass::startgamemode(const enum StartMode mode)
     // Font handling
     switch (mode)
     {
+    case Start_SERVER:
+        if (!map.custommode)
+        {
+            font::set_level_font_interface();
+        }
+        break;
     case Start_EDITORPLAYTESTING:
     case Start_CUSTOM:
     case Start_CUSTOM_QUICKSAVE:
@@ -2959,6 +2969,24 @@ void scriptclass::startgamemode(const enum StartMode mode)
 
     case Start_QUIT:
         VVV_unreachable();
+        break;
+
+    case Start_SERVER:
+        music.fadeout();
+        //map.custommodeforreal = true;
+        //map.custommode = true;
+
+        if (map.custommode)
+        {
+            cl.findstartpoint();
+            game.customstart();
+        }
+        else
+        {
+            game.start();
+        }
+
+        graphics.fademode = FADE_START_FADEIN;
         break;
     }
 

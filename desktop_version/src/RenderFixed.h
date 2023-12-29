@@ -13,4 +13,6 @@ void gamecompleterenderfixed(void);
 
 void gamecompleterenderfixed2(void);
 
+void titleupdatetextcol(void);
+
 #endif /* RENDERFIXED_H */

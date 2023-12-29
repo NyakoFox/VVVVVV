@@ -6306,7 +6306,6 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
 #if !defined(MAKEANDPLAY)
         option(loc::gettext("play"));
 #endif
-        option(loc::gettext("levels"));
         option(loc::gettext("options"));
         if (loc::show_translator_menu)
         {
@@ -7052,6 +7051,20 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
     case Menu::errorloadinglevel:
     case Menu::warninglevellist:
         option(loc::gettext("ok"));
+        menuyoff = 50;
+        break;
+    case Menu::serverselect:
+        option(loc::gettext("ok"));
+        option(loc::gettext("return"));
+
+        menuyoff = 50;
+        break;
+    case Menu::connectiontimeout:
+    case Menu::nopeers:
+        option(loc::gettext("ok"));
+        option(loc::gettext("retry"));
+
+        menuspacing = 5;
         menuyoff = 50;
         break;
     }

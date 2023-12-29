@@ -36,4 +36,9 @@ namespace multiplayer
     void update_player_position(void);
 }
 
+void connectingrender(void);
+void connectingrenderfixed(void);
+void connectinginput(void);
+void connectinglogic(void);
+
 #endif /* MULTIPLAYER_H */
