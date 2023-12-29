@@ -49,10 +49,8 @@ namespace multiplayer
     bool did_startmode = false;
     bool should_start = false;
 
-    int total_rooms = 0;
-    int waiting_for_rooms = -1;
-    int total_assets = 0;
-    int waiting_for_assets = -1;
+    int total_packets = 0;
+    int waiting_for_packets = -1;
 
     std::vector<std::string> assets;
     std::map<std::string, std::pair<unsigned char*, size_t> > assets_data;
@@ -329,10 +327,8 @@ namespace multiplayer
         did_startmode = false;
         should_start = false;
 
-        total_rooms = 0;
-        waiting_for_rooms = -1;
-        total_assets = 0;
-        waiting_for_assets = -1;
+        total_packets = 0;
+        waiting_for_packets = -1;
 
         if (peer == NULL)
         {
@@ -508,6 +504,8 @@ namespace multiplayer
                             packet.write_string(cl.level_font_name);
 
                             packet.write_int(assets.size());
+                            packet.write_int(script.customscripts.size());
+                            packet.write_int(customentities.size());
 
                             packet.send(event.peer);
 
@@ -577,6 +575,39 @@ namespace multiplayer
 
                                 VVV_free(fileIn);
                             }
+
+                            // Send the player all scripts
+                            for (int i = 0; i < script.customscripts.size(); i++)
+                            {
+                                Packet packet = Packet("level_script", ENET_PACKET_FLAG_RELIABLE);
+                                packet.write_string(script.customscripts[i].name);
+                                packet.write_int(script.customscripts[i].contents.size());
+                                for (int j = 0; j < script.customscripts[i].contents.size(); j++)
+                                {
+                                    packet.write_string(script.customscripts[i].contents[j]);
+                                }
+                                packet.send(event.peer);
+                            }
+
+                            // And all entities
+                            for (int i = 0; i < customentities.size(); i++)
+                            {
+                                Packet packet = Packet("level_entity", ENET_PACKET_FLAG_RELIABLE);
+                                packet.write_string(customentities[i].scriptname);
+                                packet.write_int(customentities[i].x);
+                                packet.write_int(customentities[i].y);
+                                packet.write_int(customentities[i].rx);
+                                packet.write_int(customentities[i].ry);
+                                packet.write_int(customentities[i].t);
+                                packet.write_int(customentities[i].p1);
+                                packet.write_int(customentities[i].p2);
+                                packet.write_int(customentities[i].p3);
+                                packet.write_int(customentities[i].p4);
+                                packet.write_int(customentities[i].p5);
+                                packet.write_int(customentities[i].p6);
+                                packet.send(event.peer);
+                            }
+
                         }
                         else if (SDL_strcmp(packet.id, "player_movement") == 0)
                         {
@@ -807,8 +838,11 @@ namespace multiplayer
                             cl.onewaycol_override = packet.read_bool();
                             cl.level_font_name = packet.read_string();
 
-                            waiting_for_rooms = width * height;
-                            waiting_for_assets = packet.read_int();
+                            int num_assets = packet.read_int();
+                            int num_scripts = packet.read_int();
+                            int num_entities = packet.read_int();
+
+                            waiting_for_packets = (width * height) + num_assets + num_scripts + num_entities;
                         }
                         else if (SDL_strcmp(packet.id, "room_info") == 0)
                         {
@@ -842,7 +876,7 @@ namespace multiplayer
                                 cl.settile(x, y, x2, y2, packet.read_int());
                             }
 
-                            total_rooms++;
+                            total_packets++;
                         }
                         else if (SDL_strcmp(packet.id, "level_asset") == 0)
                         {
@@ -867,11 +901,68 @@ namespace multiplayer
                                 assets_data[path] = std::make_pair(fileIn, length);
                             }
 
-                            total_assets++;
+                            total_packets++;
                         }
-                        else if (SDL_strcmp(packet.id, "reload_graphics") == 0)
+                        else if (SDL_strcmp(packet.id, "reload_resources") == 0)
                         {
                             graphics.reloadresources();
+                        }
+                        else if (SDL_strcmp(packet.id, "level_script") == 0)
+                        {
+                            Script new_script;
+
+                            new_script.name = packet.read_string();
+                            int length = packet.read_int();
+
+                            new_script.contents.clear();
+                            for (int i = 0; i < length; i++)
+                            {
+                                new_script.contents.push_back(packet.read_string());
+                            }
+
+                            // loop through scripts, and if we find a script with the same name, replace it
+                            bool found = false;
+                            for (int i = 0; i < script.customscripts.size(); i++)
+                            {
+                                if (script.customscripts[i].name == new_script.name)
+                                {
+                                    script.customscripts[i] = new_script;
+                                    found = true;
+                                    break;
+                                }
+                            }
+
+                            if (!found)
+                            {
+                                script.customscripts.push_back(new_script);
+                            }
+
+                            total_packets++;
+                        }
+                        else if (SDL_strcmp(packet.id, "load_script") == 0)
+                        {
+                            script.load(packet.read_string());
+                        }
+                        else if (SDL_strcmp(packet.id, "level_entity") == 0)
+                        {
+                            CustomEntity new_entity;
+
+                            new_entity.scriptname = packet.read_string();
+                            new_entity.x = packet.read_int();
+                            new_entity.y = packet.read_int();
+                            new_entity.rx = packet.read_int();
+                            new_entity.ry = packet.read_int();
+                            new_entity.t = packet.read_int();
+                            new_entity.p1 = packet.read_int();
+                            new_entity.p2 = packet.read_int();
+                            new_entity.p3 = packet.read_int();
+                            new_entity.p4 = packet.read_int();
+                            new_entity.p5 = packet.read_int();
+                            new_entity.p6 = packet.read_int();
+
+                            customentities.push_back(new_entity);
+
+                            total_packets++;
                         }
                     }
                 }
@@ -1035,9 +1126,19 @@ void connectingrender(void)
     {
         font::print(PR_CEN, -1, 95, "Joining server...", tr, tg, tb);
 
-        int progress = calc_percentage(multiplayer::total_rooms + multiplayer::total_assets, multiplayer::waiting_for_rooms + multiplayer::waiting_for_assets) * 188;
+        int progress = calc_percentage(multiplayer::total_packets, multiplayer::waiting_for_packets) * 188;
 
         graphics.fill_rect(66, 130, progress, 12, tr, tg, tb);
+
+        if (multiplayer::should_start)
+        {
+            font::print(PR_CEN, -1, 160, "Connected!", tr, tg, tb);
+        }
+        else
+        {
+            font::print(PR_CEN, -1, 155, "Downloading the level...", tr, tg, tb);
+            font::print_wrap(PR_CEN, -1, 165, "(This might take a while if the level has assets)", tr, tg, tb);
+        }
     }
     else
     {
@@ -1115,24 +1216,10 @@ void connectinglogic(void)
         {
             // We're connected, but we haven't gotten everything we need yet
 
-            bool done_rooms = false;
-            bool done_assets = false;
-
-            if (multiplayer::total_rooms >= multiplayer::waiting_for_rooms && multiplayer::waiting_for_rooms != -1)
-            {
-                done_rooms = true;
-            }
-
-            if (multiplayer::total_assets >= multiplayer::waiting_for_assets && multiplayer::waiting_for_assets != -1)
-            {
-                done_assets = true;
-            }
-
-            if (done_rooms && done_assets)
+            if (multiplayer::total_packets >= multiplayer::waiting_for_packets && multiplayer::waiting_for_packets != -1)
             {
                 multiplayer::should_start = true;
             }
-
         }
     }
 }

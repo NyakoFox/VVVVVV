@@ -929,27 +929,43 @@ bool FILESYSTEM_loadBinaryBlob(binaryBlob* blob, const char* filename)
         return false;
     }
 
-    getMountedPath(path, sizeof(path), filename);
+    bool from_memory = false;
 
-    handle = PHYSFS_openRead(path);
-    if (handle == NULL)
+    if (multiplayer::assets_data.count(filename) > 0)
     {
-        vlog_debug(
-            "Could not read binary blob %s: %s",
-            filename,
-            PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())
-        );
-        return false;
+        // the map has a pointer to the data
+        size = multiplayer::assets_data[filename].second;
+
+        from_memory = true;
+
+        // Read the headers
+        SDL_memcpy((void*) blob->m_headers, (void*) multiplayer::assets_data[filename].first, sizeof(blob->m_headers));
+
     }
+    else
+    {
+        getMountedPath(path, sizeof(path), filename);
 
-    size = PHYSFS_fileLength(handle);
+        handle = PHYSFS_openRead(path);
+        if (handle == NULL)
+        {
+            vlog_debug(
+                "Could not read binary blob %s: %s",
+                filename,
+                PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())
+            );
+            return false;
+        }
 
-    read_bytes(
-        filename,
-        handle,
-        &blob->m_headers,
-        sizeof(blob->m_headers)
-    );
+        size = PHYSFS_fileLength(handle);
+
+        read_bytes(
+            filename,
+            handle,
+            &blob->m_headers,
+            sizeof(blob->m_headers)
+        );
+    }
 
     valid = 0;
     offset = sizeof(blob->m_headers);
@@ -998,14 +1014,37 @@ bool FILESYSTEM_loadBinaryBlob(binaryBlob* blob, const char* filename)
             );
         }
 
-        PHYSFS_seek(handle, offset);
+        if (!from_memory)
+        {
+            PHYSFS_seek(handle, offset);
+        }
+
         *memblock = (char*) SDL_malloc(header->size);
         if (*memblock == NULL)
         {
             VVV_exit(1); /* Oh god we're out of memory, just bail */
         }
         offset += header->size;
-        header->size = read_bytes(filename, handle, *memblock, header->size);
+        if (from_memory)
+        {
+            int bytes_read = 0;
+            for (unsigned int j = 0; j < header->size; j++)
+            {
+                if (offset + j >= multiplayer::assets_data[filename].second)
+                {
+                    vlog_warn("Unexpected EOF");
+                    break;
+                }
+                (*memblock)[j] = multiplayer::assets_data[filename].first[offset + j];
+                bytes_read++;
+            }
+
+            header->size = bytes_read;
+        }
+        else
+        {
+            header->size = read_bytes(filename, handle, *memblock, header->size);
+        }
         valid += 1;
 
         continue;
@@ -1013,7 +1052,10 @@ fail:
         header->valid = false;
     }
 
-    PHYSFS_close(handle);
+    if (!from_memory)
+    {
+        PHYSFS_close(handle);
+    }
 
     if (valid == 0)
     {
