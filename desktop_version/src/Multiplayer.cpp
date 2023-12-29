@@ -283,13 +283,13 @@ namespace multiplayer
         }
         FILESYSTEM_freeEnumerate(&handle);
 
-        handle = {};
-        while ((item = FILESYSTEM_enumerateAssets("sounds", &handle)) != NULL)
+        EnumHandle handle2 = {};
+        while ((item = FILESYSTEM_enumerateAssets("sounds", &handle2)) != NULL)
         {
             std::string path = "sounds/" + std::string(item);
             assets.push_back(path);
         }
-        FILESYSTEM_freeEnumerate(&handle);
+        FILESYSTEM_freeEnumerate(&handle2);
 
         if (FILESYSTEM_isAssetMounted("vvvvvvmusic.vvv")) assets.push_back("vvvvvvmusic.vvv");
         if (FILESYSTEM_isAssetMounted("mmmmmm.vvv")) assets.push_back("mmmmmm.vvv");
@@ -860,10 +860,18 @@ namespace multiplayer
                             }
                             else
                             {
+                                if (assets_data.count(path) > 0)
+                                {
+                                    VVV_free(assets_data[path].first);
+                                }
                                 assets_data[path] = std::make_pair(fileIn, length);
                             }
 
                             total_assets++;
+                        }
+                        else if (SDL_strcmp(packet.id, "reload_graphics") == 0)
+                        {
+                            graphics.reloadresources();
                         }
                     }
                 }
