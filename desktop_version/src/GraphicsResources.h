@@ -50,4 +50,7 @@ public:
     SDL_Texture* im_flipsprites_translated;
 };
 
+SDL_Surface* LoadImageSurface(const char* filename);
+SDL_Texture* LoadImage(const char* filename, const TextureLoadType loadtype);
+
 #endif /* GRAPHICSRESOURCES_H */

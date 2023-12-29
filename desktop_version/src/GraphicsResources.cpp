@@ -163,6 +163,7 @@ static SDL_Texture* LoadTextureFromRaw(const char* filename, SDL_Surface* loaded
     return texture;
 }
 
+#undef LoadImage // thanks microsoft
 SDL_Texture* LoadImage(const char *filename, const TextureLoadType loadtype)
 {
     unsigned char* data;

@@ -845,6 +845,11 @@ int main(int argc, char* argv[])
         graphics.fademode = FADE_NONE;
     }
 
+    if (multiplayer::is_server())
+    {
+        multiplayer::server_init();
+    }
+
     /* Only create the window after we have loaded all the assets. */
     SDL_ShowWindow(gameScreen.m_window);
 

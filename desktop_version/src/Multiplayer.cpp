@@ -1,14 +1,18 @@
 #include <enet/enet.h>
 #include <string>
 #include <vector>
+#include <map>
+#include <utility>
 
 #include <SDL.h>
 
 #include "Multiplayer.h"
 
+#include "Alloc.h"
 #include "Constants.h"
 #include "CustomLevels.h"
 #include "Entity.h"
+#include "FileSystemUtils.h"
 #include "Font.h"
 #include "Game.h"
 #include "Graphics.h"
@@ -26,8 +30,10 @@
 // UUIDs...
 #ifdef _WIN32
 #pragma comment(lib, "rpcrt4.lib")  // UuidCreate - Minimum supported OS Win 2000
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <iostream>
+
 #else
 #include <uuid/uuid.h>
 #endif
@@ -45,6 +51,11 @@ namespace multiplayer
 
     int total_rooms = 0;
     int waiting_for_rooms = -1;
+    int total_assets = 0;
+    int waiting_for_assets = -1;
+
+    std::vector<std::string> assets;
+    std::map<std::string, std::pair<unsigned char*, size_t> > assets_data;
 
     ENetAddress server_address;
     ENetHost* host_instance;
@@ -259,6 +270,31 @@ namespace multiplayer
         return host_instance != NULL;
     }
 
+    void server_init()
+    {
+        assets.clear();
+
+        EnumHandle handle = {};
+        const char* item;
+        while ((item = FILESYSTEM_enumerateAssets("graphics", &handle)) != NULL)
+        {
+            std::string path = "graphics/" + std::string(item);
+            assets.push_back(path);
+        }
+        FILESYSTEM_freeEnumerate(&handle);
+
+        handle = {};
+        while ((item = FILESYSTEM_enumerateAssets("sounds", &handle)) != NULL)
+        {
+            std::string path = "sounds/" + std::string(item);
+            assets.push_back(path);
+        }
+        FILESYSTEM_freeEnumerate(&handle);
+
+        if (FILESYSTEM_isAssetMounted("vvvvvvmusic.vvv")) assets.push_back("vvvvvvmusic.vvv");
+        if (FILESYSTEM_isAssetMounted("mmmmmm.vvv")) assets.push_back("mmmmmm.vvv");
+    }
+
     bool create_client(void)
     {
         host_instance = enet_host_create(NULL /* create a client host */,
@@ -282,6 +318,9 @@ namespace multiplayer
         }
 
         script.hardreset();
+        assets.clear();
+
+        FILESYSTEM_unmountAssets();
 
         timeout = 5 * 30; // 5 seconds
         viridian_position = 160;
@@ -292,6 +331,8 @@ namespace multiplayer
 
         total_rooms = 0;
         waiting_for_rooms = -1;
+        total_assets = 0;
+        waiting_for_assets = -1;
 
         if (peer == NULL)
         {
@@ -462,6 +503,12 @@ namespace multiplayer
                             packet.write_int(map.getwidth());
                             packet.write_int(map.getheight());
 
+                            packet.write_int(cl.levmusic);
+                            packet.write_bool(cl.onewaycol_override);
+                            packet.write_string(cl.level_font_name);
+
+                            packet.write_int(assets.size());
+
                             packet.send(event.peer);
 
                             // Send the player all of the rooms
@@ -504,6 +551,31 @@ namespace multiplayer
                                 }
 
                                 packet.send(event.peer);
+                            }
+
+                            // Send the player all of the assets
+                            for (int i = 0; i < assets.size(); i++)
+                            {
+                                Packet packet = Packet("level_asset", ENET_PACKET_FLAG_RELIABLE);
+                                packet.write_string(assets[i]);
+
+                                unsigned char* fileIn;
+                                size_t length;
+                                FILESYSTEM_loadAssetToMemory(assets[i].c_str(), &fileIn, &length);
+                                if (fileIn == NULL)
+                                {
+                                    SDL_assert(0 && "File missing!?");
+                                    return;
+                                }
+
+                                packet.write_int(length);
+
+                                packet.write_blob(fileIn, length);
+
+                                // Send asset packets on channel 1
+                                packet.send(event.peer, 1);
+
+                                VVV_free(fileIn);
                             }
                         }
                         else if (SDL_strcmp(packet.id, "player_movement") == 0)
@@ -731,7 +803,12 @@ namespace multiplayer
                             cl.mapwidth = width;
                             cl.mapheight = height;
 
+                            cl.levmusic = packet.read_int();
+                            cl.onewaycol_override = packet.read_bool();
+                            cl.level_font_name = packet.read_string();
+
                             waiting_for_rooms = width * height;
+                            waiting_for_assets = packet.read_int();
                         }
                         else if (SDL_strcmp(packet.id, "room_info") == 0)
                         {
@@ -766,10 +843,27 @@ namespace multiplayer
                             }
 
                             total_rooms++;
-                            if (total_rooms >= waiting_for_rooms && waiting_for_rooms != -1)
+                        }
+                        else if (SDL_strcmp(packet.id, "level_asset") == 0)
+                        {
+                            std::string path = packet.read_string();
+                            size_t length = packet.read_int();
+
+                            unsigned char* fileIn;
+                            packet.read_blob(&fileIn, length);
+
+                            vlog_info("Received asset %s", path.c_str());
+
+                            if (fileIn == NULL)
                             {
-                                should_start = true;
+                                SDL_assert(0 && "Couldn't allocate memory");
                             }
+                            else
+                            {
+                                assets_data[path] = std::make_pair(fileIn, length);
+                            }
+
+                            total_assets++;
                         }
                     }
                 }
@@ -862,6 +956,15 @@ namespace multiplayer
         }
     }
 
+    void unmount_multiplayer_assets(void)
+    {
+        for (std::map<std::string, std::pair<unsigned char*, size_t> >::iterator it = assets_data.begin(); it != assets_data.end(); ++it)
+        {
+            VVV_free(it->second.first);
+        }
+        assets_data.clear();
+    }
+
     void send_to_server(Packet* packet)
     {
         packet->send(peer);
@@ -891,6 +994,12 @@ namespace multiplayer
     }
 }
 
+static inline float calc_percentage(float amount, float total)
+{
+    if (amount == total) return 1; // if 0/0, return 1, also just a nice shortcut
+    return amount / total;
+}
+
 void connectingrender(void)
 {
     graphics.clear();
@@ -918,7 +1027,7 @@ void connectingrender(void)
     {
         font::print(PR_CEN, -1, 95, "Joining server...", tr, tg, tb);
 
-        int progress = ((float)multiplayer::total_rooms / (float)multiplayer::waiting_for_rooms) * 188;
+        int progress = calc_percentage(multiplayer::total_rooms + multiplayer::total_assets, multiplayer::waiting_for_rooms + multiplayer::waiting_for_assets) * 188;
 
         graphics.fill_rect(66, 130, progress, 12, tr, tg, tb);
     }
@@ -993,6 +1102,29 @@ void connectinglogic(void)
             multiplayer::did_startmode = true;
             // We did connect, so fade out the screen
             startmode(Start_SERVER);
+        }
+        else if (!multiplayer::should_start)
+        {
+            // We're connected, but we haven't gotten everything we need yet
+
+            bool done_rooms = false;
+            bool done_assets = false;
+
+            if (multiplayer::total_rooms >= multiplayer::waiting_for_rooms && multiplayer::waiting_for_rooms != -1)
+            {
+                done_rooms = true;
+            }
+
+            if (multiplayer::total_assets >= multiplayer::waiting_for_assets && multiplayer::waiting_for_assets != -1)
+            {
+                done_assets = true;
+            }
+
+            if (done_rooms && done_assets)
+            {
+                multiplayer::should_start = true;
+            }
+
         }
     }
 }

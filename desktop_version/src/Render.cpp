@@ -20,6 +20,7 @@
 #include "MakeAndPlay.h"
 #include "Map.h"
 #include "Maths.h"
+#include "Multiplayer.h"
 #include "Music.h"
 #include "ReleaseVersion.h"
 #include "RoomnameTranslator.h"
@@ -2942,6 +2943,10 @@ void maprender(void)
                 vformat_button(ActionSet_InGame, Action_InGame_ACTION)
             );
             font::print_wrap(PR_CEN, -1, 105, buffer, 196, 196, 255 - help.glow);
+        }
+        else if (map.custommode && multiplayer::connected)
+        {
+            font::print_wrap(PR_CEN, -1, FLIP(95, 8), "Server info will go here", 196, 196, 255 - help.glow);
         }
         else if(map.custommode){
             LevelMetaData& meta = cl.ListOfMetaData[game.playcustomlevel];

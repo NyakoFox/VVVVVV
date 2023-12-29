@@ -13,6 +13,7 @@
 #include "Graphics.h"
 #include "Localization.h"
 #include "Maths.h"
+#include "Multiplayer.h"
 #include "Screen.h"
 #include "Unused.h"
 #include "UtilityClass.h"
@@ -625,6 +626,9 @@ fail:
 
 void FILESYSTEM_unmountAssets(void)
 {
+
+    multiplayer::unmount_multiplayer_assets();
+
     if (assetDir[0] != '\0')
     {
         vlog_info("Unmounting %s", assetDir);
@@ -889,6 +893,23 @@ void FILESYSTEM_loadAssetToMemory(
     size_t* len
 ) {
     char path[MAX_PATH];
+
+    if (multiplayer::assets_data.count(name) > 0)
+    {
+        // the map has a pointer to the data, so copy it
+        const size_t size = multiplayer::assets_data[name].second;
+        *mem = (unsigned char*) SDL_malloc(size);
+        if (*mem == NULL)
+        {
+            VVV_exit(1);
+        }
+        SDL_memcpy((void*) *mem, (void*) multiplayer::assets_data[name].first, size);
+        if (len != NULL)
+        {
+            *len = size;
+        }
+        return;
+    }
 
     getMountedPath(path, sizeof(path), name);
 

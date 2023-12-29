@@ -9,6 +9,7 @@
 #include "FileSystemUtils.h"
 #include "Game.h"
 #include "Graphics.h"
+#include "GraphicsResources.h"
 #include "GraphicsUtil.h"
 #include "InterimVersion.h"
 #include "Render.h"
@@ -118,7 +119,6 @@ void Screen::LoadIcon(void)
 
 }
 #else
-SDL_Surface* LoadImageSurface(const char* filename);
 
 void Screen::LoadIcon(void)
 {

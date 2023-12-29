@@ -11,6 +11,7 @@
 #include "Entity.h"
 #include "Enums.h"
 #include "Exit.h"
+#include "FileSystemUtils.h"
 #include "Font.h"
 #include "GlitchrunnerMode.h"
 #include "Graphics.h"
@@ -2972,6 +2973,10 @@ void scriptclass::startgamemode(const enum StartMode mode)
         break;
 
     case Start_SERVER:
+        // Alright, finish up loading.
+        // We did a lot of loading when receiving packets, but there's still some stuff we have to do outside of that.
+        graphics.reloadresources();
+
         music.fadeout();
         //map.custommodeforreal = true;
         //map.custommode = true;
@@ -2984,6 +2989,17 @@ void scriptclass::startgamemode(const enum StartMode mode)
         else
         {
             game.start();
+        }
+
+        map.customshowmm = true;
+
+        if (cl.levmusic > 0)
+        {
+            music.play(cl.levmusic);
+        }
+        else
+        {
+            music.currentsong = -1;
         }
 
         graphics.fademode = FADE_START_FADEIN;

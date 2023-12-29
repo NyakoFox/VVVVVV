@@ -1,6 +1,10 @@
 #ifndef MULTIPLAYER_H
 #define MULTIPLAYER_H
 
+#include <string>
+#include <map>
+#include <utility>
+
 #include <enet/enet.h>
 
 #include "Packet.h"
@@ -8,6 +12,9 @@
 namespace multiplayer
 {
     extern std::string last_uuid_hack;
+    extern std::map<std::string, std::pair<unsigned char*, size_t> > assets_data;
+    extern bool connecting;
+    extern bool connected;
 
     bool is_server(void);
     void set_server(bool server);
@@ -34,6 +41,10 @@ namespace multiplayer
     void update_player_state(void);
 
     void update_player_position(void);
+
+    void server_init(void);
+
+    void unmount_multiplayer_assets(void);
 }
 
 void connectingrender(void);

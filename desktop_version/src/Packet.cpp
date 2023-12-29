@@ -81,83 +81,94 @@ void Packet::send(ENetPeer* peer)
     enet_peer_send(peer, 0, packet);
 }
 
+void Packet::send(ENetPeer* peer, enet_uint8 channel)
+{
+    enet_peer_send(peer, channel, packet);
+}
+
 void Packet::write_string(std::string str)
 {
     // Write the string with a null terminator
     enet_packet_resize(packet, packet->dataLength + str.length() + 1);
-    memcpy(packet->data + packet->dataLength - str.length() - 1, str.c_str(), str.length() + 1);
+    SDL_memcpy(packet->data + packet->dataLength - str.length() - 1, str.c_str(), str.length() + 1);
 }
 
 void Packet::write_int(int i)
 {
     enet_packet_resize(packet, packet->dataLength + sizeof(int));
-    memcpy(packet->data + packet->dataLength - sizeof(int), &i, sizeof(int));
+    SDL_memcpy(packet->data + packet->dataLength - sizeof(int), &i, sizeof(int));
 }
 
 void Packet::write_float(float f)
 {
     enet_packet_resize(packet, packet->dataLength + sizeof(float));
-    memcpy(packet->data + packet->dataLength - sizeof(float), &f, sizeof(float));
+    SDL_memcpy(packet->data + packet->dataLength - sizeof(float), &f, sizeof(float));
 }
 
 void Packet::write_double(double d)
 {
     enet_packet_resize(packet, packet->dataLength + sizeof(double));
-    memcpy(packet->data + packet->dataLength - sizeof(double), &d, sizeof(double));
+    SDL_memcpy(packet->data + packet->dataLength - sizeof(double), &d, sizeof(double));
 }
 
 void Packet::write_bool(bool b)
 {
     enet_packet_resize(packet, packet->dataLength + sizeof(bool));
-    memcpy(packet->data + packet->dataLength - sizeof(bool), &b, sizeof(bool));
+    SDL_memcpy(packet->data + packet->dataLength - sizeof(bool), &b, sizeof(bool));
 }
 
 void Packet::write_char(char c)
 {
     enet_packet_resize(packet, packet->dataLength + sizeof(char));
-    memcpy(packet->data + packet->dataLength - sizeof(char), &c, sizeof(char));
+    SDL_memcpy(packet->data + packet->dataLength - sizeof(char), &c, sizeof(char));
 }
 
 void Packet::write_unsigned_char(unsigned char uc)
 {
     enet_packet_resize(packet, packet->dataLength + sizeof(unsigned char));
-    memcpy(packet->data + packet->dataLength - sizeof(unsigned char), &uc, sizeof(unsigned char));
+    SDL_memcpy(packet->data + packet->dataLength - sizeof(unsigned char), &uc, sizeof(unsigned char));
 }
 
 void Packet::write_short(short s)
 {
     enet_packet_resize(packet, packet->dataLength + sizeof(short));
-    memcpy(packet->data + packet->dataLength - sizeof(short), &s, sizeof(short));
+    SDL_memcpy(packet->data + packet->dataLength - sizeof(short), &s, sizeof(short));
 }
 
 void Packet::write_unsigned_short(unsigned short us)
 {
     enet_packet_resize(packet, packet->dataLength + sizeof(unsigned short));
-    memcpy(packet->data + packet->dataLength - sizeof(unsigned short), &us, sizeof(unsigned short));
+    SDL_memcpy(packet->data + packet->dataLength - sizeof(unsigned short), &us, sizeof(unsigned short));
 }
 
 void Packet::write_long(long l)
 {
     enet_packet_resize(packet, packet->dataLength + sizeof(long));
-    memcpy(packet->data + packet->dataLength - sizeof(long), &l, sizeof(long));
+    SDL_memcpy(packet->data + packet->dataLength - sizeof(long), &l, sizeof(long));
 }
 
 void Packet::write_unsigned_long(unsigned long ul)
 {
     enet_packet_resize(packet, packet->dataLength + sizeof(unsigned long));
-    memcpy(packet->data + packet->dataLength - sizeof(unsigned long), &ul, sizeof(unsigned long));
+    SDL_memcpy(packet->data + packet->dataLength - sizeof(unsigned long), &ul, sizeof(unsigned long));
 }
 
 void Packet::write_long_long(long long ll)
 {
     enet_packet_resize(packet, packet->dataLength + sizeof(long long));
-    memcpy(packet->data + packet->dataLength - sizeof(long long), &ll, sizeof(long long));
+    SDL_memcpy(packet->data + packet->dataLength - sizeof(long long), &ll, sizeof(long long));
 }
 
 void Packet::write_unsigned_long_long(unsigned long long ull)
 {
     enet_packet_resize(packet, packet->dataLength + sizeof(unsigned long long));
-    memcpy(packet->data + packet->dataLength - sizeof(unsigned long long), &ull, sizeof(unsigned long long));
+    SDL_memcpy(packet->data + packet->dataLength - sizeof(unsigned long long), &ull, sizeof(unsigned long long));
+}
+
+void Packet::write_blob(void* blob, size_t blob_size)
+{
+    enet_packet_resize(packet, packet->dataLength + blob_size);
+    SDL_memcpy(packet->data + packet->dataLength - blob_size, blob, blob_size);
 }
 
 std::string Packet::read_string(void)
@@ -165,11 +176,11 @@ std::string Packet::read_string(void)
     // Read the string, ending at the null terminator
 
     void* data_copy = SDL_malloc(packet->dataLength);
-    memcpy(data_copy, packet->data, packet->dataLength);
+    SDL_memcpy(data_copy, packet->data, packet->dataLength);
 
     std::string str = (char*)data_copy;
     enet_packet_resize(packet, packet->dataLength - str.length() - 1);
-    memcpy(packet->data, (char*)data_copy + str.length() + 1, packet->dataLength);
+    SDL_memcpy(packet->data, (char*)data_copy + str.length() + 1, packet->dataLength);
 
     SDL_free(data_copy);
     return str;
@@ -178,11 +189,11 @@ std::string Packet::read_string(void)
 int Packet::read_int(void)
 {
     void* data_copy = SDL_malloc(packet->dataLength);
-    memcpy(data_copy, packet->data, packet->dataLength);
+    SDL_memcpy(data_copy, packet->data, packet->dataLength);
 
     int i = *(int*)data_copy;
     enet_packet_resize(packet, packet->dataLength - sizeof(int));
-    memcpy(packet->data, (char*)data_copy + sizeof(int), packet->dataLength);
+    SDL_memcpy(packet->data, (char*)data_copy + sizeof(int), packet->dataLength);
 
     SDL_free(data_copy);
     return i;
@@ -191,11 +202,11 @@ int Packet::read_int(void)
 float Packet::read_float(void)
 {
     void* data_copy = SDL_malloc(packet->dataLength);
-    memcpy(data_copy, packet->data, packet->dataLength);
+    SDL_memcpy(data_copy, packet->data, packet->dataLength);
 
     float f = *(float*)data_copy;
     enet_packet_resize(packet, packet->dataLength - sizeof(float));
-    memcpy(packet->data, (char*)data_copy + sizeof(float), packet->dataLength);
+    SDL_memcpy(packet->data, (char*)data_copy + sizeof(float), packet->dataLength);
 
     SDL_free(data_copy);
     return f;
@@ -204,11 +215,11 @@ float Packet::read_float(void)
 double Packet::read_double(void)
 {
     void* data_copy = SDL_malloc(packet->dataLength);
-    memcpy(data_copy, packet->data, packet->dataLength);
+    SDL_memcpy(data_copy, packet->data, packet->dataLength);
 
     double d = *(double*)data_copy;
     enet_packet_resize(packet, packet->dataLength - sizeof(double));
-    memcpy(packet->data, (char*)data_copy + sizeof(double), packet->dataLength);
+    SDL_memcpy(packet->data, (char*)data_copy + sizeof(double), packet->dataLength);
 
     SDL_free(data_copy);
     return d;
@@ -217,11 +228,11 @@ double Packet::read_double(void)
 bool Packet::read_bool(void)
 {
     void* data_copy = SDL_malloc(packet->dataLength);
-    memcpy(data_copy, packet->data, packet->dataLength);
+    SDL_memcpy(data_copy, packet->data, packet->dataLength);
 
     bool b = *(bool*)data_copy;
     enet_packet_resize(packet, packet->dataLength - sizeof(bool));
-    memcpy(packet->data, (char*)data_copy + sizeof(bool), packet->dataLength);
+    SDL_memcpy(packet->data, (char*)data_copy + sizeof(bool), packet->dataLength);
 
     SDL_free(data_copy);
     return b;
@@ -230,11 +241,11 @@ bool Packet::read_bool(void)
 char Packet::read_char(void)
 {
     void* data_copy = SDL_malloc(packet->dataLength);
-    memcpy(data_copy, packet->data, packet->dataLength);
+    SDL_memcpy(data_copy, packet->data, packet->dataLength);
 
     char c = *(char*)data_copy;
     enet_packet_resize(packet, packet->dataLength - sizeof(char));
-    memcpy(packet->data, (char*)data_copy + sizeof(char), packet->dataLength);
+    SDL_memcpy(packet->data, (char*)data_copy + sizeof(char), packet->dataLength);
 
     SDL_free(data_copy);
     return c;
@@ -243,11 +254,11 @@ char Packet::read_char(void)
 unsigned char Packet::read_unsigned_char(void)
 {
     void* data_copy = SDL_malloc(packet->dataLength);
-    memcpy(data_copy, packet->data, packet->dataLength);
+    SDL_memcpy(data_copy, packet->data, packet->dataLength);
 
     unsigned char uc = *(unsigned char*)data_copy;
     enet_packet_resize(packet, packet->dataLength - sizeof(unsigned char));
-    memcpy(packet->data, (char*)data_copy + sizeof(unsigned char), packet->dataLength);
+    SDL_memcpy(packet->data, (char*)data_copy + sizeof(unsigned char), packet->dataLength);
 
     SDL_free(data_copy);
     return uc;
@@ -256,11 +267,11 @@ unsigned char Packet::read_unsigned_char(void)
 short Packet::read_short(void)
 {
     void* data_copy = SDL_malloc(packet->dataLength);
-    memcpy(data_copy, packet->data, packet->dataLength);
+    SDL_memcpy(data_copy, packet->data, packet->dataLength);
 
     short s = *(short*)data_copy;
     enet_packet_resize(packet, packet->dataLength - sizeof(short));
-    memcpy(packet->data, (char*)data_copy + sizeof(short), packet->dataLength);
+    SDL_memcpy(packet->data, (char*)data_copy + sizeof(short), packet->dataLength);
 
     SDL_free(data_copy);
     return s;
@@ -269,11 +280,11 @@ short Packet::read_short(void)
 unsigned short Packet::read_unsigned_short(void)
 {
     void* data_copy = SDL_malloc(packet->dataLength);
-    memcpy(data_copy, packet->data, packet->dataLength);
+    SDL_memcpy(data_copy, packet->data, packet->dataLength);
 
     unsigned short us = *(unsigned short*)data_copy;
     enet_packet_resize(packet, packet->dataLength - sizeof(unsigned short));
-    memcpy(packet->data, (char*)data_copy + sizeof(unsigned short), packet->dataLength);
+    SDL_memcpy(packet->data, (char*)data_copy + sizeof(unsigned short), packet->dataLength);
 
     SDL_free(data_copy);
     return us;
@@ -282,11 +293,11 @@ unsigned short Packet::read_unsigned_short(void)
 long Packet::read_long(void)
 {
     void* data_copy = SDL_malloc(packet->dataLength);
-    memcpy(data_copy, packet->data, packet->dataLength);
+    SDL_memcpy(data_copy, packet->data, packet->dataLength);
 
     long l = *(long*)data_copy;
     enet_packet_resize(packet, packet->dataLength - sizeof(long));
-    memcpy(packet->data, (char*)data_copy + sizeof(long), packet->dataLength);
+    SDL_memcpy(packet->data, (char*)data_copy + sizeof(long), packet->dataLength);
 
     SDL_free(data_copy);
     return l;
@@ -295,11 +306,11 @@ long Packet::read_long(void)
 unsigned long Packet::read_unsigned_long(void)
 {
     void* data_copy = SDL_malloc(packet->dataLength);
-    memcpy(data_copy, packet->data, packet->dataLength);
+    SDL_memcpy(data_copy, packet->data, packet->dataLength);
 
     unsigned long ul = *(unsigned long*)data_copy;
     enet_packet_resize(packet, packet->dataLength - sizeof(unsigned long));
-    memcpy(packet->data, (char*)data_copy + sizeof(unsigned long), packet->dataLength);
+    SDL_memcpy(packet->data, (char*)data_copy + sizeof(unsigned long), packet->dataLength);
 
     SDL_free(data_copy);
     return ul;
@@ -308,11 +319,11 @@ unsigned long Packet::read_unsigned_long(void)
 long long Packet::read_long_long(void)
 {
     void* data_copy = SDL_malloc(packet->dataLength);
-    memcpy(data_copy, packet->data, packet->dataLength);
+    SDL_memcpy(data_copy, packet->data, packet->dataLength);
 
     long long ll = *(long long*)data_copy;
     enet_packet_resize(packet, packet->dataLength - sizeof(long long));
-    memcpy(packet->data, (char*)data_copy + sizeof(long long), packet->dataLength);
+    SDL_memcpy(packet->data, (char*)data_copy + sizeof(long long), packet->dataLength);
 
     SDL_free(data_copy);
     return ll;
@@ -321,12 +332,29 @@ long long Packet::read_long_long(void)
 unsigned long long Packet::read_unsigned_long_long(void)
 {
     void* data_copy = SDL_malloc(packet->dataLength);
-    memcpy(data_copy, packet->data, packet->dataLength);
+    SDL_memcpy(data_copy, packet->data, packet->dataLength);
 
     unsigned long long ull = *(unsigned long long*)data_copy;
     enet_packet_resize(packet, packet->dataLength - sizeof(unsigned long long));
-    memcpy(packet->data, (char*)data_copy + sizeof(unsigned long long), packet->dataLength);
+    SDL_memcpy(packet->data, (char*)data_copy + sizeof(unsigned long long), packet->dataLength);
 
     SDL_free(data_copy);
     return ull;
+}
+
+// input is unallocated
+void Packet::read_blob(unsigned char** blob, size_t blob_size)
+{
+    void* data_copy = SDL_malloc(packet->dataLength);
+    SDL_memcpy(data_copy, packet->data, packet->dataLength);
+
+    // also alloc the blob
+
+    *blob = (unsigned char*)SDL_malloc(blob_size);
+
+    SDL_memcpy(*blob, data_copy, blob_size);
+    enet_packet_resize(packet, packet->dataLength - blob_size);
+    SDL_memcpy(packet->data, (char*)data_copy + blob_size, packet->dataLength);
+
+    SDL_free(data_copy);
 }
