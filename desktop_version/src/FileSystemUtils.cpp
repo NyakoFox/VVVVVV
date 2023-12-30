@@ -1024,16 +1024,20 @@ bool FILESYSTEM_loadBinaryBlob(binaryBlob* blob, const char* filename)
             VVV_exit(1); /* Oh god we're out of memory, just bail */
         }
 
-        int old_offset = offset;
+        int old_offset;
+        old_offset = offset;
 
         offset += header->size;
         if (from_memory)
         {
-            int bytes_read = 0;
+            int bytes_read;
+            bytes_read = 0;
 
-            unsigned char* data = multiplayer::assets_data[filename].first;
+            unsigned char* data;
+            data = multiplayer::assets_data[filename].first;
 
-            for (unsigned int j = 0; j < header->size; j++)
+            unsigned int j;
+            for (j = 0; j < header->size; j++)
             {
                 if (old_offset + j >= size)
                 {
