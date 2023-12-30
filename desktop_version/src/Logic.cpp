@@ -1413,7 +1413,7 @@ void gamelogic(void)
         if (INBOUNDS_VEC(i, obj.entities))
         {
             //Second, check if the player moved
-            if (obj.entities[i].xp != obj.entities[i].oldxp || obj.entities[i].yp != obj.entities[i].oldyp)
+            if (obj.entities[i].xp != obj.entities[i].oldxp || obj.entities[i].yp != obj.entities[i].oldyp || obj.entities[i].ax != 0 || obj.entities[i].ay != 0 || obj.entities[i].vx != 0 || obj.entities[i].vy != 0)
             {
                 multiplayer::update_player_position();
             }
