@@ -1812,6 +1812,35 @@ static void menurender(void)
         font::print_wrap(PR_CEN, -1, 65, message, tr, tg, tb);
         break;
     }
+    case Menu::playersetup:
+    {
+        font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Player Setup"), tr, tg, tb);
+
+        std::string keybuffer = key.keybuffer;
+
+        // 32 character limit, chop off the end if its longer
+        if (keybuffer.length() > 16)
+        {
+            keybuffer = keybuffer.substr(0, 16);
+        }
+
+        keybuffer += "_";
+
+        const char* player_name = key.textentry() ? keybuffer.c_str() : multiplayer::name.c_str();
+
+        char buffer[SCREEN_WIDTH_CHARS * 2 + 1];
+        vformat_buf(
+            buffer, sizeof(buffer),
+            loc::gettext("Name: {player}"),
+            "player:str",
+            player_name
+        );
+        font::print(PR_LEFT, 96 - 24, 65, buffer, tr, tg, tb);
+
+        // Show their color through drawing a crewmate on screen
+        graphics.draw_sprite((320 / 2) - 12, 95, 0, graphics.getcol(multiplayer::preferred_color));
+        break;
+    }
     case Menu::serverselect:
         font::print(PR_2X | PR_CEN | PR_CJK_HIGH, -1, 30, loc::gettext("Select Server"), tr, tg, tb);
         font::print_wrap(PR_CEN, -1, 65, loc::gettext("Select a server to connect to."), tr, tg, tb);

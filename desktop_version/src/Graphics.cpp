@@ -1649,6 +1649,11 @@ void Graphics::drawmenu(int cr, int cg, int cb, enum Menu::MenuName menu)
         {
             x = i * game.menuspacing + game.menuxoff;
             y = 140 + i * 12 + game.menuyoff;
+            if (menu == Menu::playersetup && i >= 2)
+            {
+                x -= 2 * game.menuspacing;
+                y += 8;
+            }
         }
 
         if (menu == Menu::levellist)

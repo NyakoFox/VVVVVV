@@ -1110,6 +1110,7 @@ void Game::updatestate(void)
             {
                 obj.entities[i].tile = 144;
                 music.playef(Sound_CRY);
+                multiplayer::playef_others(Sound_CRY);
             }
             setstate(0);
             multiplayer::update_player_state();
@@ -1688,6 +1689,8 @@ void Game::updatestate(void)
 
             screenshake = 10;
             flashlight = 5;
+            multiplayer::sync_screen_effects();
+            multiplayer::playef_others(Sound_FLASH);
             map.finalstretch = true;
             map.warpx = false;
             map.warpy = false;
@@ -1776,6 +1779,7 @@ void Game::updatestate(void)
             {
                 gravitycontrol = 0;
                 music.playef(Sound_UNFLIP);
+                multiplayer::playef_others(Sound_UNFLIP);
             }
             if (INBOUNDS_VEC(i, obj.entities) && obj.entities[i].onground > 0)
             {
@@ -1906,6 +1910,7 @@ void Game::updatestate(void)
             {
                 gravitycontrol = 1;
                 music.playef(Sound_UNFLIP);
+                multiplayer::playef_others(Sound_UNFLIP);
             }
             if (INBOUNDS_VEC(i, obj.entities) && obj.entities[i].onroof > 0)
             {
@@ -1990,6 +1995,8 @@ void Game::updatestate(void)
 
             screenshake = 10;
             flashlight = 5;
+            multiplayer::sync_screen_effects();
+            multiplayer::playef_others(Sound_FLASH);
             map.finalstretch = true;
             map.warpx = false;
             map.warpy = false;
@@ -2236,6 +2243,8 @@ void Game::updatestate(void)
             setstatedelay(15);
             flashlight = 5;
             screenshake = 90;
+            multiplayer::sync_screen_effects();
+            multiplayer::playef_others(Sound_FLASH);
             music.playef(Sound_FLASH);
             break;
         case 2501:
@@ -2244,6 +2253,8 @@ void Game::updatestate(void)
             setstatedelay(0);
             flashlight = 5;
             screenshake = 0;
+            multiplayer::sync_screen_effects();
+            multiplayer::playef_others(Sound_TELEPORT);
             //we're done here!
             music.playef(Sound_TELEPORT);
             break;
@@ -2256,7 +2267,7 @@ void Game::updatestate(void)
             int i = obj.getplayer();
             if (INBOUNDS_VEC(i, obj.entities))
             {
-                obj.entities[i].colour = 0;
+                obj.entities[i].colour = multiplayer::preferred_color;
                 obj.entities[i].invis = false;
 
                 int j = obj.getteleporter();
@@ -2383,6 +2394,8 @@ void Game::updatestate(void)
             setstatedelay(30);
             flashlight = 5;
             screenshake = 90;
+            multiplayer::sync_screen_effects();
+            multiplayer::playef_others(Sound_FLASH);
             music.playef(Sound_FLASH);
             break;
         case 3001:
@@ -2390,6 +2403,8 @@ void Game::updatestate(void)
             incstate();
             setstatedelay(15);
             flashlight = 5;
+            multiplayer::sync_screen_effects();
+            multiplayer::playef_others(Sound_FLASH);
             music.playef(Sound_FLASH);
             break;
         case 3002:
@@ -2397,6 +2412,8 @@ void Game::updatestate(void)
             incstate();
             setstatedelay(15);
             flashlight = 5;
+            multiplayer::sync_screen_effects();
+            multiplayer::playef_others(Sound_FLASH);
             music.playef(Sound_FLASH);
             break;
         case 3003:
@@ -2404,6 +2421,8 @@ void Game::updatestate(void)
             incstate();
             setstatedelay(15);
             flashlight = 5;
+            multiplayer::sync_screen_effects();
+            multiplayer::playef_others(Sound_FLASH);
             music.playef(Sound_FLASH);
             break;
         case 3004:
@@ -2412,6 +2431,8 @@ void Game::updatestate(void)
             setstatedelay(0);
             flashlight = 5;
             screenshake = 0;
+            multiplayer::sync_screen_effects();
+            multiplayer::playef_others(Sound_TELEPORT);
             //we're done here!
             music.playef(Sound_TELEPORT);
             break;
@@ -2450,7 +2471,7 @@ void Game::updatestate(void)
             int i = obj.getplayer();
             if (INBOUNDS_VEC(i, obj.entities))
             {
-                obj.entities[i].colour = 0;
+                obj.entities[i].colour = multiplayer::preferred_color;
                 obj.entities[i].invis = true;
             }
 
@@ -3076,6 +3097,8 @@ void Game::updatestate(void)
             setstatedelay(30);
             flashlight = 5;
             screenshake = 90;
+            multiplayer::sync_screen_effects();
+            multiplayer::playef_others(Sound_FLASH);
             music.playef(Sound_FLASH);
 
             multiplayer::update_player_state();
@@ -3086,6 +3109,8 @@ void Game::updatestate(void)
             incstate();
             setstatedelay(15);
             flashlight = 5;
+            multiplayer::sync_screen_effects();
+            multiplayer::playef_others(Sound_FLASH);
             music.playef(Sound_FLASH);
             break;
         case 3513:
@@ -3093,6 +3118,8 @@ void Game::updatestate(void)
             incstate();
             setstatedelay(15);
             flashlight = 5;
+            multiplayer::sync_screen_effects();
+            multiplayer::playef_others(Sound_FLASH);
             music.playef(Sound_FLASH);
             break;
         case 3514:
@@ -3100,6 +3127,8 @@ void Game::updatestate(void)
             incstate();
             setstatedelay(15);
             flashlight = 5;
+            multiplayer::sync_screen_effects();
+            multiplayer::playef_others(Sound_FLASH);
             music.playef(Sound_FLASH);
             break;
         case 3515:
@@ -3109,11 +3138,13 @@ void Game::updatestate(void)
             setstatedelay(0);
             flashlight = 5;
             screenshake = 0;
+            multiplayer::sync_screen_effects();
+            multiplayer::playef_others(Sound_TELEPORT);
 
             int i = obj.getplayer();
             if (INBOUNDS_VEC(i, obj.entities))
             {
-                obj.entities[i].colour = 0;
+                obj.entities[i].colour = multiplayer::preferred_color;
                 obj.entities[i].invis = true;
             }
 
@@ -3180,6 +3211,8 @@ void Game::updatestate(void)
             statedelay = 10;
             flashlight = 5;
             screenshake = 10;
+            multiplayer::sync_screen_effects();
+            multiplayer::playef_others(Sound_FLASH);
             music.playef(Sound_FLASH);
             break;
         case 4001:
@@ -3188,6 +3221,8 @@ void Game::updatestate(void)
             statedelay = 0;
             flashlight = 5;
             screenshake = 0;
+            multiplayer::sync_screen_effects();
+            multiplayer::playef_others(Sound_TELEPORT);
             //we're done here!
             music.playef(Sound_TELEPORT);
             break;
@@ -3200,7 +3235,7 @@ void Game::updatestate(void)
             int i = obj.getplayer();
             if (INBOUNDS_VEC(i, obj.entities))
             {
-                obj.entities[i].colour = 0;
+                obj.entities[i].colour = multiplayer::preferred_color;
                 obj.entities[i].invis = true;
             }
 
@@ -3227,6 +3262,8 @@ void Game::updatestate(void)
             setstatedelay(15);
             flashlight = 5;
             screenshake = 90;
+            multiplayer::sync_screen_effects();
+            multiplayer::playef_others(Sound_FLASH);
             music.playef(Sound_FLASH);
             break;
         case 4011:
@@ -3235,6 +3272,8 @@ void Game::updatestate(void)
             setstatedelay(0);
             flashlight = 5;
             screenshake = 0;
+            multiplayer::sync_screen_effects();
+            multiplayer::playef_others(Sound_TELEPORT);
             music.playef(Sound_TELEPORT);
             break;
         case 4012:
@@ -3256,7 +3295,7 @@ void Game::updatestate(void)
                     obj.entities[j].tile = 2;
                     obj.entities[j].colour = 101;
                 }
-                obj.entities[i].colour = 0;
+                obj.entities[i].colour = multiplayer::preferred_color;
                 obj.entities[i].invis = false;
                 obj.entities[i].dir = 1;
 
@@ -3360,6 +3399,8 @@ void Game::updatestate(void)
             setstatedelay(15);
             flashlight = 5;
             screenshake = 90;
+            multiplayer::sync_screen_effects();
+            multiplayer::playef_others(Sound_FLASH);
             music.playef(Sound_FLASH);
             break;
         case 4021:
@@ -3368,6 +3409,8 @@ void Game::updatestate(void)
             setstatedelay(0);
             flashlight = 5;
             screenshake = 0;
+            multiplayer::sync_screen_effects();
+            multiplayer::playef_others(Sound_TELEPORT);
             music.playef(Sound_TELEPORT);
             break;
         case 4022:
@@ -3389,7 +3432,7 @@ void Game::updatestate(void)
                     obj.entities[j].tile = 2;
                     obj.entities[j].colour = 101;
                 }
-                obj.entities[i].colour = 0;
+                obj.entities[i].colour = multiplayer::preferred_color;
                 obj.entities[i].invis = false;
                 obj.entities[i].dir = 1;
 
@@ -3475,6 +3518,8 @@ void Game::updatestate(void)
             setstatedelay(15);
             flashlight = 5;
             screenshake = 90;
+            multiplayer::sync_screen_effects();
+            multiplayer::playef_others(Sound_FLASH);
             music.playef(Sound_FLASH);
             break;
         case 4031:
@@ -3483,6 +3528,8 @@ void Game::updatestate(void)
             setstatedelay(0);
             flashlight = 5;
             screenshake = 0;
+            multiplayer::sync_screen_effects();
+            multiplayer::playef_others(Sound_TELEPORT);
             music.playef(Sound_TELEPORT);
             break;
         case 4032:
@@ -3504,7 +3551,7 @@ void Game::updatestate(void)
                     obj.entities[j].tile = 2;
                     obj.entities[j].colour = 101;
                 }
-                obj.entities[i].colour = 0;
+                obj.entities[i].colour = multiplayer::preferred_color;
                 obj.entities[i].invis = false;
                 obj.entities[i].dir = 0;
 
@@ -3590,6 +3637,8 @@ void Game::updatestate(void)
             setstatedelay(15);
             flashlight = 5;
             screenshake = 90;
+            multiplayer::sync_screen_effects();
+            multiplayer::playef_others(Sound_FLASH);
             music.playef(Sound_FLASH);
             break;
         case 4041:
@@ -3598,6 +3647,8 @@ void Game::updatestate(void)
             setstatedelay(0);
             flashlight = 5;
             screenshake = 0;
+            multiplayer::sync_screen_effects();
+            multiplayer::playef_others(Sound_TELEPORT);
             music.playef(Sound_TELEPORT);
             break;
         case 4042:
@@ -3619,7 +3670,7 @@ void Game::updatestate(void)
                     obj.entities[j].tile = 2;
                     obj.entities[j].colour = 101;
                 }
-                obj.entities[i].colour = 0;
+                obj.entities[i].colour = multiplayer::preferred_color;
                 obj.entities[i].invis = false;
                 obj.entities[i].dir = 1;
 
@@ -3710,6 +3761,8 @@ void Game::updatestate(void)
             setstatedelay(15);
             flashlight = 5;
             screenshake = 90;
+            multiplayer::sync_screen_effects();
+            multiplayer::playef_others(Sound_FLASH);
             music.playef(Sound_FLASH);
             break;
         case 4051:
@@ -3718,6 +3771,8 @@ void Game::updatestate(void)
             setstatedelay(0);
             flashlight = 5;
             screenshake = 0;
+            multiplayer::sync_screen_effects();
+            multiplayer::playef_others(Sound_TELEPORT);
             music.playef(Sound_TELEPORT);
             break;
         case 4052:
@@ -3739,7 +3794,7 @@ void Game::updatestate(void)
                     obj.entities[j].tile = 2;
                     obj.entities[j].colour = 101;
                 }
-                obj.entities[i].colour = 0;
+                obj.entities[i].colour = multiplayer::preferred_color;
                 obj.entities[i].invis = false;
                 obj.entities[i].dir = 1;
 
@@ -3830,6 +3885,8 @@ void Game::updatestate(void)
             setstatedelay(15);
             flashlight = 5;
             screenshake = 90;
+            multiplayer::sync_screen_effects();
+            multiplayer::playef_others(Sound_FLASH);
             music.playef(Sound_FLASH);
             break;
         case 4061:
@@ -3838,6 +3895,8 @@ void Game::updatestate(void)
             setstatedelay(0);
             flashlight = 5;
             screenshake = 0;
+            multiplayer::sync_screen_effects();
+            multiplayer::playef_others(Sound_TELEPORT);
             music.playef(Sound_TELEPORT);
             break;
         case 4062:
@@ -3859,7 +3918,7 @@ void Game::updatestate(void)
                     obj.entities[j].tile = 2;
                     obj.entities[j].colour = 101;
                 }
-                obj.entities[i].colour = 0;
+                obj.entities[i].colour = multiplayer::preferred_color;
                 obj.entities[i].invis = false;
                 obj.entities[i].dir = 0;
 
@@ -3948,6 +4007,8 @@ void Game::updatestate(void)
             setstatedelay(15);
             flashlight = 5;
             screenshake = 90;
+            multiplayer::sync_screen_effects();
+            multiplayer::playef_others(Sound_FLASH);
             music.playef(Sound_FLASH);
             break;
         case 4071:
@@ -3956,6 +4017,8 @@ void Game::updatestate(void)
             setstatedelay(0);
             flashlight = 5;
             screenshake = 0;
+            multiplayer::sync_screen_effects();
+            multiplayer::playef_others(Sound_TELEPORT);
             music.playef(Sound_TELEPORT);
             break;
         case 4072:
@@ -4063,6 +4126,8 @@ void Game::updatestate(void)
             setstatedelay(15);
             flashlight = 5;
             screenshake = 90;
+            multiplayer::sync_screen_effects();
+            multiplayer::playef_others(Sound_FLASH);
             music.playef(Sound_FLASH);
             break;
         case 4081:
@@ -4071,6 +4136,8 @@ void Game::updatestate(void)
             setstatedelay(0);
             flashlight = 5;
             screenshake = 0;
+            multiplayer::sync_screen_effects();
+            multiplayer::playef_others(Sound_TELEPORT);
             music.playef(Sound_TELEPORT);
             break;
         case 4082:
@@ -4092,7 +4159,7 @@ void Game::updatestate(void)
                     obj.entities[j].tile = 2;
                     obj.entities[j].colour = 101;
                 }
-                obj.entities[i].colour = 0;
+                obj.entities[i].colour = multiplayer::preferred_color;
                 obj.entities[i].invis = false;
                 obj.entities[i].dir = 1;
 
@@ -4178,6 +4245,8 @@ void Game::updatestate(void)
             setstatedelay(15);
             flashlight = 5;
             screenshake = 90;
+            multiplayer::sync_screen_effects();
+            multiplayer::playef_others(Sound_FLASH);
             music.playef(Sound_FLASH);
             break;
         case 4091:
@@ -4186,6 +4255,8 @@ void Game::updatestate(void)
             setstatedelay(0);
             flashlight = 5;
             screenshake = 0;
+            multiplayer::sync_screen_effects();
+            multiplayer::playef_others(Sound_TELEPORT);
             music.playef(Sound_TELEPORT);
             break;
         case 4092:
@@ -4207,7 +4278,7 @@ void Game::updatestate(void)
                     obj.entities[j].tile = 2;
                     obj.entities[j].colour = 101;
                 }
-                obj.entities[i].colour = 0;
+                obj.entities[i].colour = multiplayer::preferred_color;
                 obj.entities[i].invis = false;
                 obj.entities[i].dir = 1;
 
@@ -5095,6 +5166,7 @@ void Game::deathsequence(void)
         }
         deathcounts++;
         music.playef(Sound_CRY);
+        multiplayer::playef_others(Sound_CRY);
         if (INBOUNDS_VEC(i, obj.entities) && !noflashingmode)
         {
             obj.entities[i].invis = true;
@@ -7053,19 +7125,27 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         option(loc::gettext("ok"));
         menuyoff = 50;
         break;
+    case Menu::playersetup:
+        option(loc::gettext("change name"));
+        option(loc::gettext("change colour"));
+        option(loc::gettext("join a server"));
+        option(loc::gettext("return"));
+        maxspacing = 15;
+        break;
     case Menu::serverselect:
         option(loc::gettext("ok"));
         option(loc::gettext("return"));
 
         menuyoff = 50;
+        maxspacing = 15;
         break;
     case Menu::connectiontimeout:
     case Menu::nopeers:
         option(loc::gettext("ok"));
         option(loc::gettext("retry"));
 
-        menuspacing = 5;
         menuyoff = 50;
+        maxspacing = 15;
         break;
     }
 

@@ -27,6 +27,7 @@ Player::Player(ENetPeer* peer, std::string name, int connection_type, std::strin
     deathseq = -1;
     gravity = 0;
     colour = 0;
+    tile = 0;
 }
 
 Player::Player(const Player& other)
@@ -51,6 +52,7 @@ Player::Player(const Player& other)
     deathseq = other.deathseq;
     gravity = other.gravity;
     colour = other.colour;
+    tile = other.tile;
 }
 
 Player::~Player(void)
@@ -80,6 +82,7 @@ Player& Player::operator=(const Player& other)
     deathseq = other.deathseq;
     gravity = other.gravity;
     colour = other.colour;
+    tile = other.tile;
     return *this;
 }
 

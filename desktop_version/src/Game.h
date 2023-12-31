@@ -110,6 +110,7 @@ namespace Menu
         timetrialcomplete2,
         timetrialcomplete3,
         gamecompletecontinue,
+        playersetup,
         serverselect,
         connectiontimeout,
         nopeers

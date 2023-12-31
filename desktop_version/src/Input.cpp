@@ -412,7 +412,7 @@ static void menuactionpress(void)
             //Play
             //Bring you to the normal playmenu
             music.playef(Sound_VIRIDIAN);
-            game.createmenu(Menu::serverselect);
+            game.createmenu(Menu::playersetup);
             map.nexttowercolour();
             break;
 #endif
@@ -2231,6 +2231,45 @@ static void menuactionpress(void)
         game.returnmenu();
         map.nexttowercolour();
         break;
+    case Menu::playersetup:
+        switch (game.currentmenuoption)
+        {
+        case 0: // change name
+            music.playef(Sound_VIRIDIAN);
+            key.enabletextentry();
+            key.keybuffer = multiplayer::name;
+            break;
+        case 1:
+        {
+            music.playef(Sound_VIRIDIAN);
+            // change colour
+            multiplayer::preferred_color_id += (key.isDown(SDLK_LSHIFT) || key.isDown(SDLK_RSHIFT)) ? -1 : 1;
+            int size = multiplayer::player_colors.size();
+            multiplayer::preferred_color_id = POS_MOD(multiplayer::preferred_color_id, size);
+
+            multiplayer::preferred_color = multiplayer::player_colors[multiplayer::preferred_color_id];
+            break;
+        }
+        case 2:
+            // advance to server selection, unless name is empty
+            if (multiplayer::name.empty())
+            {
+                music.playef(Sound_CRY);
+            }
+            else
+            {
+                music.playef(Sound_VIRIDIAN);
+                map.nexttowercolour();
+                game.createmenu(Menu::serverselect);
+            }
+            break;
+        case 3:
+            music.playef(Sound_VIRIDIAN);
+            map.nexttowercolour();
+            game.returnmenu();
+            break;
+        }
+        break;
     case Menu::serverselect:
         music.playef(Sound_VIRIDIAN);
         map.nexttowercolour();
@@ -2292,6 +2331,41 @@ void titleinput(void)
     game.press_interact = false;
 
     bool lang_press_horizontal = false;
+
+    if (key.textentry())
+    {
+        if (key.isDown(SDLK_ESCAPE) && !game.mapheld)
+        {
+            game.mapheld = true;
+            key.disabletextentry();
+            music.playef(Sound_VIRIDIAN);
+        }
+
+        if (key.isDown(SDLK_RETURN) && !game.mapheld)
+        {
+            game.mapheld = true;
+            key.disabletextentry();
+            music.playef(Sound_VIRIDIAN);
+            if (game.currentmenuname == Menu::playersetup)
+            {
+                multiplayer::name = key.keybuffer;
+
+                if (multiplayer::name.length() > 16)
+                {
+                    multiplayer::name = multiplayer::name.substr(0, 16);
+                }
+
+                // Okay, trim whitespace from both sides
+
+                multiplayer::name.erase(0, multiplayer::name.find_first_not_of(" "));
+                multiplayer::name.erase(multiplayer::name.find_last_not_of(" ") + 1);
+            }
+        }
+
+        return;
+    }
+
+
 
     if (graphics.flipmode)
     {
@@ -2859,6 +2933,7 @@ void gameinput(void)
                     }
                 }
                 music.playef(Sound_FLIP);
+                multiplayer::playef_others(Sound_FLIP);
                 game.jumppressed = 0;
                 game.totalflips++;
             }
@@ -2876,6 +2951,7 @@ void gameinput(void)
                     }
                 }
                 music.playef(Sound_UNFLIP);
+                multiplayer::playef_others(Sound_UNFLIP);
                 game.jumppressed = 0;
                 game.totalflips++;
             }

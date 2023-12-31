@@ -209,6 +209,7 @@ void gamelogic(void)
                 obj.entities[i].tile = 144;
             }
             music.playef(Sound_CRY);
+            multiplayer::playef_others(Sound_CRY);
             multiplayer::update_player_state();
         }
         if (obj.upset > 301) obj.upset = 301;
@@ -803,6 +804,7 @@ void gamelogic(void)
                         obj.entities[i].tile = 144;
                     }
                     music.playef(Sound_CRY);
+                    multiplayer::playef_others(Sound_CRY);
                     multiplayer::update_player_state();
                 }
             }
@@ -1284,6 +1286,7 @@ void gamelogic(void)
                 {
                     game.flashlight = 6;
                     game.screenshake = 25;
+                    multiplayer::sync_screen_effects();
                 }
             }
         }else{
@@ -1398,6 +1401,7 @@ void gamelogic(void)
                 {
                     game.flashlight = 6;
                     game.screenshake = 25;
+                    multiplayer::sync_screen_effects();
                 }
             }
         }

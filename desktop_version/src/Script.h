@@ -53,6 +53,7 @@ enum StartMode
     Start_QUIT,
     Start_CUTSCENETEST,
 
+    Start_CLIENT,
     Start_SERVER,
 
     Start_FIRST_NODEATHMODE = Start_NODEATHMODE_WITHCUTSCENES,

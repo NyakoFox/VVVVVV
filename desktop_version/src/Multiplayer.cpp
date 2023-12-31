@@ -17,12 +17,14 @@
 #include "Game.h"
 #include "Graphics.h"
 #include "Input.h"
+#include "Localization.h"
 #include "Map.h"
 #include "Music.h"
 #include "Packet.h"
 #include "Player.h"
 #include "RenderFixed.h"
 #include "Script.h"
+#include "VFormat.h"
 #include "Vlogging.h"
 
 #include "UtilityClass.h"
@@ -48,6 +50,11 @@ namespace multiplayer
     bool connecting = false;
     bool did_startmode = false;
     bool should_start = false;
+    std::string name = "";
+    int preferred_color_id = 0;
+    int preferred_color = 0;
+
+    std::vector<int> player_colors = {0, 30, 16, 12, 35, 31, 20, 8, 15, 6, 33, 17, 36, 9, 14, 32, 13, 34, 11, 22, 21, 18, 19};
 
     int total_packets = 0;
     int waiting_for_packets = -1;
@@ -68,6 +75,7 @@ namespace multiplayer
 
     bool should_update_player = false;
     bool should_update_player_movement = false;
+    bool should_update_screen_effects = false;
 
     std::string generate_uuid(void)
     {
@@ -128,6 +136,17 @@ namespace multiplayer
         }
     }
 
+    void send_screen_effects_packet()
+    {
+        should_update_screen_effects = false;
+
+        Packet packet = Packet("screen_effects", 0);
+        packet.write_int(game.flashlight);
+        packet.write_int(game.screenshake);
+
+        multiplayer::send_to_server(&packet);
+    }
+
     void update_player_entities()
     {
         for (std::vector<Player>::iterator it = players.begin(); it != players.end(); ++it)
@@ -152,6 +171,7 @@ namespace multiplayer
                             obj.entities[i].colour = it->colour;
                             obj.entities[i].invis = it->invis;
                             obj.entities[i].para = it->deathseq; // para is our deathseq attribute
+                            obj.entities[i].tile = it->tile;
                             obj.entities[i].ax = it->ax;
                             obj.entities[i].ay = it->ay;
                             obj.entities[i].vx = it->vx;
@@ -172,6 +192,7 @@ namespace multiplayer
                             {
                                 obj.entities[i].colour = it->colour;
                                 obj.entities[i].dir = it->dir;
+                                obj.entities[i].tile = it->tile;
                                 obj.entities[i].ax = it->ax;
                                 obj.entities[i].ay = it->ay;
                                 obj.entities[i].vx = it->vx;
@@ -454,6 +475,7 @@ namespace multiplayer
                                     packet.write_int(player->dir);
                                     packet.write_int(player->invis);
                                     packet.write_int(player->deathseq);
+                                    packet.write_int(player->tile);
                                     packet.write_int(player->colour);
                                     packet.send(it->peer);
                                 }
@@ -479,6 +501,7 @@ namespace multiplayer
                                     packet.write_int(it->dir);
                                     packet.write_int(it->invis);
                                     packet.write_int(it->deathseq);
+                                    packet.write_int(it->tile);
                                     packet.write_int(it->colour);
                                     packet.send(event.peer);
                                 }
@@ -661,6 +684,7 @@ namespace multiplayer
                             player->colour = packet.read_int();
                             player->invis = packet.read_int();
                             player->deathseq = packet.read_int();
+                            player->tile = packet.read_int();
 
                             // Tell all players about the player's update
 
@@ -675,6 +699,58 @@ namespace multiplayer
                                     packet.write_int(player->deathseq);
                                     packet.write_int(player->tile);
                                     packet.send(it->peer);
+                                }
+                            }
+                        }
+                        else if (SDL_strcmp(packet.id, "screen_effects") == 0)
+                        {
+                            if (player == NULL)
+                            {
+                                vlog_info("Received screen effects from unknown player.");
+                                break;
+                            }
+
+                            int flashlight = packet.read_int();
+                            int screenshake = packet.read_int();
+
+                            // Tell all players in the same room about the screen effects
+
+                            for (std::vector<Player>::iterator it = players.begin(); it != players.end(); ++it)
+                            {
+                                if (it->peer != event.peer)
+                                {
+                                    if (player->room_x == it->room_x && player->room_y == it->room_y)
+                                    {
+                                        Packet packet = Packet("screen_effects", 0);
+                                        packet.write_int(flashlight);
+                                        packet.write_int(screenshake);
+                                        packet.send(it->peer);
+                                    }
+                                }
+                            }
+                        }
+                        else if (SDL_strcmp(packet.id, "playef") == 0)
+                        {
+                            if (player == NULL)
+                            {
+                                vlog_info("Received playef from unknown player.");
+                                break;
+                            }
+
+                            int sound = packet.read_int();
+
+                            // Tell all players in the same room about the playef
+
+                            for (std::vector<Player>::iterator it = players.begin(); it != players.end(); ++it)
+                            {
+                                if (it->peer != event.peer)
+                                {
+                                    if (player->room_x == it->room_x && player->room_y == it->room_y)
+                                    {
+                                        Packet packet = Packet("playef", 0);
+                                        packet.write_int(sound);
+                                        packet.send(it->peer);
+                                    }
                                 }
                             }
                         }
@@ -699,11 +775,11 @@ namespace multiplayer
                             // We got server information, so send client information!
 
                             Packet packet = Packet("client_info", ENET_PACKET_FLAG_RELIABLE);
-                            packet.write_string("Ally");
+                            packet.write_string(name.c_str());
                             packet.write_string(generate_uuid());
                             packet.send(event.peer);
 
-                            //script.startgamemode(Start_SERVER);
+                            //script.startgamemode(Start_CLIENT);
                         }
                         else if (SDL_strcmp(packet.id, "message") == 0)
                         {
@@ -727,6 +803,7 @@ namespace multiplayer
                             player.dir = packet.read_int();
                             player.invis = packet.read_int();
                             player.deathseq = packet.read_int();
+                            player.tile = packet.read_int();
                             player.colour = packet.read_int();
                             players.push_back(player);
 
@@ -964,6 +1041,15 @@ namespace multiplayer
 
                             total_packets++;
                         }
+                        else if (SDL_strcmp(packet.id, "screen_effects") == 0)
+                        {
+                            game.flashlight = packet.read_int();
+                            game.screenshake = packet.read_int();
+                        }
+                        else if (SDL_strcmp(packet.id, "playef") == 0)
+                        {
+                            music.playef(packet.read_int());
+                        }
                     }
                 }
 
@@ -1002,6 +1088,8 @@ namespace multiplayer
             send_player_update_packet();
         if (should_update_player_movement)
             send_player_movement_packet();
+        if (should_update_screen_effects)
+            send_screen_effects_packet();
 
         if (!connected && connecting)
         {
@@ -1091,6 +1179,24 @@ namespace multiplayer
             should_update_player_movement = true;
         }
     }
+
+    void sync_screen_effects()
+    {
+        if (!multiplayer::is_server())
+        {
+            should_update_screen_effects = true;
+        }
+    }
+
+    void playef_others(int sound)
+    {
+        if (!multiplayer::is_server())
+        {
+            Packet packet = Packet("playef", ENET_PACKET_FLAG_RELIABLE);
+            packet.write_int(sound);
+            packet.send(peer);
+        }
+    }
 }
 
 static inline float calc_percentage(float amount, float total)
@@ -1145,8 +1251,8 @@ void connectingrender(void)
         font::print(PR_CEN, -1, 95, "Connecting to the server...", tr, tg, tb);
     }
 
-    graphics.draw_sprite(multiplayer::viridian_position, 240 / 2 + 64, graphics.crewframe, graphics.col_crewcyan);
-    graphics.draw_sprite(multiplayer::viridian_position - 320, 240 / 2 + 64, graphics.crewframe, graphics.col_crewcyan);
+    graphics.draw_sprite(multiplayer::viridian_position, 240 / 2 + 64, graphics.crewframe, graphics.getcol(multiplayer::preferred_color));
+    graphics.draw_sprite(multiplayer::viridian_position - 320, 240 / 2 + 64, graphics.crewframe, graphics.getcol(multiplayer::preferred_color));
 
     graphics.drawfade();
 
@@ -1210,7 +1316,7 @@ void connectinglogic(void)
         {
             multiplayer::did_startmode = true;
             // We did connect, so fade out the screen
-            startmode(Start_SERVER);
+            startmode(Start_CLIENT);
         }
         else if (!multiplayer::should_start)
         {
@@ -1222,4 +1328,60 @@ void connectinglogic(void)
             }
         }
     }
+}
+
+
+void serverrender(void)
+{
+    graphics.clear();
+
+    if (!game.colourblindmode) graphics.drawtowerbackground(graphics.titlebg);
+
+    int tr = graphics.col_tr;
+    int tg = graphics.col_tg;
+    int tb = graphics.col_tb;
+
+    tr = int(tr * .8f);
+    tg = int(tg * .8f);
+    tb = int(tb * .8f);
+    if (tr < 0) tr = 0;
+    if (tr > 255) tr = 255;
+    if (tg < 0) tg = 0;
+    if (tg > 255) tg = 255;
+    if (tb < 0) tb = 0;
+    if (tb > 255) tb = 255;
+
+    font::print(PR_2X | PR_CEN, -1, 25, "Hosting Server", tr, tg, tb);
+
+    char buffer[SCREEN_WIDTH_CHARS + 1];
+    vformat_buf(buffer, sizeof(buffer), loc::gettext("Hosting on {host}:{port}"), "host:str, port:int", multiplayer::server_ip.c_str(), multiplayer::server_port);
+    font::print(PR_CEN, -1, 45, buffer, tr, tg, tb);
+
+    graphics.drawfade();
+
+    graphics.renderwithscreeneffects();
+}
+
+void serverrenderfixed(void)
+{
+    if (!game.colourblindmode)
+    {
+        graphics.updatetowerbackground(graphics.titlebg);
+    }
+
+    titleupdatetextcol();
+
+    graphics.updatetitlecolours();
+}
+
+void serverinput(void)
+{
+}
+
+void serverlogic(void)
+{
+    help.updateglow();
+
+    graphics.titlebg.bypos -= 2;
+    graphics.titlebg.bscroll = -2;
 }

@@ -197,6 +197,13 @@ static const inline struct ImplFunc* get_gamestate_funcs(
         {Func_fixed, connectinglogic},
     FUNC_LIST_END
 
+    FUNC_LIST_BEGIN(SERVERMODE)
+        {Func_input, serverinput},
+        {Func_fixed, serverrenderfixed},
+        {Func_delta, serverrender},
+        {Func_fixed, serverlogic},
+    FUNC_LIST_END
+
 #undef FUNC_LIST_END
 #undef FUNC_LIST_BEGIN
 
@@ -776,7 +783,7 @@ int main(int argc, char* argv[])
 
     if (multiplayer::is_server())
     {
-        script.startgamemode(Start_MAINGAME);
+        script.startgamemode(Start_SERVER);
 
         if (!multiplayer::create_server())
         {
@@ -837,10 +844,11 @@ int main(int argc, char* argv[])
             game.playgc = savegc;
             game.playmusic = savemusic;
             game.cliplaytest = true;
-            script.startgamemode(Start_CUSTOM_QUICKSAVE);
+            //script.startgamemode(Start_CUSTOM_QUICKSAVE);
         } else {
-            script.startgamemode(Start_CUSTOM);
+            //script.startgamemode(Start_CUSTOM);
         }
+        script.startgamemode(Start_SERVER);
 
         graphics.fademode = FADE_NONE;
     }

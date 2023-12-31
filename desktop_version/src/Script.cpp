@@ -377,11 +377,13 @@ void scriptclass::run(void)
             {
                 //USAGE: flash(frames)
                 game.flashlight = ss_toi(words[1]);
+                multiplayer::sync_screen_effects();
             }
             if (words[0] == "shake")
             {
                 //USAGE: shake(frames)
                 game.screenshake = ss_toi(words[1]);
+                multiplayer::sync_screen_effects();
             }
             if (words[0] == "walk")
             {
@@ -413,6 +415,10 @@ void scriptclass::run(void)
             if (words[0] == "playef")
             {
                 music.playef(ss_toi(words[1]));
+            }
+            if (words[0] == "playefothers")
+            {
+                multiplayer::playef_others(ss_toi(words[1]));
             }
             if (words[0] == "play")
             {
@@ -876,7 +882,7 @@ void scriptclass::run(void)
                     obj.entities[i].xp = 100;
                     obj.entities[i].lerpoldxp = obj.entities[i].xp;
                     obj.entities[i].size = 0;
-                    obj.entities[i].colour = 0;
+                    obj.entities[i].colour = multiplayer::preferred_color;
                     obj.entities[i].cx = 6;
                     obj.entities[i].cy = 2;
                     obj.entities[i].h = 21;
@@ -1789,7 +1795,7 @@ void scriptclass::run(void)
                 i = obj.getplayer();
                 if (INBOUNDS_VEC(i, obj.entities))
                 {
-                    obj.entities[i].colour = 0;
+                    obj.entities[i].colour = multiplayer::preferred_color;
                 }
                 multiplayer::update_player_state();
             }
@@ -1823,6 +1829,7 @@ void scriptclass::run(void)
             {
                 music.silencedasmusik();
                 music.playef(Sound_TRINKET);
+                multiplayer::playef_others(Sound_TRINKET);
 
                 size_t trinket = ss_toi(words[1]);
                 if (trinket < SDL_arraysize(obj.collect))
@@ -2677,7 +2684,7 @@ void scriptclass::startgamemode(const enum StartMode mode)
     }
 
     // Don't hardreset if we're connecting to a server, because we already did!
-    if (mode != Start_SERVER)
+    if (mode != Start_CLIENT)
     {
         hardreset();
     }
@@ -2691,10 +2698,15 @@ void scriptclass::startgamemode(const enum StartMode mode)
         game.gamestate = GAMEMODE;
     }
 
+    if (mode == Start_SERVER)
+    {
+        game.gamestate = SERVERMODE;
+    }
+
     // Font handling
     switch (mode)
     {
-    case Start_SERVER:
+    case Start_CLIENT:
         if (!map.custommode)
         {
             font::set_level_font_interface();
@@ -2896,7 +2908,7 @@ void scriptclass::startgamemode(const enum StartMode mode)
         {
             for (int i = 0; i < cl.maxwidth; i++)
             {
-                ed.kludgewarpdir[i+(j*cl.maxwidth)]=cl.roomproperties[i+(j*cl.maxwidth)].warpdir;
+                ed.kludgewarpdir[i + (j * cl.maxwidth)] = cl.roomproperties[i + (j * cl.maxwidth)].warpdir;
             }
         }
 
@@ -2973,6 +2985,10 @@ void scriptclass::startgamemode(const enum StartMode mode)
         break;
 
     case Start_SERVER:
+        // We're a server, so we don't actually want gameplay.
+        break;
+
+    case Start_CLIENT:
         // Alright, finish up loading.
         // We did a lot of loading when receiving packets, but there's still some stuff we have to do outside of that.
         graphics.reloadresources();
@@ -3006,8 +3022,11 @@ void scriptclass::startgamemode(const enum StartMode mode)
         break;
     }
 
-    game.gravitycontrol = game.savegc;
-    graphics.flipmode = graphics.setflipmode;
+    if (!multiplayer::is_server())
+    {
+        game.gravitycontrol = game.savegc;
+        graphics.flipmode = graphics.setflipmode;
+    }
 
     if (!map.custommode && !graphics.setflipmode)
     {
@@ -3017,25 +3036,28 @@ void scriptclass::startgamemode(const enum StartMode mode)
 
     obj.entities.clear();
     if (!multiplayer::is_server())
+    {
         obj.createentity(game.savex, game.savey, 0, 0);
 
-    if (player_hitbox.initialized)
-    {
-        /* Restore player hitbox */
-        const int player_idx = obj.getplayer();
-        if (INBOUNDS_VEC(player_idx, obj.entities))
+        if (player_hitbox.initialized)
         {
-            entclass* player = &obj.entities[player_idx];
-            player->size = player_hitbox.size;
-            player->cx = player_hitbox.cx;
-            player->cy = player_hitbox.cy;
-            player->w = player_hitbox.w;
-            player->h = player_hitbox.h;
+            /* Restore player hitbox */
+            const int player_idx = obj.getplayer();
+            if (INBOUNDS_VEC(player_idx, obj.entities))
+            {
+                entclass* player = &obj.entities[player_idx];
+                player->size = player_hitbox.size;
+                player->cx = player_hitbox.cx;
+                player->cy = player_hitbox.cy;
+                player->w = player_hitbox.w;
+                player->h = player_hitbox.h;
+            }
         }
+
+        map.resetplayer();
+        map.gotoroom(game.saverx, game.savery);
     }
 
-    map.resetplayer();
-    map.gotoroom(game.saverx, game.savery);
     map.initmapdata();
     if (map.custommode)
     {
@@ -3043,7 +3065,7 @@ void scriptclass::startgamemode(const enum StartMode mode)
     }
 
     /* If we are spawning in a tower, ensure variables are set correctly */
-    if (map.towermode)
+    if (map.towermode && !multiplayer::is_server())
     {
         map.resetplayer();
 
@@ -3235,7 +3257,7 @@ void scriptclass::hardreset(void)
         game.savey = 0;
         game.savegc = 0;
     }
-    game.savecolour = 0;
+    game.savecolour = multiplayer::preferred_color;
 
     game.intimetrial = false;
     game.timetrialcountdown = 0;
@@ -3469,6 +3491,7 @@ bool scriptclass::loadcustom(const std::string& t)
             add("flash(5)");
             add("shake(20)");
             add("playef(9)");
+            add("playefothers(9)");
         }else if(words[0] == "sad" || words[0] == "cry"){
             if(customtextmode==1){ add("endtext"); customtextmode=0;}
             if(words[1]=="player"){

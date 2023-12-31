@@ -1309,7 +1309,7 @@ void entityclass::createentity(int xp, int yp, int t, int meta1, int meta2, int 
     case 0: //Player
         entity.rule = 0; //Playable character
         entity.tile = 0;
-        entity.colour = 0;
+        entity.colour = multiplayer::preferred_color;
         entity.cx = 6;
         entity.cy = 2;
         entity.w = 12;
@@ -2682,6 +2682,7 @@ bool entityclass::updateentities( int i )
             if (entities[i].state == 1)
             {
                 music.playef(Sound_COIN);
+                multiplayer::playef_others(Sound_COIN);
                 if (INBOUNDS_ARR(entities[i].para, collect))
                 {
                     collect[(int) entities[i].para] = true;
@@ -2702,12 +2703,14 @@ bool entityclass::updateentities( int i )
                 if (game.intimetrial)
                 {
                     music.playef(Sound_NEWRECORD);
+                    multiplayer::playef_others(Sound_NEWRECORD);
                 }
                 else
                 {
                     game.setstate(1000);
                     if(music.currentsong!=-1) music.silencedasmusik();
                     music.playef(Sound_TRINKET);
+                    multiplayer::playef_others(Sound_TRINKET);
                     if (game.trinkets() > game.stat_trinkets && !map.custommode)
                     {
                         game.stat_trinkets = game.trinkets();
@@ -2735,6 +2738,7 @@ bool entityclass::updateentities( int i )
                 entities[i].onentity = 0;
                 game.savepoint = entities[i].para;
                 music.playef(Sound_CHECKPOINT);
+                multiplayer::playef_others(Sound_CHECKPOINT);
 
                 game.savex = entities[i].xp - 4;
 
@@ -2780,6 +2784,7 @@ bool entityclass::updateentities( int i )
 
 
                 music.playef(Sound_GRAVITYLINE);
+                multiplayer::playef_others(Sound_GRAVITYLINE);
                 game.gravitycontrol = (game.gravitycontrol + 1) % 2;
                 game.totalflips++;
                 int temp = getplayer();
@@ -2822,6 +2827,7 @@ bool entityclass::updateentities( int i )
                 entities[i].onentity = 0;
                 //play a sound or somefink
                 music.playef(Sound_TELEPORT);
+                multiplayer::playef_others(Sound_TELEPORT);
                 game.teleport = true;
 
                 game.edteleportent = i;
@@ -3174,6 +3180,7 @@ bool entityclass::updateentities( int i )
                 entities[i].colour = 5;
                 entities[i].onentity = 0;
                 music.playef(Sound_TERMINALTOUCH);
+                multiplayer::playef_others(Sound_TERMINALTOUCH);
 
                 entities[i].state = 0;
             }
@@ -3351,6 +3358,7 @@ bool entityclass::updateentities( int i )
                 if (game.intimetrial)
                 {
                     music.playef(Sound_RESCUE);
+                    multiplayer::playef_others(Sound_RESCUE);
                 }
                 else
                 {
@@ -3358,6 +3366,7 @@ bool entityclass::updateentities( int i )
                     //music.haltdasmusik();
                     if(music.currentsong!=-1) music.silencedasmusik();
                     music.playef(Sound_RESCUE);
+                    multiplayer::playef_others(Sound_RESCUE);
                 }
 
                 return disableentity(i);
@@ -3370,6 +3379,7 @@ bool entityclass::updateentities( int i )
                 if (entities[i].tile == 1)
                 {
                     music.playef(Sound_GAMESAVED);
+                    multiplayer::playef_others(Sound_GAMESAVED);
                     entities[i].tile = 2;
                     entities[i].colour = 101;
                     if(!game.intimetrial && !game.nodeathmode)
@@ -4926,6 +4936,7 @@ void entityclass::collisioncheck(int i, int j, bool scm /*= false*/)
                 if (entityhlinecollide(i, j))
                 {
                     music.playef(Sound_GRAVITYLINE);
+                    multiplayer::playef_others(Sound_GRAVITYLINE);
                     game.gravitycontrol = (game.gravitycontrol + 1) % 2;
                     game.totalflips++;
                     if (game.gravitycontrol == 0)
