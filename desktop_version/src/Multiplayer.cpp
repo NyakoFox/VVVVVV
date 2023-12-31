@@ -40,11 +40,15 @@
 #include <uuid/uuid.h>
 #endif
 
+#define MAX_CONNECTION_COUNT 32
+#define DEFAULT_SERVER_IP "localhost"
+#define DEFAULT_SERVER_PORT 65432
+
 namespace multiplayer
 {
     bool server = false;
-    std::string server_ip = "localhost";
-    int server_port = 65432;
+    std::string server_ip = DEFAULT_SERVER_IP;
+    int server_port = DEFAULT_SERVER_PORT;
 
     bool connected = false;
     bool connecting = false;
@@ -54,7 +58,8 @@ namespace multiplayer
     int preferred_color_id = 0;
     int preferred_color = 0;
 
-    std::vector<int> player_colors = {0, 30, 16, 12, 35, 31, 20, 8, 15, 6, 33, 17, 36, 9, 14, 32, 13, 34, 11, 22, 21, 18, 19};
+    static const int player_colors_arr[] = {0, 30, 16, 12, 35, 31, 20, 8, 15, 6, 33, 17, 36, 9, 14, 32, 13, 34, 11, 22, 21, 18, 19};
+    std::vector<int> player_colors(player_colors_arr, player_colors_arr + SDL_arraysize(player_colors_arr));
 
     int total_packets = 0;
     int waiting_for_packets = -1;
@@ -281,7 +286,7 @@ namespace multiplayer
         vlog_info("Creating server, listening on %s:%d", server_ip.c_str(), server_port);
 
         host_instance = enet_host_create(&server_address /* the address to bind the server host to */,
-            32      /* allow up to 32 clients and/or outgoing connections */,
+            MAX_CONNECTION_COUNT /* allow up to 32 clients and/or outgoing connections */,
             2      /* allow up to 2 channels to be used, 0 and 1 */,
             0      /* assume any amount of incoming bandwidth */,
             0      /* assume any amount of outgoing bandwidth */);
