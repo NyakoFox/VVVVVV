@@ -542,8 +542,8 @@ namespace multiplayer
                             packet.write_string(cl.level_font_name);
 
                             packet.write_int(assets.size());
-                            packet.write_int(music.num_pppppp_tracks);
-                            packet.write_int(music.num_mmmmmm_tracks);
+                            packet.write_int(has_custom_vvvvvvmusic ? music.num_pppppp_tracks : 0);
+                            packet.write_int(has_custom_mmmmmm ? music.num_mmmmmm_tracks : 0);
                             packet.write_int(script.customscripts.size());
                             packet.write_int(customentities.size());
 
