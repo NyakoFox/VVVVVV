@@ -7,6 +7,7 @@
 
 #include <enet/enet.h>
 
+#include "BinaryBlob.h"
 #include "Packet.h"
 
 namespace multiplayer
@@ -15,10 +16,17 @@ namespace multiplayer
     extern std::map<std::string, std::pair<unsigned char*, size_t> > assets_data;
     extern bool connecting;
     extern bool connected;
+    extern bool disconnected;
     extern std::string name;
     extern int preferred_color_id;
     extern std::vector<int> player_colors;
     extern int preferred_color;
+
+    extern binaryBlob pppppp_data;
+    extern binaryBlob mmmmmm_data;
+
+    extern bool has_custom_vvvvvvmusic;
+    extern bool has_custom_mmmmmm;
 
     bool is_server(void);
     void set_server(bool server);

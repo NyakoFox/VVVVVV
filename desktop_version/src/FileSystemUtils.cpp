@@ -931,6 +931,26 @@ bool FILESYSTEM_loadBinaryBlob(binaryBlob* blob, const char* filename)
 
     bool from_memory = false;
 
+    if (
+        (SDL_strcmp(filename, "vvvvvvmusic.vvv") == 0 && multiplayer::has_custom_vvvvvvmusic) ||
+        (SDL_strcmp(filename, "mmmmmm.vvv") == 0 && multiplayer::has_custom_mmmmmm)
+    )
+    {
+        // use multiplayer::pppppp_data
+        SDL_memcpy((void*) blob->m_headers, (void*) multiplayer::pppppp_data.m_headers, sizeof(blob->m_headers));
+        for (i = 0; i < SDL_arraysize(blob->m_headers); ++i)
+        {
+            if (!blob->m_headers[i].valid) continue;
+            blob->m_memblocks[i] = (char*) SDL_malloc(blob->m_headers[i].size);
+            if (blob->m_memblocks[i] == NULL)
+            {
+                VVV_exit(1);
+            }
+            SDL_memcpy((void*) blob->m_memblocks[i], (void*) multiplayer::pppppp_data.m_memblocks[i], blob->m_headers[i].size);
+        }
+        return true;
+    }
+
     if (multiplayer::assets_data.count(filename) > 0)
     {
         // the map has a pointer to the data

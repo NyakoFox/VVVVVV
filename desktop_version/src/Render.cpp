@@ -1855,6 +1855,10 @@ static void menurender(void)
         font::print(PR_2X | PR_CEN | PR_CJK_HIGH, -1, 30, loc::gettext("Connection Error"), tr, tg, tb);
         font::print_wrap(PR_CEN, -1, 65, loc::gettext("No peers available to initiate a connection."), tr, tg, tb);
         break;
+    case Menu::connectionlost:
+        font::print(PR_2X | PR_CEN | PR_CJK_HIGH, -1, 30, loc::gettext("Connection Lost"), tr, tg, tb);
+        font::print_wrap(PR_CEN, -1, 65, loc::gettext("The connection to the server was lost."), tr, tg, tb);
+        break;
     default:
         break;
     }

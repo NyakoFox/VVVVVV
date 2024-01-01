@@ -2293,6 +2293,7 @@ static void menuactionpress(void)
         break;
     case Menu::connectiontimeout:
     case Menu::nopeers:
+    case Menu::connectionlost:
         music.playef(Sound_VIRIDIAN);
         map.nexttowercolour();
 

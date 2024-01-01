@@ -21,8 +21,8 @@ class Packet
         size_t get_data_size(void);
         int get_flags(void);
 
-        void send(ENetPeer* peer);
-        void send(ENetPeer* peer, enet_uint8 channel);
+        int send(ENetPeer* peer);
+        int send(ENetPeer* peer, enet_uint8 channel);
 
         void write_string(std::string str);
         void write_int(int i);

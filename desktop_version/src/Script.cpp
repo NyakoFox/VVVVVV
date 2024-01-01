@@ -2698,7 +2698,7 @@ void scriptclass::startgamemode(const enum StartMode mode)
         game.gamestate = GAMEMODE;
     }
 
-    if (mode == Start_SERVER)
+    if (mode == Start_SERVER || mode == Start_SERVER_CUSTOM)
     {
         game.gamestate = SERVERMODE;
     }
@@ -2984,6 +2984,19 @@ void scriptclass::startgamemode(const enum StartMode mode)
         VVV_unreachable();
         break;
 
+    case Start_SERVER_CUSTOM:
+        map.custommodeforreal = true;
+        map.custommode = true;
+
+        if (!cl.load(std::string(cl.ListOfMetaData[game.playcustomlevel].filename)))
+        {
+            gotoerrorloadinglevel();
+            return;
+        }
+
+        map.customshowmm = true;
+
+        SDL_FALLTHROUGH;
     case Start_SERVER:
         // We're a server, so we don't actually want gameplay.
         break;

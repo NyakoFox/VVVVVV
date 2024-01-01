@@ -846,9 +846,8 @@ int main(int argc, char* argv[])
             game.cliplaytest = true;
             //script.startgamemode(Start_CUSTOM_QUICKSAVE);
         } else {
-            //script.startgamemode(Start_CUSTOM);
         }
-        script.startgamemode(Start_SERVER);
+        script.startgamemode(Start_SERVER_CUSTOM);
 
         graphics.fademode = FADE_NONE;
     }

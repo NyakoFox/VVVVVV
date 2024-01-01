@@ -9,6 +9,7 @@
 #include "Multiplayer.h"
 
 #include "Alloc.h"
+#include "BinaryBlob.h"
 #include "Constants.h"
 #include "CustomLevels.h"
 #include "Entity.h"
@@ -54,6 +55,7 @@ namespace multiplayer
     bool connecting = false;
     bool did_startmode = false;
     bool should_start = false;
+    bool disconnected = false;
     std::string name = "";
     int preferred_color_id = 0;
     int preferred_color = 0;
@@ -66,6 +68,12 @@ namespace multiplayer
 
     std::vector<std::string> assets;
     std::map<std::string, std::pair<unsigned char*, size_t> > assets_data;
+
+    binaryBlob pppppp_data;
+    binaryBlob mmmmmm_data;
+
+    bool has_custom_vvvvvvmusic = false;
+    bool has_custom_mmmmmm = false;
 
     ENetAddress server_address;
     ENetHost* host_instance;
@@ -315,8 +323,8 @@ namespace multiplayer
         }
         FILESYSTEM_freeEnumerate(&handle2);
 
-        if (FILESYSTEM_isAssetMounted("vvvvvvmusic.vvv")) assets.push_back("vvvvvvmusic.vvv");
-        if (FILESYSTEM_isAssetMounted("mmmmmm.vvv")) assets.push_back("mmmmmm.vvv");
+        has_custom_vvvvvvmusic = FILESYSTEM_isAssetMounted("vvvvvvmusic.vvv");
+        has_custom_mmmmmm = FILESYSTEM_isAssetMounted("mmmmmm.vvv");
     }
 
     bool create_client(void)
@@ -349,6 +357,7 @@ namespace multiplayer
         timeout = 5 * 30; // 5 seconds
         viridian_position = 160;
         connected = false;
+        disconnected = false;
         connecting = true;
         did_startmode = false;
         should_start = false;
@@ -376,6 +385,7 @@ namespace multiplayer
 
                 connecting = false;
                 connected = true;
+                disconnected = false;
 
                 vlog_info("A new client connected from %x:%u.",
                     event.peer->address.host,
@@ -532,6 +542,8 @@ namespace multiplayer
                             packet.write_string(cl.level_font_name);
 
                             packet.write_int(assets.size());
+                            packet.write_int(music.num_pppppp_tracks);
+                            packet.write_int(music.num_mmmmmm_tracks);
                             packet.write_int(script.customscripts.size());
                             packet.write_int(customentities.size());
 
@@ -599,9 +611,77 @@ namespace multiplayer
                                 packet.write_blob(fileIn, length);
 
                                 // Send asset packets on channel 1
-                                packet.send(event.peer, 1);
+                                int success = packet.send(event.peer, 1);
 
                                 VVV_free(fileIn);
+
+                                if (success < 0)
+                                {
+                                    vlog_error("Failed to send asset %s to %s, return code %d", assets[i].c_str(), player->name.c_str(), success);
+                                    // disconnect them
+                                    enet_peer_disconnect(event.peer, 0);
+                                }
+                            }
+
+                            // Send the music as well on channel 1
+                            if (has_custom_vvvvvvmusic)
+                            {
+                                int valid_tracks = 0;
+                                int i = 0;
+                                while (valid_tracks < music.num_pppppp_tracks)
+                                {
+                                    if (music.pppppp_blob.m_headers[i].valid)
+                                    {
+                                        Packet packet = Packet("music_track", ENET_PACKET_FLAG_RELIABLE);
+
+                                        packet.write_string(music.pppppp_blob.m_headers[i].name);
+                                        packet.write_int(music.pppppp_blob.m_headers[i].size);
+                                        packet.write_int(i);
+                                        packet.write_bool(false);
+                                        packet.write_blob(music.pppppp_blob.m_memblocks[i], music.pppppp_blob.m_headers[i].size);
+
+                                        int success = packet.send(event.peer, 1);
+                                        if (success < 0)
+                                        {
+                                            vlog_error("Failed to send music track %s to %s, return code %d", music.pppppp_blob.m_headers[i].name, player->name.c_str(), success);
+                                            // disconnect them
+                                            enet_peer_disconnect(event.peer, 0);
+                                        }
+
+                                        valid_tracks++;
+                                    }
+                                    i++;
+                                }
+                            }
+
+                            if (has_custom_mmmmmm)
+                            {
+                                int valid_tracks = 0;
+                                int i = 0;
+                                while (valid_tracks < music.num_mmmmmm_tracks)
+                                {
+                                    if (music.mmmmmm_blob.m_headers[i].valid)
+                                    {
+                                        Packet packet = Packet("music_track", ENET_PACKET_FLAG_RELIABLE);
+
+                                        packet.write_string(music.mmmmmm_blob.m_headers[i].name);
+                                        packet.write_int(music.mmmmmm_blob.m_headers[i].size);
+                                        packet.write_int(i);
+                                        packet.write_bool(true);
+                                        packet.write_blob(music.mmmmmm_blob.m_memblocks[i], music.mmmmmm_blob.m_headers[i].size);
+
+                                        int success = packet.send(event.peer, 1);
+                                        if (success < 0)
+                                        {
+                                            vlog_error("Failed to send music track %s to %s, return code %d", music.mmmmmm_blob.m_headers[i].name, player->name.c_str(), success);
+                                            // disconnect them
+                                            enet_peer_disconnect(event.peer, 0);
+                                        }
+
+                                        valid_tracks++;
+                                    }
+                                    i++;
+                                }
                             }
 
                             // Send the player all scripts
@@ -921,10 +1001,12 @@ namespace multiplayer
                             cl.level_font_name = packet.read_string();
 
                             int num_assets = packet.read_int();
+                            int num_pppppp_tracks = packet.read_int();
+                            int num_mmmmmm_tracks = packet.read_int();
                             int num_scripts = packet.read_int();
                             int num_entities = packet.read_int();
 
-                            waiting_for_packets = (width * height) + num_assets + num_scripts + num_entities;
+                            waiting_for_packets = (width * height) + num_assets + num_pppppp_tracks + num_mmmmmm_tracks + num_scripts + num_entities;
                         }
                         else if (SDL_strcmp(packet.id, "room_info") == 0)
                         {
@@ -1055,6 +1137,45 @@ namespace multiplayer
                         {
                             music.playef(packet.read_int());
                         }
+                        else if (SDL_strcmp(packet.id, "music_track") == 0)
+                        {
+                            std::string name = packet.read_string();
+                            int length = packet.read_int();
+                            int id = packet.read_int();
+                            bool mmmmmm = packet.read_bool();
+
+                            unsigned char* fileIn;
+                            packet.read_blob(&fileIn, length);
+
+                            vlog_info("Received music track %s", name.c_str());
+
+                            if (fileIn == NULL)
+                            {
+                                SDL_assert(0 && "Couldn't allocate memory");
+                            }
+                            else
+                            {
+                                if (mmmmmm)
+                                {
+                                    has_custom_mmmmmm = true;
+                                }
+                                else
+                                {
+                                    has_custom_vvvvvvmusic = true;
+                                }
+
+                                binaryBlob* music_data = mmmmmm ? &mmmmmm_data : &pppppp_data;
+
+                                SDL_memcpy(music_data->m_headers[id].name, name.substr(0, 48).c_str(), 48);
+                                music_data->m_headers[id].size = length;
+                                music_data->m_headers[id].valid = true;
+                                music_data->m_headers[id].start_UNUSED = -1;
+
+                                music_data->m_memblocks[id] = (char*) fileIn;
+                            }
+
+                            total_packets++;
+                        }
                     }
                 }
 
@@ -1065,26 +1186,42 @@ namespace multiplayer
                 /* Reset the peer's client information. */
                 event.peer->data = NULL;
 
-                // Remove the player from the list
-                for (std::vector<Player>::iterator it = players.begin(); it != players.end(); ++it)
+                if (is_server())
                 {
-                    if (it->peer == event.peer)
+                    // Remove the player from the list
+                    for (std::vector<Player>::iterator it = players.begin(); it != players.end(); ++it)
                     {
-                        vlog_info("Removing player %s, UUID %s", it->name.c_str(), it->uuid.c_str());
-
-                        // Send a player_remove packet to all players
-
-                        for (std::vector<Player>::iterator it2 = players.begin(); it2 != players.end(); ++it2)
+                        if (it->peer == event.peer)
                         {
-                            Packet packet = Packet("player_remove", ENET_PACKET_FLAG_RELIABLE);
-                            packet.write_string(it->uuid);
-                            packet.send(it2->peer);
+                            vlog_info("Removing player %s, UUID %s", it->name.c_str(), it->uuid.c_str());
+
+                            // Send a player_remove packet to all players
+
+                            for (std::vector<Player>::iterator it2 = players.begin(); it2 != players.end(); ++it2)
+                            {
+                                Packet packet = Packet("player_remove", ENET_PACKET_FLAG_RELIABLE);
+                                packet.write_string(it->uuid);
+                                packet.send(it2->peer);
+                            }
+
+                            players.erase(it);
+
+                            break;
                         }
-
-                        players.erase(it);
-
-                        break;
                     }
+
+                    enet_peer_reset(event.peer);
+                }
+                else
+                {
+                    // We disconnected!
+                    enet_peer_reset(peer);
+                    peer = NULL;
+                    disconnected = true;
+                    connected = false;
+                    connecting = false;
+                    did_startmode = false;
+                    should_start = false;
                 }
             }
         }
@@ -1105,8 +1242,11 @@ namespace multiplayer
                 enet_peer_reset(peer);
                 //enet_host_destroy(host_instance);
                 peer = NULL;
+                disconnected = false;
                 connected = false;
                 connecting = false;
+                should_start = false;
+                did_startmode = false;
                 return;
             }
         }
@@ -1309,12 +1449,19 @@ void connectinglogic(void)
     // If we're no longer trying to connect
     if (!multiplayer::connecting)
     {
-        if (!multiplayer::connected)
+        if (!multiplayer::connected && !multiplayer::disconnected)
         {
-            // We didn't connect, so probably a timeout
+            // We didn't connect, so it's a timeout
             map.nexttowercolour();
             music.playef(Sound_CRY);
             game.createmenu(Menu::connectiontimeout, false);
+            game.gamestate = TITLEMODE;
+        }
+        else if (!multiplayer::connected && multiplayer::disconnected)
+        {
+            map.nexttowercolour();
+            music.playef(Sound_CRY);
+            game.createmenu(Menu::connectionlost, false);
             game.gamestate = TITLEMODE;
         }
         else if (!multiplayer::did_startmode && multiplayer::should_start)

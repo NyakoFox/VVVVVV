@@ -113,6 +113,7 @@ namespace Menu
         playersetup,
         serverselect,
         connectiontimeout,
+        connectionlost,
         nopeers
     };
 }

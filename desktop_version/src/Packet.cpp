@@ -76,14 +76,14 @@ int Packet::get_flags(void)
     return packet->flags;
 }
 
-void Packet::send(ENetPeer* peer)
+int Packet::send(ENetPeer* peer)
 {
-    enet_peer_send(peer, 0, packet);
+    return enet_peer_send(peer, 0, packet);
 }
 
-void Packet::send(ENetPeer* peer, enet_uint8 channel)
+int Packet::send(ENetPeer* peer, enet_uint8 channel)
 {
-    enet_peer_send(peer, channel, packet);
+    return enet_peer_send(peer, channel, packet);
 }
 
 void Packet::write_string(std::string str)

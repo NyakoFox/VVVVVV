@@ -7141,6 +7141,7 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         break;
     case Menu::connectiontimeout:
     case Menu::nopeers:
+    case Menu::connectionlost:
         option(loc::gettext("ok"));
         option(loc::gettext("retry"));
 
