@@ -1295,6 +1295,16 @@ namespace multiplayer
             VVV_free(it->second.first);
         }
         assets_data.clear();
+
+        if (has_custom_vvvvvvmusic)
+        {
+            pppppp_data.clear();
+        }
+
+        if (has_custom_mmmmmm)
+        {
+            mmmmmm_data.clear();
+        }
     }
 
     void send_to_server(Packet* packet)
