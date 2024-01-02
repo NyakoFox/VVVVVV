@@ -3267,6 +3267,8 @@ static void mapmenuactionpress(const bool version2_2)
     }
         break;
     case 3:
+        break;
+    case -3:
     if (!game.gamesaved && !game.gamesavefailed && !game.inspecial())
     {
         game.flashlight = 5;

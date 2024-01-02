@@ -45,6 +45,9 @@
 #define DEFAULT_SERVER_IP "localhost"
 #define DEFAULT_SERVER_PORT 65432
 
+#define DEFAULT_SERVER_NAME "VVVVVV Server"
+
+
 namespace multiplayer
 {
     bool server = false;
@@ -78,6 +81,8 @@ namespace multiplayer
     ENetAddress server_address;
     ENetHost* host_instance;
     ENetPeer* peer;
+
+    std::string server_name = DEFAULT_SERVER_NAME;
 
     std::vector<Player> players;
 
@@ -402,7 +407,7 @@ namespace multiplayer
 
                     Packet packet = Packet("server_info", ENET_PACKET_FLAG_RELIABLE);
                     packet.write_int(1); // version 1
-                    packet.write_string("Test Server");
+                    packet.write_string(server_name);
                     player.send(&packet);
                 }
 
@@ -855,7 +860,8 @@ namespace multiplayer
                                 vlog_info("Client version match.");
                             }
 
-                            vlog_info("Connected to server %s.", packet.read_string().c_str());
+                            server_name = packet.read_string();
+                            vlog_info("Connected to server %s.", server_name.c_str());
 
                             // We got server information, so send client information!
 
@@ -1518,6 +1524,16 @@ void serverrender(void)
     char buffer[SCREEN_WIDTH_CHARS + 1];
     vformat_buf(buffer, sizeof(buffer), loc::gettext("Hosting on {host}:{port}"), "host:str, port:int", multiplayer::server_ip.c_str(), multiplayer::server_port);
     font::print(PR_CEN, -1, 45, buffer, tr, tg, tb);
+
+    font::print(PR_FONT_LEVEL | PR_CEN, -1, 70, multiplayer::server_name, tr, tg, tb);
+    font::print(PR_FONT_LEVEL, 8, 85, "Players:", tr, tg, tb);
+
+    int sp = SDL_max(10, font::height(PR_FONT_LEVEL));
+
+    for (int i = 0; i < multiplayer::players.size(); i++)
+    {
+        font::print(PR_FONT_LEVEL, 8, 100 + (sp * i), multiplayer::players[i].name, tr, tg, tb);
+    }
 
     graphics.drawfade();
 

@@ -2838,7 +2838,7 @@ void maprender(void)
         TAB(0, loc::gettext("MAP"));
         TAB(1, tab1);
         TAB(2, loc::gettext("STATS"));
-        TAB(3, loc::gettext("SAVE"));
+        TAB(3, loc::gettext("SERVER"));
 #undef TAB
     }
 
@@ -2977,12 +2977,19 @@ void maprender(void)
             );
             font::print_wrap(PR_CEN, -1, 105, buffer, 196, 196, 255 - help.glow);
         }
-        else if (map.custommode && multiplayer::connected)
-        {
-            font::print_wrap(PR_CEN, -1, FLIP(95, 8), "Server info will go here", 196, 196, 255 - help.glow);
-        }
         else if(map.custommode){
-            LevelMetaData& meta = cl.ListOfMetaData[game.playcustomlevel];
+            /*LevelMetaData& meta = cl.ListOfMetaData[game.playcustomlevel];
+            */
+
+            LevelMetaData meta;
+            meta.creator = cl.creator;
+            meta.title = cl.title;
+            meta.Desc1 = cl.Desc1;
+            meta.Desc2 = cl.Desc2;
+            meta.Desc3 = cl.Desc3;
+            meta.website = cl.website;
+            meta.title_is_gettext = false;
+            meta.creator_is_gettext = false;
 
             uint32_t title_flags = meta.title_is_gettext ? PR_FONT_INTERFACE : PR_FONT_LEVEL;
             uint32_t creator_flags = meta.creator_is_gettext ? PR_FONT_INTERFACE : PR_FONT_LEVEL;
@@ -3099,6 +3106,16 @@ void maprender(void)
         break;
     }
     case 3:
+    {
+        font::print(PR_FONT_LEVEL | PR_2X | PR_CEN, -1, FLIP(45, 8), multiplayer::server_name, 196, 196, 255 - help.glow);
+        int sp = SDL_max(10, font::height(PR_FONT_LEVEL));
+        for (int i = 0; i < multiplayer::players.size(); i++)
+        {
+            font::print(PR_FONT_LEVEL | PR_CEN, -1, FLIP(70 + (sp * i), 8), multiplayer::players[i].name, 196, 196, 255 - help.glow);
+        }
+        break;
+    }
+    case -3:
     {
         if (game.inintermission || game.translator_exploring)
         {

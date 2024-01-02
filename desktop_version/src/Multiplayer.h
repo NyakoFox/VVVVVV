@@ -9,6 +9,7 @@
 
 #include "BinaryBlob.h"
 #include "Packet.h"
+#include "Player.h"
 
 namespace multiplayer
 {
@@ -21,6 +22,8 @@ namespace multiplayer
     extern int preferred_color_id;
     extern std::vector<int> player_colors;
     extern int preferred_color;
+    extern std::string server_name;
+    extern std::vector<Player> players;
 
     extern binaryBlob pppppp_data;
     extern binaryBlob mmmmmm_data;
