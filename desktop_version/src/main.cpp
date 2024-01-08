@@ -570,6 +570,10 @@ int main(int argc, char* argv[])
                 multiplayer::set_server_port(SDL_atoi(argv[i]));
             })
         }
+        else if (ARG("-headless"))
+        {
+            multiplayer::headless = true;
+        }
 #undef ARG_INNER
 #undef ARG
         else
@@ -858,7 +862,10 @@ int main(int argc, char* argv[])
     }
 
     /* Only create the window after we have loaded all the assets. */
-    SDL_ShowWindow(gameScreen.m_window);
+    if (!multiplayer::headless)
+    {
+        SDL_ShowWindow(gameScreen.m_window);
+    }
 
     key.isActive = true;
 

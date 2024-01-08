@@ -69,6 +69,7 @@ set(VVV_SRC
     src/BinaryBlob.cpp
     src/BlockV.cpp
     src/ButtonGlyphs.cpp
+    src/ConsoleInput.cpp
     src/CustomLevels.cpp
     src/CWrappers.cpp
     src/Editor.cpp

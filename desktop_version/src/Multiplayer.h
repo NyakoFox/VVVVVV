@@ -25,6 +25,8 @@ namespace multiplayer
     extern std::string server_name;
     extern std::vector<Player> players;
 
+    extern bool headless;
+
     extern binaryBlob pppppp_data;
     extern binaryBlob mmmmmm_data;
 

@@ -11,6 +11,7 @@
 #include "Alloc.h"
 #include "BinaryBlob.h"
 #include "Constants.h"
+#include "ConsoleInput.h"
 #include "CustomLevels.h"
 #include "Entity.h"
 #include "FileSystemUtils.h"
@@ -62,6 +63,7 @@ namespace multiplayer
     std::string name = "";
     int preferred_color_id = 0;
     int preferred_color = 0;
+    bool headless = false;
 
     static const int player_colors_arr[] = {0, 30, 16, 12, 35, 31, 20, 8, 15, 6, 33, 17, 36, 9, 14, 32, 13, 34, 11, 22, 21, 18, 19};
     std::vector<int> player_colors(player_colors_arr, player_colors_arr + SDL_arraysize(player_colors_arr));
@@ -381,6 +383,43 @@ namespace multiplayer
 
     void update(void)
     {
+        if (is_server())
+        {
+            consoleinput::begin();
+            if (consoleinput::hasinput())
+            {
+                std::string command = consoleinput::getinput();
+                // Split by spaces
+                std::vector<std::string> args;
+
+                std::string::size_type pos = 0;
+                std::string::size_type prev = 0;
+                while ((pos = command.find(' ', prev)) != std::string::npos)
+                {
+                    if (pos > prev)
+                        args.push_back(command.substr(prev, pos - prev));
+                    prev = pos + 1;
+                }
+
+                if (prev < command.length())
+                    args.push_back(command.substr(prev, std::string::npos));
+
+                if (args.size() > 0)
+                {
+                    if (args[0] == "say")
+                    {
+                        for (int i = 0; i < players.size(); i++)
+                        {
+                            Packet packet = Packet("message", ENET_PACKET_FLAG_RELIABLE);
+                            packet.write_string("Server");
+                            packet.write_string(command.substr(4, std::string::npos));
+                            players[i].send(&packet);
+                        }
+                    }
+                }
+            }
+        }
+
         ENetEvent event;
         while (enet_host_service(host_instance, &event, 0) > 0)
         {
@@ -874,7 +913,9 @@ namespace multiplayer
                         }
                         else if (SDL_strcmp(packet.id, "message") == 0)
                         {
-                            vlog_info("[MESSAGE] <%s> %s", packet.read_string().c_str(), packet.read_string().c_str());
+                            std::string name = packet.read_string();
+                            std::string message = packet.read_string();
+                            vlog_info("[MESSAGE] <%s> %s", name.c_str(), message.c_str());
                         }
                         else if (SDL_strcmp(packet.id, "player_add") == 0)
                         {
