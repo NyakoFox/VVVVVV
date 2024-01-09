@@ -1927,6 +1927,7 @@ void mapclass::loadlevel(int rx, int ry)
                 text.x = ex / 8;
                 text.y = ey / 8;
                 text.text = ent.scriptname.c_str();
+                text.rtl = ent.p1;
                 roomtext.push_back(text);
                 break;
             }
