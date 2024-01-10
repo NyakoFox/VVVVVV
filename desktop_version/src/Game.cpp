@@ -6284,6 +6284,7 @@ void Game::returnmenu(void)
     {
         music.play(Music_PRESENTINGVVVVVV);
     }
+    enum Menu::MenuName camefrom = currentmenuname;
 
     MenuStackFrame& frame = menustack[menustack.size()-1];
 
@@ -6298,6 +6299,15 @@ void Game::returnmenu(void)
     if (!menustack.empty())
     {
         menustack.pop_back();
+    }
+
+    /* FIXME: Even more horrible kludge! */
+    if (camefrom == Menu::timetrialcomplete3)
+    {
+        if (can_unlock_ndm())
+        {
+            unlock_ndm();
+        }
     }
 }
 
@@ -6936,20 +6946,9 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         else
         {
             //Alright, we haven't unlocked any time trials. How about no death mode?
-            temp = 0;
-            if (bestrank[TimeTrial_SPACESTATION1] >= 2) temp++;
-            if (bestrank[TimeTrial_LABORATORY] >= 2) temp++;
-            if (bestrank[TimeTrial_TOWER] >= 2) temp++;
-            if (bestrank[TimeTrial_SPACESTATION2] >= 2) temp++;
-            if (bestrank[TimeTrial_WARPZONE] >= 2) temp++;
-            if (bestrank[TimeTrial_FINALLEVEL] >= 2) temp++;
-            if (temp >= 4 && !unlocknotify[Unlock_NODEATHMODE])
+            if (can_unlock_ndm())
             {
-                //Unlock No Death Mode
-                unlocknotify[Unlock_NODEATHMODE] = true;
-                unlock[Unlock_NODEATHMODE] = true;
-                createmenu(Menu::unlocknodeathmode, true);
-                savestatsandsettings();
+                unlock_ndm();
             }
             //Alright then! Flip mode?
             else if (unlock[UnlockTrophy_GAME_COMPLETE]
@@ -7154,6 +7153,26 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         }
     }
     menuxoff = (320-menuwidth)/2;
+}
+
+bool Game::can_unlock_ndm(void)
+{
+    int temp = 0;
+    if (bestrank[TimeTrial_SPACESTATION1] >= 2) temp++;
+    if (bestrank[TimeTrial_LABORATORY] >= 2) temp++;
+    if (bestrank[TimeTrial_TOWER] >= 2) temp++;
+    if (bestrank[TimeTrial_SPACESTATION2] >= 2) temp++;
+    if (bestrank[TimeTrial_WARPZONE] >= 2) temp++;
+    if (bestrank[TimeTrial_FINALLEVEL] >= 2) temp++;
+    return temp >= 4 && !unlocknotify[Unlock_NODEATHMODE];
+}
+
+void Game::unlock_ndm(void)
+{
+    unlocknotify[Unlock_NODEATHMODE] = true;
+    unlock[Unlock_NODEATHMODE] = true;
+    createmenu(Menu::unlocknodeathmode, true);
+    savestatsandsettings();
 }
 
 void Game::deletequick(void)
