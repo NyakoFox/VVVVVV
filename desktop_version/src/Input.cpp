@@ -26,6 +26,7 @@
 #include "Touch.h"
 #include "UtilityClass.h"
 #include "Vlogging.h"
+#include "Input.h"
 
 static void updatebuttonmappings(int bind)
 {
@@ -368,7 +369,7 @@ static void slidermodeinput(void)
     *user_changing_volume = SDL_clamp(*user_changing_volume, 0, USER_VOLUME_MAX);
 }
 
-static void menuactionpress(void)
+void menuactionpress(void)
 {
     if (game.menutestmode)
     {
@@ -1038,12 +1039,18 @@ static void menuactionpress(void)
             map.nexttowercolour();
             break;
         case 4:
+            // touch input options
+            music.playef(Sound_VIRIDIAN);
+            game.createmenu(Menu::touch_input);
+            map.nexttowercolour();
+            break;
+        case 5:
             //accessibility options
             music.playef(Sound_VIRIDIAN);
             game.createmenu(Menu::accessibility);
             map.nexttowercolour();
             break;
-        case 5:
+        case 6:
             //language options
             if (graphics.textboxes.empty())
             {
@@ -1949,6 +1956,20 @@ static void menuactionpress(void)
             break;
         }
         break;
+    case Menu::touch_input:
+        switch (game.currentmenuoption)
+        {
+        case 1:
+            touch::scale += 0.5;
+            music.playef(Sound_VIRIDIAN);
+            if (touch::scale > 2)
+            {
+                touch::scale = 0.5;
+            }
+            game.savestatsandsettings_menu();
+            break;
+        }
+        break;
     case Menu::cleardatamenu:
         switch (game.currentmenuoption)
         {
@@ -2587,7 +2608,7 @@ void gameinput(void)
             game.press_action = false;
             if (key.isDown(KEYBOARD_z) || key.isDown(KEYBOARD_SPACE) || key.isDown(KEYBOARD_v)
                 || key.isDown(KEYBOARD_UP) || key.isDown(KEYBOARD_DOWN) || key.isDown(KEYBOARD_w)
-                || key.isDown(KEYBOARD_s) || key.isDown(game.controllerButton_flip) || touch::screen_tapped()
+                || key.isDown(KEYBOARD_s) || key.isDown(game.controllerButton_flip) || touch::screen_down()
                 )
             {
                 game.press_action = true;
@@ -2835,13 +2856,20 @@ void gameinput(void)
         if (!game.press_action)
         {
             game.jumppressed = 0;
+            game.action_pressed = 0;
             game.jumpheld = false;
         }
 
         if (game.press_action && !game.jumpheld)
         {
             game.jumppressed = 5;
+            game.action_pressed = 5;
             game.jumpheld = true;
+        }
+
+        if (touch::screen_tapped())
+        {
+            game.action_pressed = 5;
         }
 
         std::vector<size_t> player_entities;
@@ -2863,6 +2891,7 @@ void gameinput(void)
             }
 
             game.jumppressed--;
+            game.action_pressed--;
             if (obj.entities[ie].onground > 0 && game.gravitycontrol == 0)
             {
                 game.gravitycontrol = 1;
@@ -2877,6 +2906,7 @@ void gameinput(void)
                 }
                 music.playef(Sound_FLIP);
                 game.jumppressed = 0;
+                game.action_pressed = 0;
                 game.totalflips++;
             }
             if (obj.entities[ie].onroof > 0 && game.gravitycontrol == 1)
@@ -2893,6 +2923,7 @@ void gameinput(void)
                 }
                 music.playef(Sound_UNFLIP);
                 game.jumppressed = 0;
+                game.action_pressed = 0;
                 game.totalflips++;
             }
         }
@@ -2904,13 +2935,20 @@ void gameinput(void)
         if (!game.press_action)
         {
             game.jumppressed = 0;
+            game.action_pressed = 0;
             game.jumpheld = false;
         }
 
         if (game.press_action && !game.jumpheld)
         {
             game.jumppressed = 5;
+            game.action_pressed = 5;
             game.jumpheld = true;
+        }
+
+        if (touch::screen_tapped())
+        {
+            game.action_pressed = 5;
         }
     }
 
@@ -2929,10 +2967,10 @@ void gameinput(void)
         //quitting the super gravitron
         game.mapheld = true;
         //Quit menu, same conditions as in game menu
+        game.menupage = 20; // The Map Page
         game.mapmenuchange(MAPMODE, true);
         game.gamesaved = false;
         game.gamesavefailed = false;
-        game.menupage = 20; // The Map Page
     }
     else if (game.intimetrial && graphics.fademode == FADE_NONE && !game.translator_exploring)
     {
@@ -2953,11 +2991,6 @@ void gameinput(void)
     else
     {
         //Normal map screen, do transition later
-        game.mapmenuchange(MAPMODE, true);
-        map.cursordelay = 0;
-        map.cursorstate = 0;
-        game.gamesaved = false;
-        game.gamesavefailed = false;
         if (script.running)
         {
             game.menupage = 3; // Only allow saving
@@ -2966,6 +2999,11 @@ void gameinput(void)
         {
             game.menupage = 0; // The Map Page
         }
+        game.mapmenuchange(MAPMODE, true);
+        map.cursordelay = 0;
+        map.cursorstate = 0;
+        game.gamesaved = false;
+        game.gamesavefailed = false;
     }
 
     if (!game.mapheld
@@ -2974,10 +3012,10 @@ void gameinput(void)
     {
         game.mapheld = true;
         //Quit menu, same conditions as in game menu
+        game.menupage = 30; // Pause screen
         game.mapmenuchange(MAPMODE, true);
         game.gamesaved = false;
         game.gamesavefailed = false;
-        game.menupage = 30; // Pause screen
     }
 
     if (game.deathseq == -1 && (key.isDown(SDLK_r) || key.isDown(game.controllerButton_restart)) && !game.nodeathmode)// && map.custommode) //Have fun glitchrunners!
@@ -2985,8 +3023,6 @@ void gameinput(void)
         game.deathseq = 30;
     }
 }
-
-static void mapmenuactionpress(bool version2_2);
 
 void mapinput(void)
 {
@@ -3107,9 +3143,10 @@ void mapinput(void)
         || (game.menupage >= 20 && game.menupage <= 21)
         || (game.menupage >= 30 && game.menupage <= 32))
         {
-            if (key.isDown(KEYBOARD_ENTER) || key.isDown(game.controllerButton_map) || touch::button_tapped(TOUCH_BUTTON_CONFIRM)) game.press_map = true;
-            if ((key.isDown(27) || touch::button_tapped(TOUCH_BUTTON_CANCEL)) && !game.mapheld)
+            if (key.isDown(KEYBOARD_ENTER) || key.isDown(game.controllerButton_map) || touch::button_tapped(TOUCH_BUTTON_MAP_BACK)) game.press_map = true;
+            if ((key.isDown(27)) && !game.mapheld)
             {
+                touch::remove_dynamic_buttons();
                 game.mapheld = true;
                 if (game.menupage < 9
                 || (game.menupage >= 20 && game.menupage <= 21))
@@ -3129,8 +3166,7 @@ void mapinput(void)
         }
         else
         {
-            if (key.isDown(KEYBOARD_ENTER) || key.isDown(27) || key.isDown(game.controllerButton_map)
-                || touch::button_tapped(TOUCH_BUTTON_CANCEL) || touch::button_tapped(TOUCH_BUTTON_CONFIRM))
+            if (key.isDown(KEYBOARD_ENTER) || key.isDown(27) || key.isDown(game.controllerButton_map))
             {
                 game.press_map = true;
             }
@@ -3200,7 +3236,7 @@ void mapinput(void)
     }
 }
 
-static void mapmenuactionpress(const bool version2_2)
+void mapmenuactionpress(const bool version2_2)
 {
     switch (game.menupage)
     {
@@ -3356,7 +3392,7 @@ void teleporterinput(void)
         if (!game.press_action && !game.press_left && !game.press_right && !game.press_interact) game.jumpheld = false;
         if (!game.press_map) game.mapheld = false;
 
-        if (key.isDown(27) || touch::button_tapped(TOUCH_BUTTON_CANCEL))
+        if (key.isDown(27) )
         {
             if (!map.custommode || map.custommodeforreal)
             {
@@ -3483,7 +3519,7 @@ void gamecompleteinput(void)
     graphics.titlebg.bypos += graphics.titlebg.bscroll;
     game.oldcreditposition = game.creditposition;
 
-    if (key.isDown(KEYBOARD_z) || key.isDown(KEYBOARD_SPACE) || key.isDown(KEYBOARD_v) || key.isDown(game.controllerButton_flip) || touch::screen_tapped())
+    if (key.isDown(KEYBOARD_z) || key.isDown(KEYBOARD_SPACE) || key.isDown(KEYBOARD_v) || key.isDown(game.controllerButton_flip) || touch::screen_down())
     {
         game.creditposition -= 6;
         if (game.creditposition <= -Credits::creditmaxposition)
@@ -3531,7 +3567,7 @@ void gamecompleteinput2(void)
     //Do this here because input comes first
     game.oldcreditposx = game.creditposx;
 
-    if (key.isDown(KEYBOARD_z) || key.isDown(KEYBOARD_SPACE) || key.isDown(KEYBOARD_v) || key.isDown(game.controllerButton_flip) || touch::screen_tapped())
+    if (key.isDown(KEYBOARD_z) || key.isDown(KEYBOARD_SPACE) || key.isDown(KEYBOARD_v) || key.isDown(game.controllerButton_flip) || touch::screen_down())
     {
         game.creditposx++;
         game.oldcreditposx++;

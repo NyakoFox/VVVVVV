@@ -141,6 +141,25 @@ static int changemousestate(
     return timeout;
 }
 
+static void remove_finger(int i)
+{
+    for (int j = 0; j < (int)touch::all_buttons.size(); j++)
+    {
+        if (touch::all_buttons[j]->fingerId == touch::fingers[i].id)
+        {
+            if (touch::all_buttons[j]->active && touch::all_buttons[j]->pressed && touch::all_buttons[j]->down)
+            {
+                touch::on_button_up(touch::all_buttons[j]);
+            }
+            touch::all_buttons[j]->down = false;
+            touch::all_buttons[j]->pressed = false;
+            touch::all_buttons[j]->fingerId = -1;
+        }
+    }
+
+    touch::fingers.erase(touch::fingers.begin() + i);
+}
+
 void KeyPoll::Poll(void)
 {
     static int raw_mousex = 0;
@@ -157,6 +176,14 @@ void KeyPoll::Poll(void)
     gameScreen.GetScreenSize(&screen_width, &screen_height);
 
     touch::reset();
+
+    for (int i = touch::fingers.size() - 1; i >= 0; i--)
+    {
+        if (touch::fingers[i].kept)
+        {
+            remove_finger(i);
+        }
+    }
 
     while (SDL_PollEvent(&evt))
     {
@@ -371,10 +398,12 @@ void KeyPoll::Poll(void)
             using_touch = true;
 
             VVV_Finger finger;
+            finger.kept = false;
             finger.pressed = true;
             finger.x = evt.tfinger.x * screen_width;
             finger.y = evt.tfinger.y * screen_height;
             finger.id = evt.tfinger.fingerId;
+            finger.on_button = false;
             touch::fingers.push_back(finger);
 
             raw_mousex = evt.tfinger.x * screen_width;
@@ -404,21 +433,21 @@ void KeyPoll::Poll(void)
         {
             using_touch = true;
 
-            for (int i = (int)touch::fingers.size() - 1; i >= 0; i--)
+            for (int i = (int) touch::fingers.size() - 1; i >= 0; i--)
             {
                 if (touch::fingers[i].id == evt.tfinger.fingerId)
                 {
-                    // Unpress any buttons that this finger may belong to
-                    for (int j = 0; j < NUM_TOUCH_BUTTONS; j++)
+                    if (touch::fingers[i].pressed)
                     {
-                        if (touch::buttons[j].finger == &touch::fingers[i])
-                        {
-                            touch::buttons[j].down = false;
-                            touch::buttons[j].finger = NULL;
-                        }
+                        // Wait, it was created in the same frame... Let's keep it around for one more frame so it actually gets detected
+                        touch::fingers[i].kept = true;
+                        touch::fingers[i].id -= 1000; // Arbitrary offset -- avoids collisions with other fingers that may be created next frame
                     }
-
-                    touch::fingers.erase(touch::fingers.begin() + i);
+                    else
+                    {
+                        // Unpress any buttons that this finger may belong to
+                        remove_finger(i);
+                    }
                     break;
                 }
             }
@@ -510,6 +539,7 @@ void KeyPoll::Poll(void)
         switch (evt.type)
         {
         case SDL_KEYDOWN:
+            using_touch = false;
             if (evt.key.repeat == 0)
             {
                 hidemouse = true;
@@ -518,6 +548,7 @@ void KeyPoll::Poll(void)
         case SDL_TEXTINPUT:
         case SDL_CONTROLLERBUTTONDOWN:
         case SDL_CONTROLLERAXISMOTION:
+            using_touch = false;
             hidemouse = true;
             break;
         case SDL_MOUSEMOTION:

@@ -27,6 +27,7 @@
 #include "RoomnameTranslator.h"
 #include "Screen.h"
 #include "Script.h"
+#include "Touch.h"
 #include "Unused.h"
 #include "UTF8.h"
 #include "UtilityClass.h"
@@ -160,6 +161,7 @@ void Game::init(void)
     jumpheld = false;
     advancetext = false;
     jumppressed = 0;
+    action_pressed = 0;
     gravitycontrol = 0;
     teleport = false;
     edteleportent = 0; //Added in the port!
@@ -753,12 +755,19 @@ void Game::remaining_textbox(void)
 void Game::actionprompt_textbox(void)
 {
     char buffer[SCREEN_WIDTH_CHARS + 1];
-    vformat_buf(
-        buffer, sizeof(buffer),
-        loc::gettext("Press {button} to continue"),
-        "button:but",
-        vformat_button(ActionSet_InGame, Action_InGame_ACTION)
-    );
+    if (key.using_touch)
+    {
+        SDL_strlcpy(buffer, loc::gettext("Tap screen to continue"), sizeof(buffer));
+    }
+    else
+    {
+        vformat_buf(
+            buffer, sizeof(buffer),
+            loc::gettext("Press {button} to continue"),
+            "button:but",
+            vformat_button(ActionSet_InGame, Action_InGame_ACTION)
+        );
+    }
     graphics.createtextboxflipme(buffer, -1, 196, TEXT_COLOUR("cyan"));
     graphics.textboxprintflags(PR_FONT_INTERFACE);
     graphics.textboxpad(1, 1);
@@ -911,12 +920,24 @@ void Game::updatestate(void)
                 obj.flags[13] = true;
 
                 char buffer[SCREEN_WIDTH_CHARS*3 + 1];
-                vformat_buf(
-                    buffer, sizeof(buffer),
-                    loc::gettext("Press {button} to view map and quicksave"),
-                    "button:but",
-                    vformat_button(ActionSet_InGame, Action_InGame_Map)
-                );
+                if (key.using_touch)
+                {
+                    vformat_buf(
+                        buffer, sizeof(buffer),
+                        loc::gettext("Press {button} to view map and quicksave"),
+                        "button:str",
+                        "MAP"
+                    );
+                }
+                else
+                {
+                    vformat_buf(
+                        buffer, sizeof(buffer),
+                        loc::gettext("Press {button} to view map and quicksave"),
+                        "button:but",
+                        vformat_button(ActionSet_InGame, Action_InGame_Map)
+                    );
+                }
 
                 graphics.createtextbox(buffer, -1, 155, TEXT_COLOUR("gray"));
                 graphics.textboxprintflags(PR_FONT_INTERFACE);
@@ -2498,7 +2519,7 @@ void Game::updatestate(void)
             actionprompt_textbox();
             break;
         case 3010:
-            if (jumppressed)
+            if (action_pressed)
             {
                 incstate();
                 setstatedelay(30);
@@ -2540,7 +2561,7 @@ void Game::updatestate(void)
             actionprompt_textbox();
             break;
         case 3024:
-            if (jumppressed)
+            if (action_pressed)
             {
                 incstate();
                 setstatedelay(30);
@@ -2581,7 +2602,7 @@ void Game::updatestate(void)
             actionprompt_textbox();
             break;
         case 3044:
-            if (jumppressed)
+            if (action_pressed)
             {
                 incstate();
                 setstatedelay(30);
@@ -2623,7 +2644,7 @@ void Game::updatestate(void)
             actionprompt_textbox();
             break;
         case 3054:
-            if (jumppressed)
+            if (action_pressed)
             {
                 incstate();
                 setstatedelay(30);
@@ -2689,7 +2710,7 @@ void Game::updatestate(void)
             actionprompt_textbox();
             break;
         case 3064:
-            if (jumppressed)
+            if (action_pressed)
             {
                 incstate();
                 setstatedelay(30);
@@ -2997,7 +3018,7 @@ void Game::updatestate(void)
             actionprompt_textbox();
             break;
         case 3509:
-            if (jumppressed)
+            if (action_pressed)
             {
                 incstate();
                 setstatedelay(30);
@@ -4638,6 +4659,11 @@ void Game::deserializesettings(tinyxml2::XMLElement* dataNode, struct ScreenSett
             key.sensitivity = help.Int(pText);
         }
 
+        if (SDL_strcmp(pKey, "touchscale") == 0)
+        {
+            touch::scale = help.Int(pText);
+        }
+
         if (SDL_strcmp(pKey, "lang") == 0)
         {
             loc::lang = std::string(pText);
@@ -4915,6 +4941,8 @@ void Game::serializesettings(tinyxml2::XMLElement* dataNode, const struct Screen
     }
 
     xml::update_tag(dataNode, "controllerSensitivity", key.sensitivity);
+
+    xml::update_tag(dataNode, "touchscale", touch::scale);
 
     xml::update_tag(dataNode, "lang", loc::lang.c_str());
     xml::update_tag(dataNode, "lang_set", (int) loc::lang_set);
@@ -6261,6 +6289,8 @@ void Game::returntomenu(enum Menu::MenuName t)
 
 void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
 {
+    touch::remove_dynamic_buttons();
+
     if (t == Menu::mainmenu && !menutestmode)
     {
         //Either we've just booted up the game or returned from gamemode
@@ -6286,25 +6316,36 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
     switch (t)
     {
     case Menu::mainmenu:
+    {
         if (ingame_titlemode)
         {
             /* We shouldn't be here! */
             SDL_assert(0 && "Entering main menu from in-game options!");
             break;
         }
+        int offset = 0;
 #if !defined(MAKEANDPLAY)
         option(loc::gettext("play"));
+        touch::create_menu_button(80, 96, 160, 26, loc::gettext("play"), offset++);
 #endif
         option(loc::gettext("levels"));
         option(loc::gettext("options"));
+        touch::create_menu_button(80, 128, 160, 26, loc::gettext("levels"), offset++);
+        touch::create_menu_button(164, 160, 76, 26, loc::gettext("options"), offset++);
+
         if (loc::show_translator_menu)
         {
             option(loc::gettext("translator"));
+            offset++;
         }
         option(loc::gettext("credits"));
         option(loc::gettext("quit"));
         menuyoff = -10;
         maxspacing = 15;
+
+        touch::create_menu_button(80, 160, 76, 26, loc::gettext("credits"), offset++);
+        touch::create_menu_button(80, 192, 160, 26, loc::gettext("quit"), offset++); // TODO: Don't show this on phones! Fine for now, but we have to do it before submitting to app stores.
+    }
         break;
     case Menu::playerworlds:
         option(loc::gettext("play a level"));
@@ -6313,10 +6354,21 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         {
             option(loc::gettext("open level folder"), FILESYSTEM_openDirectoryEnabled());
             option(loc::gettext("show level folder path"));
+
+            touch::create_menu_button(80, 128, 160, 26, loc::gettext("return"), 4);
         }
+        else
+        {
+            touch::create_menu_button(80, 128, 160, 26, loc::gettext("return"), 2);
+        }
+
         option(loc::gettext("return"));
         menuyoff = -40;
         maxspacing = 15;
+
+        touch::create_menu_button(80, 64, 160, 26, loc::gettext("play a level"), 0);
+        touch::create_menu_button(80, 96, 160, 26, loc::gettext("level editor"), 1);
+
         break;
     case Menu::confirmshowlevelspath:
         option(loc::gettext("no, don't show me"));
@@ -6443,10 +6495,16 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         option(loc::gettext("yes, quit"));
         option(loc::gettext("no, return"));
         menuyoff = -20;
+
+        touch::create_menu_button(80, 96 + 32, 160, 26, loc::gettext("yes, quit"), 0);
+        touch::create_menu_button(80, 96 + 64, 160, 26, loc::gettext("no, return"), 1);
+
         break;
     case Menu::errornostart:
         option(loc::gettext("ok"));
         menuyoff = -20;
+
+        touch::create_menu_button(160 - 40, 96 + 32, 80, 26, loc::gettext("ok"), 0);
         break;
     case Menu::gameplayoptions:
 #if !defined(MAKEANDPLAY)
@@ -6541,6 +6599,7 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         option(loc::gettext("graphics"));
         option(loc::gettext("audio"));
         option(loc::gettext("game pad"));
+        option(loc::gettext("touch input"));
         option(loc::gettext("accessibility"));
         option(loc::gettext("language"), graphics.textboxes.empty());
         option(loc::gettext("return"));
@@ -6612,6 +6671,13 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         option(loc::gettext("return"));
         menuyoff = 0;
         maxspacing = 10;
+        break;
+    case Menu::touch_input:
+        option(loc::gettext("control style"));
+        option(loc::gettext("ui scale"));
+        option(loc::gettext("return"));
+        menuyoff = 0;
+        maxspacing = 15;
         break;
     case Menu::language:
         if (loc::languagelist.empty())
@@ -6760,6 +6826,9 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         option(loc::gettext("last page"));
         option(loc::gettext("return"));
         menuyoff = 64;
+
+        touch::create_menu_button(80, 176, 160, 26, loc::gettext("next page"), 0);
+        touch::create_menu_button(80, 208, 160, 26, loc::gettext("return"), 2);
         break;
     case Menu::credits2:
     case Menu::credits25:
@@ -6772,12 +6841,18 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         option(loc::gettext("previous page"));
         option(loc::gettext("return"));
         menuyoff = 64;
+
+        touch::create_menu_button(80, 176, 160, 26, loc::gettext("next page"), 0);
+        touch::create_menu_button(80, 208, 160, 26, loc::gettext("return"), 2);
         break;
     case Menu::credits6:
         option(loc::gettext("first page"));
         option(loc::gettext("previous page"));
         option(loc::gettext("return"));
         menuyoff = 64;
+
+        touch::create_menu_button(80, 176, 160, 26, loc::gettext("first page"), 0);
+        touch::create_menu_button(80, 208, 160, 26, loc::gettext("return"), 2);
         break;
     case Menu::play:
     {
@@ -6892,25 +6967,33 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
             }
             else
             {
+                int option_id = 0;
+                int option_offset = 0;
                 if (save_exists())
                 {
                     option(loc::gettext("continue"));
+                    touch::create_menu_button(80, 64 + 32 * option_offset++, 160, 26, loc::gettext("continue"), option_id++);
                 }
                 else
                 {
                     option(loc::gettext("new game"));
+                    touch::create_menu_button(80, 64 + 32 * option_offset++, 160, 26, loc::gettext("new game"), option_id++);
                 }
                 //ok, secret lab! no notification, but test:
                 if (unlock[Unlock_SECRETLAB])
                 {
                     option(loc::gettext("secret lab"));
+                    touch::create_menu_button(80, 64 + 32 * option_offset++, 160, 26, loc::gettext("secret lab"), option_id++);
                 }
                 option(loc::gettext("play modes"));
+                touch::create_menu_button(80, 64 + 32 * option_offset++, 160, 26, loc::gettext("play modes"), option_id++);
                 if (save_exists())
                 {
                     option(loc::gettext("new game"));
+                    touch::create_menu_button(80, 64 + 32 * option_offset++, 160, 26, loc::gettext("new game"), option_id++);
                 }
                 option(loc::gettext("return"));
+                touch::create_menu_button(80, 64 + 32 * option_offset++, 160, 26, loc::gettext("return"), option_id++);
                 if (unlock[Unlock_SECRETLAB])
                 {
                     menuyoff = -30;
@@ -6930,11 +7013,16 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
     case Menu::unlockflipmode:
         option(loc::gettext("proceed"));
         menuyoff = 70;
+
+        touch::create_menu_button(80, 176, 160, 26, loc::gettext("proceed"), 0);
         break;
     case Menu::newgamewarning:
         option(loc::gettext("start new game"));
         option(loc::gettext("return"));
         menuyoff = 64;
+
+        touch::create_menu_button(80, 176, 160, 26, loc::gettext("start new game"), 0);
+        touch::create_menu_button(80, 208, 160, 26, loc::gettext("return"), 1);
         break;
     case Menu::playmodes:
         option(loc::gettext("time trials"), !nocompetitive_unless_translator());
@@ -6944,6 +7032,12 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         option(loc::gettext("return"));
         menuyoff = 8;
         maxspacing = 20;
+
+        touch::create_menu_button(80, 32 + 32, 160, 26, loc::gettext("time trials"), 0, !nocompetitive_unless_translator());
+        touch::create_menu_button(80, 32 + 64, 160, 26, loc::gettext("intermissions"), 1, unlock[Unlock_INTERMISSION_REPLAYS]);
+        touch::create_menu_button(80, 32 + 96, 160, 26, loc::gettext("no death mode"), 2, unlock[Unlock_NODEATHMODE] && !nocompetitive());
+        touch::create_menu_button(80, 32 + 128, 160, 26, loc::gettext("flip mode"), 3, unlock[Unlock_FLIPMODE]);
+        touch::create_menu_button(80, 32 + 160, 160, 26, loc::gettext("return"), 4);
         break;
     case Menu::intermissionmenu:
         option(loc::gettext("play intermission 1"));
@@ -6974,6 +7068,11 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         option(loc::gettext("continue from teleporter"));
         option(loc::gettext("continue from quicksave"));
         option(loc::gettext("return"));
+
+        touch::create_menu_button(17, 65 - 20 - 32, 286, 90, "", 0);
+        touch::create_menu_button(17, 65 - 20 + 64, 286, 90, "", 1);
+        touch::create_menu_button(17, 65 - 20 + 160, 286, 26, loc::gettext("return"), 2);
+
         menuyoff = 20;
         break;
     case Menu::startnodeathmode:
@@ -7053,6 +7152,8 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
     case Menu::warninglevellist:
         option(loc::gettext("ok"));
         menuyoff = 50;
+
+        touch::create_menu_button(160 - 40, 96 + 32, 80, 26, loc::gettext("ok"), 0);
         break;
     }
 

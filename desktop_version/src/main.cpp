@@ -33,6 +33,7 @@
 #include "RenderFixed.h"
 #include "Screen.h"
 #include "Script.h"
+#include "Touch.h"
 #include "UtilityClass.h"
 #include "Vlogging.h"
 
@@ -527,6 +528,10 @@ int main(int argc, char *argv[])
         {
             loc::show_translator_menu = true;
         }
+        else if (ARG("-emutouch"))
+        {
+            SDL_SetHint(SDL_HINT_MOUSE_TOUCH_EVENTS, "1");
+        }
 #ifdef _WIN32
         else if (ARG("-console"))
         {
@@ -613,6 +618,9 @@ int main(int argc, char *argv[])
 
     // Set up screen
     graphics.init();
+
+    // Set up touch input before we load settings
+    touch::init();
 
     game.init();
     game.seed_use_sdl_getticks = seed_use_sdl_getticks;

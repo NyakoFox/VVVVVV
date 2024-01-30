@@ -25,12 +25,15 @@
 #include "RoomnameTranslator.h"
 #include "Screen.h"
 #include "Script.h"
+#include "Touch.h"
 #include "UtilityClass.h"
 #include "VFormat.h"
 
 static int tr;
 static int tg;
 static int tb;
+
+static bool dont_render_buttons;
 
 struct MapRenderData
 {
@@ -195,6 +198,38 @@ static inline void draw_skip_message()
         -1, graphics.flipmode ? 20 : 210, buffer,
         220 - help.glow, 220 - help.glow, 255 - help.glow / 2
     );
+}
+
+static void draw_summary(Game::Summary* summary, int offset)
+{
+    font::print(
+        PR_CEN, -1, 80 - 20 + offset,
+        loc::gettext_roomname_special(map.currentarea(summary->saverx, summary->savery)),
+        25, 255 - (help.glow / 2), 255 - (help.glow / 2)
+    );
+    for (int i = 0; i < 6; i++)
+    {
+        graphics.drawcrewman(169 - (3 * 42) + (i * 42), 95 - 20 + offset, i, summary->crewstats[i], true);
+    }
+    font::print(
+        0, 59, 132 - 20 + offset,
+        game.giventimestring(
+            summary->hours,
+            summary->minutes,
+            summary->seconds
+        ),
+        255 - (help.glow / 2), 255 - (help.glow / 2), 255 - (help.glow / 2)
+    );
+    char buffer[SCREEN_WIDTH_CHARS + 1];
+    vformat_buf(buffer, sizeof(buffer),
+        loc::gettext("{savebox_n_trinkets|wordy}"),
+        "savebox_n_trinkets:int",
+        summary->trinkets
+    );
+    font::print(PR_RIGHT, 262, 132 - 20 + offset, buffer, 255 - (help.glow / 2), 255 - (help.glow / 2), 255 - (help.glow / 2));
+
+    graphics.draw_sprite(34, 126 - 20 + offset, 50, graphics.col_clock);
+    graphics.draw_sprite(270, 126 - 20 + offset, 22, graphics.col_trinket);
 }
 
 static void menurender(void)
@@ -381,10 +416,14 @@ static void menurender(void)
             font::print_wrap(PR_CEN, -1, 65, loc::gettext("Rebind your controller's buttons and adjust sensitivity."), tr, tg, tb);
             break;
         case 4:
+            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Touch Input"), tr, tg, tb);
+            font::print_wrap(PR_CEN, -1, 65, loc::gettext("Change touch input options."), tr, tg, tb);
+            break;
+        case 5:
             font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Accessibility"), tr, tg, tb);
             font::print_wrap(PR_CEN, -1, 65, loc::gettext("Disable screen effects, enable slowdown modes or invincibility."), tr, tg, tb);
             break;
-        case 5:
+        case 6:
         {
             font::print(PR_2X | PR_CEN,  -1, 30, loc::gettext("Language"), tr, tg, tb);
             int next_y = font::print_wrap(PR_CEN, -1, 65, loc::gettext("Change the language."), tr, tg, tb);
@@ -755,6 +794,31 @@ static void menurender(void)
 
         break;
     }
+    case Menu::touch_input:
+    {
+        switch (game.currentmenuoption)
+        {
+        case 0: // Control style
+            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Control Style"), tr, tg, tb);
+            font::print_wrap(PR_CEN, -1, 65, loc::gettext("Change the control style for touch input."), tr, tg, tb);
+            break;
+        case 1:
+            // Display touch buttons!
+            key.using_touch = true;
+
+            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("UI Scale"), tr, tg, tb);
+            font::print_wrap(PR_CEN, -1, 65, loc::gettext("Change the scale of the UI buttons."), tr, tg, tb);
+
+            char buffer[SCREEN_WIDTH_CHARS + 1];
+            vformat_buf(buffer, sizeof(buffer), loc::gettext("Current scale: {scale}.{extra}x"), "scale:int, extra:int",
+                (int)touch::scale,
+                (int) ((float) ((float) touch::scale - (int) touch::scale) * 10)
+            );
+            font::print(PR_CEN, -1, 75, buffer, tr, tg, tb);
+            break;
+        }
+    }
+        break;
     case Menu::language:
         if (loc::languagelist.empty())
         {
@@ -1237,6 +1301,12 @@ static void menurender(void)
         font::print_wrap(PR_CEN, -1, 65, loc::gettext("Who do you want to play the level with?"), tr, tg, tb);
         break;
     case Menu::playmodes:
+        if (key.using_touch)
+        {
+            // Can't render the text here... buttons are too big!
+            break;
+        }
+
         switch (game.currentmenuoption)
         {
         case 0:
@@ -1306,52 +1376,38 @@ static void menurender(void)
     {
         const char* title = NULL;
         struct Game::Summary* summary = NULL;
+        struct Game::Summary* telesummary = &game.last_telesave;
+        struct Game::Summary* quicksummary = &game.last_quicksave;
 
         switch (game.currentmenuoption)
         {
         case 0:
             title = loc::gettext("Tele Save");
-            summary = &game.last_telesave;
+            summary = telesummary;
             break;
         case 1:
             title = loc::gettext("Quick Save");
-            summary = &game.last_quicksave;
+            summary = quicksummary;
             break;
         }
 
-        if (summary != NULL)
+        if (key.using_touch)
+        {
+            dont_render_buttons = true;
+            touch::render_buttons(tr, tg, tb, true);
+
+            draw_summary(telesummary, -32 + 6);
+            draw_summary(quicksummary, 64 + 6);
+
+            font::print(PR_CEN | PR_BOR, -1, 32 - 16 + 2, loc::gettext("Tele Save"), 196, 196, 255 - help.glow);
+            font::print(PR_CEN | PR_BOR, -1, 128 - 16 + 2, loc::gettext("Quick Save"), 196, 196, 255 - help.glow);
+        }
+        else if (summary != NULL)
         {
             graphics.drawpixeltextbox(17, 65-20, 286, 90, 65, 185, 207);
-
             font::print(PR_2X | PR_CEN, -1, 20, title, tr, tg, tb);
-            font::print(
-                PR_CEN, -1, 80-20,
-                loc::gettext_roomname_special(map.currentarea(summary->saverx, summary->savery)),
-                25, 255 - (help.glow / 2), 255 - (help.glow / 2)
-            );
-            for (int i = 0; i < 6; i++)
-            {
-                graphics.drawcrewman(169-(3*42)+(i*42), 95-20, i, summary->crewstats[i], true);
-            }
-            font::print(
-                0, 59, 132-20,
-                game.giventimestring(
-                    summary->hours,
-                    summary->minutes,
-                    summary->seconds
-                ),
-                255 - (help.glow / 2), 255 - (help.glow / 2), 255 - (help.glow / 2)
-            );
-            char buffer[SCREEN_WIDTH_CHARS + 1];
-            vformat_buf(buffer, sizeof(buffer),
-                loc::gettext("{savebox_n_trinkets|wordy}"),
-                "savebox_n_trinkets:int",
-                summary->trinkets
-            );
-            font::print(PR_RIGHT, 262, 132-20, buffer, 255 - (help.glow / 2), 255 - (help.glow / 2), 255 - (help.glow / 2));
 
-            graphics.draw_sprite(34, 126-20, 50, graphics.col_clock);
-            graphics.draw_sprite(270, 126-20, 22, graphics.col_trinket);
+            draw_summary(summary, 0);
         }
         break;
     }
@@ -1835,6 +1891,7 @@ static void menurender(void)
 
 void titlerender(void)
 {
+    dont_render_buttons = false;
     graphics.clear();
     if (!game.menustart)
     {
@@ -1854,14 +1911,21 @@ void titlerender(void)
 #endif
 
         char buffer[SCREEN_WIDTH_CHARS*2 + 1];
-        vformat_buf(
-            buffer, sizeof(buffer),
-            loc::gettext("[ Press {button} to Start ]"),
-            "button:but",
-            vformat_button(ActionSet_Menu, Action_Menu_Accept)
-        );
+        if (key.using_touch)
+        {
+            SDL_strlcpy(buffer, loc::gettext("[ Tap to Start ]"), sizeof(buffer));
+        }
+        else
+        {
+            vformat_buf(
+                buffer, sizeof(buffer),
+                loc::gettext("[ Press {button} to Start ]"),
+                "button:but",
+                vformat_button(ActionSet_Menu, Action_Menu_Accept)
+            );
+        }
         font::print_wrap(PR_CEN, -1, 175, buffer, tr, tg, tb);
-        if (BUTTONGLYPHS_keyboard_is_active())
+        if (!key.using_touch && BUTTONGLYPHS_keyboard_is_active())
         {
             font::print_wrap(PR_CEN, -1, 195, loc::gettext("ACTION = Space, Z, or V"), int(tr*0.5f), int(tg*0.5f), int(tb*0.5f));
         }
@@ -1874,18 +1938,31 @@ void titlerender(void)
         tg = graphics.col_tg;
         tb = graphics.col_tb;
 
-        menurender();
-
         tr = int(tr * .8f);
         tg = int(tg * .8f);
         tb = int(tb * .8f);
         if (tr < 0) tr = 0;
-        if(tr>255) tr=255;
+        if (tr > 255) tr = 255;
         if (tg < 0) tg = 0;
-        if(tg>255) tg=255;
+        if (tg > 255) tg = 255;
         if (tb < 0) tb = 0;
-        if(tb>255) tb=255;
-        graphics.drawmenu(tr, tg, tb, game.currentmenuname);
+        if (tb > 255) tb = 255;
+
+        menurender();
+
+        if (key.using_touch && touch::dynamic_buttons.size() > 0)
+        {
+            // If we're using touch, and buttons actually exist, render them
+            if (!dont_render_buttons)
+            {
+                // Oh, and we should make sure we WANT to render them as well
+                touch::render_buttons(tr, tg, tb);
+            }
+        }
+        else
+        {
+            graphics.drawmenu(tr, tg, tb, game.currentmenuname);
+        }
     }
 
     graphics.drawfade();
@@ -2165,12 +2242,24 @@ static const char* interact_prompt(
     const size_t buffer_size,
     const char* raw
 ) {
-    vformat_buf(
-        buffer, buffer_size,
-        raw,
-        "button:but",
-        vformat_button(ActionSet_InGame, Action_InGame_Interact)
-    );
+    if (key.using_touch)
+    {
+        vformat_buf(
+            buffer, buffer_size,
+            raw,
+            "button:str",
+            "MAP"
+        );
+    }
+    else
+    {
+        vformat_buf(
+            buffer, buffer_size,
+            raw,
+            "button:but",
+            vformat_button(ActionSet_InGame, Action_InGame_Interact)
+        );
+    }
 
     return buffer;
 }
@@ -2393,6 +2482,8 @@ void gamerender(void)
             220 - (help.glow), 220 - (help.glow), 255 - (help.glow / 2)
         );
     }
+
+    touch::render_buttons();
 
     graphics.cutscenebars();
     graphics.drawfade();
@@ -3057,14 +3148,17 @@ void maprender(void)
         }
         else if (obj.flags[67] && !map.custommode)
         {
-            char buffer[SCREEN_WIDTH_CHARS + 1];
-            vformat_buf(
-                buffer, sizeof(buffer),
-                loc::gettext("Press {button} to warp to the ship."),
-                "button:but",
-                vformat_button(ActionSet_InGame, Action_InGame_ACTION)
-            );
-            font::print_wrap(PR_CEN, -1, 105, buffer, 196, 196, 255 - help.glow);
+            if (!key.using_touch)
+            {
+                char buffer[SCREEN_WIDTH_CHARS + 1];
+                vformat_buf(
+                    buffer, sizeof(buffer),
+                    loc::gettext("Press {button} to warp to the ship."),
+                    "button:but",
+                    vformat_button(ActionSet_InGame, Action_InGame_ACTION)
+                );
+                font::print_wrap(PR_CEN, -1, 105, buffer, 196, 196, 255 - help.glow);
+            }
         }
         else if(map.custommode){
             LevelMetaData& meta = cl.ListOfMetaData[game.playcustomlevel];
@@ -3217,27 +3311,35 @@ void maprender(void)
         {
             /* FIXME: The text here should be automatically "balance-wrapped" instead of hardcoding the width.
              * In fact, maybe print_wrap should balance-wrap by default. */
-            font::print_wrap(PR_CEN, -1, 174, loc::gettext("(Note: The game is autosaved at every teleporter.)"), 146, 146, 180, 12);
+
+            int offset = key.using_touch ? -96 : 0;
+            if (!(key.using_touch && game.gamesaved))
+            font::print_wrap(PR_CEN, -1, 174 + offset, loc::gettext("(Note: The game is autosaved at every teleporter.)"), 146, 146, 180, 12);
         }
 
         if (!game.gamesaved)
         {
             char buffer[SCREEN_WIDTH_CHARS + 1];
-            vformat_buf(
-                buffer, sizeof(buffer),
-                loc::gettext("[Press {button} to save your game]"),
-                "button:but",
-                vformat_button(ActionSet_InGame, Action_InGame_ACTION)
-            );
 
-            font::print(PR_CEN, -1, 80, buffer, 255 - help.glow*2, 255 - help.glow*2, 255 - help.glow);
+            if (!key.using_touch)
+            {
+                vformat_buf(
+                    buffer, sizeof(buffer),
+                    loc::gettext("[Press {button} to save your game]"),
+                    "button:but",
+                    vformat_button(ActionSet_InGame, Action_InGame_ACTION)
+                );
+
+                font::print(PR_CEN, -1, 80, buffer, 255 - help.glow * 2, 255 - help.glow * 2, 255 - help.glow);
+            }
 
             if (map.custommode || !game.last_quicksave.exists)
             {
                 break;
             }
 
-            font::print(PR_CEN, -1, FLIP(100, 8), loc::gettext("Last Save:"), 164 - help.glow/4, 164 - help.glow/4, 164);
+            int offset = key.using_touch ? -64 : 0;
+            font::print(PR_CEN, -1, FLIP(100 + offset, 8), loc::gettext("Last Save:"), 164 - help.glow/4, 164 - help.glow/4, 164);
 
             struct Game::Summary* last = &game.last_quicksave;
             vformat_buf(
@@ -3248,7 +3350,7 @@ void maprender(void)
                 game.giventimestring(last->hours, last->minutes, last->seconds).c_str()
             );
 
-            font::print(PR_CEN, -1, FLIP(112, 8), buffer, 164 - help.glow/4, 164 - help.glow/4, 164);
+            font::print(PR_CEN, -1, FLIP(112 + offset, 8), buffer, 164 - help.glow/4, 164 - help.glow/4, 164);
             break;
         }
 
@@ -3313,8 +3415,11 @@ void maprender(void)
                 font::print_wrap(PR_CEN, -1, 142, loc::gettext("Do you want to quit? You will lose any unsaved progress."), 196, 196, 255 - help.glow, 12);
             }
 
-            font::print(PR_RTL_XFLIP, 80-selection_offset, 88, loc::gettext("[ NO, KEEP PLAYING ]"), 196, 196, 255 - help.glow);
-            font::print(PR_RTL_XFLIP, 80 + 32, 76, loc::gettext("yes, quit to menu"),  96, 96, 96);
+            if (!key.using_touch)
+            {
+                font::print(PR_RTL_XFLIP, 80 - selection_offset, 88, loc::gettext("[ NO, KEEP PLAYING ]"), 196, 196, 255 - help.glow);
+                font::print(PR_RTL_XFLIP, 80 + 32, 76, loc::gettext("yes, quit to menu"), 96, 96, 96);
+            }
         }
         else
         {
@@ -3328,9 +3433,11 @@ void maprender(void)
                 font::print_wrap(PR_CEN, -1, 76, loc::gettext("Do you want to quit? You will lose any unsaved progress."), 196, 196, 255 - help.glow, 12);
             }
 
-            font::print(PR_RTL_XFLIP, 80-selection_offset, 130, loc::gettext("[ NO, KEEP PLAYING ]"), 196, 196, 255 - help.glow);
-            font::print(PR_RTL_XFLIP, 80 + 32, 142, loc::gettext("yes, quit to menu"),  96, 96, 96);
-
+            if (!key.using_touch)
+            {
+                font::print(PR_RTL_XFLIP, 80 - selection_offset, 130, loc::gettext("[ NO, KEEP PLAYING ]"), 196, 196, 255 - help.glow);
+                font::print(PR_RTL_XFLIP, 80 + 32, 142, loc::gettext("yes, quit to menu"), 96, 96, 96);
+            }
         }
         break;
     case 11:
@@ -3347,8 +3454,11 @@ void maprender(void)
                 font::print_wrap(PR_CEN, -1, 142, loc::gettext("Do you want to quit? You will lose any unsaved progress."), 196, 196, 255 - help.glow, 12);
             }
 
-            font::print(PR_RTL_XFLIP, 80, 88, loc::gettext("no, keep playing"), 96,96,96);
-            font::print(PR_RTL_XFLIP, 80+32-selection_offset, 76, loc::gettext("[ YES, QUIT TO MENU ]"),  196, 196, 255 - help.glow);
+            if (!key.using_touch)
+            {
+                font::print(PR_RTL_XFLIP, 80, 88, loc::gettext("no, keep playing"), 96, 96, 96);
+                font::print(PR_RTL_XFLIP, 80 + 32 - selection_offset, 76, loc::gettext("[ YES, QUIT TO MENU ]"), 196, 196, 255 - help.glow);
+            }
         }
         else
         {
@@ -3361,8 +3471,11 @@ void maprender(void)
                 font::print_wrap(PR_CEN, -1, 76, loc::gettext("Do you want to quit? You will lose any unsaved progress."), 196, 196, 255 - help.glow, 12);
             }
 
-            font::print(PR_RTL_XFLIP, 80, 130, loc::gettext("no, keep playing"), 96,96,96);
-            font::print(PR_RTL_XFLIP, 80+32-selection_offset, 142, loc::gettext("[ YES, QUIT TO MENU ]"), 196, 196, 255 - help.glow);
+            if (!key.using_touch)
+            {
+                font::print(PR_RTL_XFLIP, 80, 130, loc::gettext("no, keep playing"), 96, 96, 96);
+                font::print(PR_RTL_XFLIP, 80 + 32 - selection_offset, 142, loc::gettext("[ YES, QUIT TO MENU ]"), 196, 196, 255 - help.glow);
+            }
         }
         break;
     case 20:
@@ -3399,6 +3512,8 @@ void maprender(void)
         }
 
     }
+
+    touch::render_buttons();
 
     graphics.set_render_target(graphics.gameTexture);
 
@@ -3477,7 +3592,8 @@ void teleporterrender(void)
     if (game.useteleporter)
     {
         char buffer[SCREEN_WIDTH_CHARS + 1];
-        const char* final_string = interact_prompt(
+        const char* final_string;
+        final_string = interact_prompt(
             buffer,
             sizeof(buffer),
             loc::gettext("Press {button} to Teleport")

@@ -64,6 +64,7 @@ namespace Menu
         audiooptions,
         accessibility,
         controller,
+        touch_input,
         language,
         translator_main,
         translator_options,
@@ -335,6 +336,7 @@ public:
     enum GameGamestate prevgamestate; //only used sometimes
     bool hascontrol, jumpheld;
     int jumppressed;
+    int action_pressed;
     int gravitycontrol;
     bool isingamecompletescreen(void);
 

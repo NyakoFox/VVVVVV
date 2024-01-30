@@ -6,6 +6,7 @@
 #include "Enums.h"
 #include "Map.h"
 #include "Script.h"
+#include "Touch.h"
 #include "UtilityClass.h"
 
 static inline void titleupdatetextcol(void)
@@ -228,6 +229,7 @@ void maprenderfixed(void)
                 graphics.menuoffset = threshold;
                 //go back to gamemode!
                 game.mapheld = true;
+                touch::remove_dynamic_buttons();
                 game.gamestate = GAMEMODE;
                 graphics.resumegamemode = false;
             }
