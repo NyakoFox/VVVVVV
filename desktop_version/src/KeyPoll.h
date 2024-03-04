@@ -6,6 +6,9 @@
 #include <string>
 #include <vector>
 
+extern "C" DECLSPEC void SDLCALL keypressed(const char* key);
+extern "C" DECLSPEC void SDLCALL keyreleased(const char* key);
+
 enum Kybrd
 {
     KEYBOARD_UP = SDLK_UP,

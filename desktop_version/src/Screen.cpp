@@ -41,6 +41,7 @@ void Screen::init(const struct ScreenSettings* settings)
 {
     m_window = NULL;
     m_renderer = NULL;
+    m_screen = NULL;
     windowDisplay = settings->windowDisplay;
     windowWidth = settings->windowWidth;
     windowHeight = settings->windowHeight;
@@ -78,6 +79,24 @@ void Screen::init(const struct ScreenSettings* settings)
 
     SDL_RenderSetVSync(m_renderer, (int) vsync);
 
+    m_screen = SDL_CreateRGBSurfaceFrom(
+        screenbufferPointer,
+        SCREEN_WIDTH_PIXELS,
+        SCREEN_HEIGHT_PIXELS,
+        32,
+        4 * SCREEN_WIDTH_PIXELS,
+        0,
+        0,
+        0,
+        0
+    );
+
+    if (m_screen == NULL)
+    {
+        vlog_error("Could not create screen surface: %s", SDL_GetError());
+        VVV_exit(1);
+    }
+
 #ifdef INTERIM_VERSION_EXISTS
     /* Branch name limits are ill-defined but on GitHub it's ~256 chars
      * ( https://stackoverflow.com/a/24014513/ ).
@@ -99,6 +118,7 @@ void Screen::init(const struct ScreenSettings* settings)
 void Screen::destroy(void)
 {
     /* Order matters! */
+    VVV_freefunc(SDL_FreeSurface, m_screen);
     VVV_freefunc(SDL_DestroyRenderer, m_renderer);
     VVV_freefunc(SDL_DestroyWindow, m_window);
 }
@@ -289,6 +309,17 @@ void Screen::GetScreenSize(int* x, int* y)
 
 void Screen::RenderPresent(void)
 {
+    graphics.set_render_target(graphics.gameTexture);
+
+    const int result = SDL_RenderReadPixels(m_renderer, NULL, SDL_PIXELFORMAT_RGBA32, m_screen->pixels, m_screen->pitch);
+    if (result != 0)
+    {
+        vlog_error("Could not read pixels from renderer: %s", SDL_GetError());
+        return;
+    }
+
+    graphics.set_render_target(NULL);
+
     SDL_RenderPresent(m_renderer);
     graphics.clear();
 }
@@ -319,8 +350,8 @@ void Screen::toggleLinearFilter(void)
 
     graphics.gameTexture = SDL_CreateTexture(
         m_renderer,
-        SDL_PIXELFORMAT_ABGR8888,
-        SDL_TEXTUREACCESS_STREAMING,
+        SDL_PIXELFORMAT_ARGB8888,
+        SDL_TEXTUREACCESS_TARGET,
         SCREEN_WIDTH_PIXELS,
         SCREEN_HEIGHT_PIXELS
     );

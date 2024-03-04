@@ -89,6 +89,16 @@ struct ImplFunc
     void (*func)(void);
 };
 
+extern "C" DECLSPEC void SDLCALL keypressed(const char* new_key)
+{
+    key.keymap[SDL_GetKeyFromName(new_key)] = true;
+}
+
+extern "C" DECLSPEC void SDLCALL keyreleased(const char* new_key)
+{
+    key.keymap[SDL_GetKeyFromName(new_key)] = false;
+}
+
 static void runscript(void)
 {
     script.run();
@@ -856,7 +866,7 @@ extern "C" DECLSPEC int SDLCALL mainLoop(int argc, char *argv[])
     }
 
     /* Only create the window after we have loaded all the assets. */
-    SDL_ShowWindow(gameScreen.m_window);
+    //SDL_ShowWindow(gameScreen.m_window);
 
     key.isActive = true;
 
@@ -953,7 +963,10 @@ extern "C" DECLSPEC void SDLCALL deltadraw(float delta)
 
         if (implfunc->type == Func_delta && implfunc->func != NULL)
         {
+            graphics.clear();
+            graphics.set_render_target(graphics.gameTexture);
             implfunc->func();
+            gameScreen.RenderPresent();
         }
     }
 }
