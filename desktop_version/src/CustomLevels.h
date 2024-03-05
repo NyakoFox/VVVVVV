@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+extern "C" DECLSPEC void SDLCALL inject_level_data(const char* level_data);
+
 class CustomEntity
 {
 public:
@@ -97,6 +99,9 @@ public:
     std::string website;
 
     std::vector<LevelMetaData> ListOfMetaData;
+
+    unsigned char* injected_level;
+    size_t injected_level_len;
 
     void loadZips(void);
     void getDirectoryData(void);

@@ -89,14 +89,43 @@ struct ImplFunc
     void (*func)(void);
 };
 
-extern "C" DECLSPEC void SDLCALL keypressed(const char* new_key)
+extern "C" DECLSPEC void SDLCALL simulate_keyevent(const char* event_type, const char* new_key)
 {
-    key.keymap[SDL_GetKeyFromName(new_key)] = true;
+    SDL_Event event;
+    SDL_zero(event);
+
+    if (SDL_strcmp(event_type, "keydown") == 0)
+    {
+        event.type = SDL_KEYDOWN;
+    }
+    else if (SDL_strcmp(event_type, "keyup") == 0)
+    {
+        event.type = SDL_KEYUP;
+    }
+    else
+    {
+        vlog_error("Invalid event type: %s", event_type);
+        return;
+    }
+
+    event.key.keysym.sym = SDL_GetKeyFromName(new_key);
+
+    SDL_PushEvent(&event);
 }
 
-extern "C" DECLSPEC void SDLCALL keyreleased(const char* new_key)
+extern "C" DECLSPEC void SDLCALL inject_level_data(const char* level_data)
 {
-    key.keymap[SDL_GetKeyFromName(new_key)] = false;
+    cl.injected_level = (unsigned char*) SDL_malloc(SDL_strlen(level_data) + 1);
+
+    if (cl.injected_level == NULL)
+    {
+        vlog_error("Failed to allocate memory for injected level data!");
+        VVV_exit(1);
+    }
+
+    SDL_memcpy(cl.injected_level, level_data, SDL_strlen(level_data) + 1);
+    cl.injected_level_len = SDL_strlen(level_data);
+    return;
 }
 
 static void runscript(void)
@@ -863,6 +892,14 @@ extern "C" DECLSPEC int SDLCALL mainLoop(int argc, char *argv[])
         }
 
         graphics.fademode = FADE_NONE;
+
+        if (cl.injected_level != NULL)
+        {
+            // we injected a level, so let's free the memory we used for that
+            SDL_free(cl.injected_level);
+            cl.injected_level = NULL;
+            cl.injected_level_len = 0;
+        }
     }
 
     /* Only create the window after we have loaded all the assets. */
