@@ -9,6 +9,7 @@
 #include "Alloc.h"
 #include "BinaryBlob.h"
 #include "Constants.h"
+#include "CustomLevels.h"
 #include "Exit.h"
 #include "Graphics.h"
 #include "Localization.h"
@@ -897,6 +898,25 @@ void FILESYSTEM_loadFileToMemory(
         }
 
         SDL_memcpy((void*) *mem, (void*) stdin_buffer, stdin_length + 1);
+        return;
+    }
+
+    if (SDL_strcmp(name, "levels/special/dll.vvvvvv") == 0)
+    {
+        // cl.injected_level is an unsigned char* that is set from whatever's including this DLL
+
+        *mem = (unsigned char*) SDL_malloc(cl.injected_level_len + 1);
+        if (*mem == NULL)
+        {
+            VVV_exit(1);
+        }
+
+        if (len != NULL)
+        {
+            *len = cl.injected_level_len;
+        }
+
+        SDL_memcpy((void*) *mem, (void*) cl.injected_level, cl.injected_level_len + 1);
         return;
     }
 

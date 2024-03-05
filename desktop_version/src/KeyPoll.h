@@ -6,8 +6,7 @@
 #include <string>
 #include <vector>
 
-extern "C" DECLSPEC void SDLCALL keypressed(const char* key);
-extern "C" DECLSPEC void SDLCALL keyreleased(const char* key);
+extern "C" DECLSPEC void SDLCALL simulate_keyevent(const char* event_type, const char* new_key);
 
 enum Kybrd
 {
