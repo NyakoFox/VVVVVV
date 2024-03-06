@@ -71,6 +71,7 @@ set(VVV_CXX_SRC
     src/ButtonGlyphs.cpp
     src/CustomLevels.cpp
     src/CWrappers.cpp
+    src/DLLHook.cpp
     src/Editor.cpp
     src/Ent.cpp
     src/Entity.cpp

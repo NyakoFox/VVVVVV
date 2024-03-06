@@ -30,18 +30,10 @@ void ScreenSettings_default(struct ScreenSettings* _this)
     _this->badSignal = false;
 }
 
-void* screenbufferPointer;
-
-extern "C" DECLSPEC void SDLCALL setScreenbufferPointer(void* ptr)
-{
-    screenbufferPointer = ptr;
-}
-
 void Screen::init(const struct ScreenSettings* settings)
 {
     m_window = NULL;
     m_renderer = NULL;
-    m_screen = NULL;
     windowDisplay = settings->windowDisplay;
     windowWidth = settings->windowWidth;
     windowHeight = settings->windowHeight;
@@ -79,24 +71,6 @@ void Screen::init(const struct ScreenSettings* settings)
 
     SDL_RenderSetVSync(m_renderer, (int) vsync);
 
-    m_screen = SDL_CreateRGBSurfaceFrom(
-        screenbufferPointer,
-        SCREEN_WIDTH_PIXELS,
-        SCREEN_HEIGHT_PIXELS,
-        32,
-        4 * SCREEN_WIDTH_PIXELS,
-        0,
-        0,
-        0,
-        0
-    );
-
-    if (m_screen == NULL)
-    {
-        vlog_error("Could not create screen surface: %s", SDL_GetError());
-        VVV_exit(1);
-    }
-
 #ifdef INTERIM_VERSION_EXISTS
     /* Branch name limits are ill-defined but on GitHub it's ~256 chars
      * ( https://stackoverflow.com/a/24014513/ ).
@@ -118,7 +92,6 @@ void Screen::init(const struct ScreenSettings* settings)
 void Screen::destroy(void)
 {
     /* Order matters! */
-    VVV_freefunc(SDL_FreeSurface, m_screen);
     VVV_freefunc(SDL_DestroyRenderer, m_renderer);
     VVV_freefunc(SDL_DestroyWindow, m_window);
 }
@@ -298,33 +271,14 @@ void Screen::ResizeToNearestMultiple(void)
 
 void Screen::GetScreenSize(int* x, int* y)
 {
-    if (SDL_GetRendererOutputSize(m_renderer, x, y) != 0)
-    {
-        vlog_error("Could not get window size: %s", SDL_GetError());
-        /* Initialize to safe defaults */
-        *x = SCREEN_WIDTH_PIXELS;
-        *y = SCREEN_HEIGHT_PIXELS;
-    }
-}
-
-void Screen::RenderToScreen(SDL_Texture* texture)
-{
-    graphics.set_render_target(texture);
-
-    const int result = SDL_RenderReadPixels(m_renderer, NULL, SDL_PIXELFORMAT_RGBA32, m_screen->pixels, m_screen->pitch);
-    if (result != 0)
-    {
-        vlog_error("Could not read pixels from renderer: %s", SDL_GetError());
-        return;
-    }
-
-    graphics.set_render_target(NULL);
+    *x = SCREEN_WIDTH_PIXELS;
+    *y = SCREEN_HEIGHT_PIXELS;
 }
 
 void Screen::RenderPresent(void)
 {
-    SDL_RenderPresent(m_renderer);
-    graphics.clear();
+    //SDL_RenderPresent(m_renderer);
+    //graphics.clear();
 }
 
 void Screen::toggleFullScreen(void)

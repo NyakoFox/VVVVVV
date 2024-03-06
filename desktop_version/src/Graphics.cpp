@@ -6,6 +6,7 @@
 #include "Alloc.h"
 #include "Constants.h"
 #include "CustomLevels.h"
+#include "DLLHook.h"
 #include "Editor.h"
 #include "Entity.h"
 #include "Exit.h"
@@ -445,34 +446,110 @@ void Graphics::print_level_creator(
     font::print(print_flags, text_x, y, creator, r, g, b);
 }
 
+int Graphics::get_texture_id(SDL_Texture* texture)
+{
+    if (texture == NULL)
+    {
+        return -1;
+    }
+    else if (texture == gameTexture)
+    {
+        return 0;
+    }
+    else if (texture == gameplayTexture)
+    {
+        return 1;
+    }
+    else if (texture == menuTexture)
+    {
+        return 2;
+    }
+    else if (texture == ghostTexture)
+    {
+        return 3;
+    }
+    else if (texture == tempShakeTexture)
+    {
+        return 4;
+    }
+    else if (texture == foregroundTexture)
+    {
+        return 5;
+    }
+    else if (texture == backgroundTexture)
+    {
+        return 6;
+    }
+    else if (texture == tempScrollingTexture)
+    {
+        return 7;
+    }
+    else if (texture == towerbg.texture)
+    {
+        return 8;
+    }
+    else if (texture == titlebg.texture)
+    {
+        return 9;
+    }
+    else if (texture == images[IMAGE_CUSTOMMINIMAP])
+    {
+        return 10;
+    }
+    else if (texture == grphx.im_sprites)
+    {
+        return 11;
+    }
+    else if (texture == grphx.im_tiles)
+    {
+        return 12;
+    }
+    else if (texture == grphx.im_tiles2)
+    {
+        return 13;
+    }
+    else
+    {
+        WHINE_ONCE_ARGS(("Unknown texture passed to get_render_id"));
+        return -2;
+    }
+}
+
+SDL_Texture* Graphics::get_render_target(void)
+{
+    return render_target;
+}
+
 int Graphics::set_render_target(SDL_Texture* texture)
 {
-    const int result = SDL_SetRenderTarget(gameScreen.m_renderer, texture);
-    if (result != 0)
-    {
-        WHINE_ONCE_ARGS(("Could not set render target: %s", SDL_GetError()));
-    }
-    return result;
+    render_target = texture;
+    draw_message message;
+    message.type = DRAW_SET_TARGET;
+    message.texture = get_texture_id(texture);
+    push_draw_message(message);
+    return 0;
 }
 
 int Graphics::set_texture_color_mod(SDL_Texture* texture, const Uint8 r, const Uint8 g, const Uint8 b)
 {
-    const int result = SDL_SetTextureColorMod(texture, r, g, b);
-    if (result != 0)
-    {
-        WHINE_ONCE_ARGS(("Could not set texture color mod: %s", SDL_GetError()));
-    }
-    return result;
+    draw_message message;
+    message.type = DRAW_SET_TINT_COLOR;
+    message.texture = get_texture_id(texture);
+    message.color.r = r;
+    message.color.g = g;
+    message.color.b = b;
+    push_draw_message(message);
+    return 0;
 }
 
 int Graphics::set_texture_alpha_mod(SDL_Texture* texture, const Uint8 alpha)
 {
-    const int result = SDL_SetTextureAlphaMod(texture, alpha);
-    if (result != 0)
-    {
-        WHINE_ONCE_ARGS(("Could not set texture alpha mod: %s", SDL_GetError()));
-    }
-    return result;
+    draw_message message;
+    message.type = DRAW_SET_TINT_ALPHA;
+    message.texture = get_texture_id(texture);
+    message.color.a = alpha;
+    push_draw_message(message);
+    return 0;
 }
 
 int Graphics::query_texture(SDL_Texture* texture, Uint32* format, int* access, int* w, int* h)
@@ -509,12 +586,10 @@ int Graphics::clear(const int r, const int g, const int b, const int a)
 {
     set_color(r, g, b, a);
 
-    const int result = SDL_RenderClear(gameScreen.m_renderer);
-    if (result != 0)
-    {
-        WHINE_ONCE_ARGS(("Could not clear current render target: %s", SDL_GetError()));
-    }
-    return result;
+    draw_message message;
+    message.type = DRAW_CLEAR;
+    push_draw_message(message);
+    return 0;
 }
 
 int Graphics::clear(void)
@@ -569,46 +644,93 @@ int Graphics::copy_texture(SDL_Texture* texture, const SDL_Rect* src, const SDL_
 {
     bool is_substituted = substitute(&texture);
 
-    const int result = SDL_RenderCopy(gameScreen.m_renderer, texture, src, dest);
-    if (result != 0)
+    draw_message message;
+    message.type = DRAW_TEXTURE;
+    message.texture = get_texture_id(texture);
+    if (src == NULL)
     {
-        WHINE_ONCE_ARGS(("Could not copy texture: %s", SDL_GetError()));
+        message.src_whole = true;
     }
+    else
+    {
+        message.src = { src->x, src->y, src->w, src->h };
+        message.src_whole = false;
+    }
+    if (dest == NULL)
+    {
+        message.dest_whole = true;
+    }
+    else
+    {
+        message.dest = { dest->x, dest->y, dest->w, dest->h };
+        message.dest_whole = false;
+    }
+    push_draw_message(message);
 
     if (is_substituted)
     {
         post_substitute(texture);
     }
 
-    return result;
+    return 0;
 }
 
 int Graphics::copy_texture(SDL_Texture* texture, const SDL_Rect* src, const SDL_Rect* dest, const double angle, const SDL_Point* center, const SDL_RendererFlip flip)
 {
     bool is_substituted = substitute(&texture);
 
-    const int result = SDL_RenderCopyEx(gameScreen.m_renderer, texture, src, dest, angle, center, flip);
-    if (result != 0)
+    draw_message message;
+    message.type = DRAW_TEXTURE_EXT;
+    message.texture = get_texture_id(texture);
+    if (src == NULL)
     {
-        WHINE_ONCE_ARGS(("Could not copy texture: %s", SDL_GetError()));
+        message.src_whole = true;
     }
+    else
+    {
+        message.src = { src->x, src->y, src->w, src->h };
+        message.src_whole = false;
+    }
+    if (dest == NULL)
+    {
+        message.dest_whole = true;
+    }
+    else
+    {
+        message.dest = { dest->x, dest->y, dest->w, dest->h };
+        message.dest_whole = false;
+    }
+    message.angle = angle;
+    if (center == NULL)
+    {
+        message.center = { -1, -1 };
+    }
+    else
+    {
+        message.center = { center->x, center->y };
+    }
+    message.flip_x = (flip & SDL_FLIP_HORIZONTAL) != 0;
+    message.flip_y = (flip & SDL_FLIP_VERTICAL) != 0;
+    push_draw_message(message);
 
     if (is_substituted)
     {
         post_substitute(texture);
     }
 
-    return result;
+    return 0;
 }
 
 int Graphics::set_color(const Uint8 r, const Uint8 g, const Uint8 b, const Uint8 a)
 {
-    const int result = SDL_SetRenderDrawColor(gameScreen.m_renderer, r, g, b, a);
-    if (result != 0)
-    {
-        WHINE_ONCE_ARGS(("Could not set draw color: %s", SDL_GetError()));
-    }
-    return result;
+    draw_message message;
+    message.type = DRAW_SET_COLOR;
+    message.color.r = r;
+    message.color.g = g;
+    message.color.b = b;
+    message.color.a = a;
+    push_draw_message(message);
+    return 0;
 }
 
 int Graphics::set_color(const Uint8 r, const Uint8 g, const Uint8 b)
@@ -623,12 +745,19 @@ int Graphics::set_color(const SDL_Color color)
 
 int Graphics::fill_rect(const SDL_Rect* rect)
 {
-    const int result = SDL_RenderFillRect(gameScreen.m_renderer, rect);
-    if (result != 0)
+    draw_message message;
+    message.type = DRAW_FILL_RECT;
+    if (rect == NULL)
     {
-        WHINE_ONCE_ARGS(("Could not draw filled rectangle: %s", SDL_GetError()));
+        message.dest_whole = true;
     }
-    return result;
+    else
+    {
+        message.dest = { rect->x, rect->y, rect->w, rect->h };
+        message.dest_whole = false;
+    }
+    push_draw_message(message);
+    return 0;
 }
 
 int Graphics::fill_rect(const SDL_Rect* rect, const int r, const int g, const int b, const int a)
@@ -675,12 +804,16 @@ int Graphics::fill_rect(const int x, const int y, const int w, const int h, cons
 
 int Graphics::draw_rect(const SDL_Rect* rect)
 {
-    const int result = SDL_RenderDrawRect(gameScreen.m_renderer, rect);
-    if (result != 0)
-    {
-        WHINE_ONCE_ARGS(("Could not draw rectangle: %s", SDL_GetError()));
-    }
-    return result;
+    draw_message message;
+    message.type = DRAW_RECT;
+    message.p1.x = rect->x;
+    message.p1.y = rect->y;
+    message.size.x = rect->w;
+    message.size.y = rect->h;
+
+    push_draw_message(message);
+
+    return 0;
 }
 
 int Graphics::draw_rect(const SDL_Rect* rect, const int r, const int g, const int b, const int a)
@@ -758,7 +891,7 @@ void Graphics::draw_flipsprite(const int x, const int y, const int t, const SDL_
 
 void Graphics::scroll_texture(SDL_Texture* texture, SDL_Texture* temp, const int x, const int y)
 {
-    SDL_Texture* target = SDL_GetRenderTarget(gameScreen.m_renderer);
+    SDL_Texture* target = get_render_target();
     SDL_Rect texture_rect = {0, 0, 0, 0};
     SDL_QueryTexture(texture, NULL, NULL, &texture_rect.w, &texture_rect.h);
 
@@ -2693,7 +2826,7 @@ void Graphics::updatebackground(int t)
         backoffset += 3;
         if (backoffset >= 16) backoffset -= 16;
 
-        SDL_Texture* target = SDL_GetRenderTarget(gameScreen.m_renderer);
+        SDL_Texture* target = get_render_target();
         set_render_target(backgroundTexture);
 
         if (backgrounddrawn)
@@ -2736,7 +2869,7 @@ void Graphics::updatebackground(int t)
         backoffset += 3;
         if (backoffset >= 16) backoffset -= 16;
 
-        SDL_Texture* target = SDL_GetRenderTarget(gameScreen.m_renderer);
+        SDL_Texture* target = get_render_target();
         set_render_target(backgroundTexture);
 
         if (backgrounddrawn)
@@ -2803,7 +2936,7 @@ void Graphics::drawmap(void)
 {
     if (!foregrounddrawn)
     {
-        SDL_Texture* target = SDL_GetRenderTarget(gameScreen.m_renderer);
+        SDL_Texture* target = get_render_target();
 
         set_render_target(foregroundTexture);
         set_blendmode(foregroundTexture, SDL_BLENDMODE_BLEND);
@@ -2855,7 +2988,7 @@ void Graphics::drawfinalmap(void)
 {
     if (!foregrounddrawn)
     {
-        SDL_Texture* target = SDL_GetRenderTarget(gameScreen.m_renderer);
+        SDL_Texture* target = get_render_target();
 
         set_render_target(foregroundTexture);
         set_blendmode(foregroundTexture, SDL_BLENDMODE_BLEND);
@@ -2924,7 +3057,7 @@ void Graphics::updatetowerbackground(TowerBG& bg_obj)
 {
     if (bg_obj.bypos < 0) bg_obj.bypos += 120 * 8;
 
-    SDL_Texture* target = SDL_GetRenderTarget(gameScreen.m_renderer);
+    SDL_Texture* target = get_render_target();
     set_render_target(bg_obj.texture);
 
     if (bg_obj.tdrawback)
@@ -3465,8 +3598,6 @@ void Graphics::screenshake(void)
     get_stretch_info(&rect);
 
     copy_texture(tempShakeTexture, NULL, &rect, 0, NULL, flipmode ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE);
-
-    gameScreen.RenderToScreen(tempShakeTexture);
 }
 
 void Graphics::updatescreenshake(void)
@@ -3550,8 +3681,6 @@ void Graphics::render(void)
 
     ime_set_rect(&stretch_info);
     copy_texture(gameTexture, NULL, &stretch_info, 0, NULL, flipmode ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE);
-
-    gameScreen.RenderToScreen(gameTexture);
 }
 
 void Graphics::renderwithscreeneffects(void)

@@ -5,8 +5,6 @@
 #include <string>
 #include <vector>
 
-extern "C" DECLSPEC void SDLCALL play_level(const char* level_data, const char* playassets);
-
 class CustomEntity
 {
 public:

@@ -197,6 +197,10 @@ public:
         uint8_t b
     );
 
+    int get_texture_id(SDL_Texture* texture);
+
+    SDL_Texture* get_render_target(void);
+
     int set_render_target(SDL_Texture* texture);
 
     int set_texture_color_mod(SDL_Texture* texture, Uint8 r, Uint8 g, Uint8 b);
@@ -435,6 +439,8 @@ public:
     void render_roomname(uint32_t font_flag, const char* roomname, int r, int g, int b);
 
     void print_roomtext(int x, int y, const char* text, bool rtl);
+
+    SDL_Texture* render_target;
 };
 
 #ifndef GRAPHICS_DEFINITION

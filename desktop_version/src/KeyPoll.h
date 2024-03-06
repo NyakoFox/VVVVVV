@@ -6,8 +6,6 @@
 #include <string>
 #include <vector>
 
-extern "C" DECLSPEC void SDLCALL simulate_keyevent(const char* event_type, const char* new_key);
-
 enum Kybrd
 {
     KEYBOARD_UP = SDLK_UP,
