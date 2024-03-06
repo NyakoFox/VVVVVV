@@ -5,8 +5,6 @@
 
 #include "ScreenSettings.h"
 
-extern "C" DECLSPEC void SDLCALL setScreenbufferPointer(void* ptr);
-
 class Screen
 {
 public:
@@ -21,7 +19,6 @@ public:
     void ResizeToNearestMultiple(void);
     void GetScreenSize(int* x, int* y);
 
-    void RenderToScreen(SDL_Texture* texture);
     void RenderPresent(void);
 
     void toggleFullScreen(void);
@@ -44,7 +41,6 @@ public:
 
     SDL_Window* m_window;
     SDL_Renderer* m_renderer;
-    SDL_Surface* m_screen;
 };
 
 #ifndef GAMESCREEN_DEFINITION

@@ -1,8 +1,6 @@
 #ifndef GAME_H
 #define GAME_H
 
-#define DLL_EXPORT
-
 #include <SDL.h>
 #include <map>
 #include <string>
@@ -10,10 +8,6 @@
 
 #include "Font.h"
 #include "ScreenSettings.h"
-
-extern "C" DECLSPEC int SDLCALL mainLoop(int argc, char* argv[]);
-extern "C" DECLSPEC const char* SDLCALL get_state(void);
-extern "C" DECLSPEC void SDLCALL set_base_path(const char* path);
 
 /* FIXME: Can't forward declare this enum in C++, unfortunately.
  * In C, enum sizes are always the same, so you can forward declare them.
