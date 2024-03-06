@@ -11,6 +11,7 @@
 #include "Constants.h"
 #include "CustomLevels.h"
 #include "Exit.h"
+#include "Game.h"
 #include "Graphics.h"
 #include "Localization.h"
 #include "Maths.h"
@@ -285,7 +286,7 @@ int FILESYSTEM_init(char *argvZero, char* baseDir, char *assetsPath, char* langD
     }
 
     //basePath = SDL_GetBasePath();
-    basePath = SDL_strdup("D:\\Programs\\ved\\");
+    basePath = SDL_strdup(game.base_path.c_str());
 
     if (basePath == NULL)
     {
