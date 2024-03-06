@@ -2518,9 +2518,6 @@ void scriptclass::run(void)
 static void gotoerrorloadinglevel(void)
 {
     game.quittomenu();
-    game.createmenu(Menu::errorloadinglevel);
-    music.currentsong = -1; /* otherwise music.play won't work */
-    music.play(Music_PRESENTINGVVVVVV);
 }
 
 #define DECLARE_MODE_FUNC(funcname, modename) \

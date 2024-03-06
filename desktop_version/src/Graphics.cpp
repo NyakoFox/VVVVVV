@@ -3465,6 +3465,8 @@ void Graphics::screenshake(void)
     get_stretch_info(&rect);
 
     copy_texture(tempShakeTexture, NULL, &rect, 0, NULL, flipmode ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE);
+
+    gameScreen.RenderToScreen(tempShakeTexture);
 }
 
 void Graphics::updatescreenshake(void)
@@ -3547,8 +3549,9 @@ void Graphics::render(void)
     get_stretch_info(&stretch_info);
 
     ime_set_rect(&stretch_info);
-
     copy_texture(gameTexture, NULL, &stretch_info, 0, NULL, flipmode ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE);
+
+    gameScreen.RenderToScreen(gameTexture);
 }
 
 void Graphics::renderwithscreeneffects(void)

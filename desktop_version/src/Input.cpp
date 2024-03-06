@@ -3056,7 +3056,6 @@ void mapinput(void)
         else
         {
             game.quittomenu();
-            music.play(Music_PRESENTINGVVVVVV); // should be after game.quittomenu()
             game.fadetomenu = false;
         }
     }

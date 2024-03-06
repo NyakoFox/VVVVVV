@@ -21,6 +21,7 @@ public:
     void ResizeToNearestMultiple(void);
     void GetScreenSize(int* x, int* y);
 
+    void RenderToScreen(SDL_Texture* texture);
     void RenderPresent(void);
 
     void toggleFullScreen(void);

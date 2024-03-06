@@ -1881,7 +1881,6 @@ void Game::updatestate(void)
             break;
         case 81:
             quittomenu();
-            music.play(Music_PRESENTINGVVVVVV); //should be after quittomenu()
             setstate(0);
             break;
 
@@ -2496,7 +2495,6 @@ void Game::updatestate(void)
             }
 
             quittomenu();
-            music.play(Music_PRESENTINGVVVVVV); //should be after quittomenu()
             setstate(0);
             break;
 
@@ -3151,7 +3149,6 @@ void Game::updatestate(void)
             break;
         case 3101:
             quittomenu();
-            music.play(Music_PRESENTINGVVVVVV); //should be after quittomenu();
             setstate(0);
             break;
 
@@ -7586,7 +7583,7 @@ void Game::quittomenu(void)
         return;
     }
 
-    gamestate = TITLEMODE;
+    gamestate = IDLEMODE;
     graphics.fademode = FADE_START_FADEIN;
     FILESYSTEM_unmountAssets();
     loc::unloadtext_custom();
@@ -7594,56 +7591,6 @@ void Game::quittomenu(void)
     cliplaytest = false;
     graphics.titlebg.tdrawback = true;
     graphics.flipmode = false;
-    //Don't be stuck on the summary screen,
-    //or "who do you want to play the level with?"
-    //or "do you want cutscenes?"
-    //or the confirm-load-quicksave menu
-    if (translator_cutscene_test)
-    {
-        returntomenu(Menu::translator_options_cutscenetest);
-    }
-    else if (translator_exploring)
-    {
-        returntomenu(Menu::translator_options_exploregame);
-    }
-    else if (intimetrial)
-    {
-        returntomenu(Menu::timetrials);
-    }
-    else if (inintermission)
-    {
-        returntomenu(Menu::intermissionmenu);
-    }
-    else if (nodeathmode)
-    {
-        returntomenu(Menu::playmodes);
-    }
-    else if (map.custommode)
-    {
-        if (map.custommodeforreal)
-        {
-            returntomenu(Menu::levellist);
-        }
-        else
-        {
-            //Returning from editor
-            editor_disabled = !BUTTONGLYPHS_keyboard_is_available();
-            returntomenu(Menu::playerworlds);
-        }
-    }
-    else if (save_exists() || anything_unlocked())
-    {
-        returntomenu(Menu::play);
-        if (!insecretlab)
-        {
-            //Select "continue"
-            currentmenuoption = 0;
-        }
-    }
-    else
-    {
-        createmenu(Menu::mainmenu);
-    }
     /* We might not be at the end of the frame yet.
      * If we hardreset() now, some state might still persist. */
     DEFER_CALLBACK(hardreset);

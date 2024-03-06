@@ -11,8 +11,9 @@
 #include "Font.h"
 #include "ScreenSettings.h"
 
-extern "C" DECLSPEC int SDLCALL getFrameCounter(void);
 extern "C" DECLSPEC int SDLCALL mainLoop(int argc, char* argv[]);
+extern "C" DECLSPEC const char* SDLCALL get_state(void);
+extern "C" DECLSPEC void SDLCALL set_base_path(const char* path);
 
 /* FIXME: Can't forward declare this enum in C++, unfortunately.
  * In C, enum sizes are always the same, so you can forward declare them.
@@ -607,6 +608,8 @@ public:
     int old_screenshot_border_timer;
     int screenshot_border_timer;
     bool screenshot_saved_success;
+
+    std::string base_path;
 };
 
 #ifndef GAME_DEFINITION

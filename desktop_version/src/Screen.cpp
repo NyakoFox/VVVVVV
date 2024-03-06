@@ -307,9 +307,9 @@ void Screen::GetScreenSize(int* x, int* y)
     }
 }
 
-void Screen::RenderPresent(void)
+void Screen::RenderToScreen(SDL_Texture* texture)
 {
-    graphics.set_render_target(graphics.gameTexture);
+    graphics.set_render_target(texture);
 
     const int result = SDL_RenderReadPixels(m_renderer, NULL, SDL_PIXELFORMAT_RGBA32, m_screen->pixels, m_screen->pitch);
     if (result != 0)
@@ -319,7 +319,10 @@ void Screen::RenderPresent(void)
     }
 
     graphics.set_render_target(NULL);
+}
 
+void Screen::RenderPresent(void)
+{
     SDL_RenderPresent(m_renderer);
     graphics.clear();
 }

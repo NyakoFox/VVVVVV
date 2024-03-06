@@ -89,6 +89,38 @@ struct ImplFunc
     void (*func)(void);
 };
 
+extern "C" DECLSPEC void SDLCALL set_base_path(const char* path)
+{
+    game.base_path = path;
+}
+
+extern "C" DECLSPEC const char* SDLCALL get_state(void)
+{
+    switch (game.gamestate)
+    {
+        case GAMEMODE:
+            return "GAMEMODE";
+        case TITLEMODE:
+            return "TITLEMODE";
+        case MAPMODE:
+            return "MAPMODE";
+        case TELEPORTERMODE:
+            return "TELEPORTERMODE";
+        case GAMECOMPLETE:
+            return "GAMECOMPLETE";
+        case GAMECOMPLETE2:
+            return "GAMECOMPLETE2";
+        case EDITORMODE:
+            return "EDITORMODE";
+        case PRELOADER:
+            return "PRELOADER";
+        case IDLEMODE:
+            return "IDLEMODE";
+        default:
+            return "UNKNOWN";
+    }
+}
+
 extern "C" DECLSPEC void SDLCALL simulate_keyevent(const char* event_type, const char* new_key)
 {
     SDL_Event event;
@@ -113,7 +145,7 @@ extern "C" DECLSPEC void SDLCALL simulate_keyevent(const char* event_type, const
     SDL_PushEvent(&event);
 }
 
-extern "C" DECLSPEC void SDLCALL inject_level_data(const char* level_data)
+extern "C" DECLSPEC void SDLCALL play_level(const char* level_data, const char* playassets)
 {
     cl.injected_level = (unsigned char*) SDL_malloc(SDL_strlen(level_data) + 1);
 
@@ -125,6 +157,68 @@ extern "C" DECLSPEC void SDLCALL inject_level_data(const char* level_data)
 
     SDL_memcpy(cl.injected_level, level_data, SDL_strlen(level_data) + 1);
     cl.injected_level_len = SDL_strlen(level_data);
+
+    game.levelpage = 0;
+    game.playcustomlevel = 0;
+    game.playassets = playassets;
+    game.menustart = true;
+
+    LevelMetaData meta;
+    CliPlaytestArgs pt_args;
+    if (cl.getLevelMetaDataAndPlaytestArgs("levels/special/dll.vvvvvv", meta, &pt_args)) {
+        cl.ListOfMetaData.clear();
+        cl.ListOfMetaData.push_back(meta);
+    }
+    else {
+        cl.loadZips();
+        if (cl.getLevelMetaDataAndPlaytestArgs("levels/special/dll.vvvvvv", meta, &pt_args)) {
+            cl.ListOfMetaData.clear();
+            cl.ListOfMetaData.push_back(meta);
+        }
+        else {
+            vlog_error("Level not found");
+            VVV_exit(1);
+        }
+    }
+
+    if (pt_args.valid)
+    {
+        savefileplaytest = true;
+        savex = pt_args.x;
+        savey = pt_args.y;
+        saverx = pt_args.rx;
+        savery = pt_args.ry;
+        savegc = pt_args.gc;
+        savemusic = pt_args.music;
+    }
+
+    game.loadcustomlevelstats();
+    game.customleveltitle = cl.ListOfMetaData[game.playcustomlevel].title;
+    game.customlevelfilename = cl.ListOfMetaData[game.playcustomlevel].filename;
+    if (savefileplaytest) {
+        game.playx = savex;
+        game.playy = savey;
+        game.playrx = saverx;
+        game.playry = savery;
+        game.playgc = savegc;
+        game.playmusic = savemusic;
+        game.cliplaytest = true;
+        script.startgamemode(Start_CUSTOM_QUICKSAVE);
+    }
+    else {
+        script.startgamemode(Start_CUSTOM);
+    }
+
+    graphics.fademode = FADE_NONE;
+
+    if (cl.injected_level != NULL)
+    {
+        // we injected a level, so let's free the memory we used for that
+        SDL_free(cl.injected_level);
+        cl.injected_level = NULL;
+        cl.injected_level_len = 0;
+    }
+
     return;
 }
 
@@ -154,6 +248,20 @@ static void flipmodeoff(void)
 static void focused_begin(void);
 static void focused_end(void);
 
+static void idleinput(void)
+{
+}
+
+static void idlerenderfixed(void)
+{
+    graphics.renderfixedpre();
+}
+
+static void idlerender(void)
+{
+    graphics.render();
+}
+
 static const inline struct ImplFunc* get_gamestate_funcs(
     const int gamestate,
     int* num_implfuncs
@@ -173,6 +281,12 @@ static const inline struct ImplFunc* get_gamestate_funcs(
         *num_implfuncs = SDL_arraysize(implfuncs); \
         return implfuncs; \
     }
+
+    FUNC_LIST_BEGIN(IDLEMODE)
+        {Func_input, idleinput},
+        {Func_fixed, idlerenderfixed},
+        {Func_delta, idlerender},
+    FUNC_LIST_END
 
     FUNC_LIST_BEGIN(GAMEMODE)
         {Func_fixed, runscript},
@@ -660,10 +774,6 @@ extern "C" DECLSPEC int SDLCALL mainLoop(int argc, char *argv[])
         SDL_INIT_JOYSTICK |
         SDL_INIT_GAMECONTROLLER
     );
-    if (SDL_IsTextInputActive() == SDL_TRUE)
-    {
-        SDL_StopTextInput();
-    }
 
     NETWORK_init();
 
@@ -702,7 +812,7 @@ extern "C" DECLSPEC int SDLCALL mainLoop(int argc, char *argv[])
     game.init();
     game.seed_use_sdl_getticks = seed_use_sdl_getticks;
 
-    game.gamestate = PRELOADER;
+    game.gamestate = IDLEMODE;
 
     game.menustart = false;
 
@@ -755,8 +865,6 @@ extern "C" DECLSPEC int SDLCALL mainLoop(int argc, char *argv[])
 
     graphics.create_buffers();
 
-    if (game.skipfakeload)
-        game.gamestate = TITLEMODE;
     if (game.slowdown == 0) game.slowdown = 30;
 
     int min_lang_set = loc::lang_set_current;
