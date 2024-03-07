@@ -197,7 +197,7 @@ public:
         uint8_t b
     );
 
-    int get_texture_id(SDL_Texture* texture);
+    const char* get_texture_id(SDL_Texture* texture);
 
     SDL_Texture* get_render_target(void);
 
