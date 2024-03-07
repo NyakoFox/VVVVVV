@@ -56,7 +56,7 @@ typedef struct {
     point p2;
     point size;
     color color;
-    int texture;
+    char texture[255];
     rect src;
     rect dest;
     point center;

@@ -446,74 +446,49 @@ void Graphics::print_level_creator(
     font::print(print_flags, text_x, y, creator, r, g, b);
 }
 
-int Graphics::get_texture_id(SDL_Texture* texture)
+#define DEFINE_TEXTURE(name) \
+    else if (texture == name) \
+    { \
+        return #name; \
+    }
+
+#define DEFINE_TEXTURE_WITH_NAME(name, texture_name) \
+    else if (texture == name) \
+    { \
+        return texture_name; \
+    }
+const char* Graphics::get_texture_id(SDL_Texture* texture)
 {
     if (texture == NULL)
     {
-        return -1;
+        return "main";
     }
-    else if (texture == gameTexture)
-    {
-        return 0;
-    }
-    else if (texture == gameplayTexture)
-    {
-        return 1;
-    }
-    else if (texture == menuTexture)
-    {
-        return 2;
-    }
-    else if (texture == ghostTexture)
-    {
-        return 3;
-    }
-    else if (texture == tempShakeTexture)
-    {
-        return 4;
-    }
-    else if (texture == foregroundTexture)
-    {
-        return 5;
-    }
-    else if (texture == backgroundTexture)
-    {
-        return 6;
-    }
-    else if (texture == tempScrollingTexture)
-    {
-        return 7;
-    }
-    else if (texture == towerbg.texture)
-    {
-        return 8;
-    }
-    else if (texture == titlebg.texture)
-    {
-        return 9;
-    }
-    else if (texture == images[IMAGE_CUSTOMMINIMAP])
-    {
-        return 10;
-    }
-    else if (texture == grphx.im_sprites)
-    {
-        return 11;
-    }
-    else if (texture == grphx.im_tiles)
-    {
-        return 12;
-    }
-    else if (texture == grphx.im_tiles2)
-    {
-        return 13;
-    }
+    DEFINE_TEXTURE(gameTexture)
+    DEFINE_TEXTURE(gameplayTexture)
+    DEFINE_TEXTURE(menuTexture)
+    DEFINE_TEXTURE(ghostTexture)
+    DEFINE_TEXTURE(tempShakeTexture)
+    DEFINE_TEXTURE(foregroundTexture)
+    DEFINE_TEXTURE(backgroundTexture)
+    DEFINE_TEXTURE(tempScrollingTexture)
+    DEFINE_TEXTURE(towerbg.texture, "towerbgTexture")
+    DEFINE_TEXTURE(titlebg.texture, "titlebgTexture")
+    DEFINE_TEXTURE_WITH_NAME(images[IMAGE_CUSTOMMINIMAP], "generatedMinimapTexture")
+    DEFINE_TEXTURE_WITH_NAME(grphx.im_sprites, "spritesTexture")
+    DEFINE_TEXTURE_WITH_NAME(grphx.im_tiles, "tilesTexture")
+    DEFINE_TEXTURE_WITH_NAME(grphx.im_tiles_white, "tilesWhiteTexture")
+    DEFINE_TEXTURE_WITH_NAME(grphx.im_tiles2, "tiles2Texture")
+    DEFINE_TEXTURE_WITH_NAME(grphx.im_tiles3, "tiles3Texture")
+    DEFINE_TEXTURE_WITH_NAME(grphx.im_teleporter, "teleporterTexture")
+    DEFINE_TEXTURE_WITH_NAME(grphx.im_entcolours, "entcoloursTexture")
     else
     {
         WHINE_ONCE_ARGS(("Unknown texture passed to get_render_id"));
-        return -2;
+        return "unknown";
     }
 }
+#undef DEFINE_TEXTURE
+#undef DEFINE_TEXTURE_WITH_NAME
 
 SDL_Texture* Graphics::get_render_target(void)
 {
@@ -525,7 +500,8 @@ int Graphics::set_render_target(SDL_Texture* texture)
     render_target = texture;
     draw_message message;
     message.type = DRAW_SET_TARGET;
-    message.texture = get_texture_id(texture);
+    //message.texture = SDL_strdup(get_texture_id(texture));
+    SDL_strlcpy(message.texture, get_texture_id(texture), sizeof(message.texture));
     push_draw_message(message);
     return 0;
 }
@@ -534,7 +510,7 @@ int Graphics::set_texture_color_mod(SDL_Texture* texture, const Uint8 r, const U
 {
     draw_message message;
     message.type = DRAW_SET_TINT_COLOR;
-    message.texture = get_texture_id(texture);
+    SDL_strlcpy(message.texture, get_texture_id(texture), sizeof(message.texture));
     message.color.r = r;
     message.color.g = g;
     message.color.b = b;
@@ -546,7 +522,7 @@ int Graphics::set_texture_alpha_mod(SDL_Texture* texture, const Uint8 alpha)
 {
     draw_message message;
     message.type = DRAW_SET_TINT_ALPHA;
-    message.texture = get_texture_id(texture);
+    SDL_strlcpy(message.texture, get_texture_id(texture), sizeof(message.texture));
     message.color.a = alpha;
     push_draw_message(message);
     return 0;
@@ -646,7 +622,7 @@ int Graphics::copy_texture(SDL_Texture* texture, const SDL_Rect* src, const SDL_
 
     draw_message message;
     message.type = DRAW_TEXTURE;
-    message.texture = get_texture_id(texture);
+    SDL_strlcpy(message.texture, get_texture_id(texture), sizeof(message.texture));
     if (src == NULL)
     {
         message.src_whole = true;
@@ -681,7 +657,7 @@ int Graphics::copy_texture(SDL_Texture* texture, const SDL_Rect* src, const SDL_
 
     draw_message message;
     message.type = DRAW_TEXTURE_EXT;
-    message.texture = get_texture_id(texture);
+    SDL_strlcpy(message.texture, get_texture_id(texture), sizeof(message.texture));
     if (src == NULL)
     {
         message.src_whole = true;
@@ -850,22 +826,30 @@ int Graphics::draw_rect(const int x, const int y, const int w, const int h, cons
 
 int Graphics::draw_line(const int x, const int y, const int x2, const int y2)
 {
-    const int result = SDL_RenderDrawLine(gameScreen.m_renderer, x, y, x2, y2);
-    if (result != 0)
-    {
-        WHINE_ONCE_ARGS(("Could not draw line: %s", SDL_GetError()));
-    }
-    return result;
+    draw_message message;
+    message.type = DRAW_LINE;
+    message.p1.x = x;
+    message.p1.y = y;
+    message.p2.x = x2;
+    message.p2.y = y2;
+
+    push_draw_message(message);
+
+    return 0;
 }
 
 int Graphics::draw_points(const SDL_Point* points, const int count)
 {
-    const int result = SDL_RenderDrawPoints(gameScreen.m_renderer, points, count);
-    if (result != 0)
+    for (int i = 0; i < count; i += 1)
     {
-        WHINE_ONCE_ARGS(("Could not draw points: %s", SDL_GetError()));
+        draw_message message;
+        message.type = DRAW_FILL_RECT;
+        message.dest = { points[i].x, points[i].y, 1, 1 };
+        message.dest_whole = false;
+        push_draw_message(message);
     }
-    return result;
+
+    return 0;
 }
 
 int Graphics::draw_points(const SDL_Point* points, const int count, const int r, const int g, const int b)
