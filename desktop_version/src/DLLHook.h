@@ -6,14 +6,35 @@
 #include <stdint.h>
 #include <SDL.h>
 #include <vector>
+#include <string>
+
+#define SDL_Texture VVV_Texture
+#define SDL_DestroyTexture(texture) VVV_DestroyTexture(texture)
+#define SDL_CreateTexture(renderer, format, access, w, h) VVV_CreateTexture(w, h)
+#define SDL_CreateTextureFromSurface(renderer, surface) VVV_CreateTexture(surface->w, surface->h)
+#define SDL_SetTextureScaleMode() 0
+
+struct VVV_Texture
+{
+    std::string id;
+    int w;
+    int h;
+};
+
+void VVV_DestroyTexture(VVV_Texture* texture);
+VVV_Texture* VVV_CreateTexture(int width, int height);
 
 extern "C" DECLSPEC int SDLCALL mainLoop(int argc, char* argv[]);
 extern "C" DECLSPEC const char* SDLCALL get_state(void);
 extern "C" DECLSPEC void SDLCALL set_base_path(const char* path);
 
+extern "C" DECLSPEC void SDLCALL play_level_init(void);
+extern "C" DECLSPEC void SDLCALL set_texture_size(const char* texture, int w, int h);
 extern "C" DECLSPEC void SDLCALL play_level(const char* level_data, const char* playassets);
 
 extern "C" DECLSPEC void SDLCALL simulate_keyevent(const char* event_type, const char* new_key);
+extern "C" DECLSPEC void SDLCALL simulate_mouseevent(const char* event_type, int button, int x, int y);
+extern "C" DECLSPEC void SDLCALL simulate_mousemoveevent(int x, int y);
 
 typedef enum {
     DRAW_NONE = -1,

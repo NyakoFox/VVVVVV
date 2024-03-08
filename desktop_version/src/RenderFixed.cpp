@@ -132,7 +132,7 @@ void gamerenderfixed(void)
     map.updateroomnames();
 
     ed.old_return_message_timer = ed.return_message_timer;
-    if (map.custommode && !map.custommodeforreal && ed.return_message_timer > 0)
+    if (ed.return_message_timer > 0)
     {
         ed.return_message_timer -= 15;
     }

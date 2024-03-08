@@ -280,7 +280,7 @@ void recomputetextboxes(void)
         graphics.textboxes[i].applyposition();
     }
 }
-
+/*
 static void toggleflipmode(void)
 {
     graphics.setflipmode = !graphics.setflipmode;
@@ -296,13 +296,13 @@ static void toggleflipmode(void)
         music.playef(Sound_VIRIDIAN);
     }
 
-    /* Some text boxes change depending on Flip Mode, so update text boxes. */
+    /* Some text boxes change depending on Flip Mode, so update text boxes.
     const bool temp = graphics.flipmode;
     graphics.flipmode = graphics.setflipmode;
     recomputetextboxes();
     graphics.flipmode = temp;
 }
-
+*/
 static bool fadetomode = false;
 static int fadetomodedelay = 0;
 static enum StartMode gotomode = Start_MAINGAME;
@@ -600,7 +600,7 @@ static void menuactionpress(void)
                 && FILESYSTEM_openDirectory(FILESYSTEM_getUserLevelDirectory()))
             {
                 music.playef(Sound_VIRIDIAN);
-                SDL_MinimizeWindow(gameScreen.m_window);
+                //SDL_MinimizeWindow(gameScreen.m_window);
             }
             else
             {
@@ -845,16 +845,8 @@ static void menuactionpress(void)
         switch (game.currentmenuoption)
         {
         case 0:
-            // toggle unfocus pause
-            game.disablepause = !game.disablepause;
-            game.savestatsandsettings_menu();
-            music.playef(Sound_VIRIDIAN);
-            break;
         case 1:
-            /* toggle unfocus music pause */
-            game.disableaudiopause = !game.disableaudiopause;
-            game.savestatsandsettings_menu();
-            music.playef(Sound_VIRIDIAN);
+            music.playef(Sound_CRY);
             break;
         case 2:
             // toggle translucent roomname BG
@@ -957,32 +949,6 @@ static void menuactionpress(void)
     case Menu::gameplayoptions:
     {
         int gameplayoptionsoffset = 0;
-#if !defined(MAKEANDPLAY)
-        if (game.ingame_titlemode && game.unlock[Unlock_FLIPMODE])
-#endif
-        {
-            gameplayoptionsoffset = 1;
-            if (game.currentmenuoption == 0) {
-                toggleflipmode();
-                // Fix wrong area music in Tower (Positive Force vs. ecroF evitisoP)
-                if (map.custommode)
-                {
-                    break;
-                }
-                int area = map.area(game.roomx, game.roomy);
-                if (area == 3 || area == 11)
-                {
-                    if (graphics.setflipmode)
-                    {
-                        music.play(Music_POSITIVEFORCEREVERSED);
-                    }
-                    else
-                    {
-                        music.play(Music_POSITIVEFORCE);
-                    }
-                }
-            }
-        }
 
         if (game.currentmenuoption == gameplayoptionsoffset + 0)
         {
@@ -1038,9 +1004,7 @@ static void menuactionpress(void)
             break;
         case 1:
             //graphic options
-            music.playef(Sound_VIRIDIAN);
-            game.createmenu(Menu::graphicoptions);
-            map.nexttowercolour();
+            music.playef(Sound_CRY);
             break;
         case 2:
             /* Audio options */
@@ -1187,7 +1151,7 @@ static void menuactionpress(void)
             && FILESYSTEM_openDirectory(FILESYSTEM_getUserMainLangDirectory()))
             {
                 music.playef(Sound_VIRIDIAN);
-                SDL_MinimizeWindow(gameScreen.m_window);
+                //SDL_MinimizeWindow(gameScreen.m_window);
             }
             else
             {
@@ -1513,11 +1477,7 @@ static void menuactionpress(void)
             break;
         case 3:
             //unlock flip mode
-            music.playef(Sound_VIRIDIAN);
-            game.unlock[Unlock_FLIPMODE] = true;
-            game.unlocknotify[Unlock_FLIPMODE] = true;
-            game.createmenu(Menu::unlockmenu, true);
-            game.savestatsandsettings_menu();
+            music.playef(Sound_CRY);
             break;
         case 4:
             //unlock jukebox
@@ -2037,10 +1997,9 @@ static void menuactionpress(void)
             game.createmenu(Menu::startnodeathmode);
             map.nexttowercolour();
         }
-        else if (game.currentmenuoption == 3
-            && game.unlock[Unlock_FLIPMODE])    //enable/disable flip mode
+        else if (game.currentmenuoption == 3) //enable/disable flip mode
         {
-            toggleflipmode();
+            music.playef(Sound_CRY);
         }
         else if (game.currentmenuoption == 4)
         {
@@ -3235,28 +3194,8 @@ static void mapmenuactionpress(const bool version2_2)
     }
         break;
     case 3:
-    if (!game.gamesaved && !game.gamesavefailed && !game.inspecial())
-    {
-        game.flashlight = 5;
-        game.screenshake = 10;
-        music.playef(Sound_GAMESAVED);
-
-        game.savetime = game.timestring();
-        game.savetrinkets = game.trinkets();
-
-        bool success;
-
-        if(map.custommodeforreal)
-        {
-            success = game.customsavequick(cl.ListOfMetaData[game.playcustomlevel].filename);
-        }
-        else
-        {
-            success = game.savequick();
-        }
-        game.gamesaved = success;
-        game.gamesavefailed = !success;
-    }
+        music.playef(Sound_VIRIDIAN);
+        game.menupage = 30;
         break;
 
     case 10:

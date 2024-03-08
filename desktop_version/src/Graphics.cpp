@@ -459,6 +459,35 @@ void Graphics::print_level_creator(
     }
 const char* Graphics::get_texture_id(SDL_Texture* texture)
 {
+    FontContainer* fonts_main = font::get_fonts_main();
+    FontContainer* fonts_custom = font::get_fonts_custom();
+
+    if (fonts_main != NULL)
+    {
+        for (size_t i = 0; i < fonts_main->count; i++)
+        {
+            if (texture == fonts_main->fonts[i].image)
+            {
+                static char buffer[256];
+                SDL_snprintf(buffer, sizeof(buffer), "font_main_%s", fonts_main->fonts[i].name);
+                return buffer;
+            }
+        }
+    }
+
+    if (fonts_custom != NULL)
+    {
+        for (size_t i = 0; i < fonts_custom->count; i++)
+        {
+            if (texture == fonts_custom->fonts[i].image)
+            {
+                static char buffer[256];
+                SDL_snprintf(buffer, sizeof(buffer), "font_custom_%s", fonts_custom->fonts[i].name);
+                return buffer;
+            }
+        }
+    }
+
     if (texture == NULL)
     {
         return "main";
@@ -471,8 +500,8 @@ const char* Graphics::get_texture_id(SDL_Texture* texture)
     DEFINE_TEXTURE(foregroundTexture)
     DEFINE_TEXTURE(backgroundTexture)
     DEFINE_TEXTURE(tempScrollingTexture)
-    DEFINE_TEXTURE(towerbg.texture, "towerbgTexture")
-    DEFINE_TEXTURE(titlebg.texture, "titlebgTexture")
+    DEFINE_TEXTURE_WITH_NAME(towerbg.texture, "towerbgTexture")
+    DEFINE_TEXTURE_WITH_NAME(titlebg.texture, "titlebgTexture")
     DEFINE_TEXTURE_WITH_NAME(images[IMAGE_CUSTOMMINIMAP], "generatedMinimapTexture")
     DEFINE_TEXTURE_WITH_NAME(grphx.im_sprites, "spritesTexture")
     DEFINE_TEXTURE_WITH_NAME(grphx.im_tiles, "tilesTexture")
@@ -481,6 +510,19 @@ const char* Graphics::get_texture_id(SDL_Texture* texture)
     DEFINE_TEXTURE_WITH_NAME(grphx.im_tiles3, "tiles3Texture")
     DEFINE_TEXTURE_WITH_NAME(grphx.im_teleporter, "teleporterTexture")
     DEFINE_TEXTURE_WITH_NAME(grphx.im_entcolours, "entcoloursTexture")
+    DEFINE_TEXTURE_WITH_NAME(grphx.im_image0, "image0Texture")
+    DEFINE_TEXTURE_WITH_NAME(grphx.im_image1, "image1Texture")
+    DEFINE_TEXTURE_WITH_NAME(grphx.im_image2, "image2Texture")
+    DEFINE_TEXTURE_WITH_NAME(grphx.im_image3, "image3Texture")
+    DEFINE_TEXTURE_WITH_NAME(grphx.im_image4, "image4Texture")
+    DEFINE_TEXTURE_WITH_NAME(grphx.im_image5, "image5Texture")
+    DEFINE_TEXTURE_WITH_NAME(grphx.im_image6, "image6Texture")
+    DEFINE_TEXTURE_WITH_NAME(grphx.im_image7, "image7Texture")
+    DEFINE_TEXTURE_WITH_NAME(grphx.im_image8, "image8Texture")
+    DEFINE_TEXTURE_WITH_NAME(grphx.im_image9, "image9Texture")
+    DEFINE_TEXTURE_WITH_NAME(grphx.im_image10, "image10Texture")
+    DEFINE_TEXTURE_WITH_NAME(grphx.im_image11, "image11Texture")
+    DEFINE_TEXTURE_WITH_NAME(grphx.im_image12, "image12Texture")
     else
     {
         WHINE_ONCE_ARGS(("Unknown texture passed to get_render_id"));
@@ -530,32 +572,41 @@ int Graphics::set_texture_alpha_mod(SDL_Texture* texture, const Uint8 alpha)
 
 int Graphics::query_texture(SDL_Texture* texture, Uint32* format, int* access, int* w, int* h)
 {
-    const int result = SDL_QueryTexture(texture, format, access, w, h);
-    if (result != 0)
+    // OK, we're here for width and height, nothing else. This is a bit hacky, but it's the best we can do.
+    // We have a map of widths and heights, so let's grab them from there.
+    const char* texture_id = get_texture_id(texture);
+    if (texture_sizes.count(texture_id) == 0)
     {
-        WHINE_ONCE_ARGS(("Could not query texture: %s", SDL_GetError()));
+        WHINE_ONCE_ARGS(("Could not query texture: texture not found"));
+        return -1;
     }
-    return result;
+    if (w != NULL) *w = texture_sizes[texture_id].x;
+    if (h != NULL) *h = texture_sizes[texture_id].y;
+    return 0;
 }
 
 int Graphics::set_blendmode(const SDL_BlendMode blendmode)
 {
-    const int result = SDL_SetRenderDrawBlendMode(gameScreen.m_renderer, blendmode);
-    if (result != 0)
-    {
-        WHINE_ONCE_ARGS(("Could not set draw mode: %s", SDL_GetError()));
-    }
-    return result;
+    // TODO
+    //const int result = SDL_SetRenderDrawBlendMode(gameScreen.m_renderer, blendmode);
+    //if (result != 0)
+    //{
+    //    WHINE_ONCE_ARGS(("Could not set draw mode: %s", SDL_GetError()));
+    //}
+    //return result;
+    return 0;
 }
 
 int Graphics::set_blendmode(SDL_Texture* texture, const SDL_BlendMode blendmode)
 {
-    const int result = SDL_SetTextureBlendMode(texture, blendmode);
-    if (result != 0)
-    {
-        WHINE_ONCE_ARGS(("Could not set texture blend mode: %s", SDL_GetError()));
-    }
-    return result;
+    // TODO
+    //const int result = SDL_SetTextureBlendMode(texture, blendmode);
+    //if (result != 0)
+    //{
+    //    WHINE_ONCE_ARGS(("Could not set texture blend mode: %s", SDL_GetError()));
+    //}
+    //return result;
+    return 0;
 }
 
 int Graphics::clear(const int r, const int g, const int b, const int a)
@@ -599,12 +650,14 @@ bool Graphics::substitute(SDL_Texture** texture)
         return false;
     }
 
+    // TODO
+
     // Apply the same colors as on the original
-    Uint8 r, g, b, a;
-    SDL_GetTextureColorMod(*texture, &r, &g, &b);
-    SDL_GetTextureAlphaMod(*texture, &a);
-    set_texture_color_mod(subst, r, g, b);
-    set_texture_alpha_mod(subst, a);
+    //Uint8 r, g, b, a;
+    //SDL_GetTextureColorMod(*texture, &r, &g, &b);
+    //SDL_GetTextureAlphaMod(*texture, &a);
+    //set_texture_color_mod(subst, r, g, b);
+    //set_texture_alpha_mod(subst, a);
 
     *texture = subst;
     return true;
@@ -618,7 +671,7 @@ void Graphics::post_substitute(SDL_Texture* subst)
 
 int Graphics::copy_texture(SDL_Texture* texture, const SDL_Rect* src, const SDL_Rect* dest)
 {
-    bool is_substituted = substitute(&texture);
+    //bool is_substituted = substitute(&texture);
 
     draw_message message;
     message.type = DRAW_TEXTURE;
@@ -643,17 +696,17 @@ int Graphics::copy_texture(SDL_Texture* texture, const SDL_Rect* src, const SDL_
     }
     push_draw_message(message);
 
-    if (is_substituted)
-    {
-        post_substitute(texture);
-    }
+    //if (is_substituted)
+    //{
+    //    post_substitute(texture);
+    //}
 
     return 0;
 }
 
 int Graphics::copy_texture(SDL_Texture* texture, const SDL_Rect* src, const SDL_Rect* dest, const double angle, const SDL_Point* center, const SDL_RendererFlip flip)
 {
-    bool is_substituted = substitute(&texture);
+    //bool is_substituted = substitute(&texture);
 
     draw_message message;
     message.type = DRAW_TEXTURE_EXT;
@@ -689,10 +742,10 @@ int Graphics::copy_texture(SDL_Texture* texture, const SDL_Rect* src, const SDL_
     message.flip_y = (flip & SDL_FLIP_VERTICAL) != 0;
     push_draw_message(message);
 
-    if (is_substituted)
-    {
-        post_substitute(texture);
-    }
+    //if (is_substituted)
+    //{
+    //    post_substitute(texture);
+    //}
 
     return 0;
 }
@@ -877,7 +930,7 @@ void Graphics::scroll_texture(SDL_Texture* texture, SDL_Texture* temp, const int
 {
     SDL_Texture* target = get_render_target();
     SDL_Rect texture_rect = {0, 0, 0, 0};
-    SDL_QueryTexture(texture, NULL, NULL, &texture_rect.w, &texture_rect.h);
+    query_texture(texture, NULL, NULL, &texture_rect.w, &texture_rect.h);
 
     const SDL_Rect src = {0, 0, texture_rect.w, texture_rect.h};
     const SDL_Rect dest = {x, y, texture_rect.w, texture_rect.h};
@@ -3549,7 +3602,7 @@ void Graphics::flashlight(void)
 
 void Graphics::screenshake(void)
 {
-    if (gameScreen.badSignalEffect)
+    if (false)
     {
         ApplyFilter(&tempFilterSrc, &tempFilterDest);
     }
@@ -3650,7 +3703,7 @@ void Graphics::render(void)
     ime_render();
     draw_screenshot_border();
 
-    if (gameScreen.badSignalEffect)
+    if (false)
     {
         ApplyFilter(&tempFilterSrc, &tempFilterDest);
     }

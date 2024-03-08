@@ -4,6 +4,7 @@
 #include <tinyxml2.h>
 
 #include "Alloc.h"
+#include "DLLHook.h"
 #include "FileSystemUtils.h"
 #include "Graphics.h"
 #include "GraphicsUtil.h"

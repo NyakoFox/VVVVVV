@@ -303,24 +303,6 @@ static void menurender(void)
     case Menu::gameplayoptions:
     {
         int gameplayoptionsoffset = 0;
-#if !defined(MAKEANDPLAY)
-        if (game.ingame_titlemode && game.unlock[Unlock_FLIPMODE])
-#endif
-        {
-            gameplayoptionsoffset = 1;
-            if (game.currentmenuoption == 0) {
-                font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Flip Mode"), tr, tg, tb);
-                int next_y = font::print_wrap(PR_CEN, -1, 65, loc::gettext("Flip the entire game vertically."), tr, tg, tb);
-                if (graphics.setflipmode)
-                {
-                    font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Currently ENABLED!"), tr, tg, tb);
-                }
-                else
-                {
-                    font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Currently Disabled."), tr/2, tg/2, tb/2);
-                }
-            }
-        }
 
         if (game.currentmenuoption == gameplayoptionsoffset + 0)
         {
@@ -1284,27 +1266,6 @@ static void menurender(void)
             }
             break;
         }
-        case 3:
-            // WARNING: Partially duplicated in Menu::options
-            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Flip Mode"), tr, tg, tb);
-            int next_y = font::print_wrap(PR_CEN, -1, 65, loc::gettext("Flip the entire game vertically. Compatible with other game modes."), tr, tg, tb);
-
-            if (game.unlock[Unlock_FLIPMODE])
-            {
-                if (graphics.setflipmode)
-                {
-                    font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Currently ENABLED!"), tr, tg, tb);
-                }
-                else
-                {
-                    font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Currently Disabled."), tr/2, tg/2, tb/2);
-                }
-            }
-            else
-            {
-                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("TO UNLOCK: Complete the game."), tr, tg, tb);
-            }
-            break;
         }
         break;
     case Menu::youwannaquit:
@@ -2343,7 +2304,7 @@ void gamerender(void)
 
     int return_editor_alpha = 0;
     bool draw_return_editor_text = false;
-    if (map.custommode && !map.custommodeforreal && !game.advancetext)
+    if (map.custommode && !game.advancetext)
     {
         return_editor_alpha = graphics.lerp(
             ed.old_return_message_timer, ed.return_message_timer
@@ -2953,7 +2914,7 @@ void maprender(void)
         TAB(0, loc::gettext("MAP"));
         TAB(1, tab1);
         TAB(2, loc::gettext("STATS"));
-        TAB(3, loc::gettext("SAVE"));
+        TAB(3, loc::gettext("QUIT"));
 #undef TAB
     }
 
@@ -3251,7 +3212,7 @@ void maprender(void)
             char buffer[SCREEN_WIDTH_CHARS + 1];
             vformat_buf(
                 buffer, sizeof(buffer),
-                loc::gettext("[Press {button} to save your game]"),
+                loc::gettext("[Press {button} to exit to Ved]"),
                 "button:but",
                 vformat_button(ActionSet_InGame, Action_InGame_ACTION)
             );
@@ -3332,30 +3293,30 @@ void maprender(void)
         {
             if (game.inspecial())
             {
-                font::print_wrap(PR_CEN, -1, 135, loc::gettext("Return to main menu?"), 196, 196, 255 - help.glow, 12);
+                font::print_wrap(PR_CEN, -1, 135, loc::gettext("Return to Ved?"), 196, 196, 255 - help.glow, 12);
             }
             else
             {
-                font::print_wrap(PR_CEN, -1, 142, loc::gettext("Do you want to quit? You will lose any unsaved progress."), 196, 196, 255 - help.glow, 12);
+                font::print_wrap(PR_CEN, -1, 142, loc::gettext("Do you want to quit? You will not be able to resume later."), 196, 196, 255 - help.glow, 12);
             }
 
             font::print(PR_RTL_XFLIP, 80-selection_offset, 88, loc::gettext("[ NO, KEEP PLAYING ]"), 196, 196, 255 - help.glow);
-            font::print(PR_RTL_XFLIP, 80 + 32, 76, loc::gettext("yes, quit to menu"),  96, 96, 96);
+            font::print(PR_RTL_XFLIP, 80 + 32, 76, loc::gettext("yes, quit to ved"),  96, 96, 96);
         }
         else
         {
 
             if (game.inspecial())
             {
-                font::print_wrap(PR_CEN, -1, 80, loc::gettext("Return to main menu?"), 196, 196, 255 - help.glow, 12);
+                font::print_wrap(PR_CEN, -1, 80, loc::gettext("Return to Ved?"), 196, 196, 255 - help.glow, 12);
             }
             else
             {
-                font::print_wrap(PR_CEN, -1, 76, loc::gettext("Do you want to quit? You will lose any unsaved progress."), 196, 196, 255 - help.glow, 12);
+                font::print_wrap(PR_CEN, -1, 76, loc::gettext("Do you want to quit? You will not be able to resume later."), 196, 196, 255 - help.glow, 12);
             }
 
             font::print(PR_RTL_XFLIP, 80-selection_offset, 130, loc::gettext("[ NO, KEEP PLAYING ]"), 196, 196, 255 - help.glow);
-            font::print(PR_RTL_XFLIP, 80 + 32, 142, loc::gettext("yes, quit to menu"),  96, 96, 96);
+            font::print(PR_RTL_XFLIP, 80 + 32, 142, loc::gettext("yes, quit to ved"),  96, 96, 96);
 
         }
         break;
@@ -3366,29 +3327,29 @@ void maprender(void)
         {
             if (game.inspecial())
             {
-                font::print_wrap(PR_CEN, -1, 135, loc::gettext("Return to main menu?"), 196, 196, 255 - help.glow, 12);
+                font::print_wrap(PR_CEN, -1, 135, loc::gettext("Return to Ved?"), 196, 196, 255 - help.glow, 12);
             }
             else
             {
-                font::print_wrap(PR_CEN, -1, 142, loc::gettext("Do you want to quit? You will lose any unsaved progress."), 196, 196, 255 - help.glow, 12);
+                font::print_wrap(PR_CEN, -1, 142, loc::gettext("Do you want to quit? You will not be able to resume later."), 196, 196, 255 - help.glow, 12);
             }
 
             font::print(PR_RTL_XFLIP, 80, 88, loc::gettext("no, keep playing"), 96,96,96);
-            font::print(PR_RTL_XFLIP, 80+32-selection_offset, 76, loc::gettext("[ YES, QUIT TO MENU ]"),  196, 196, 255 - help.glow);
+            font::print(PR_RTL_XFLIP, 80+32-selection_offset, 76, loc::gettext("[ YES, QUIT TO VED ]"),  196, 196, 255 - help.glow);
         }
         else
         {
             if (game.inspecial())
             {
-                font::print_wrap(PR_CEN, -1, 80, loc::gettext("Return to main menu?"), 196, 196, 255 - help.glow, 12);
+                font::print_wrap(PR_CEN, -1, 80, loc::gettext("Return to Ved?"), 196, 196, 255 - help.glow, 12);
             }
             else
             {
-                font::print_wrap(PR_CEN, -1, 76, loc::gettext("Do you want to quit? You will lose any unsaved progress."), 196, 196, 255 - help.glow, 12);
+                font::print_wrap(PR_CEN, -1, 76, loc::gettext("Do you want to quit? You will not be able to resume later."), 196, 196, 255 - help.glow, 12);
             }
 
             font::print(PR_RTL_XFLIP, 80, 130, loc::gettext("no, keep playing"), 96,96,96);
-            font::print(PR_RTL_XFLIP, 80+32-selection_offset, 142, loc::gettext("[ YES, QUIT TO MENU ]"), 196, 196, 255 - help.glow);
+            font::print(PR_RTL_XFLIP, 80+32-selection_offset, 142, loc::gettext("[ YES, QUIT TO VED ]"), 196, 196, 255 - help.glow);
         }
         break;
     case 20:

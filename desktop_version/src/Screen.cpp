@@ -46,30 +46,9 @@ void Screen::init(const struct ScreenSettings* settings)
     // Uncomment this next line when you need to debug -flibit
     // SDL_SetHintWithPriority(SDL_HINT_RENDER_DRIVER, "software", SDL_HINT_OVERRIDE);
 
-    m_window = SDL_CreateWindow(
-        "VVVVVV",
-        SDL_WINDOWPOS_CENTERED_DISPLAY(windowDisplay),
-        SDL_WINDOWPOS_CENTERED_DISPLAY(windowDisplay),
-        SCREEN_WIDTH_PIXELS * 2,
-        SCREEN_HEIGHT_PIXELS * 2,
-        SDL_WINDOW_HIDDEN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI
-    );
+    m_window = NULL;
 
-    if (m_window == NULL)
-    {
-        vlog_error("Could not create window: %s", SDL_GetError());
-        VVV_exit(1);
-    }
-
-    m_renderer = SDL_CreateRenderer(m_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
-
-    if (m_renderer == NULL)
-    {
-        vlog_error("Could not create renderer: %s", SDL_GetError());
-        VVV_exit(1);
-    }
-
-    SDL_RenderSetVSync(m_renderer, (int) vsync);
+    m_renderer = NULL;
 
 #ifdef INTERIM_VERSION_EXISTS
     /* Branch name limits are ill-defined but on GitHub it's ~256 chars
@@ -77,12 +56,12 @@ void Screen::init(const struct ScreenSettings* settings)
      * Really though, just don't use super long branch names. */
     char title[256];
     SDL_snprintf(title, sizeof(title), "VVVVVV [%s]", BRANCH_NAME);
-    SDL_SetWindowTitle(m_window, title);
+    //SDL_SetWindowTitle(m_window, title);
 #else
-    SDL_SetWindowTitle(m_window, "VVVVVV");
+    //SDL_SetWindowTitle(m_window, "VVVVVV");
 #endif
 
-    SDL_SetWindowMinimumSize(m_window, SCREEN_WIDTH_PIXELS, SCREEN_HEIGHT_PIXELS);
+    //SDL_SetWindowMinimumSize(m_window, SCREEN_WIDTH_PIXELS, SCREEN_HEIGHT_PIXELS);
 
     LoadIcon();
 
@@ -92,19 +71,19 @@ void Screen::init(const struct ScreenSettings* settings)
 void Screen::destroy(void)
 {
     /* Order matters! */
-    VVV_freefunc(SDL_DestroyRenderer, m_renderer);
-    VVV_freefunc(SDL_DestroyWindow, m_window);
+    //VVV_freefunc(SDL_DestroyRenderer, m_renderer);
+    //VVV_freefunc(SDL_DestroyWindow, m_window);
 }
 
 void Screen::GetSettings(struct ScreenSettings* settings)
 {
-    windowDisplay = SDL_GetWindowDisplayIndex(m_window);
+    /*windowDisplay = SDL_GetWindowDisplayIndex(m_window);
     if (windowDisplay < 0)
     {
         vlog_error("Error: could not get display index: %s", SDL_GetError());
         windowDisplay = 0;
     }
-    settings->windowDisplay = windowDisplay;
+    settings->windowDisplay = windowDisplay;*/
     settings->windowWidth = windowWidth;
     settings->windowHeight = windowHeight;
 
@@ -123,19 +102,19 @@ void Screen::LoadIcon(void)
 }
 #else
 void Screen::LoadIcon(void)
-{
+{/*
     SDL_Surface* icon = LoadImageSurface("VVVVVV.png");
     if (icon == NULL)
     {
         return;
     }
     SDL_SetWindowIcon(m_window, icon);
-    VVV_freefunc(SDL_FreeSurface, icon);
+    VVV_freefunc(SDL_FreeSurface, icon);*/
 }
 #endif /* __APPLE__ */
 
 void Screen::ResizeScreen(int x, int y)
-{
+{/*
     windowDisplay = SDL_GetWindowDisplayIndex(m_window);
     if (windowDisplay < 0)
     {
@@ -177,7 +156,7 @@ void Screen::ResizeScreen(int x, int y)
             );
         }
         recacheTextures();
-    }
+    }*/
 }
 
 static void constrain_to_desktop(int display_index, int* width, int* height)
@@ -320,6 +299,7 @@ void Screen::toggleLinearFilter(void)
         SCREEN_WIDTH_PIXELS,
         SCREEN_HEIGHT_PIXELS
     );
+    graphics.tempShakeTexture->id = "tempShakeTexture";
 
     if (graphics.gameTexture == NULL)
     {
