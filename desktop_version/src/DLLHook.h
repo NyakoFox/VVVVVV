@@ -24,6 +24,8 @@ struct VVV_Texture
 void VVV_DestroyTexture(VVV_Texture* texture);
 VVV_Texture* VVV_CreateTexture(int width, int height);
 
+extern "C" DECLSPEC bool SDLCALL should_vvvvvv_exit(void);
+
 extern "C" DECLSPEC int SDLCALL mainLoop(int argc, char* argv[]);
 extern "C" DECLSPEC const char* SDLCALL get_state(void);
 extern "C" DECLSPEC void SDLCALL set_base_path(const char* path);
