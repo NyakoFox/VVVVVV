@@ -133,13 +133,7 @@ endif()
 set(VVV_SRC ${VVV_CXX_SRC} ${VVV_C_SRC})
 
 # Executable information
-if(WIN32)
-    add_executable(VVVVVV WIN32 ${VVV_SRC} icon.rc)
-elseif(ANDROID)
-    add_library(VVVVVV SHARED ${VVV_SRC})
-else()
-    add_executable(VVVVVV ${VVV_SRC})
-endif()
+add_library(VVVVVV SHARED ${VVV_SRC})
 
 # Include Directories
 if(BUNDLE_DEPENDENCIES)
