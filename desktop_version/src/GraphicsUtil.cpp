@@ -277,6 +277,8 @@ void ApplyFilter(SDL_Surface** src, SDL_Surface** dest)
 
 bool TakeScreenshot(SDL_Surface** surface)
 {
+    return false;
+
     if (surface == NULL)
     {
         SDL_assert(0 && "surface is NULL!");

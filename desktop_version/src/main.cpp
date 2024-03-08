@@ -116,9 +116,27 @@ static void flipmodeoff(void)
 static void focused_begin(void);
 static void focused_end(void);
 
+bool should_exit = false;
+
 static void idleinput(void)
 {
+    if (key.isDown(27))
+    {
+        key.keymap[27] = false;
+        should_exit = true;
+    }
 }
+
+extern "C" DECLSPEC bool SDLCALL should_vvvvvv_exit(void)
+{
+    if (should_exit)
+    {
+        should_exit = false;
+        return true;
+    }
+    return false;
+}
+
 
 static void idlerenderfixed(void)
 {
@@ -127,6 +145,9 @@ static void idlerenderfixed(void)
 
 static void idlerender(void)
 {
+    font::print(PR_CEN, -1, 32, loc::gettext("VVVVVV is waiting for instructions"), 196 - help.glow, 196 - help.glow, 255 - help.glow);
+
+    font::print_wrap(PR_CEN, -1, 200, loc::gettext("If stuck, press ESC, no idea why this happens"), 196 - help.glow, 196 - help.glow, 255 - help.glow);
     graphics.render();
 }
 

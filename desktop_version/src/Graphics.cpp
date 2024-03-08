@@ -682,7 +682,10 @@ int Graphics::copy_texture(SDL_Texture* texture, const SDL_Rect* src, const SDL_
     }
     else
     {
-        message.src = { src->x, src->y, src->w, src->h };
+        message.src.x = src->x;
+        message.src.y = src->y;
+        message.src.w = src->w;
+        message.src.h = src->h;
         message.src_whole = false;
     }
     if (dest == NULL)
@@ -691,7 +694,10 @@ int Graphics::copy_texture(SDL_Texture* texture, const SDL_Rect* src, const SDL_
     }
     else
     {
-        message.dest = { dest->x, dest->y, dest->w, dest->h };
+        message.dest.x = dest->x;
+        message.dest.y = dest->y;
+        message.dest.w = dest->w;
+        message.dest.h = dest->h;
         message.dest_whole = false;
     }
     push_draw_message(message);
@@ -835,13 +841,16 @@ int Graphics::draw_rect(const SDL_Rect* rect)
 {
     draw_message message;
     message.type = DRAW_RECT;
-    message.p1.x = rect->x;
-    message.p1.y = rect->y;
-    message.size.x = rect->w;
-    message.size.y = rect->h;
-
+    if (rect == NULL)
+    {
+        message.dest_whole = true;
+    }
+    else
+    {
+        message.dest = { rect->x, rect->y, rect->w, rect->h };
+        message.dest_whole = false;
+    }
     push_draw_message(message);
-
     return 0;
 }
 
