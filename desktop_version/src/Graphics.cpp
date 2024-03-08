@@ -723,7 +723,10 @@ int Graphics::copy_texture(SDL_Texture* texture, const SDL_Rect* src, const SDL_
     }
     else
     {
-        message.src = { src->x, src->y, src->w, src->h };
+        message.src.x = src->x;
+        message.src.y = src->y;
+        message.src.w = src->w;
+        message.src.h = src->h;
         message.src_whole = false;
     }
     if (dest == NULL)
@@ -732,17 +735,22 @@ int Graphics::copy_texture(SDL_Texture* texture, const SDL_Rect* src, const SDL_
     }
     else
     {
-        message.dest = { dest->x, dest->y, dest->w, dest->h };
+        message.dest.x = dest->x;
+        message.dest.y = dest->y;
+        message.dest.w = dest->w;
+        message.dest.h = dest->h;
         message.dest_whole = false;
     }
     message.angle = angle;
     if (center == NULL)
     {
-        message.center = { -1, -1 };
+        message.center.x = -1;
+        message.center.y = -1;
     }
     else
     {
-        message.center = { center->x, center->y };
+        message.center.x = center->x;
+        message.center.y = center->y;
     }
     message.flip_x = (flip & SDL_FLIP_HORIZONTAL) != 0;
     message.flip_y = (flip & SDL_FLIP_VERTICAL) != 0;
@@ -788,7 +796,10 @@ int Graphics::fill_rect(const SDL_Rect* rect)
     }
     else
     {
-        message.dest = { rect->x, rect->y, rect->w, rect->h };
+        message.dest.x = rect->x;
+        message.dest.y = rect->y;
+        message.dest.w = rect->w;
+        message.dest.h = rect->h;
         message.dest_whole = false;
     }
     push_draw_message(message);
@@ -847,7 +858,10 @@ int Graphics::draw_rect(const SDL_Rect* rect)
     }
     else
     {
-        message.dest = { rect->x, rect->y, rect->w, rect->h };
+        message.dest.x = rect->x;
+        message.dest.y = rect->y;
+        message.dest.w = rect->w;
+        message.dest.h = rect->h;
         message.dest_whole = false;
     }
     push_draw_message(message);
@@ -906,7 +920,10 @@ int Graphics::draw_points(const SDL_Point* points, const int count)
     {
         draw_message message;
         message.type = DRAW_FILL_RECT;
-        message.dest = { points[i].x, points[i].y, 1, 1 };
+        message.dest.x = points[i].x;
+        message.dest.y = points[i].y;
+        message.dest.w = 1;
+        message.dest.h = 1;
         message.dest_whole = false;
         push_draw_message(message);
     }
