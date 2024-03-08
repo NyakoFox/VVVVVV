@@ -457,7 +457,7 @@ void Game::clearcustomlevelstats(void)
 
 void Game::updatecustomlevelstats(std::string clevel, int cscore)
 {
-    if (!map.custommodeforreal)
+    if (true)
     {
         /* We are playtesting, don't update level stats */
         return;
@@ -4796,7 +4796,7 @@ void Game::deserializesettings(tinyxml2::XMLElement* dataNode, struct ScreenSett
 
         if (SDL_strcmp(pKey, "setflipmode") == 0)
         {
-            graphics.setflipmode = help.Int(pText);
+            graphics.setflipmode = false;
         }
 
         if (SDL_strcmp(pKey, "invincibility") == 0)
@@ -6844,12 +6844,6 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         menuyoff = -20;
         break;
     case Menu::gameplayoptions:
-#if !defined(MAKEANDPLAY)
-        if (ingame_titlemode && unlock[Unlock_FLIPMODE])
-#endif
-        {
-                option(loc::gettext("flip mode"));
-        }
         option(loc::gettext("toggle fps"));
         option(loc::gettext("speedrun options"));
         option(loc::gettext("advanced options"));
@@ -6933,7 +6927,7 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
     }
     case Menu::options:
         option(loc::gettext("gameplay"));
-        option(loc::gettext("graphics"));
+        option(loc::gettext("graphics"), false);
         option(loc::gettext("audio"));
         option(loc::gettext("game pad"));
         option(loc::gettext("accessibility"));
@@ -6966,8 +6960,8 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         break;
     }
     case Menu::advancedoptions:
-        option(loc::gettext("unfocus pause"));
-        option(loc::gettext("unfocus audio pause"));
+        option(loc::gettext("unfocus pause"), false);
+        option(loc::gettext("unfocus audio pause"), false);
         option(loc::gettext("room name background"));
         option(loc::gettext("checkpoint saving"));
         option(loc::gettext("return"));
@@ -7751,7 +7745,7 @@ static void resetbg(void)
 
 void Game::returntoeditor(void)
 {
-    gamestate = EDITORMODE;
+    gamestate = IDLEMODE;
 
     graphics.textboxes.clear();
     hascontrol = true;

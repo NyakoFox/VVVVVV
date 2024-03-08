@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 
+#include "DLLHook.h"
 #include "Game.h"
 #include "GraphicsResources.h"
 #include "Textbox.h"
@@ -449,6 +450,8 @@ public:
     void print_roomtext(int x, int y, const char* text, bool rtl);
 
     SDL_Texture* render_target;
+
+    std::map<std::string, SDL_Point> texture_sizes;
 };
 
 #ifndef GRAPHICS_DEFINITION

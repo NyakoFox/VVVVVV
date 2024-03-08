@@ -272,7 +272,7 @@ void ApplyFilter(SDL_Surface** src, SDL_Surface** dest)
         }
     }
 
-    SDL_UpdateTexture(graphics.gameTexture, NULL, (*dest)->pixels, (*dest)->pitch);
+    //SDL_UpdateTexture(graphics.gameTexture, NULL, (*dest)->pixels, (*dest)->pitch);
 }
 
 bool TakeScreenshot(SDL_Surface** surface)

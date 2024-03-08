@@ -21,6 +21,20 @@
 #include "UtilityClass.h"
 #include "Vlogging.h"
 
+VVV_Texture* VVV_CreateTexture(int width, int height)
+{
+    VVV_Texture* texture = new VVV_Texture();
+    texture->id = "unknown";
+    texture->w = width;
+    texture->h = height;
+    return texture;
+}
+
+void VVV_DestroyTexture(VVV_Texture* texture)
+{
+    delete texture;
+}
+
 extern "C" DECLSPEC draw_message SDLCALL pop_draw_messages(void)
 {
     draw_message message;
@@ -95,6 +109,57 @@ extern "C" DECLSPEC void SDLCALL simulate_keyevent(const char* event_type, const
     event.key.keysym.sym = SDL_GetKeyFromName(new_key);
 
     SDL_PushEvent(&event);
+}
+
+extern "C" DECLSPEC void SDLCALL simulate_mouseevent(const char* event_type, int button, int x, int y)
+{
+    SDL_Event event;
+    SDL_zero(event);
+
+    if (SDL_strcmp(event_type, "mousedown") == 0)
+    {
+        event.type = SDL_MOUSEBUTTONDOWN;
+    }
+    else if (SDL_strcmp(event_type, "mouseup") == 0)
+    {
+        event.type = SDL_MOUSEBUTTONUP;
+    }
+    else
+    {
+        vlog_error("Invalid event type: %s", event_type);
+        return;
+    }
+
+    event.button.button = button;
+    event.button.x = x;
+    event.button.y = y;
+
+    SDL_PushEvent(&event);
+}
+
+extern "C" DECLSPEC void SDLCALL simulate_mousemoveevent(int x, int y)
+{
+    SDL_Event event;
+    SDL_zero(event);
+
+    event.type = SDL_MOUSEMOTION;
+    event.motion.x = x;
+    event.motion.y = y;
+
+    SDL_PushEvent(&event);
+}
+
+extern "C" DECLSPEC void SDLCALL play_level_init(void)
+{
+    graphics.texture_sizes.clear();
+}
+
+extern "C" DECLSPEC void SDLCALL set_texture_size(const char* texture, int w, int h)
+{
+    SDL_Point point;
+    point.x = w;
+    point.y = h;
+    graphics.texture_sizes[texture] = point;
 }
 
 extern "C" DECLSPEC void SDLCALL play_level(const char* level_data, const char* playassets)

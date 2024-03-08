@@ -402,8 +402,8 @@ void editorclass::reset(void)
     script_list_offset = 0;
     selected_script = 0;
 
-    return_message_timer = 0;
-    old_return_message_timer = 0;
+    return_message_timer = 1000; // Let's start it higher than 255 since it gets clamped
+    old_return_message_timer = 1000;
 
     ghosts.clear();
     current_ghosts = 0;

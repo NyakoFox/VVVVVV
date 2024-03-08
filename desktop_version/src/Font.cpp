@@ -5,6 +5,7 @@
 #include "Alloc.h"
 #include "Constants.h"
 #include "CustomLevels.h"
+#include "DLLHook.h"
 #include "FileSystemUtils.h"
 #include "FontBidi.h"
 #include "Graphics.h"
@@ -23,53 +24,6 @@ extern "C"
 
 namespace font
 {
-
-#define GLYPH_EXISTS 0x1
-#define GLYPH_COLOR 0x2
-
-struct GlyphInfo
-{
-    uint16_t image_idx;
-    uint8_t advance;
-    uint8_t flags;
-};
-
-/* Codepoints go up to U+10FFFF, so we have 0x110 (272) pages
- * of 0x1000 (4096) glyphs, allocated as needed */
-#define FONT_N_PAGES 0x110
-#define FONT_PAGE_SIZE 0x1000
-
-enum FontType
-{
-    FontType_FONT,
-    FontType_BUTTONS
-};
-
-struct Font
-{
-    char name[64];
-    char display_name[SCREEN_WIDTH_CHARS + 1];
-
-    FontType type;
-
-    uint8_t glyph_w;
-    uint8_t glyph_h;
-
-    SDL_Texture* image;
-
-    GlyphInfo* glyph_page[FONT_N_PAGES];
-
-    char fallback_key[64];
-    uint8_t fallback_idx;
-    bool fallback_idx_valid;
-};
-
-struct FontContainer
-{
-    uint8_t count;
-    Font* fonts;
-    hashmap* map_name_idx;
-};
 
 struct PrintFlags
 {
@@ -515,6 +469,16 @@ static bool find_font_by_name(FontContainer* container, const char* name, uint8_
         return true;
     }
     return false;
+}
+
+FontContainer* get_fonts_main(void)
+{
+    return &fonts_main;
+}
+
+FontContainer* get_fonts_custom(void)
+{
+    return &fonts_custom;
 }
 
 bool find_main_font_by_name(const char* name, uint8_t* idx)

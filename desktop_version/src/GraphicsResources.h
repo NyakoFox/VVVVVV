@@ -3,6 +3,8 @@
 
 #include <SDL.h>
 
+#include "DLLHook.h"
+
 enum TextureLoadType
 {
     TEX_COLOR,
