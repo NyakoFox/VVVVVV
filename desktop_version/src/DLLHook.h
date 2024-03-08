@@ -12,7 +12,7 @@
 #define SDL_DestroyTexture(texture) VVV_DestroyTexture(texture)
 #define SDL_CreateTexture(renderer, format, access, w, h) VVV_CreateTexture(w, h)
 #define SDL_CreateTextureFromSurface(renderer, surface) VVV_CreateTexture(surface->w, surface->h)
-#define SDL_SetTextureScaleMode() 0
+#define SDL_SetTextureScaleMode(a, b)
 
 struct VVV_Texture
 {
@@ -50,37 +50,37 @@ typedef enum {
     DRAW_TEXTURE_EXT = 9,
     DRAW_SET_TINT_COLOR = 10,
     DRAW_SET_TINT_ALPHA = 11
-} draw_type;
+} DLL_draw_type;
 
 typedef struct {
     int x;
     int y;
-} point;
+} DLL_point;
 
 typedef struct {
     uint8_t r;
     uint8_t g;
     uint8_t b;
     uint8_t a;
-} color;
+} DLL_color;
 
 typedef struct {
     int x;
     int y;
     int w;
     int h;
-} rect;
+} DLL_rect;
 
 typedef struct {
-    draw_type type;
-    point p1;
-    point p2;
-    point size;
-    color color;
+    DLL_draw_type type;
+    DLL_point p1;
+    DLL_point p2;
+    DLL_point size;
+    DLL_color color;
     char texture[255];
-    rect src;
-    rect dest;
-    point center;
+    DLL_rect src;
+    DLL_rect dest;
+    DLL_point center;
     int angle;
     bool flip_x;
     bool flip_y;
