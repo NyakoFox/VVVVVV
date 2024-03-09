@@ -35,15 +35,12 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
             message(WARNING "CMAKE_OSX_SYSROOT not set and macOS 10.9 SDK not found! Using default one.")
         endif()
     endif()
-    set(CMAKE_OSX_DEPLOYMENT_TARGET 10.9)
+    set(CMAKE_OSX_DEPLOYMENT_TARGET 10.9 FORCE)
+    set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64")
     link_directories(/usr/local/lib)
     add_compile_options(-Werror=partial-availability)
 elseif(CMAKE_SYSTEM_NAME STREQUAL "iOS")
     set(CMAKE_OSX_DEPLOYMENT_TARGET 12.0) # SDL goes back to iOS 8.0, but modern Xcode doesn't
-endif()
-
-if(APPLE)
-    set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64")
 endif()
 
 project(VVVVVV)
