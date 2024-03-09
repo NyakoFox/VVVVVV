@@ -48,6 +48,10 @@ jobs:
     - name: Build
       run: ninja -C ${SRC_DIR_PATH}/build
 
+    - name: Fix dylib paths
+      run: |
+        install_name_tool -change '/usr/local/opt/sdl2/lib/libSDL2-2.0.0.dylib' '@rpath/SDL2.framework/Versions/A/SDL2' ${SRC_DIR_PATH}/build/libVVVVVV.dylib
+
     - name: Upload binary
       uses: actions/upload-artifact@v1
       with:
