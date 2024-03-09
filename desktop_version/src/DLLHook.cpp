@@ -35,6 +35,23 @@ void VVV_DestroyTexture(VVV_Texture* texture)
     delete texture;
 }
 
+bool VVV_PollEvent(VVV_Event* event)
+{
+    if (events.size() == 0)
+    {
+        return false;
+    }
+
+    *event = events.front();
+    events.erase(events.begin());
+    return true;
+}
+
+void VVV_PushEvent(VVV_Event* event)
+{
+    events.push_back(*event);
+}
+
 extern "C" DECLSPEC draw_message SDLCALL pop_draw_messages(void)
 {
     draw_message message;
@@ -87,18 +104,18 @@ extern "C" DECLSPEC const char* SDLCALL get_state(void)
     }
 }
 
-extern "C" DECLSPEC void SDLCALL simulate_keyevent(const char* event_type, const char* new_key)
+extern "C" DECLSPEC void SDLCALL simulate_keyevent(const char* event_type, const char* new_key, bool repeat)
 {
-    SDL_Event event;
+    VVV_Event event;
     SDL_zero(event);
 
     if (SDL_strcmp(event_type, "keydown") == 0)
     {
-        event.type = SDL_KEYDOWN;
+        event.type = VVV_EventType_KEYDOWN;
     }
     else if (SDL_strcmp(event_type, "keyup") == 0)
     {
-        event.type = SDL_KEYUP;
+        event.type = VVV_EventType_KEYUP;
     }
     else
     {
@@ -106,23 +123,24 @@ extern "C" DECLSPEC void SDLCALL simulate_keyevent(const char* event_type, const
         return;
     }
 
-    event.key.keysym.sym = SDL_GetKeyFromName(new_key);
+    event.keysym.sym = SDL_GetKeyFromName(new_key);
+    event.repeat = repeat;
 
-    SDL_PushEvent(&event);
+    VVV_PushEvent(&event);
 }
 
 extern "C" DECLSPEC void SDLCALL simulate_mouseevent(const char* event_type, int button, int x, int y)
 {
-    SDL_Event event;
+    VVV_Event event;
     SDL_zero(event);
 
     if (SDL_strcmp(event_type, "mousedown") == 0)
     {
-        event.type = SDL_MOUSEBUTTONDOWN;
+        event.type = VVV_EventType_MOUSEBUTTONDOWN;
     }
     else if (SDL_strcmp(event_type, "mouseup") == 0)
     {
-        event.type = SDL_MOUSEBUTTONUP;
+        event.type = VVV_EventType_MOUSEBUTTONUP;
     }
     else
     {
@@ -130,23 +148,23 @@ extern "C" DECLSPEC void SDLCALL simulate_mouseevent(const char* event_type, int
         return;
     }
 
-    event.button.button = button;
-    event.button.x = x;
-    event.button.y = y;
+    event.button = button;
+    event.x = x;
+    event.y = y;
 
-    SDL_PushEvent(&event);
+    VVV_PushEvent(&event);
 }
 
 extern "C" DECLSPEC void SDLCALL simulate_mousemoveevent(int x, int y)
 {
-    SDL_Event event;
+    VVV_Event event;
     SDL_zero(event);
 
-    event.type = SDL_MOUSEMOTION;
-    event.motion.x = x;
-    event.motion.y = y;
+    event.type = VVV_EventType_MOUSEMOTION;
+    event.x = x;
+    event.y = y;
 
-    SDL_PushEvent(&event);
+    VVV_PushEvent(&event);
 }
 
 extern "C" DECLSPEC void SDLCALL play_level_init(void)

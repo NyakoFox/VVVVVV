@@ -21,6 +21,31 @@ struct VVV_Texture
     int h;
 };
 
+enum VVV_EventType
+{
+    VVV_EventType_NONE,
+    VVV_EventType_KEYDOWN,
+    VVV_EventType_KEYUP,
+    VVV_EventType_MOUSEBUTTONDOWN,
+    VVV_EventType_MOUSEBUTTONUP,
+    VVV_EventType_MOUSEMOTION
+};
+
+struct VVV_Event
+{
+    VVV_EventType type;
+    SDL_Keysym keysym;
+    int button;
+    int x;
+    int y;
+    bool repeat;
+};
+
+bool VVV_PollEvent(VVV_Event* event);
+void VVV_PushEvent(VVV_Event* event);
+
+static std::vector<VVV_Event> events;
+
 void VVV_DestroyTexture(VVV_Texture* texture);
 VVV_Texture* VVV_CreateTexture(int width, int height);
 
@@ -34,7 +59,7 @@ extern "C" DECLSPEC void SDLCALL play_level_init(void);
 extern "C" DECLSPEC void SDLCALL set_texture_size(const char* texture, int w, int h);
 extern "C" DECLSPEC void SDLCALL play_level(const char* level_data, const char* playassets);
 
-extern "C" DECLSPEC void SDLCALL simulate_keyevent(const char* event_type, const char* new_key);
+extern "C" DECLSPEC void SDLCALL simulate_keyevent(const char* event_type, const char* new_key, bool repeat);
 extern "C" DECLSPEC void SDLCALL simulate_mouseevent(const char* event_type, int button, int x, int y);
 extern "C" DECLSPEC void SDLCALL simulate_mousemoveevent(int x, int y);
 
