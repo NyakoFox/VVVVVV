@@ -52,6 +52,11 @@ void VVV_PushEvent(VVV_Event* event)
     events.push_back(*event);
 }
 
+extern "C" DECLSPEC void SDLCALL return_to_idlemode(void)
+{
+    game.quittomenu();
+}
+
 extern "C" DECLSPEC draw_message SDLCALL pop_draw_messages(void)
 {
     draw_message message;

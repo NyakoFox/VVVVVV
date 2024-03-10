@@ -137,7 +137,6 @@ extern "C" DECLSPEC bool SDLCALL should_vvvvvv_exit(void)
     return false;
 }
 
-
 static void idlerenderfixed(void)
 {
     graphics.renderfixedpre();
