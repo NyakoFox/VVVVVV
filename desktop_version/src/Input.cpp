@@ -948,7 +948,7 @@ static void menuactionpress(void)
     }
     case Menu::gameplayoptions:
     {
-        int gameplayoptionsoffset = 0;
+        int gameplayoptionsoffset = -1;
 
         if (game.currentmenuoption == gameplayoptionsoffset + 0)
         {
@@ -2945,7 +2945,7 @@ void gameinput(void)
         game.mapmenuchange(MAPMODE, true);
         game.gamesaved = false;
         game.gamesavefailed = false;
-        game.menupage = 30; // Pause screen
+        game.menupage = 10; // Pause screen
     }
 
     if (game.deathseq == -1 && (key.isDown(SDLK_r) || key.isDown(game.controllerButton_restart)) && !game.nodeathmode)// && map.custommode) //Have fun glitchrunners!
@@ -3085,7 +3085,7 @@ void mapinput(void)
                 }
                 else if (game.menupage < 12)
                 {
-                    game.menupage = 32;
+                    graphics.resumegamemode = true;
                 }
                 else
                 {
@@ -3195,13 +3195,13 @@ static void mapmenuactionpress(const bool version2_2)
         break;
     case 3:
         music.playef(Sound_VIRIDIAN);
-        game.menupage = 30;
+        game.menupage = 10;
         break;
 
     case 10:
         //return to pause menu
         music.playef(Sound_VIRIDIAN);
-        game.menupage = 32;
+        graphics.resumegamemode = true;
         break;
     case 11:
         //quit to menu

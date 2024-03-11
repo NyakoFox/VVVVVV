@@ -302,7 +302,7 @@ static void menurender(void)
         break;
     case Menu::gameplayoptions:
     {
-        int gameplayoptionsoffset = 0;
+        int gameplayoptionsoffset = -1;
 
         if (game.currentmenuoption == gameplayoptionsoffset + 0)
         {

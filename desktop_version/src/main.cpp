@@ -719,7 +719,7 @@ extern "C" DECLSPEC int SDLCALL mainLoop(int argc, char *argv[])
         struct ScreenSettings screen_settings;
         SDL_zero(screen_settings);
         ScreenSettings_default(&screen_settings);
-        game.loadstats(&screen_settings);
+        //game.loadstats(&screen_settings);
         game.loadsettings(&screen_settings);
         gameScreen.init(&screen_settings);
     }
