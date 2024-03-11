@@ -3,6 +3,10 @@
 
 cmake_minimum_required(VERSION 2.8.12...3.5)
 
+if(WIN32)
+    cmake_policy(SET CMP0091 NEW)
+endif()
+
 # CMake Options
 option(ENABLE_WARNINGS "Enable compilation warnings" ON)
 option(ENABLE_WERROR "Treat compilation warnings as errors" OFF)
