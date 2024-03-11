@@ -52,6 +52,21 @@ void VVV_PushEvent(VVV_Event* event)
     events.push_back(*event);
 }
 
+extern "C" DECLSPEC void SDLCALL set_roomname_bg(bool translucent)
+{
+    graphics.translucentroomname = translucent;
+}
+
+extern "C" DECLSPEC void SDLCALL set_volume(int volume)
+{
+    music.user_music_volume = volume;
+}
+
+extern "C" DECLSPEC void SDLCALL set_sound_volume(int volume)
+{
+    music.user_sound_volume = volume;
+}
+
 extern "C" DECLSPEC void SDLCALL return_to_idlemode(void)
 {
     game.quittomenu();

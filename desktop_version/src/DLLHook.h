@@ -49,6 +49,10 @@ static std::vector<VVV_Event> events;
 void VVV_DestroyTexture(VVV_Texture* texture);
 VVV_Texture* VVV_CreateTexture(int width, int height);
 
+extern "C" DECLSPEC void SDLCALL set_roomname_bg(bool translucent);
+extern "C" DECLSPEC void SDLCALL set_volume(int volume);
+extern "C" DECLSPEC void SDLCALL set_sound_volume(int volume);
+
 extern "C" DECLSPEC void SDLCALL return_to_idlemode(void);
 extern "C" DECLSPEC bool SDLCALL should_vvvvvv_exit(void);
 
