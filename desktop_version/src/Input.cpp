@@ -3096,7 +3096,7 @@ void mapinput(void)
                 if (game.menupage < 9
                 || (game.menupage >= 20 && game.menupage <= 21))
                 {
-                    game.menupage = 30;
+                    game.menupage = 10;
                 }
                 else if (game.menupage < 12)
                 {
@@ -3315,7 +3315,7 @@ void teleporterinput(void)
             {
                 // Go to pause menu
                 game.mapheld = true;
-                game.menupage = 30;
+                game.menupage = 10;
                 game.gamestate = MAPMODE;
             }
             else
