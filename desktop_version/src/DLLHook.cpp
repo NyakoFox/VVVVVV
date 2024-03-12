@@ -52,6 +52,11 @@ void VVV_PushEvent(VVV_Event* event)
     events.push_back(*event);
 }
 
+extern "C" DECLSPEC void SDLCALL set_invincibility(bool invincible)
+{
+    map.invincibility = invincible;
+}
+
 extern "C" DECLSPEC void SDLCALL set_roomname_bg(bool translucent)
 {
     graphics.translucentroomname = translucent;
