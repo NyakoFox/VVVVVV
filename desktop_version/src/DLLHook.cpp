@@ -52,6 +52,28 @@ void VVV_PushEvent(VVV_Event* event)
     events.push_back(*event);
 }
 
+extern "C" DECLSPEC void SDLCALL clear_input(void)
+{
+    key.keymap.clear();
+}
+
+extern "C" DECLSPEC bool SDLCALL get_flag(int flag)
+{
+    if (INBOUNDS_ARR(flag, obj.flags))
+    {
+        return obj.flags[flag];
+    }
+    return false;
+}
+
+extern "C" DECLSPEC void SDLCALL set_flag(int flag, bool value)
+{
+    if (INBOUNDS_ARR(flag, obj.flags))
+    {
+        obj.flags[flag] = value;
+    }
+}
+
 extern "C" DECLSPEC void SDLCALL set_invincibility(bool invincible)
 {
     map.invincibility = invincible;

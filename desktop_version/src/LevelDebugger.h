@@ -11,6 +11,7 @@ namespace level_debugger
     void logic(void);
     void render(void);
     void set_forced(void);
+    void open_flag_menu(void);
 }
 
 #endif /* LEVELDEBUGGER_H */
