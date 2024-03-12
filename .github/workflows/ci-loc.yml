@@ -1,0 +1,41 @@
+name: CI-loc
+
+# Only trigger workflow when code changes, or this file is changed.
+# Android has a different workflow and different rules.
+on:
+  push:
+    paths:
+      - "desktop_version/fonts/**.png"
+      - "desktop_version/lang/**"
+      - ".github/workflows/ci-loc.yml"
+  pull_request:
+    paths:
+      - "desktop_version/fonts/**.png"
+      - "desktop_version/lang/**"
+      - ".github/workflows/ci-loc.yml"
+
+env:
+  SRC_DIR_PATH: desktop_version
+
+jobs:
+  zip:
+    name: Zip
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        submodules: false
+
+    - name: Upload fonts
+      uses: actions/upload-artifact@v1
+      with:
+        name: fonts
+        path: ${{ env.SRC_DIR_PATH }}/fonts/
+
+    - name: Upload lang
+      uses: actions/upload-artifact@v1
+      with:
+        name: lang
+        path: ${{ env.SRC_DIR_PATH }}/lang/
