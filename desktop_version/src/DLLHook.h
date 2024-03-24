@@ -8,6 +8,8 @@
 #include <vector>
 #include <string>
 
+#include "Editor.h"
+
 #define SDL_Texture VVV_Texture
 #define SDL_DestroyTexture(texture) VVV_DestroyTexture(texture)
 #define SDL_CreateTexture(renderer, format, access, w, h) VVV_CreateTexture(w, h)
@@ -56,6 +58,8 @@ extern "C" DECLSPEC void SDLCALL set_invincibility(bool invincible);
 extern "C" DECLSPEC void SDLCALL set_roomname_bg(bool translucent);
 extern "C" DECLSPEC void SDLCALL set_volume(int volume);
 extern "C" DECLSPEC void SDLCALL set_sound_volume(int volume);
+extern "C" DECLSPEC int SDLCALL get_ghost_count(void);
+extern "C" DECLSPEC GhostInfo SDLCALL get_ghost_info(int index);
 
 extern "C" DECLSPEC void SDLCALL return_to_idlemode(void);
 extern "C" DECLSPEC bool SDLCALL should_vvvvvv_exit(void);

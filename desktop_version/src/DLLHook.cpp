@@ -52,6 +52,18 @@ void VVV_PushEvent(VVV_Event* event)
     events.push_back(*event);
 }
 
+extern "C" DECLSPEC int SDLCALL get_ghost_count(void)
+{
+    return ed.ghosts.size();
+}
+
+extern "C" DECLSPEC GhostInfo SDLCALL get_ghost_info(int index)
+{
+    SDL_assert(INBOUNDS_VEC(index, ed.ghosts));
+
+    return ed.ghosts[index];
+}
+
 extern "C" DECLSPEC void SDLCALL clear_input(void)
 {
     key.keymap.clear();

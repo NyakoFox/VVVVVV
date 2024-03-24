@@ -144,9 +144,9 @@ void gamerenderfixed(void)
     }
 
     // Editor ghosts!
-    if (game.ghostsenabled)
+    if (true)
     {
-        if (map.custommode && !map.custommodeforreal)
+        if (true)
         {
             if (game.frames % 3 == 0)
             {
