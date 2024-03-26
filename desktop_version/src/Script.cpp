@@ -483,6 +483,10 @@ void scriptclass::run(void)
             {
                 graphics.showcutscenebars = false;
             }
+            if (words[0] == "setbars")
+            {
+                graphics.setbars(ss_toi(words[1]));
+            }
             if (words[0] == "audiopause")
             {
                 if (words[1] == "on")
@@ -1400,6 +1404,11 @@ void scriptclass::run(void)
             else if (words[0] == "fadeout")
             {
                 graphics.fademode = FADE_START_FADEOUT;
+            }
+            else if (words[0] == "befadeout")
+            {
+                graphics.setfade(440);
+                graphics.fademode = FADE_FULLY_BLACK;
             }
             else if (words[0] == "untilfade")
             {
@@ -2486,6 +2495,17 @@ void scriptclass::run(void)
                     {
                         graphics.textboxes[i].print_flags = flags;
                         graphics.textboxes[i].resize();
+                    }
+                }
+            }
+            else if (words[0] == "grabviolet")
+            {
+                for (i = 0; i < (int) obj.entities.size(); i++)
+                {
+                    if (obj.entities[i].rule == 105)
+                    {
+                        obj.entities[i].state = 1;
+                        break;
                     }
                 }
             }

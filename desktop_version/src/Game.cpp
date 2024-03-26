@@ -377,6 +377,17 @@ void Game::init(void)
     screenshot_saved_success = false;
 
     setdefaultcontrollerbuttons();
+
+    specialmode = SpecialMode_NONE;
+    walksoundtimer = 0;
+    boosting = 25;
+    canboost = true;
+    currently_boosting = false;
+    started_boosting = false;
+
+    shoot_held = false;
+
+    spur_charge = 0;
 }
 
 void Game::setdefaultcontrollerbuttons(void)

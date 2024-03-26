@@ -2550,6 +2550,10 @@ void gameinput(void)
     //game.mx = (mouseX / 2);
     //game.my = (mouseY / 2);
 
+    bool holding_up = false;
+    bool holding_down = false;
+    bool holding_shoot = false;
+
     if(!script.running)
     {
         if (roomname_translator::enabled && roomname_translator::overlay_input())
@@ -2570,13 +2574,28 @@ void gameinput(void)
         {
             game.press_right = true;
         }
-        if (key.isDown(KEYBOARD_z) || key.isDown(KEYBOARD_SPACE) || key.isDown(KEYBOARD_v)
-                || key.isDown(KEYBOARD_UP) || key.isDown(KEYBOARD_DOWN) || key.isDown(KEYBOARD_w) || key.isDown(KEYBOARD_s)|| key.isDown(game.controllerButton_flip))
+        if (!map.jumpmode())
         {
-            game.press_action = true;
+            if (key.isDown(KEYBOARD_z) || key.isDown(KEYBOARD_SPACE) || key.isDown(KEYBOARD_v)
+                || key.isDown(KEYBOARD_UP) || key.isDown(KEYBOARD_DOWN) || key.isDown(KEYBOARD_w) || key.isDown(KEYBOARD_s) || key.isDown(game.controllerButton_flip))
+            {
+                game.press_action = true;
+            }
+        }
+        else
+        {
+            if (key.isDown(KEYBOARD_z) || key.isDown(KEYBOARD_SPACE) || key.isDown(KEYBOARD_v)
+                || key.isDown(game.controllerButton_flip))
+            {
+                game.press_action = true;
+            }
         }
 
-        if (key.isDown(KEYBOARD_e) || key.isDown(game.controllerButton_interact))
+        holding_up = key.isDown(KEYBOARD_UP) || key.isDown(KEYBOARD_w) || key.controllerWantsUp();
+        holding_down = key.isDown(KEYBOARD_DOWN) || key.isDown(KEYBOARD_s) || key.controllerWantsDown();
+        holding_shoot = key.isDown(SDLK_x) || key.isDown(SDL_CONTROLLER_BUTTON_X);
+
+        if (key.isDown(KEYBOARD_e) || key.isDown(game.controllerButton_interact) && !map.jumpmode())
         {
             game.press_interact = true;
         }
@@ -2781,15 +2800,52 @@ void gameinput(void)
                     }
                 }
 
+                bool holding_dir = false;
+
                 if(game.press_left)
                 {
+                    holding_dir = true;
                     obj.entities[ie].ax = -3;
                     obj.entities[ie].dir = 0;
+                    game.walksoundtimer++;
+                    if (map.jumpmode() && !game.currently_boosting)
+                    {
+                        if (obj.entities[ie].onground > 0)
+                        {
+                            obj.entities[ie].vx -= 0.166015625 * 4;
+                        }
+                        else
+                        {
+                            obj.entities[ie].vx -= 0.0625 * 4;
+                        }
+                    }
                 }
                 else if (game.press_right)
                 {
+                    holding_dir = true;
+                    game.walksoundtimer++;
                     obj.entities[ie].ax = 3;
                     obj.entities[ie].dir = 1;
+                    if (map.jumpmode() && !game.currently_boosting)
+                    {
+                        if (obj.entities[ie].onground > 0)
+                        {
+                            obj.entities[ie].vx += 0.166015625 * 4;
+                        }
+                        else
+                        {
+                            obj.entities[ie].vx += 0.0625 * 4;
+                        }
+                    }
+                }
+                else
+                {
+                    game.walksoundtimer = 0;
+                }
+
+                if (game.walksoundtimer % 6 == 0 && obj.entities[ie].onground > 0 && map.jumpmode() && holding_dir)
+                {
+                    music.playef(Sound_QUOTE_WALK);
                 }
             }
         }
@@ -2803,7 +2859,7 @@ void gameinput(void)
         }
         else
         {
-            if (game.tapleft <= 4 && game.tapleft > 0)
+            if (game.tapleft <= 4 && game.tapleft > 0 && !map.jumpmode())
             {
                 for (size_t ie = 0; ie < obj.entities.size(); ++ie)
                 {
@@ -2824,7 +2880,7 @@ void gameinput(void)
         }
         else
         {
-            if (game.tapright <= 4 && game.tapright > 0)
+            if (game.tapright <= 4 && game.tapright > 0 && !map.jumpmode())
             {
                 for (size_t ie = 0; ie < obj.entities.size(); ++ie)
                 {
@@ -2844,6 +2900,8 @@ void gameinput(void)
         {
             game.jumppressed = 0;
             game.jumpheld = false;
+            game.canboost = true;
+            game.started_boosting = false;
         }
 
         if (game.press_action && !game.jumpheld)
@@ -2861,8 +2919,168 @@ void gameinput(void)
             }
         }
 
+        if (holding_shoot)
+        {
+            game.spur_charge++;
+            if (game.spur_charge % 2 == 0)
+            {
+                if (game.spur_charge <= 10)
+                {
+                    music.playef(Sound_SPUR_CHARGE_1);
+                }
+                else if (game.spur_charge <= 10 + 16)
+                {
+                    music.playef(Sound_SPUR_CHARGE_2);
+                }
+                else if (game.spur_charge < 10 + 16 + 50)
+                {
+                    music.playef(Sound_SPUR_CHARGE_3);
+                }
+            }
+            if (game.spur_charge == 10 + 16 + 50)
+            {
+                music.playef(Sound_SPUR_CHARGED);
+            }
+        }
+        else
+        {
+            game.shoot_held = false;
+
+            if (game.spur_charge > 10)
+            {
+                int strength = 0;
+                if (game.spur_charge <= 10 + 16)
+                {
+                    strength = 1;
+                    music.playef(Sound_SPUR_SHOOT_1);
+                }
+                else if (game.spur_charge < 10 + 16 + 50)
+                {
+                    strength = 2;
+                    music.playef(Sound_SPUR_SHOOT_2);
+                }
+                else
+                {
+                    strength = 3;
+                    music.playef(Sound_SPUR_SHOOT_3);
+                }
+
+                for (size_t j = 0; j < player_entities.size(); j++)
+                {
+                    const size_t e = player_entities[j];
+                    for (int i = 0; i < 12; i++)
+                    {
+                        int color = 0;
+                        if (i == 10) color = 1;
+                        if (i == 11) color = 2;
+
+                        if (holding_up)
+                        {
+                            obj.createentity(obj.entities[e].xp + 6, obj.entities[e].yp, 106, 0, -12, strength, i, color, 0);
+                        }
+                        else if (holding_down && obj.entities[e].onground <= 0)
+                        {
+                            obj.createentity(obj.entities[e].xp + 6, obj.entities[e].yp + 8 + 8, 106, 0, 12, strength, i, color, 0);
+                        }
+                        else
+                        {
+                            int spd = obj.entities[e].dir == 0 ? -12 : 12;
+                            obj.createentity(obj.entities[e].xp + 8 + (spd / 4), obj.entities[e].yp + 8 + 4, 106, spd, 0, strength, i, color, 0);
+                        }
+                    }
+                }
+            }
+
+            game.spur_charge = 0;
+        }
+
+        if (map.jumpmode())
+        {
+            for (size_t j = 0; j < player_entities.size(); j++)
+            {
+                const size_t e = player_entities[j];
+                if (holding_shoot && !game.shoot_held)
+                {
+                    music.playef(Sound_SHOOT);
+                    game.shoot_held = true;
+                    if (holding_up)
+                    {
+                        obj.createentity(obj.entities[e].xp + 6, obj.entities[e].yp, 106, 0, -12);
+                    }
+                    else if (holding_down && obj.entities[e].onground <= 0)
+                    {
+                        obj.createentity(obj.entities[e].xp + 6, obj.entities[e].yp + 8 + 8, 106, 0, 12);
+                    }
+                    else
+                    {
+                        int spd = obj.entities[e].dir == 0 ? -12 : 12;
+                        obj.createentity(obj.entities[e].xp + 8 + (spd / 4), obj.entities[e].yp + 8 + 4, 106, spd, 0);
+                    }
+                }
+            }
+        }
+
+        game.currently_boosting = false;
+        if (map.jumpmode() && (game.boosting > 0) && game.jumpheld && game.canboost)
+        {
+            game.boosting--;
+
+            for (size_t j = 0; j < player_entities.size(); j++)
+            {
+                const size_t e = player_entities[j];
+                if (obj.entities[e].onground <= 0)
+                {
+                    game.currently_boosting = true;
+                    if (!game.started_boosting)
+                    {
+                        game.started_boosting = true;
+                        if (game.press_left)
+                        {
+                            obj.entities[e].vx = -(3 * 2);
+                            obj.entities[e].vy = 0;
+                        }
+                        else if (game.press_right)
+                        {
+                            obj.entities[e].vx = 3 * 2;
+                            obj.entities[e].vy = 0;
+                        }
+                        else if (holding_down)
+                        {
+                            obj.entities[e].vy = 3 * 2;
+                            obj.entities[e].vx = 0;
+                        }
+                        else
+                        {
+                            obj.entities[e].vy = -(3 * 2);
+                            obj.entities[e].vx = 0;
+                        }
+                    }
+
+                    if (game.press_right && obj.entities[e].vx <= 1)
+                    {
+                        obj.entities[e].vx = 1;
+                    }
+
+                    if (game.press_left && obj.entities[e].vx >= -1)
+                    {
+                        obj.entities[e].vx = -1;
+                    }
+
+                    if (game.boosting % 2 == 0)
+                    {
+                        music.playef(Sound_QUOTE_BOOST);
+                        int xspd = -obj.entities[e].vx / 4;
+                        int yspd = -obj.entities[e].vy / 4;
+                        obj.createentity(obj.entities[e].xp + 8 + xspd, obj.entities[e].yp + 8 + yspd + 4, 102, xspd, yspd);
+                    }
+                }
+            }
+        }
+
         for (size_t ie = 0; ie < obj.entities.size(); ie++)
         {
+            if (obj.entities[ie].rule == 0 && obj.entities[ie].onground > 0) game.boosting = 25;
+
             const bool process_flip = obj.entities[ie].rule == 0 &&
                 game.jumppressed > 0;
             if (!process_flip)
@@ -2873,20 +3091,32 @@ void gameinput(void)
             game.jumppressed--;
             if (obj.entities[ie].onground > 0 && game.gravitycontrol == 0)
             {
-                game.gravitycontrol = 1;
+                if (!map.jumpmode())
+                {
+                    game.gravitycontrol = 1;
+                }
+                game.canboost = false;
                 for (size_t j = 0; j < player_entities.size(); j++)
                 {
                     const size_t e = player_entities[j];
                     if (obj.entities[e].onground > 0 || obj.entities[e].onroof > 0)
                     {
-                        obj.entities[e].vy = -4;
-                        obj.entities[e].ay = -3;
+                        if (map.jumpmode())
+                        {
+                            obj.entities[e].vy = -2.5 * 2;
+                        }
+                        else
+                        {
+                            obj.entities[e].vy = -4;
+                            obj.entities[e].ay = -3;
+                        }
                     }
                 }
-                music.playef(Sound_FLIP);
+                music.playef(map.jumpmode() ? Sound_QUOTE_JUMP : Sound_FLIP);
                 game.jumppressed = 0;
                 game.totalflips++;
             }
+
             if (obj.entities[ie].onroof > 0 && game.gravitycontrol == 1)
             {
                 game.gravitycontrol = 0;

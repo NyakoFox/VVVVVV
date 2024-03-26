@@ -60,7 +60,21 @@ enum
     Sound_COMBINE = 24,
     Sound_NEWRECORD = 25,
     Sound_TROPHY = 26,
-    Sound_RESCUE = 27
+    Sound_RESCUE = 27,
+    Sound_QUOTE_WALK = 28,
+    Sound_QUOTE_JUMP = 29,
+    Sound_QUOTE_BOOST = 30,
+    Sound_HIT_GROUND = 31,
+    Sound_BLOCK_DESTROY = 32,
+    Sound_BLOCK_HIT = 33,
+    Sound_SHOOT = 34,
+    Sound_SPUR_CHARGE_1 = 35,
+    Sound_SPUR_CHARGE_2 = 36,
+    Sound_SPUR_CHARGE_3 = 37,
+    Sound_SPUR_SHOOT_1 = 38,
+    Sound_SPUR_SHOOT_2 = 39,
+    Sound_SPUR_SHOOT_3 = 40,
+    Sound_SPUR_CHARGED = 41
 };
 
 class musicclass

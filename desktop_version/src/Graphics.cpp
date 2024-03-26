@@ -790,6 +790,15 @@ void Graphics::drawtile(int x, int y, int t)
     }
 }
 
+void Graphics::drawtilehell(int x, int y, int t)
+{
+    draw_grid_tile(grphx.im_tileshell, t, x, y, 16, 16);
+}
+
+void Graphics::draw8x8effect(int x, int y, int t)
+{
+    draw_grid_tile(grphx.im_8x8effects, t, x, y, 8, 8);
+}
 
 void Graphics::drawtile2(int x, int y, int t)
 {
@@ -2033,6 +2042,15 @@ void Graphics::drawentity(const int i, const int yoff)
         return;
     }
 
+    int xpos = 0;
+    int ypos = yoff;
+
+    if (map.largermode)
+    {
+        xpos = map.xpos;
+        ypos = map.ypos;
+    }
+
     SDL_Point tpoint;
 
     SDL_Rect drawRect;
@@ -2062,8 +2080,8 @@ void Graphics::drawentity(const int i, const int yoff)
     case 0:
     {
         // Sprites
-        tpoint.x = xp;
-        tpoint.y = yp - yoff;
+        tpoint.x = xp - xpos;
+        tpoint.y = yp - ypos;
         const SDL_Color ct = obj.entities[i].realcol;
 
         drawRect = sprites_rect;
@@ -2127,8 +2145,8 @@ void Graphics::drawentity(const int i, const int yoff)
     }
     case 1:
         // Tiles
-        tpoint.x = xp;
-        tpoint.y = yp - yoff;
+        tpoint.x = xp - xpos;
+        tpoint.y = yp - ypos;
         drawRect = tiles_rect;
         drawRect.x += tpoint.x;
         drawRect.y += tpoint.y;
@@ -2140,8 +2158,8 @@ void Graphics::drawentity(const int i, const int yoff)
     {
         // Special: Moving platform, 4 tiles or 8 tiles
 
-        tpoint.x = xp;
-        tpoint.y = yp - yoff;
+        tpoint.x = xp - xpos;
+        tpoint.y = yp - ypos;
         int thiswidth = 4;
         if (obj.entities[i].size == 8)
         {
@@ -2165,12 +2183,12 @@ void Graphics::drawentity(const int i, const int yoff)
         break;
     }
     case 3: // Big chunky pixels!
-        fill_rect(xp, yp - yoff, 4, 4, obj.entities[i].realcol);
+        fill_rect(xp - xpos, yp - ypos, 4, 4, obj.entities[i].realcol);
         break;
     case 4: // Small pickups
     {
         const SDL_Color color = obj.entities[i].realcol;
-        drawcoloredtile(xp, yp - yoff, obj.entities[i].tile, color.r, color.g, color.b);
+        drawcoloredtile(xp - xpos, yp - ypos, obj.entities[i].tile, color.r, color.g, color.b);
         break;
     }
     case 5: // Horizontal Line
@@ -2181,14 +2199,14 @@ void Graphics::drawentity(const int i, const int yoff)
         {
             oldw -= 24;
         }
-        drawgravityline(i, xp, yp - yoff, lerp(oldw, obj.entities[i].w) - 1, 0);
+        drawgravityline(i, xp - xpos, yp - ypos, lerp(oldw, obj.entities[i].w) - 1, 0);
         break;
     }
     case 6: // Vertical Line
-        drawgravityline(i, xp, yp - yoff, 0, obj.entities[i].h - 1);
+        drawgravityline(i, xp - xpos, yp - ypos, 0, obj.entities[i].h - 1);
         break;
     case 7: // Teleporter
-        drawtele(xp, yp - yoff, obj.entities[i].drawframe, obj.entities[i].realcol);
+        drawtele(xp - xpos, yp - ypos, obj.entities[i].drawframe, obj.entities[i].realcol);
         break;
     // case 8:    // Special: Moving platform, 8 tiles
         // Note: This code is in the 4-tile code
@@ -2197,8 +2215,8 @@ void Graphics::drawentity(const int i, const int yoff)
     {
         const SDL_Color ct = obj.entities[i].realcol;
 
-        tpoint.x = xp;
-        tpoint.y = yp - yoff;
+        tpoint.x = xp - xpos;
+        tpoint.y = yp - ypos;
 
         drawRect = sprites_rect;
         drawRect.x += tpoint.x;
@@ -2206,8 +2224,8 @@ void Graphics::drawentity(const int i, const int yoff)
 
         draw_grid_tile(sprites, obj.entities[i].drawframe, drawRect.x, drawRect.y, 32, 32, ct);
 
-        tpoint.x = xp + 32;
-        tpoint.y = yp - yoff;
+        tpoint.x = xp - xpos + 32;
+        tpoint.y = yp - ypos;
 
         drawRect = sprites_rect;
         drawRect.x += tpoint.x;
@@ -2215,8 +2233,8 @@ void Graphics::drawentity(const int i, const int yoff)
 
         draw_grid_tile(sprites, obj.entities[i].drawframe + 1, drawRect.x, drawRect.y, 32, 32, ct);
 
-        tpoint.x = xp;
-        tpoint.y = yp + 32 - yoff;
+        tpoint.x = xp - xpos;
+        tpoint.y = yp + 32 - ypos;
 
         drawRect = sprites_rect;
         drawRect.x += tpoint.x;
@@ -2224,8 +2242,8 @@ void Graphics::drawentity(const int i, const int yoff)
 
         draw_grid_tile(sprites, obj.entities[i].drawframe + 12, drawRect.x, drawRect.y, 32, 32, ct);
 
-        tpoint.x = xp + 32;
-        tpoint.y = yp + 32 - yoff;
+        tpoint.x = xp + 32 - xpos;
+        tpoint.y = yp + 32 - ypos;
 
         drawRect = sprites_rect;
         drawRect.x += tpoint.x;
@@ -2238,8 +2256,8 @@ void Graphics::drawentity(const int i, const int yoff)
     {
         const SDL_Color ct = obj.entities[i].realcol;
 
-        tpoint.x = xp;
-        tpoint.y = yp - yoff;
+        tpoint.x = xp - xpos;
+        tpoint.y = yp - ypos;
 
         drawRect = sprites_rect;
         drawRect.x += tpoint.x;
@@ -2247,8 +2265,8 @@ void Graphics::drawentity(const int i, const int yoff)
 
         draw_grid_tile(sprites, obj.entities[i].drawframe, drawRect.x, drawRect.y, 32, 32, ct);
 
-        tpoint.x = xp + 32;
-        tpoint.y = yp - yoff;
+        tpoint.x = xp + 32 - xpos;
+        tpoint.y = yp - ypos;
 
         drawRect = sprites_rect;
         drawRect.x += tpoint.x;
@@ -2258,12 +2276,12 @@ void Graphics::drawentity(const int i, const int yoff)
         break;
     }
     case 11: // The fucking elephant
-        drawimagecol(IMAGE_ELEPHANT, xp, yp - yoff, obj.entities[i].realcol);
+        drawimagecol(IMAGE_ELEPHANT, xp - xpos, yp - ypos, obj.entities[i].realcol);
         break;
     case 12: // Regular sprites that don't wrap
     {
-        tpoint.x = xp;
-        tpoint.y = yp - yoff;
+        tpoint.x = xp - xpos;
+        tpoint.y = yp - ypos;
         const SDL_Color ct = obj.entities[i].realcol;
 
         drawRect = sprites_rect;
@@ -2319,8 +2337,92 @@ void Graphics::drawentity(const int i, const int yoff)
     case 13:
     {
         // Special for epilogue: huge hero!
-        draw_grid_tile(grphx.im_sprites, obj.entities[i].drawframe, xp, yp - yoff, sprites_rect.w, sprites_rect.h, obj.entities[i].realcol, 6, 6);
+        draw_grid_tile(grphx.im_sprites, obj.entities[i].drawframe, xp - xpos, yp - ypos, sprites_rect.w, sprites_rect.h, obj.entities[i].realcol, 6, 6);
         break;
+    }
+    case 100:
+    {
+        // Special: 2x2 spikes using hell tiles
+        drawtilehell(xp - xpos, yp - ypos, 216);
+        drawtilehell(xp - xpos + 16, yp - ypos, 217);
+        drawtilehell(xp - xpos, yp - ypos + 16, 232);
+        drawtilehell(xp - xpos + 16, yp - ypos + 16, 233);
+        break;
+    }
+    case 101:
+    {
+        // Special: 1x1 spikes using hell tiles
+        drawtilehell(xp - xpos, yp - ypos, 234 + obj.entities[i].tile);
+        break;
+    }
+    case 102:
+    {
+        // Special: Booster particle
+        draw8x8effect(xp - xpos, yp - ypos, 7 - obj.entities[i].life);
+        break;
+    }
+    case 103:
+    {
+        // Special: 2x2 rock using hell tiles
+        drawtilehell(xp - xpos, yp - ypos, 16);
+        drawtilehell(xp - xpos + 16, yp - ypos, 17);
+        drawtilehell(xp - xpos, yp - ypos + 16, 32);
+        drawtilehell(xp - xpos + 16, yp - ypos + 16, 33);
+        break;
+    }
+    case 104:
+    {
+        // Special: 1x1 rock using hell tiles
+        drawtilehell(xp - xpos, yp - ypos, 1);
+        break;
+    }
+    case 105:
+    {
+        // Special: Violet
+        drawspritesetcol(xp - xpos, yp - ypos, obj.entities[i].tile, 20);
+        break;
+    }
+    case 106:
+    {
+        // Special: Bullet
+
+        SDL_Color color = getRGB(255, 255, 255);
+        switch ((int) obj.entities[i].para)
+        {
+        case 0:
+            break;
+        case 1:
+            color = getRGB(118, 131, 215);
+            break;
+        case 2:
+            color = getRGB(76, 82, 163);
+            break;
+        }
+
+        switch (obj.entities[i].behave)
+        {
+        case 0:
+            fill_rect(xp - xpos, yp - ypos, obj.entities[i].w, obj.entities[i].h, color);
+            break;
+        case 1:
+            fill_rect(xp - xpos, yp - ypos, obj.entities[i].w, obj.entities[i].h, color);
+            break;
+        case 2:
+            if (obj.entities[i].vy == 0)
+            {
+                fill_rect(xp - xpos, yp - ypos, obj.entities[i].w, 1, color);
+                fill_rect(xp - xpos, yp - ypos + 3, obj.entities[i].w, 1, color);
+            }
+            else
+            {
+                fill_rect(xp - xpos, yp - ypos, 1, obj.entities[i].h, color);
+                fill_rect(xp - xpos + 3, yp - ypos, 1, obj.entities[i].h, color);
+            }
+            break;
+        case 3:
+            fill_rect(xp - xpos, yp - ypos, obj.entities[i].w, obj.entities[i].h, color);
+            break;
+        }
     }
     }
 }
@@ -2796,6 +2898,64 @@ void Graphics::updatebackground(int t)
         }
         break;
     }
+}
+
+void Graphics::drawlargebg(void)
+{
+    for (int y = 0; y < 240; y += 32)
+    {
+        for (int x = 0; x < 320; x += 32)
+        {
+            drawtilehell(x, y, 222);
+            drawtilehell(x + 16, y, 223);
+            drawtilehell(x, y + 16, 238);
+            drawtilehell(x + 16, y + 16, 239);
+        }
+    }
+}
+
+static bool is_tile_foreground(int tile)
+{
+    switch (tile)
+    {
+    case 10:
+    case 11:
+    case 26:
+    case 27:
+    case 41:
+    case 42:
+    case 43:
+    case 57:
+    case 58:
+    case 59:
+        return false;
+    default:
+        return true;
+    }
+    return true;
+}
+
+void Graphics::drawlargemap(bool foreground)
+{
+    //SDL_Texture* target = SDL_GetRenderTarget(gameScreen.m_renderer);
+    //set_render_target(foregroundTexture);
+    //clear(0, 0, 0, 0);
+
+    for (int y = 0; y < map.room_height; y++)
+    {
+        for (int x = 0; x < map.room_width; x++)
+        {
+            int tile = map.large_contents[x + y * map.room_width];
+            if (tile > 0 && (is_tile_foreground(tile) == foreground))
+            {
+                drawtilehell(x * 16 - map.xpos, y * 16 - map.ypos, tile);
+            }
+        }
+    }
+
+    //set_render_target(target);
+
+    //copy_texture(foregroundTexture, NULL, NULL);
 }
 
 void Graphics::drawmap(void)
@@ -3468,8 +3628,16 @@ void Graphics::screenshake(void)
 
 void Graphics::updatescreenshake(void)
 {
-    screenshake_x =  static_cast<Sint32>((fRandom() * 7) - 4);
-    screenshake_y =  static_cast<Sint32>((fRandom() * 7) - 4);
+    if (map.jumpmode())
+    {
+        screenshake_x = round((fRandom() * 2) - 1);
+        screenshake_y = round((fRandom() * 2) - 1);
+    }
+    else
+    {
+        screenshake_x = static_cast<Sint32>((fRandom() * 7) - 4);
+        screenshake_y = static_cast<Sint32>((fRandom() * 7) - 4);
+    }
 }
 
 void Graphics::draw_window_background(void)

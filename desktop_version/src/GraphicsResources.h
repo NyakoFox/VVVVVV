@@ -26,6 +26,7 @@ public:
     SDL_Texture* im_tiles_tint;
     SDL_Texture* im_tiles2;
     SDL_Texture* im_tiles2_tint;
+    SDL_Texture* im_tileshell;
     SDL_Texture* im_tiles3;
     SDL_Texture* im_entcolours;
     SDL_Texture* im_entcolours_tint;
@@ -45,6 +46,7 @@ public:
     SDL_Texture* im_image10;
     SDL_Texture* im_image11;
     SDL_Texture* im_image12;
+    SDL_Texture* im_8x8effects;
 
     SDL_Texture* im_sprites_translated;
     SDL_Texture* im_flipsprites_translated;

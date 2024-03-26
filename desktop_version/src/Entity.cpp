@@ -2137,6 +2137,167 @@ void entityclass::createentity(int xp, int yp, int t, int meta1, int meta2, int 
 
         entityclonefix(&entity);
         break;
+      case 100: // Large spikes!!
+      {
+          entity.rule = 1;
+          entity.type = 1;
+          entity.size = 100;
+          entity.harmful = true;
+
+          entity.cx = 0;
+          entity.cy = 16;
+          entity.w = 32;
+          entity.h = 16;
+
+          entity.x1 = -9999;
+          entity.y1 = -9999;
+          entity.x2 = 9999;
+          entity.y2 = 9999;
+          break;
+      }
+      case 101: // Small spikes!!
+      {
+          entity.rule = 1;
+          entity.type = 1;
+          entity.size = 101;
+          entity.harmful = true;
+
+          switch (meta1)
+          {
+          case 0:
+              entity.cx = 8;
+              entity.cy = 0;
+              entity.w = 8;
+              entity.h = 16;
+              break;
+          case 1:
+              entity.cx = 0;
+              entity.cy = 8;
+              entity.w = 16;
+              entity.h = 8;
+              break;
+          case 2:
+              entity.cx = 0;
+              entity.cy = 0;
+              entity.w = 8;
+              entity.h = 16;
+              break;
+          case 3:
+              entity.cx = 0;
+              entity.cy = 0;
+              entity.w = 16;
+              entity.h = 8;
+              break;
+          }
+
+          entity.tile = meta1;
+
+          entity.x1 = -9999;
+          entity.y1 = -9999;
+          entity.x2 = 9999;
+          entity.y2 = 9999;
+          break;
+      }
+      case 102: // Tiny boost particles
+      {
+          entity.rule = 2;
+          entity.type = 5;  //Particles
+          entity.size = 102;
+          entity.vx = meta1;
+          entity.vy = meta2;
+
+          entity.life = 7;
+          break;
+      }
+      case 103: // Big falling rock
+      {
+          entity.rule = 103;
+          entity.type = 103;
+          entity.size = 103;
+          entity.state = 0;
+          entity.w = 32;
+          entity.h = 4;
+          entity.cx = 0;
+          entity.cy = 32 - 4;
+          break;
+      }
+      case 104: // Small falling rock
+      {
+          entity.rule = 103;
+          entity.type = 103;
+          entity.size = 104;
+          entity.state = 0;
+          entity.w = 16;
+          entity.h = 4;
+          entity.cx = 0;
+          entity.cy = 16 - 4;
+          break;
+      }
+      case 105: // Violet
+      {
+          entity.rule = 105;
+          entity.type = 105;
+          entity.size = 105;
+          entity.state = meta1;
+          entity.tile = 198;
+          entity.w = 16;
+          entity.h = 16;
+          entity.cx = 4;
+          entity.cy = 7;
+          break;
+      }
+      case 106: // Bullet
+      {
+          entity.rule = 106;
+          entity.type = 106;
+          entity.size = 106;
+          entity.vx = meta1;
+          entity.vy = meta2;
+          entity.onwall = 1;
+          int thick = 0;
+          int thin = 0;
+          int coordoff = 0;
+
+          switch (p1)
+          {
+          case 0:
+              thick = 16;
+              thin = 8;
+              break;
+          case 1:
+              thin = 2;
+              thick = 12;
+              coordoff += 4;
+              break;
+          case 2:
+              thin = 4;
+              thick = 12;
+              coordoff += 2;
+              break;
+          case 3:
+              thin = 8;
+              thick = 12;
+              break;
+          }
+
+          if (entity.vy != 0)
+          {
+              entity.w = thin;
+              entity.h = thick;
+              entity.xp += coordoff;
+          }
+          else
+          {
+              entity.yp += coordoff;
+              entity.w = thick;
+              entity.h = thin;
+          }
+
+          entity.behave = p1;
+          entity.para = p3;
+          entity.life = p2;
+          break;
+      }
     }
 
     entity.lerpoldxp = entity.xp;
@@ -3403,6 +3564,45 @@ bool entityclass::updateentities( int i )
                 entities[i].state = 0;
             }
             break;
+        case 103: // Big rock
+            entities[i].vy += 0.15625 * 4;
+            if (entities[i].vy > 3 * 2) entities[i].vy = 3 * 2;
+
+            // If hit ground
+            if (entities[i].state == 0 && entities[i].yp > 80)
+            {
+                entities[i].onywall = 1;
+            }
+            else if (entities[i].state == 0)
+            {
+                entities[i].onywall = 0;
+            }
+
+            if (entities[i].state == 1)
+            {
+                music.playef(Sound_BLOCK_HIT);
+                entities[i].onywall = 2;
+                entities[i].vy = -3;
+                entities[i].state = 2;
+            }
+            break;
+        case 105:
+            if (entities[i].state == 1)
+            {
+                int j = getplayer();
+                entities[i].xp = entities[j].xp;
+                entities[i].yp = entities[j].yp;
+                entities[i].tile = 200 - entities[j].dir;
+            }
+            break;
+        case 106:
+        {
+            entities[i].life--;
+            if (entities[i].state == 1)
+            {
+                disableentity(i);
+            }
+        }
         }
     }
     else
@@ -3430,7 +3630,6 @@ void entityclass::animateentities( int _i )
         switch(entities[_i].type)
         {
         case 0:
-            entities[_i].framedelay--;
             if(entities[_i].dir==1)
             {
                 entities[_i].drawframe=entities[_i].tile;
@@ -3439,6 +3638,64 @@ void entityclass::animateentities( int _i )
             {
                 entities[_i].drawframe=entities[_i].tile+3;
             }
+
+            if (map.jumpmode())
+            {
+                entities[_i].walkingframe = 0;
+
+                if (entities[_i].visualonground > 0)
+                {
+                    if (entities[_i].vx > 0.00f || entities[_i].vx < -0.00f)
+                    {
+                        /* Walking */
+
+                        if (entities[_i].framedelay < 0) entities[_i].framedelay = 0;
+                        entities[_i].framedelay++;
+
+                        if (entities[_i].framedelay < 4)
+                        {
+                            entities[_i].drawframe += 1;
+                        }
+                        else if (entities[_i].framedelay < 8)
+                        {
+                            entities[_i].drawframe += 0;
+                        }
+                        else if (entities[_i].framedelay < 12)
+                        {
+                            entities[_i].drawframe += 2;
+                        }
+                        else if (entities[_i].framedelay < 16)
+                        {
+                            entities[_i].drawframe += 0;
+                        }
+                        else if (entities[_i].framedelay < 20)
+                        {
+                            entities[_i].framedelay = 0;
+                            entities[_i].drawframe += 1;
+                        }
+                    }
+                    else
+                    {
+                        /* Standing */
+                        entities[_i].framedelay = 0;
+                        entities[_i].drawframe += 0;
+                    }
+                }
+                else
+                {
+                    if (entities[_i].vy < 0)
+                    {
+                        entities[_i].drawframe += 2;
+                    }
+                    else
+                    {
+                        entities[_i].drawframe += 1;
+                    }
+                }
+                return;
+            }
+
+            entities[_i].framedelay--;
 
             if(entities[_i].visualonground>0 || entities[_i].visualonroof>0)
             {
@@ -3822,8 +4079,6 @@ void entityclass::animatehumanoidcollision(const int i)
         return;
     }
 
-    --entity->collisionframedelay;
-
     if (entity->dir == 1)
     {
         entity->collisiondrawframe = entity->tile;
@@ -3832,6 +4087,68 @@ void entityclass::animatehumanoidcollision(const int i)
     {
         entity->collisiondrawframe = entity->tile + 3;
     }
+
+    if (map.jumpmode())
+    {
+        entity->collisionwalkingframe = 0;
+
+        if (entity->visualonground > 0)
+        {
+            if (entity->vx > 0.00f || entity->vx < -0.00f)
+            {
+                /* Walking */
+
+                if (entity->collisionframedelay < 0) entity->collisionframedelay = 0;
+                entity->collisionframedelay++;
+
+                if (entity->collisionframedelay < 4)
+                {
+                    entity->collisiondrawframe += 1;
+                }
+                else if (entity->collisionframedelay < 8)
+                {
+                    entity->collisiondrawframe += 0;
+                }
+                else if (entity->collisionframedelay < 12)
+                {
+                    entity->collisiondrawframe += 2;
+                }
+                else if (entity->collisionframedelay < 16)
+                {
+                    entity->collisiondrawframe += 0;
+                }
+                else if (entity->collisionframedelay < 20)
+                {
+                    entity->collisionframedelay = 0;
+                    entity->collisiondrawframe += 1;
+                }
+            }
+            else
+            {
+                /* Standing */
+                entity->collisionframedelay = 0;
+                entity->collisiondrawframe += 0;
+            }
+        }
+        else
+        {
+            if (entity->vy < 0)
+            {
+                entity->collisiondrawframe += 2;
+            }
+            else
+            {
+                entity->collisiondrawframe += 1;
+            }
+        }
+        entity->framedelay = entity->collisionframedelay;
+        entity->drawframe = entity->collisiondrawframe;
+        entity->walkingframe = entity->collisionwalkingframe;
+        return;
+    }
+
+    --entity->collisionframedelay;
+
 
     if (entity->visualonground > 0 || entity->visualonroof > 0)
     {
@@ -4536,6 +4853,36 @@ void entityclass::applyfriction( int t, float xrate, float yrate )
         return;
     }
 
+    if (game.currently_boosting)
+    {
+        return;
+    }
+
+    if (map.jumpmode())
+    {
+        if (entities[t].onground > 0)
+        {
+            if (entities[t].vx > 0.00f) { entities[t].vx -= (0.099609375 * 4); if (entities[t].vx < 0) entities[t].vx = 0; };
+            if (entities[t].vx < 0.00f) { entities[t].vx += (0.099609375 * 4); if (entities[t].vx > 0) entities[t].vx = 0; };
+        }
+
+        if (game.jumpheld)
+        {
+            entities[t].vy += 0.0625 * 4;
+        }
+        else
+        {
+            entities[t].vy += 0.15625 * 4;
+        }
+
+        if (entities[t].vx > 1.5859375 * 2) entities[t].vx = 1.5859375 * 2;
+        if (entities[t].vx < -1.5859375 * 2) entities[t].vx = -1.5859375 * 2;
+
+        if (entities[t].vy > 3.0 * 2) entities[t].vy = 3.0 * 2;
+
+        return;
+    }
+
     if (entities[t].vx > 0.00f) entities[t].vx -= xrate;
     if (entities[t].vx < 0.00f) entities[t].vx += xrate;
     if (entities[t].vy > 0.00f) entities[t].vy -= yrate;
@@ -4560,8 +4907,11 @@ void entityclass::updateentitylogic( int t )
     entities[t].oldxp = entities[t].xp;
     entities[t].oldyp = entities[t].yp;
 
-    entities[t].vx = entities[t].vx + entities[t].ax;
-    entities[t].vy = entities[t].vy + entities[t].ay;
+    if (!map.jumpmode())
+    {
+        entities[t].vx = entities[t].vx + entities[t].ax;
+        entities[t].vy = entities[t].vy + entities[t].ay;
+    }
     entities[t].ax = 0;
 
     if (entities[t].gravity)
@@ -4570,11 +4920,11 @@ void entityclass::updateentitylogic( int t )
         {
             if(game.gravitycontrol==0)
             {
-                entities[t].ay = 3;
+                if (!map.jumpmode()) entities[t].ay = 3;
             }
             else
             {
-                entities[t].ay = -3;
+                if (!map.jumpmode()) entities[t].ay = -3;
             }
         }
         else if (entities[t].rule == 7)
@@ -4588,8 +4938,16 @@ void entityclass::updateentitylogic( int t )
         applyfriction(t, game.inertia, 0.25f);
     }
 
-    entities[t].newxp = entities[t].xp + entities[t].vx;
-    entities[t].newyp = entities[t].yp + entities[t].vy;
+    if ((entities[t].type == 106 && entities[t].life <= 0) || (entities[t].type != 106))
+    {
+        entities[t].newxp = entities[t].xp + entities[t].vx;
+        entities[t].newyp = entities[t].yp + entities[t].vy;
+    }
+    else
+    {
+        entities[t].newxp = entities[t].xp;
+        entities[t].newyp = entities[t].yp;
+    }
 }
 
 void entityclass::entitymapcollision( int t )
@@ -4599,6 +4957,11 @@ void entityclass::entitymapcollision( int t )
         vlog_error("entitymapcollision() out-of-bounds!");
         return;
     }
+
+    float newxp = entities[t].newxp;
+    float newyp = entities[t].newyp;
+    float vx = entities[t].vx;
+    float vy = entities[t].vy;
 
     if (testwallsx(t, entities[t].newxp, entities[t].yp, false))
     {
@@ -4617,7 +4980,21 @@ void entityclass::entitymapcollision( int t )
     {
         if (entities[t].onwall > 0) entities[t].state = entities[t].onwall;
         if (entities[t].onywall > 0) entities[t].state = entities[t].onywall;
+        if (entities[t].type == 103 && entities[t].state == 1)
+        {
+            newxp = entities[t].xp;
+            newyp = entities[t].yp;
+        }
     }
+
+    if (entities[t].type == 103)
+    {
+        entities[t].xp = newxp;
+        entities[t].yp = newyp;
+        entities[t].vx = vx;
+        entities[t].vy = vy;
+    }
+
 }
 
 void entityclass::movingplatformfix( int t, int j )
@@ -4894,6 +5271,15 @@ void entityclass::collisioncheck(int i, int j, bool scm /*= false*/)
             entities[j].state = entities[j].onentity;
         }
         break;
+    case 103: // Person versus big fucking rock
+    case 104: // Person versus small fucking rock
+    {
+        if (entitycollide(i, j) && !map.invincibility)
+        {
+            game.deathseq = 30;
+        }
+        break;
+    }
     }
 }
 

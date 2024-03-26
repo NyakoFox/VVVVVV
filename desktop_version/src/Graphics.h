@@ -288,11 +288,19 @@ public:
     void drawbackground(int t);
     void updatebackground(int t);
 
+    void drawlargebg(void);
+
+    void drawlargemap(bool foreground);
+
     bool shouldrecoloroneway(const int tilenum, const bool mounted);
 
     void drawtile3(int x, int y, int t, int off, int height_subtract = 0);
     void drawtile2(int x, int y, int t);
     void drawtile(int x, int y, int t);
+
+    void drawtilehell(int x, int y, int t);
+
+    void draw8x8effect(int x, int y, int t);
 
     void drawmap(void);
 

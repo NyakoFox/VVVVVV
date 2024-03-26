@@ -180,6 +180,11 @@ struct MenuStackFrame
     enum Menu::MenuName name;
 };
 
+enum SpecialModes
+{
+    SpecialMode_NONE,
+    SpecialMode_CAVE,
+};
 
 class Game
 {
@@ -334,6 +339,7 @@ public:
     enum GameGamestate gamestate;
     enum GameGamestate prevgamestate; //only used sometimes
     bool hascontrol, jumpheld;
+    bool shoot_held;
     int jumppressed;
     int gravitycontrol;
     bool isingamecompletescreen(void);
@@ -602,6 +608,15 @@ public:
     int old_screenshot_border_timer;
     int screenshot_border_timer;
     bool screenshot_saved_success;
+
+    SpecialModes specialmode;
+    int walksoundtimer;
+    int boosting;
+    bool canboost;
+    bool currently_boosting;
+    bool started_boosting;
+
+    int spur_charge;
 };
 
 #ifndef GAME_DEFINITION

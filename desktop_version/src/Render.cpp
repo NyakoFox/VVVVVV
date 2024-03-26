@@ -2303,7 +2303,7 @@ void gamerender(void)
         }
         else
         {
-            if(!game.colourblindmode)
+            if(!game.colourblindmode && !map.largermode)
             {
                 graphics.drawbackground(map.background);
             }
@@ -2311,7 +2311,15 @@ void gamerender(void)
             {
                 graphics.clear();
             }
-            if ((map.finalmode || map.custommode) && map.final_colormode)
+
+            if (map.largermode)
+            {
+                graphics.drawlargebg();
+                graphics.drawlargemap(false);
+                graphics.drawentities();
+                graphics.drawlargemap(true);
+            }
+            else if ((map.finalmode || map.custommode) && map.final_colormode)
             {
                 graphics.drawfinalmap();
             }
@@ -2321,8 +2329,10 @@ void gamerender(void)
             }
         }
 
-
-        graphics.drawentities();
+        if (!map.largermode)
+        {
+            graphics.drawentities();
+        }
         if (map.towermode)
         {
             graphics.drawtowerspikes();

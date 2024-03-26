@@ -128,6 +128,11 @@ static void gotoroom_wrapper(const int rx, const int ry)
     map.gotoroom(rx, ry);
 }
 
+static int lerp(int a, int b, int c)
+{
+    return (a * (100 - c) + b * c) / 100;
+}
+
 void gamelogic(void)
 {
     if (game.physics_frozen())
@@ -157,6 +162,14 @@ void gamelogic(void)
             /* Is this entity on the ground? (needed for jumping) */
             if (obj.entitycollidefloor(i))
             {
+                if (obj.entities[i].onground <= 0)
+                {
+                    if (obj.entities[i].rule == 0 && map.jumpmode())
+                    {
+                        music.playef(Sound_HIT_GROUND);
+                    }
+                }
+
                 obj.entities[i].onground = 2;
             }
             else
@@ -554,6 +567,23 @@ void gamelogic(void)
                     obj.entities[i].dir = 0;
                 }
             }
+        }
+
+        // Hell logic (shaking)
+        if (game.roomx >= 101 && game.roomx <= 103 && game.roomy == 100)
+        {
+            game.screenshake = 1;
+        }
+
+        // (2,0) logic (falling rocks)
+        if (game.roomx == 102 && game.roomy == 100 && (game.framecounter % 8 == 0))
+        {
+            int x = 0;
+            while (x < 144)
+            {
+                x = map.xpos + (fRandom() * (320 + 64));
+            }
+            obj.createentity(x, 0, (fRandom() < 0.25) ? 103 : 104, 0);
         }
 
         //SWN Minigame Logic
@@ -1026,7 +1056,7 @@ void gamelogic(void)
         }
 
         //Finally: Are we changing room?
-        if (map.warpx && !map.towermode)
+        if (map.warpx && !map.towermode && !map.largermode)
         {
             size_t i;
             for (i = 0; i < obj.entities.size(); ++i)
@@ -1084,7 +1114,7 @@ void gamelogic(void)
             }
         }
 
-        if (map.warpy && !map.towermode)
+        if (map.warpy && !map.towermode && !map.largermode)
         {
             size_t i;
             for (i = 0; i < obj.entities.size(); ++i)
@@ -1149,7 +1179,7 @@ void gamelogic(void)
             }
         }
 
-        if (!map.warpy && !map.towermode)
+        if (!map.warpy && !map.towermode && !map.largermode)
         {
             //Normal! Just change room
             int player = obj.getplayer();
@@ -1165,7 +1195,7 @@ void gamelogic(void)
             }
         }
 
-        if (!map.warpx && !map.towermode)
+        if (!map.warpx && !map.towermode && !map.largermode)
         {
             //Normal! Just change room
             int player = obj.getplayer();
@@ -1260,6 +1290,21 @@ void gamelogic(void)
                     GOTOROOM(110, 104);
                 }
             }
+        }
+
+        if (map.largermode)
+        {
+            int player = obj.getplayer();
+            int target_x = obj.entities[player].xp - 160;
+            int target_y = obj.entities[player].yp - 120;
+
+            map.xpos = lerp(map.xpos, target_x, 35);
+            map.ypos = lerp(map.ypos, target_y, 35);
+
+            if (map.xpos < 0) map.xpos = 0;
+            if (map.xpos > (map.room_width * 16) - 320) map.xpos = (map.room_width * 16) - 320;
+            if (map.ypos < 0) map.ypos = 0;
+            if (map.ypos > (map.room_height * 16) - 240) map.ypos = (map.room_height * 16) - 240;
         }
 
         //Warp tokens

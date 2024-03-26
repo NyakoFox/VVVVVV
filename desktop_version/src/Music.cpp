@@ -772,6 +772,20 @@ void musicclass::init(void)
     soundTracks.push_back(SoundTrack( "sounds/newrecord.wav" ));
     soundTracks.push_back(SoundTrack( "sounds/trophy.wav" ));
     soundTracks.push_back(SoundTrack( "sounds/rescue.wav" ));
+    soundTracks.push_back(SoundTrack( "sounds/quote_walk.wav" ));
+    soundTracks.push_back(SoundTrack( "sounds/quote_jump.wav" ));
+    soundTracks.push_back(SoundTrack( "sounds/quote_boost.wav" ));
+    soundTracks.push_back(SoundTrack( "sounds/hitground.wav" ));
+    soundTracks.push_back(SoundTrack( "sounds/block_destroy.wav" ));
+    soundTracks.push_back(SoundTrack( "sounds/block_hit.wav" ));
+    soundTracks.push_back(SoundTrack( "sounds/shoot.wav" ));
+    soundTracks.push_back(SoundTrack( "sounds/spur_charge_1.wav" ));
+    soundTracks.push_back(SoundTrack( "sounds/spur_charge_2.wav" ));
+    soundTracks.push_back(SoundTrack( "sounds/spur_charge_3.wav" ));
+    soundTracks.push_back(SoundTrack( "sounds/spur_shoot_1.wav" ));
+    soundTracks.push_back(SoundTrack( "sounds/spur_shoot_2.wav" ));
+    soundTracks.push_back(SoundTrack( "sounds/spur_shoot_3.wav" ));
+    soundTracks.push_back(SoundTrack( "sounds/spur_charged.wav" ));
 
 #ifdef VVV_COMPILEMUSIC
     binaryBlob musicWriteBlob;

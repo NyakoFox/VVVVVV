@@ -111,6 +111,12 @@ public:
 
     const char* currentarea(int roomx, int roomy);
 
+    bool jumpmode();
+
+    void setplayer();
+
+    void load_large_map(int rx, int ry);
+
     void loadlevel(int rx, int ry);
 
     void twoframedelayfix(void);
@@ -138,6 +144,13 @@ public:
     const char* hiddenname;
 
     std::vector<Roomname> specialroomnames;
+
+    // Large map mode
+    bool largermode;
+    int xpos;
+    std::vector<int> large_contents;
+    int room_width;
+    int room_height;
 
     //Special tower stuff
     bool towermode;

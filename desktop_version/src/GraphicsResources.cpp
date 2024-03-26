@@ -408,6 +408,7 @@ void GraphicsResources::init(void)
 {
     LoadVariants("graphics/tiles.png", &im_tiles, &im_tiles_white, &im_tiles_tint);
     LoadVariants("graphics/tiles2.png", &im_tiles2, NULL, &im_tiles2_tint);
+    LoadVariants("graphics/tileshell.png", &im_tileshell, NULL, NULL);
     LoadVariants("graphics/entcolours.png", &im_entcolours, NULL, &im_entcolours_tint);
 
     LoadSprites("graphics/sprites.png", &im_sprites, &im_sprites_surf);
@@ -428,6 +429,7 @@ void GraphicsResources::init(void)
     im_image9 = LoadImage("graphics/site3.png", TEX_WHITE);
     im_image10 = LoadImage("graphics/ending.png");
     im_image11 = LoadImage("graphics/site4.png", TEX_WHITE);
+    im_8x8effects = LoadImage("graphics/8x8effects.png");
 
     im_sprites_translated = NULL;
     im_flipsprites_translated = NULL;
@@ -453,6 +455,7 @@ void GraphicsResources::destroy(void)
     CLEAR(im_tiles_tint);
     CLEAR(im_tiles2);
     CLEAR(im_tiles2_tint);
+    CLEAR(im_tileshell);
     CLEAR(im_tiles3);
     CLEAR(im_entcolours);
     CLEAR(im_entcolours_tint);
@@ -473,6 +476,8 @@ void GraphicsResources::destroy(void)
     CLEAR(im_image10);
     CLEAR(im_image11);
     CLEAR(im_image12);
+
+    CLEAR(im_8x8effects);
 
     CLEAR(im_sprites_translated);
     CLEAR(im_flipsprites_translated);

@@ -97,7 +97,7 @@ namespace level_debugger
         for (int i = 0; i < (int) obj.entities.size(); i++)
         {
             SDL_Rect bounding_box = {
-                obj.entities[i].xp + obj.entities[i].cx,
+                obj.entities[i].xp + obj.entities[i].cx - map.xpos,
                 obj.entities[i].yp + obj.entities[i].cy - map.ypos,
                 obj.entities[i].w,
                 obj.entities[i].h
@@ -159,7 +159,7 @@ namespace level_debugger
             for (int i = 0; i < (int) obj.blocks.size(); i++)
             {
                 SDL_Rect bounding_box = {
-                    obj.blocks[i].rect.x,
+                    obj.blocks[i].rect.x - map.xpos,
                     obj.blocks[i].rect.y - map.ypos,
                     obj.blocks[i].rect.w,
                     obj.blocks[i].rect.h
@@ -266,7 +266,7 @@ namespace level_debugger
         for (int i = 0; i < (int) obj.entities.size(); i++)
         {
             SDL_Rect bounding_box = {
-                obj.entities[i].xp + obj.entities[i].cx,
+                obj.entities[i].xp + obj.entities[i].cx - map.xpos,
                 obj.entities[i].yp + obj.entities[i].cy - map.ypos,
                 obj.entities[i].w,
                 obj.entities[i].h
@@ -296,7 +296,7 @@ namespace level_debugger
         for (int i = 0; i < (int) obj.blocks.size(); i++)
         {
             SDL_Rect bounding_box = {
-                obj.blocks[i].rect.x,
+                obj.blocks[i].rect.x - map.xpos,
                 obj.blocks[i].rect.y - map.ypos,
                 obj.blocks[i].rect.w,
                 obj.blocks[i].rect.h
