@@ -569,6 +569,11 @@ void gamelogic(void)
             }
         }
 
+        if (!game.completestop)
+        {
+            game.respawnseq--;
+        }
+
         // Hell logic (shaking)
         if (game.roomx >= 101 && game.roomx <= 103 && game.roomy == 100)
         {
@@ -576,7 +581,7 @@ void gamelogic(void)
         }
 
         // (2,0) logic (falling rocks)
-        if (game.roomx == 102 && game.roomy == 100 && (game.framecounter % 8 == 0))
+        if (game.roomx == 102 && game.roomy == 100 && (game.framecounter % 12 == 0) && !game.completestop)
         {
             int x = 0;
             while (x < 144)

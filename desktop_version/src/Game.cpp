@@ -388,6 +388,9 @@ void Game::init(void)
     shoot_held = false;
 
     spur_charge = 0;
+
+    lastcollidedwallx = 0;
+    lastcollidedwally = 0;
 }
 
 void Game::setdefaultcontrollerbuttons(void)
@@ -5293,6 +5296,7 @@ void Game::customstart(void)
     setstate(0);
     deathseq = -1;
     lifeseq = 0;
+    respawnseq = 0;
 }
 
 void Game::start(void)
@@ -5311,6 +5315,7 @@ void Game::start(void)
     setstate(0);
     deathseq = -1;
     lifeseq = 0;
+    respawnseq = 0;
 
     if (!nocutscenes)
     {
@@ -5424,6 +5429,7 @@ void Game::startspecial( int t )
     setstate(0);
     deathseq = -1;
     lifeseq = 0;
+    respawnseq = 0;
 }
 
 void Game::starttrial( int t )
@@ -5495,6 +5501,7 @@ void Game::starttrial( int t )
     setstate(0);
     deathseq = -1;
     lifeseq = 0;
+    respawnseq = 0;
 }
 
 void Game::loadquick(void)

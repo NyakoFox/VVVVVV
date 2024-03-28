@@ -822,6 +822,8 @@ void entityclass::createblock( int t, int xp, int yp, int w, int h, int trig /*=
         block.type = TRIGGER;
         block.wp = w;
         block.hp = h;
+        block.xp = -1;
+        block.yp = -1;
         block.rectset(xp, yp, w, h);
         block.trigger = trig;
         block.script = script;
@@ -1182,7 +1184,14 @@ void entityclass::disableblockat(int x, int y)
 {
     for (size_t i = 0; i < blocks.size(); i++)
     {
-        if (blocks[i].xp == x && blocks[i].yp == y)
+        if (blocks[i].type == DAMAGE)
+        {
+            if (blocks[i].rect.x == x && blocks[i].rect.y == y)
+            {
+                disableblock(i);
+            }
+        }
+        else if (blocks[i].xp == x && blocks[i].yp == y)
         {
             disableblock(i);
         }
@@ -1302,6 +1311,8 @@ void entityclass::createentity(int xp, int yp, int t, int meta1, int meta2, int 
     entity.xp = xp;
     entity.yp = yp;
     entity.type = t;
+    entity.state2 = 0;
+    entity.statedelay2 = 0;
     switch(t)
     {
     case 0: //Player
@@ -2207,6 +2218,7 @@ void entityclass::createentity(int xp, int yp, int t, int meta1, int meta2, int 
           entity.vy = meta2;
 
           entity.life = 7;
+          entity.statedelay = 0;
           break;
       }
       case 103: // Big falling rock
@@ -2215,10 +2227,11 @@ void entityclass::createentity(int xp, int yp, int t, int meta1, int meta2, int 
           entity.type = 103;
           entity.size = 103;
           entity.state = 0;
-          entity.w = 32;
+          entity.w = 32-8;
           entity.h = 4;
-          entity.cx = 0;
+          entity.cx = 4;
           entity.cy = 32 - 4;
+          entity.statedelay = 0;
           break;
       }
       case 104: // Small falling rock
@@ -2227,10 +2240,24 @@ void entityclass::createentity(int xp, int yp, int t, int meta1, int meta2, int 
           entity.type = 103;
           entity.size = 104;
           entity.state = 0;
-          entity.w = 16;
+          entity.w = 16-4;
           entity.h = 4;
-          entity.cx = 0;
+          entity.cx = 2;
           entity.cy = 16 - 4;
+          entity.statedelay = 0;
+          entity.behave = meta1;
+          if (entity.behave == 1)
+          {
+              entity.vy = -4;
+              if (meta2 == 0)
+              {
+                  entity.vx = -6;
+              }
+              else
+              {
+                  entity.vx = 6;
+              }
+          }
           break;
       }
       case 105: // Violet
@@ -2244,6 +2271,7 @@ void entityclass::createentity(int xp, int yp, int t, int meta1, int meta2, int 
           entity.h = 16;
           entity.cx = 4;
           entity.cy = 7;
+          entity.statedelay = 0;
           break;
       }
       case 106: // Bullet
@@ -2257,26 +2285,38 @@ void entityclass::createentity(int xp, int yp, int t, int meta1, int meta2, int 
           int thick = 0;
           int thin = 0;
           int coordoff = 0;
+          int off = 0;
 
           switch (p1)
           {
           case 0:
               thick = 16;
               thin = 8;
+              entity.shotstrength = 1;
               break;
           case 1:
               thin = 2;
               thick = 12;
               coordoff += 4;
+              entity.shotstrength = 1;
               break;
           case 2:
               thin = 4;
               thick = 12;
               coordoff += 2;
+              entity.shotstrength = 2;
               break;
           case 3:
               thin = 8;
               thick = 12;
+              entity.shotstrength = 8;
+              break;
+          case 4:
+              thick = 32;
+              thin = 16 - 8;
+              coordoff -= 4 + 4;
+              off = 4;
+              entity.shotstrength = 2;
               break;
           }
 
@@ -2285,17 +2325,177 @@ void entityclass::createentity(int xp, int yp, int t, int meta1, int meta2, int 
               entity.w = thin;
               entity.h = thick;
               entity.xp += coordoff;
+              entity.cx = off;
           }
           else
           {
               entity.yp += coordoff;
               entity.w = thick;
               entity.h = thin;
+              entity.cy = off;
           }
 
           entity.behave = p1;
           entity.para = p3;
           entity.life = p2;
+          entity.state2 = 20 + p2;
+          entity.statedelay = 0;
+          break;
+      }
+      case 107: // Deleet
+      {
+          entity.rule = 107;
+          entity.type = 107;
+          entity.size = 107;
+          entity.state = 0;
+          entity.w = 24;
+          entity.h = 24;
+          entity.life = 8;
+          entity.onshot = 1;
+          entity.behave = 0;
+          entity.statedelay = 0;
+          break;
+      }
+      case 108: // Press
+      {
+          entity.rule = 108;
+          entity.type = 108;
+          entity.size = 108;
+          entity.state = 0;
+          entity.w = 16;
+          entity.h = 24;
+          entity.life = 8;
+          entity.onshot = 1;
+          entity.behave = 0;
+          entity.para = 0;
+          entity.statedelay = 0;
+          break;
+      }
+      case 109: // Rollings
+      {
+          entity.rule = 109;
+          entity.type = 109;
+          entity.size = 109;
+          entity.state = 0;
+          entity.w = 16;
+          entity.h = 16;
+          entity.onwall = 2;
+          entity.behave = meta1;
+          entity.para = 4;
+          entity.vx = 0;
+          entity.vy = 0;
+          entity.harmful = true;
+          entity.statedelay = 0;
+          switch (entity.behave)
+          {
+          case 0:
+              entity.vx = entity.para;
+              break;
+          case 1:
+              entity.vy = entity.para;
+              break;
+          case 2:
+              entity.vx = -entity.para;
+              break;
+          case 3:
+              entity.vy = -entity.para;
+              break;
+          }
+          break;
+      }
+      case 110: // Mesas
+      {
+          entity.rule = 110;
+          entity.type = 110;
+          entity.size = 110;
+          entity.state = 0;
+          entity.w = 20;
+          entity.h = 32;
+          entity.cx = 7;
+          entity.cy = 6;
+          entity.dir = meta1;
+          entity.life = 8;
+          entity.behave = 0;
+          entity.onshot = 1;
+          entity.gravity = true;
+          entity.para = 0;
+          entity.statedelay = 0;
+          entity.state2 = 0;
+          entity.statedelay2 = 60;
+          break;
+      }
+      case 111: // Winged Brutes
+      {
+          entity.rule = 111;
+          entity.type = 111;
+          entity.size = 111;
+          entity.state = 0;
+          entity.w = 12;
+          entity.h = 16;
+          entity.cx = 1;
+          entity.cy = 0;
+          entity.dir = 0;
+          entity.vy = meta1;
+          entity.onshot = 0;
+          entity.statedelay = 0;
+          entity.state2 = 0;
+          entity.statedelay2 = 0;
+          if (meta1 == 0)
+          {
+              // If spawned with no velocity, skip straight to flying
+              entity.state2 = 3;
+          }
+          break;
+      }
+      case 112: // Bow Brutes
+      {
+          entity.rule = 112;
+          entity.type = 112;
+          entity.size = 112;
+          entity.state = 0;
+          entity.w = 11;
+          entity.h = 16;
+          entity.cx = 4;
+          entity.cy = 0;
+          entity.dir = meta1;
+          entity.onshot = 1;
+          entity.statedelay = 0;
+          entity.state2 = 0;
+          entity.statedelay2 = 0;
+          entity.para = 0;
+          break;
+      }
+      case 113: // Arrow
+      {
+          entity.rule = 113;
+          entity.type = 113;
+          entity.size = 113;
+          entity.state = 0;
+          entity.w = 13;
+          entity.h = 1;
+          entity.cx = 1;
+          entity.cy = 8;
+          entity.gravity = true;
+          entity.onwall = 1;
+          entity.life = 60;
+          entity.behave = meta1;
+          entity.para = 0;
+          if (meta1 == 0)
+          {
+              entity.vx = -6;
+          }
+          else
+          {
+              entity.vx = 6;
+          }
+          if (meta2 == 0)
+          {
+              entity.vy = -2;
+          }
+          else
+          {
+              entity.vy = -8;
+          }
           break;
       }
     }
@@ -3568,22 +3768,41 @@ bool entityclass::updateentities( int i )
             entities[i].vy += 0.15625 * 4;
             if (entities[i].vy > 3 * 2) entities[i].vy = 3 * 2;
 
-            // If hit ground
-            if (entities[i].state == 0 && entities[i].yp > 80)
+            if (map.largermode)
             {
-                entities[i].onywall = 1;
+                if (entities[i].yp > map.room_height * 16)
+                {
+                    disableentity(i);
+                }
             }
-            else if (entities[i].state == 0)
+            else
             {
-                entities[i].onywall = 0;
+                if (entities[i].yp > 240)
+                {
+                    disableentity(i);
+                }
             }
 
-            if (entities[i].state == 1)
+
+            if (entities[i].behave == 0)
             {
-                music.playef(Sound_BLOCK_HIT);
-                entities[i].onywall = 2;
-                entities[i].vy = -3;
-                entities[i].state = 2;
+                // If hit ground
+                if (entities[i].state == 0 && entities[i].yp > 80)
+                {
+                    entities[i].onywall = 1;
+                }
+                else if (entities[i].state == 0)
+                {
+                    entities[i].onywall = 0;
+                }
+
+                if (entities[i].state == 1)
+                {
+                    music.playef(Sound_BLOCK_HIT);
+                    entities[i].onywall = 2;
+                    entities[i].vy = -3;
+                    entities[i].state = 2;
+                }
             }
             break;
         case 105:
@@ -3594,14 +3813,554 @@ bool entityclass::updateentities( int i )
                 entities[i].yp = entities[j].yp;
                 entities[i].tile = 200 - entities[j].dir;
             }
+            if (entities[i].state == 2)
+            {
+                int j = getplayer();
+                entities[i].xp = entities[j].xp;
+                entities[i].yp = entities[j].yp;
+                entities[i].tile = 201 + entities[j].dir;
+            }
             break;
         case 106:
         {
             entities[i].life--;
-            if (entities[i].state == 1)
+            entities[i].state2--;
+            if (entities[i].state == 1 || entities[i].state2 <= 0)
             {
                 disableentity(i);
             }
+            break;
+        }
+        case 107:
+        {
+            if (entities[i].state == 1)
+            {
+                entities[i].state = 2;
+                entities[i].life -= entities[i].shotstrength;
+                entities[i].behave = 8;
+                entities[i].onshot = 0;
+                music.playef(Sound_FLASH);
+
+                if (entities[i].life <= 0)
+                {
+                    entities[i].state = 3;
+                    entities[i].onshot = 0;
+                    entities[i].behave = 0;
+                    entities[i].life = 5;
+                }
+            }
+            if (entities[i].state == 2)
+            {
+                entities[i].behave--;
+                if (entities[i].behave <= 0)
+                {
+                    entities[i].behave = 0;
+                    entities[i].state = 0;
+                    entities[i].onshot = 1;
+                }
+            }
+            if (entities[i].state == 3)
+            {
+                entities[i].behave--;
+                if (entities[i].behave <= 0)
+                {
+                    if (entities[i].life <= 0)
+                    {
+                        game.flashlight = 2;
+                        music.playef(Sound_DESTROY);
+                        disableentity(i);
+                        map.remove_large_tile_at(entities[i].xp + 4, entities[i].yp - 4);
+                        map.remove_large_tile_at(entities[i].xp + 4, entities[i].yp - 4 + 16);
+                    }
+                    else
+                    {
+                        entities[i].life--;
+                        entities[i].behave = 30;
+                        music.playef(Sound_ALARM);
+                    }
+                }
+            }
+            break;
+        }
+        case 108:
+        {
+            disableblockat(entities[i].oldxp, entities[i].oldyp);
+            createblock(BLOCK, entities[i].xp, entities[i].yp, entities[i].w, entities[i].h);
+            createblock(DAMAGE, entities[i].xp, entities[i].yp, entities[i].w, entities[i].h);
+
+            int j = getplayer();
+            if (INBOUNDS_VEC(j, entities))
+            {
+                if (entities[j].xp + entities[j].w >= entities[i].xp && entities[j].xp <= entities[i].xp + entities[i].w && entities[i].para == 0)
+                {
+                    entities[i].vy = 8;
+                    entities[i].para = 1;
+                }
+            }
+
+            if (entities[i].vy == 0 && entities[i].para == 1)
+            {
+                entities[i].para = 2;
+                music.playef(Sound_BLOCK_HIT);
+            }
+
+            if (entities[i].state == 1)
+            {
+                entities[i].state = 2;
+                entities[i].life -= entities[i].shotstrength;
+                entities[i].behave = 8;
+                entities[i].onshot = 0;
+                music.playef(Sound_FLASH);
+
+                if (entities[i].life <= 0)
+                {
+                    entities[i].state = 3;
+                    entities[i].onshot = 0;
+                    entities[i].behave = 0;
+                    entities[i].life = 5;
+                }
+            }
+            if (entities[i].state == 2)
+            {
+                entities[i].behave--;
+                if (entities[i].behave <= 0)
+                {
+                    entities[i].behave = 0;
+                    entities[i].state = 0;
+                    entities[i].onshot = 1;
+                }
+            }
+            if (entities[i].state == 3)
+            {
+                disableblockat(entities[i].xp, entities[i].yp);
+                disableentity(i);
+                game.flashlight = 2;
+            }
+            break;
+        }
+        case 109:
+        {
+            if (entities[i].state == 2)
+            {
+                entities[i].state = 0;
+                if (entities[i].behave == 0)
+                {
+                    entities[i].behave = 1;
+                    entities[i].vy = entities[i].para;
+                    entities[i].vx = 0;
+                }
+                else if (entities[i].behave == 1)
+                {
+                    entities[i].vx = -entities[i].para;
+                    entities[i].vy = 0;
+                    entities[i].behave = 2;
+                }
+                else if (entities[i].behave == 2)
+                {
+                    entities[i].vy = -entities[i].para;
+                    entities[i].vx = 0;
+                    entities[i].behave = 3;
+                }
+                else if (entities[i].behave == 3)
+                {
+                    entities[i].vx = entities[i].para;
+                    entities[i].vy = 0;
+                    entities[i].behave = 0;
+                }
+            }
+            break;
+        }
+        case 110:
+        {
+            if (entities[i].state < 3)
+            {
+                entities[i].statedelay2--;
+
+                switch (entities[i].state2)
+                {
+                case 0:
+                    // If on screen
+                    if (entities[i].xp >= map.xpos && entities[i].xp < map.xpos + 320)
+                    {
+                        if (entities[i].statedelay2 <= 0)
+                        {
+                            entities[i].state2++;
+                            entities[i].statedelay2 = 20;
+                        }
+                    }
+                    else
+                    {
+                        entities[i].statedelay2++;
+                    }
+                    break;
+                case 1:
+                case 2:
+                    if (entities[i].statedelay2 <= 0)
+                    {
+                        entities[i].state2++;
+                        entities[i].statedelay2 = 20;
+                        if (entities[i].state2 == 3)
+                        {
+                            createentity(entities[i].xp + 8, entities[i].yp - 8, 104, 1, entities[i].dir);
+                        }
+                    }
+                    break;
+                case 3:
+                    if (entities[i].statedelay2 <= 0)
+                    {
+                        int player = getplayer();
+                        if (INBOUNDS_VEC(player, entities))
+                        {
+                            if (entities[player].xp + entities[player].w < entities[i].xp + entities[i].w / 2)
+                            {
+                                entities[i].dir = 0;
+                            }
+                            else
+                            {
+                                entities[i].dir = 1;
+                            }
+                        }
+                        entities[i].state2 = 0;
+                        entities[i].statedelay2 = 60;
+                    }
+                    break;
+                default:
+                    break;
+                }
+            }
+            if (entities[i].state == 1)
+            {
+                entities[i].state = 2;
+                entities[i].life -= entities[i].shotstrength;
+                entities[i].behave = 8;
+                entities[i].onshot = 0;
+                music.playef(Sound_FLASH);
+
+                if (entities[i].life <= 0)
+                {
+                    entities[i].state = 3;
+                    entities[i].onshot = 0;
+                    entities[i].behave = 30;
+                    entities[i].life = 5;
+                    entities[i].vy = -4;
+                    if (entities[i].dir == 1)
+                    {
+                        entities[i].vx = -2;
+                    }
+                    else
+                    {
+                        entities[i].vx = 2;
+                    }
+                    entities[i].onywall = 4;
+                }
+            }
+            if (entities[i].state == 2)
+            {
+                entities[i].behave--;
+                if (entities[i].behave <= 0)
+                {
+                    entities[i].behave = 0;
+                    entities[i].state = 0;
+                    entities[i].onshot = 1;
+                }
+            }
+            if (entities[i].state == 4)
+            {
+                if (entities[i].behave == 30)
+                {
+                    music.playef(Sound_CRY);
+                }
+
+                entities[i].invis = false;
+                if (entities[i].behave == 25) entities[i].invis = true;
+                if (entities[i].behave == 20) entities[i].invis = true;
+                if (entities[i].behave == 16) entities[i].invis = true;
+                if (entities[i].behave == 14) entities[i].invis = true;
+                if (entities[i].behave == 12) entities[i].invis = true;
+                if (entities[i].behave < 10) entities[i].invis = true;
+
+                entities[i].behave--;
+                if (entities[i].behave <= 0)
+                {
+                    disableentity(i);
+                }
+            }
+            break;
+        }
+        case 111:
+        {
+            if (entities[i].state < 3)
+            {
+                if (entities[i].state2 == 0)
+                {
+                    // Alright, so we've been spawned in a wall. Let's just wait until we're out of it (we were spawned with velocity)
+                    if ((entities[i].onground <= 0 || entities[i].onroof <= 0) && (entities[i].yp > 0 && entities[i].yp < map.room_height * 16))
+                    {
+                        // We're in the air!! Let's switch to state 1 -- we'll keep spinning tho
+                        entities[i].state2 = 1;
+                    }
+                }
+                if (entities[i].state2 == 1)
+                {
+                    // Alright, we're still spinning, but we're in the air.
+                    // Now, let's wait until we either hit the ground/ceiling, or reach the Y position of the player.
+                    entities[i].onywall = 5;
+
+                    int j = getplayer();
+                    if (INBOUNDS_VEC(j, entities))
+                    {
+                        if (entities[i].vy > 0 && entities[i].yp > entities[j].yp)
+                        {
+                            // We're below the player, and moving down. Let's switch to state 3
+                            entities[i].vy = 0;
+                            entities[i].state2 = 3;
+                            entities[i].onywall = 0;
+                        }
+                        else if (entities[i].vy < 0 && entities[i].yp < entities[j].yp)
+                        {
+                            // We're above the player, and moving up. Let's switch to state 3
+                            entities[i].vy = 0;
+                            entities[i].state2 = 3;
+                            entities[i].onywall = 0;
+                        }
+                    }
+                }
+                if (entities[i].state2 == 3)
+                {
+                    // Can be shot now! Let's fly!
+                    entities[i].onshot = 1;
+                    entities[i].onywall = 0;
+
+                    int j = getplayer();
+                    if (INBOUNDS_VEC(j, entities))
+                    {
+                        if (entities[i].yp < entities[j].yp)
+                        {
+                            entities[i].vy += 0.1;
+                        }
+                        if (entities[i].yp > entities[j].yp)
+                        {
+                            entities[i].vy -= 0.1;
+                        }
+                        if (entities[i].xp < entities[j].xp)
+                        {
+                            entities[i].vx += 0.1;
+                            entities[i].dir = 1;
+                        }
+                        if (entities[i].xp > entities[j].xp)
+                        {
+                            entities[i].vx -= 0.1;
+                            entities[i].dir = 0;
+                        }
+                        entities[i].vx = SDL_clamp(entities[i].vx, -4.0, 4.0);
+                        entities[i].vy = SDL_clamp(entities[i].vy, -4.0, 4.0);
+                    }
+                }
+            }
+
+            if (entities[i].state == 5)
+            {
+                // We hit a wall! Flying phase!
+                entities[i].state = 0;
+                entities[i].state2 = 3;
+                entities[i].onywall = 0;
+                entities[i].vy = 0;
+            }
+
+            if (entities[i].state == 1)
+            {
+                music.playef(Sound_FLASH);
+
+                entities[i].state2 = 2;
+                entities[i].state = 3;
+                entities[i].onshot = 0;
+                entities[i].behave = 30;
+                entities[i].life = 5;
+                entities[i].vy = -4;
+                entities[i].gravity = true;
+                if (entities[i].dir == 1)
+                {
+                    entities[i].vx = -2;
+                }
+                else
+                {
+                    entities[i].vx = 2;
+                }
+                entities[i].onywall = 4;
+            }
+            if (entities[i].state == 2)
+            {
+                entities[i].behave--;
+                if (entities[i].behave <= 0)
+                {
+                    entities[i].behave = 0;
+                    entities[i].state = 0;
+                    entities[i].onshot = 1;
+                }
+            }
+            if (entities[i].state == 4)
+            {
+                if (entities[i].behave == 30)
+                {
+                    music.playef(Sound_CRY);
+                }
+
+                entities[i].invis = false;
+                if (entities[i].behave == 25) entities[i].invis = true;
+                if (entities[i].behave == 20) entities[i].invis = true;
+                if (entities[i].behave == 16) entities[i].invis = true;
+                if (entities[i].behave == 14) entities[i].invis = true;
+                if (entities[i].behave == 12) entities[i].invis = true;
+                if (entities[i].behave < 10) entities[i].invis = true;
+
+                entities[i].behave--;
+                if (entities[i].behave <= 0)
+                {
+                    disableentity(i);
+                }
+            }
+            break;
+        }
+        case 112:
+        {
+            if (entities[i].state < 3)
+            {
+                if (entities[i].state2 == 0)
+                {
+                    // We were just spawned -- wait until Viridian is in the direction we're facing
+                    int j = getplayer();
+                    if (INBOUNDS_VEC(j, entities))
+                    {
+                        if (entities[i].dir == 0 && entities[j].xp < entities[i].xp)
+                        {
+                            entities[i].state2 = 1;
+                        }
+                        else if (entities[i].dir == 1 && entities[j].xp > entities[i].xp)
+                        {
+                            entities[i].state2 = 1;
+                        }
+                    }
+                }
+
+                if (entities[i].state2 == 1)
+                {
+                    // Okay, we should be "activated" now. Single frame just to pick direction and stuff
+                    int j = getplayer();
+                    if (INBOUNDS_VEC(j, entities))
+                    {
+                        if (entities[j].xp < entities[i].xp)
+                        {
+                            entities[i].dir = 0;
+                        }
+                        else
+                        {
+                            entities[i].dir = 1;
+                        }
+                        if (entities[j].yp < entities[i].yp - 16)
+                        {
+                            entities[i].para = 1;
+                        }
+                        else
+                        {
+                            entities[i].para = 0;
+                        }
+                    }
+                    entities[i].state2 = 2;
+                    entities[i].statedelay2 = 30;
+                }
+
+                entities[i].statedelay2--;
+
+                if (entities[i].statedelay2 <= 0 && entities[i].state2 == 2)
+                {
+                    // Shoot
+                    int offx = -8;
+                    if (entities[i].dir == 1)
+                    {
+                        offx = 8;
+                    }
+                    createentity(entities[i].xp + offx, entities[i].yp, 113, entities[i].dir, entities[i].para);
+                    entities[i].state2 = 3;
+                    entities[i].statedelay2 = 15;
+                }
+
+                if (entities[i].statedelay2 <= 0 && entities[i].state2 == 3)
+                {
+                    entities[i].state2 = 1;
+                }
+            }
+            if (entities[i].state == 1)
+            {
+                music.playef(Sound_FLASH);
+
+                entities[i].state2 = 2;
+                entities[i].state = 3;
+                entities[i].onshot = 0;
+                entities[i].behave = 30;
+                entities[i].life = 5;
+                entities[i].vy = -4;
+                entities[i].gravity = true;
+                if (entities[i].dir == 1)
+                {
+                    entities[i].vx = -2;
+                }
+                else
+                {
+                    entities[i].vx = 2;
+                }
+                entities[i].onywall = 4;
+            }
+            if (entities[i].state == 2)
+            {
+                entities[i].behave--;
+                if (entities[i].behave <= 0)
+                {
+                    entities[i].behave = 0;
+                    entities[i].state = 0;
+                    entities[i].onshot = 1;
+                }
+            }
+            if (entities[i].state == 4)
+            {
+                if (entities[i].behave == 30)
+                {
+                    music.playef(Sound_CRY);
+                }
+
+                entities[i].invis = false;
+                if (entities[i].behave == 25) entities[i].invis = true;
+                if (entities[i].behave == 20) entities[i].invis = true;
+                if (entities[i].behave == 16) entities[i].invis = true;
+                if (entities[i].behave == 14) entities[i].invis = true;
+                if (entities[i].behave == 12) entities[i].invis = true;
+                if (entities[i].behave < 10) entities[i].invis = true;
+
+                entities[i].behave--;
+                if (entities[i].behave <= 0)
+                {
+                    disableentity(i);
+                }
+            }
+            break;
+        }
+        case 113:
+        {
+            if (entities[i].state == 1)
+            {
+                entities[i].vx = 0;
+                entities[i].vy = 0;
+                entities[i].gravity = false;
+                entities[i].life--;
+                if (entities[i].life <= 0)
+                {
+                    disableentity(i);
+                }
+            }
+            else
+            {
+                entities[i].para = entities[i].vy;
+            }
+            break;
         }
         }
     }
@@ -4777,6 +5536,29 @@ bool entityclass::testwallsx( int t, int tx, int ty, const bool skipdirblocks )
     //Ok, now we check walls
     if (checkwall(invincible, temprect, dx, dy, dr, skipblocks, skipdirblocks))
     {
+        if (entities[t].type == 111 && entities[t].state2 == 3)
+        {
+            entities[t].vx = -entities[t].vx;
+            return false;
+        }
+        if (dr == 106)
+        {
+            // Special case for bullets
+            int tileindex = game.lastcollidedwallx + (game.lastcollidedwally * map.room_width);
+            if (INBOUNDS_VEC(tileindex, map.large_contents) && map.large_contents[tileindex] == 61 && game.lastcollidedwallx != 0 && game.lastcollidedwally != 0)
+            {
+                map.large_contents[tileindex] = 38;
+                music.playef(Sound_BLOCK_DESTROY);
+                return false;
+            }
+        }
+        if (dr == 113)
+        {
+            // Special case for arrows
+            entities[t].xp = entities[t].newxp;
+            entities[t].yp = entities[t].newyp;
+            return false;
+        }
         if (entities[t].vx > 1.0f)
         {
             entities[t].vx--;
@@ -4824,6 +5606,31 @@ bool entityclass::testwallsy( int t, int tx, int ty )
     //Ok, now we check walls
     if (checkwall(invincible, temprect, dx, dy, dr, skipblocks, false))
     {
+        if (entities[t].type == 111 && entities[t].state2 == 3)
+        {
+            entities[t].vy = -entities[t].vy;
+            return false;
+        }
+
+        if (dr == 106)
+        {
+            // Special case for bullets
+            int tileindex = game.lastcollidedwallx + (game.lastcollidedwally * map.room_width);
+            if (INBOUNDS_VEC(tileindex, map.large_contents) && map.large_contents[tileindex] == 61 && game.lastcollidedwallx != 0 && game.lastcollidedwally != 0)
+            {
+                map.large_contents[tileindex] = 38;
+                music.playef(Sound_BLOCK_DESTROY);
+                return false;
+            }
+        }
+        if (dr == 113)
+        {
+            // Special case for arrows
+            entities[t].xp = entities[t].newxp;
+            entities[t].yp = entities[t].newyp;
+            return false;
+        }
+
         if (entities[t].vy > 1)
         {
             entities[t].vy--;
@@ -4866,7 +5673,7 @@ void entityclass::applyfriction( int t, float xrate, float yrate )
             if (entities[t].vx < 0.00f) { entities[t].vx += (0.099609375 * 4); if (entities[t].vx > 0) entities[t].vx = 0; };
         }
 
-        if (game.jumpheld)
+        if (game.jumpheld && entities[t].rule == 0)
         {
             entities[t].vy += 0.0625 * 4;
         }
@@ -4875,8 +5682,11 @@ void entityclass::applyfriction( int t, float xrate, float yrate )
             entities[t].vy += 0.15625 * 4;
         }
 
-        if (entities[t].vx > 1.5859375 * 2) entities[t].vx = 1.5859375 * 2;
-        if (entities[t].vx < -1.5859375 * 2) entities[t].vx = -1.5859375 * 2;
+        if (entities[t].type != 113)
+        {
+            if (entities[t].vx > 1.5859375 * 2) entities[t].vx = 1.5859375 * 2;
+            if (entities[t].vx < -1.5859375 * 2) entities[t].vx = -1.5859375 * 2;
+        }
 
         if (entities[t].vy > 3.0 * 2) entities[t].vy = 3.0 * 2;
 
@@ -4980,14 +5790,14 @@ void entityclass::entitymapcollision( int t )
     {
         if (entities[t].onwall > 0) entities[t].state = entities[t].onwall;
         if (entities[t].onywall > 0) entities[t].state = entities[t].onywall;
-        if (entities[t].type == 103 && entities[t].state == 1)
+        if ((entities[t].type == 103 && entities[t].state == 1))
         {
             newxp = entities[t].xp;
             newyp = entities[t].yp;
         }
     }
 
-    if (entities[t].type == 103)
+    if ((entities[t].type == 103) || (entities[t].type == 111 && entities[t].state2 == 0)) // Rocks should ignore floors and walls, and so should spinning winged brutes
     {
         entities[t].xp = newxp;
         entities[t].yp = newyp;
@@ -5072,6 +5882,24 @@ void entityclass::entitycollisioncheck(void)
 {
     for (size_t i = 0; i < entities.size(); i++)
     {
+        if (entities[i].rule == 106) // If bullet
+        {
+            for (size_t j = 0; j < entities.size(); j++)
+            {
+                if (i == j)
+                {
+                    continue;
+                }
+
+                if (entities[j].onshot > 0 && entitycollide(i, j))
+                {
+                    entities[j].state = entities[j].onshot;
+                    entities[j].shotstrength = entities[i].shotstrength;
+                    entities[i].state = 1;
+                }
+            }
+        }
+
         bool player = entities[i].rule == 0;
         bool scm = game.supercrewmate && entities[i].type == 14;
         if (!player && !scm)
@@ -5273,8 +6101,27 @@ void entityclass::collisioncheck(int i, int j, bool scm /*= false*/)
         break;
     case 103: // Person versus big fucking rock
     case 104: // Person versus small fucking rock
+    case 109: // Person versus rolling
     {
-        if (entitycollide(i, j) && !map.invincibility)
+        if (entitycollide(i, j) && !map.invincibility && game.respawnseq <= 0)
+        {
+            game.deathseq = 30;
+        }
+        break;
+    }
+    case 110: // Person versus Mesa
+    case 111: // Person versus Flying Brute
+    case 112: // Person versus Bow Brute
+    {
+        if (entitycollide(i, j) && !map.invincibility && entities[j].state < 3 && game.respawnseq <= 0)
+        {
+            game.deathseq = 30;
+        }
+        break;
+    }
+    case 113: // Person versus Arrow
+    {
+        if (entitycollide(i, j) && !map.invincibility && entities[j].state == 0 && game.respawnseq <= 0)
         {
             game.deathseq = 30;
         }

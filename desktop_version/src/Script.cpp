@@ -2509,6 +2509,32 @@ void scriptclass::run(void)
                     }
                 }
             }
+            else if (words[0] == "pausegame")
+            {
+                game.completestop = true;
+            }
+            else if (words[0] == "resumegame")
+            {
+                game.completestop = false;
+            }
+            else if (words[0] == "setvelocity")
+            {
+                int i = obj.getplayer();
+                if (INBOUNDS_VEC(i, obj.entities))
+                {
+                    obj.entities[i].vx = ss_toi(words[1]);
+                    obj.entities[i].vy = ss_toi(words[2]);
+                }
+            }
+            else if (words[0] == "settile")
+            {
+                int x = ss_toi(words[1]);
+                int y = ss_toi(words[2]);
+                int t = ss_toi(words[3]);
+
+                map.settile(x, y, t);
+                graphics.foregrounddrawn = false;
+            }
 
             position++;
         }

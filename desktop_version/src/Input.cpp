@@ -2919,7 +2919,7 @@ void gameinput(void)
             }
         }
 
-        if (holding_shoot)
+        if (holding_shoot && !game.completestop)
         {
             game.spur_charge++;
             if (game.spur_charge % 2 == 0)
@@ -2942,7 +2942,7 @@ void gameinput(void)
                 music.playef(Sound_SPUR_CHARGED);
             }
         }
-        else
+        else if (!game.completestop)
         {
             game.shoot_held = false;
 
@@ -2999,29 +2999,41 @@ void gameinput(void)
             for (size_t j = 0; j < player_entities.size(); j++)
             {
                 const size_t e = player_entities[j];
-                if (holding_shoot && !game.shoot_held)
+                if (holding_shoot && !game.shoot_held && !game.completestop)
                 {
                     music.playef(Sound_SHOOT);
                     game.shoot_held = true;
                     if (holding_up)
                     {
                         obj.createentity(obj.entities[e].xp + 6, obj.entities[e].yp, 106, 0, -12);
+                        if (obj.flags[4])
+                        {
+                            obj.createentity(obj.entities[e].xp + 6, obj.entities[e].yp - 16, 106, 0, -12, 4);
+                        }
                     }
                     else if (holding_down && obj.entities[e].onground <= 0)
                     {
                         obj.createentity(obj.entities[e].xp + 6, obj.entities[e].yp + 8 + 8, 106, 0, 12);
+                        if (obj.flags[4])
+                        {
+                            obj.createentity(obj.entities[e].xp + 6, obj.entities[e].yp + 8 + 8, 106, 0, 12, 4);
+                        }
                     }
                     else
                     {
                         int spd = obj.entities[e].dir == 0 ? -12 : 12;
                         obj.createentity(obj.entities[e].xp + 8 + (spd / 4), obj.entities[e].yp + 8 + 4, 106, spd, 0);
+                        if (obj.flags[4])
+                        {
+                            obj.createentity(obj.entities[e].xp - 8 - (spd / 4), obj.entities[e].yp + 8, 106, -spd, 0, 4);
+                        }
                     }
                 }
             }
         }
 
         game.currently_boosting = false;
-        if (map.jumpmode() && (game.boosting > 0) && game.jumpheld && game.canboost)
+        if (map.jumpmode() && (game.boosting > 0) && game.jumpheld && game.canboost && !game.completestop)
         {
             game.boosting--;
 

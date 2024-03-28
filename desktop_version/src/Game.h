@@ -486,7 +486,7 @@ public:
     int screenshake, flashlight;
     bool advancetext, pausescript;
 
-    int deathseq, lifeseq;
+    int deathseq, lifeseq, respawnseq;
 
     int trinkets(void);
     int crewmates(void);
@@ -617,6 +617,9 @@ public:
     bool started_boosting;
 
     int spur_charge;
+
+    int lastcollidedwallx;
+    int lastcollidedwally;
 };
 
 #ifndef GAME_DEFINITION

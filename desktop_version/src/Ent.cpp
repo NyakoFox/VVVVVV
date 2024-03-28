@@ -53,6 +53,8 @@ void entclass::clear(void)
     visualonroof = 0;
 
     onentity = 0;
+    onshot = 0;
+    shotstrength = 0;
     harmful = false;
     onwall = 0;
     onxwall = 0;

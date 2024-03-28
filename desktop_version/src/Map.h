@@ -87,6 +87,8 @@ public:
 
     bool towerspikecollide(int x, int y);
 
+    void remove_large_tile_at(int x, int y);
+
     bool collide(int x, int y, bool invincible);
 
     void settile(int xp, int yp, int t);

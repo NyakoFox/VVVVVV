@@ -28,6 +28,8 @@ public:
     bool invis;
     int type, size, tile, rule;
     int state, statedelay;
+    int state2;
+    int statedelay2;
     int behave, animate;
     float para;
     int life, colour;
@@ -41,6 +43,8 @@ public:
     int x1,y1,x2,y2;
     //Collision Rules
     int onentity;
+    int onshot;
+    int shotstrength;
     bool harmful;
     int onwall, onxwall, onywall;
 

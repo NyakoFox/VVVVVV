@@ -2422,7 +2422,228 @@ void Graphics::drawentity(const int i, const int yoff)
         case 3:
             fill_rect(xp - xpos, yp - ypos, obj.entities[i].w, obj.entities[i].h, color);
             break;
+        case 4:
+            int off = ((int)game.framecounter / 2) % 2;
+            SDL_Color col = getRGB(255, 226, 41);
+
+            if (off == 1)
+            {
+                col = getRGB(100, 114, 207);
+            }
+
+            if (obj.entities[i].vx < 0)
+            {
+                draw_sprite(xp - xpos, yp - ypos, 204 + off, col);
+            }
+            else if (obj.entities[i].vx > 0)
+            {
+                draw_sprite(xp - xpos, yp - ypos, 208 + off, col);
+            }
+            else if (obj.entities[i].vy < 0)
+            {
+                draw_sprite(xp - xpos, yp - ypos, 206 + off, col);
+            }
+            else if (obj.entities[i].vy > 0)
+            {
+                draw_sprite(xp - xpos, yp - ypos, 210 + off, col);
+            }
+            break;
         }
+        break;
+    }
+    case 107:
+    {
+        // Special: Deleets
+
+        SDL_Color ct = getRGB(184, 184, 184);
+        int spr = 212 + (obj.entities[i].behave % 2);
+        if (obj.entities[i].state == 3)
+        {
+            spr = 214;
+        }
+        draw_sprite(xp - xpos, yp - ypos, spr, ct);
+        break;
+    }
+    case 108:
+    {
+        // Special: Presses
+        SDL_Color ct = getRGB(184, 184, 184);
+
+        if (obj.entities[i].behave % 2 == 1)
+        {
+            ct = getRGB(192, 96, 96);
+        }
+
+        if (obj.entities[i].vy == 0)
+        {
+            draw_sprite(xp - xpos, yp - ypos, 216, ct);
+        }
+        else
+        {
+            draw_sprite(xp - xpos, yp - ypos, 217, ct);
+        }
+        break;
+    }
+    case 109:
+    {
+        // Special: Rollings
+        SDL_Color ct = getRGB(192, 96, 96);
+        draw_sprite(xp - xpos, yp - ypos, 218 + ((game.framecounter / 4) % 3), ct);
+        break;
+    }
+    case 110:
+    {
+        // Special: Mesas
+        SDL_Color ct = getRGB(255, 255, 127);
+        int inc = 0;
+        int scalex = 1;
+        if (obj.entities[i].dir == 1)
+        {
+            scalex = -1;
+        }
+
+        if (obj.entities[i].state2 == 1)
+        {
+            inc = 1;
+        }
+        if (obj.entities[i].state2 == 2)
+        {
+            inc = 2;
+        }
+        if (obj.entities[i].state2 == 3)
+        {
+            inc = 3;
+        }
+
+        if (obj.entities[i].state == 2)
+        {
+            if (obj.entities[i].behave % 2 == 1)
+            {
+                ct = getRGB(192, 96, 96);
+            }
+        }
+
+        if (obj.entities[i].state == 3)
+        {
+            inc = 4;
+        }
+        if (obj.entities[i].state == 4)
+        {
+            inc = 5;
+            ct = getcol(1);
+        }
+
+        draw_grid_tile(grphx.im_sprites, 228 + inc, xp - xpos, yp - ypos, sprites_rect.w, sprites_rect.h, ct, scalex, 1);
+        draw_grid_tile(grphx.im_sprites, 240 + inc, xp - xpos, yp - ypos + 32, sprites_rect.w, sprites_rect.h, ct, scalex, 1);
+        break;
+    }
+    case 111:
+    {
+        SDL_Color ct = getRGB(255, 255, 127);
+        int inc = 0;
+        int scalex = 1;
+        int offx = 0;
+        if (obj.entities[i].dir == 1)
+        {
+            offx = -16;
+            scalex = -1;
+        }
+
+        if (obj.entities[i].state2 <= 1)
+        {
+            inc = 2 + ((game.framecounter / 4) % 4);
+        }
+
+        if (obj.entities[i].state2 == 3)
+        {
+            inc = (game.framecounter / 4) % 2;
+        }
+
+        if (obj.entities[i].state == 3)
+        {
+            inc = 12;
+        }
+        if (obj.entities[i].state == 4)
+        {
+            inc = 13;
+            ct = getcol(1);
+        }
+
+        draw_grid_tile(grphx.im_sprites, 234 + inc, xp - xpos + offx, yp - ypos, sprites_rect.w, sprites_rect.h, ct, scalex, 1);
+        break;
+    }
+    case 112:
+    {
+        SDL_Color ct = getRGB(255, 255, 127);
+        int inc = 0;
+        int scalex = 1;
+        int offx = 0;
+        if (obj.entities[i].dir == 1)
+        {
+            offx = -16;
+            scalex = -1;
+        }
+
+        if (obj.entities[i].para == 1)
+        {
+            inc += 2;
+        }
+
+        if (obj.entities[i].state2 == 3)
+        {
+            inc++;
+        }
+
+
+        if (obj.entities[i].state == 3)
+        {
+            inc = -6;
+        }
+        if (obj.entities[i].state == 4)
+        {
+            inc = -5;
+            ct = getcol(1);
+        }
+
+        draw_grid_tile(grphx.im_sprites, 252 + inc, xp - xpos + offx, yp - ypos, sprites_rect.w, sprites_rect.h, ct, scalex, 1);
+        break;
+    }
+    case 113:
+    {
+        int scalex = 1;
+        int scaley = 1;
+        int offset = 0;
+
+
+        if (obj.entities[i].para < -4)
+        {
+            offset = 0;
+        }
+        if (obj.entities[i].para >= -4 && obj.entities[i].para < -2)
+        {
+            offset = 1;
+        }
+        if (obj.entities[i].para >= -2 && obj.entities[i].para < 2)
+        {
+            offset = 2;
+        }
+        if (obj.entities[i].para >= 2 && obj.entities[i].para < 4)
+        {
+            offset = 1;
+            scaley = -1;
+        }
+        if (obj.entities[i].para >= 4)
+        {
+            offset = 0;
+            scaley = -1;
+        }
+
+        if (obj.entities[i].behave)
+        {
+            scalex = -1;
+        }
+        draw_grid_tile(grphx.im_tileshell, 224 + offset, xp - xpos, yp - ypos, 16, 16, scalex, scaley);
+        break;
     }
     }
 }
@@ -2928,6 +3149,8 @@ static bool is_tile_foreground(int tile)
     case 57:
     case 58:
     case 59:
+    case 65:
+    case 81:
         return false;
     default:
         return true;
