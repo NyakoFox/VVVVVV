@@ -74,7 +74,11 @@ enum
     Sound_SPUR_SHOOT_1 = 38,
     Sound_SPUR_SHOOT_2 = 39,
     Sound_SPUR_SHOOT_3 = 40,
-    Sound_SPUR_CHARGED = 41
+    Sound_SPUR_CHARGED = 41,
+    Sound_CSTELEPORT = 42,
+    Sound_COOLHURT = 43,
+    Sound_SQUEAKHURT = 44,
+    Sound_SMB_PIPE = 45
 };
 
 class musicclass

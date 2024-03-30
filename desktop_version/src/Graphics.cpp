@@ -401,6 +401,10 @@ void Graphics::printcrewnamestatus( int x, int y, int t, bool rescued )
     {
         r = 64; g = 64; b = 64;
         status_text = loc::gettext_case("Missing...", gender);
+        if (game.scary && t == 1)
+        {
+            status_text = loc::gettext_case("Lost.", gender);
+        }
     }
 
     font::print(flipmode ? PR_CJK_HIGH : PR_CJK_LOW, x, y, status_text, r, g, b);
@@ -782,17 +786,22 @@ void Graphics::drawtile(int x, int y, int t)
 {
     if (shouldrecoloroneway(t, tiles1_mounted))
     {
-        draw_grid_tile(grphx.im_tiles_tint, t, x, y, tiles_rect.w, tiles_rect.h, cl.getonewaycol());
+        draw_grid_tile(game.scary ? grphx.im_tilesgray_tint : grphx.im_tiles_tint, t, x, y, tiles_rect.w, tiles_rect.h, cl.getonewaycol());
     }
     else
     {
-        draw_grid_tile(grphx.im_tiles, t, x, y, tiles_rect.w, tiles_rect.h);
+        draw_grid_tile(game.scary ? grphx.im_tilesgray : grphx.im_tiles, t, x, y, tiles_rect.w, tiles_rect.h);
     }
 }
 
 void Graphics::drawtilehell(int x, int y, int t)
 {
     draw_grid_tile(grphx.im_tileshell, t, x, y, 16, 16);
+}
+
+void Graphics::drawtilesmb(int x, int y, int t)
+{
+    draw_grid_tile(grphx.im_tilessmb, t, x, y, 16, 16);
 }
 
 void Graphics::draw8x8effect(int x, int y, int t)
@@ -1058,6 +1067,10 @@ void Graphics::drawgui(void)
                 }
             }
         }
+        else if (textboxes[i].image == TEXTIMAGE_SWELLOW)
+        {
+            drawswellow();
+        }
 
         for (size_t index = 0; index < textboxes[i].sprites.size(); index++)
         {
@@ -1158,6 +1171,11 @@ void Graphics::drawimage( int t, int xp, int yp, bool cent/*=false*/ )
     }
 
     draw_texture(images[t], trect.x, trect.y);
+}
+
+void Graphics::drawswellow(void)
+{
+    draw_texture(grphx.im_swellow, (320 - 128) / 2, (240 - 128) / 2);
 }
 
 void Graphics::drawpartimage(const int t, const int xp, const int yp, const int wp, const int hp)
@@ -2069,8 +2087,8 @@ void Graphics::drawentity(const int i, const int yoff)
     }
 
     SDL_Texture* sprites = flipmode ? grphx.im_flipsprites : grphx.im_sprites;
-    SDL_Texture* tiles = (map.custommode && !map.finalmode) ? grphx.im_entcolours : grphx.im_tiles;
-    SDL_Texture* tiles_tint = (map.custommode && !map.finalmode) ? grphx.im_entcolours_tint : grphx.im_tiles_tint;
+    SDL_Texture* tiles = (map.custommode && !map.finalmode) ? grphx.im_entcolours : (game.scary ? grphx.im_tilesgray : grphx.im_tiles);
+    SDL_Texture* tiles_tint = (map.custommode && !map.finalmode) ? grphx.im_entcolours_tint : (game.scary ? grphx.im_tilesgray_tint : grphx.im_tiles_tint);
 
     const int xp = lerp(obj.entities[i].lerpoldxp, obj.entities[i].xp);
     const int yp = lerp(obj.entities[i].lerpoldyp, obj.entities[i].yp);
@@ -2645,6 +2663,89 @@ void Graphics::drawentity(const int i, const int yoff)
         draw_grid_tile(grphx.im_tileshell, 224 + offset, xp - xpos, yp - ypos, 16, 16, scalex, scaley);
         break;
     }
+    case 114:
+    {
+        SDL_Color ct = getRGB(255, 255, 127);
+        int inc = 0;
+        int scalex = 1;
+        int offx = 0;
+        if (obj.entities[i].dir == 1)
+        {
+            offx = -16 + 5;
+            scalex = -1;
+        }
+
+        if (obj.entities[i].state2 == 3)
+        {
+            inc += (game.framecounter / 4) % 2;
+        }
+
+        if (obj.entities[i].state2 == 4)
+        {
+            inc += 2;
+            if (obj.entities[i].vy > 0)
+            {
+                inc++;
+            }
+        }
+
+
+        if (obj.entities[i].state == 3)
+        {
+            inc = -10;
+        }
+        if (obj.entities[i].state == 4)
+        {
+            inc = -9;
+            ct = getcol(1);
+        }
+
+        draw_grid_tile(grphx.im_sprites, 256 + inc, xp - xpos + offx, yp - ypos, sprites_rect.w, sprites_rect.h, ct, scalex, 1);
+        break;
+    }
+    case 115:
+    {
+        //Special: HEAVY PRESS (HUGE)
+        SDL_Color ct = getRGB(184, 184, 184);
+        int tile = 0;
+        if (obj.entities[i].vy > 0)
+        {
+            tile = 1;
+        }
+        if (obj.entities[i].vy > 2)
+        {
+            tile = 2;
+        }
+        if (obj.entities[i].state >= 5)
+        {
+            tile = 2;
+        }
+        if ((obj.entities[i].state == 1 || obj.entities[i].state == 2) && game.bossbattle)
+        {
+            if ((game.framecounter / 2) % 2 == 0)
+            {
+                tile = 3;
+                ct = getRGB(255, 255, 127);
+            }
+        }
+        draw_grid_tile(grphx.im_heavypress, tile, xp - xpos, yp - ypos, 81, 122, ct);
+
+        if (obj.entities[i].state2 == 2)
+        {
+            fill_rect(xp - xpos + 33 - 1, yp - ypos + 108 + 8, 16 + 2 - 1, 96 - 8, 161, 165, 170);
+            fill_rect(xp - xpos + 33, yp - ypos + 108 + 8, 16 - 1, 96 - 8, 255, 255, 255);
+        }
+        if (obj.entities[i].state2 == 1)
+        {
+            draw_grid_tile(grphx.im_32x32effects, 1 + (game.framecounter % 3), xp - xpos + 40 - 8 - 8, yp - ypos + 102, 32, 32);
+        }
+        break;
+    }
+    case 116:
+        // Special: Smoke
+        int tile = 207 - (obj.entities[i].life / 2);
+        drawtilehell(xp - xpos, yp - ypos, tile);
+        break;
     }
 }
 
@@ -2655,6 +2756,7 @@ void Graphics::drawbackground( int t )
     case 1:
         // Starfield
         fill_rect(0, 0, 0);
+        if (game.scary) return;
         for (int i = 0; i < numstars; i++)
         {
             SDL_Rect star_rect = stars[i];
@@ -3169,9 +3271,16 @@ void Graphics::drawlargemap(bool foreground)
         for (int x = 0; x < map.room_width; x++)
         {
             int tile = map.large_contents[x + y * map.room_width];
-            if (tile > 0 && (is_tile_foreground(tile) == foreground))
+            if (tile > 0 && ((is_tile_foreground(tile) == foreground) || map.smbmode()))
             {
-                drawtilehell(x * 16 - map.xpos, y * 16 - map.ypos, tile);
+                if (map.cavestorymode())
+                {
+                    drawtilehell(x * 16 - map.xpos, y * 16 - map.ypos, tile);
+                }
+                else if (map.smbmode())
+                {
+                    drawtilesmb(x * 16 - map.xpos, y * 16 - map.ypos, tile);
+                }
             }
         }
     }
@@ -3851,7 +3960,7 @@ void Graphics::screenshake(void)
 
 void Graphics::updatescreenshake(void)
 {
-    if (map.jumpmode())
+    if (map.cavestorymode())
     {
         screenshake_x = round((fRandom() * 2) - 1);
         screenshake_y = round((fRandom() * 2) - 1);
@@ -4035,7 +4144,19 @@ SDL_Color Graphics::getRGBA(const Uint8 r, const Uint8 g, const Uint8 b, const U
 
 SDL_Color Graphics::getRGB(const Uint8 r, const Uint8 g, const Uint8 b)
 {
-    const SDL_Color color = {r, g, b, 255};
+    Uint8 user = r;
+    Uint8 useg = g;
+    Uint8 useb = b;
+
+    if (game.scary)
+    {
+        Uint8 gray = (r * 0.299 + g * 0.587 + b * 0.114);
+        user = gray;
+        useg = gray;
+        useb = gray;
+    }
+
+    const SDL_Color color = {user, useg, useb, 255};
     return color;
 }
 
@@ -4044,8 +4165,7 @@ SDL_Color Graphics::RGBf(int r, int g, int b)
     r = (r + 128) / 3;
     g = (g + 128) / 3;
     b = (b + 128) / 3;
-    const SDL_Color color = {(Uint8) r, (Uint8) g, (Uint8) b, 255};
-    return color;
+    return getRGB(r, g, b);
 }
 
 bool Graphics::onscreen(int t)

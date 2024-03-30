@@ -113,7 +113,8 @@ public:
 
     const char* currentarea(int roomx, int roomy);
 
-    bool jumpmode();
+    bool cavestorymode();
+    bool smbmode();
 
     void setplayer();
 

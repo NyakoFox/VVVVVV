@@ -2312,11 +2312,16 @@ void gamerender(void)
                 graphics.clear();
             }
 
-            if (map.largermode)
+            if (map.cavestorymode())
             {
                 graphics.drawlargebg();
                 graphics.drawlargemap(false);
                 graphics.drawentities();
+                graphics.drawlargemap(true);
+            }
+            else if (map.smbmode())
+            {
+                graphics.fill_rect(92, 148, 252);
                 graphics.drawlargemap(true);
             }
             else if ((map.finalmode || map.custommode) && map.final_colormode)
@@ -2329,7 +2334,7 @@ void gamerender(void)
             }
         }
 
-        if (!map.largermode)
+        if (!map.cavestorymode())
         {
             graphics.drawentities();
         }
@@ -2357,25 +2362,6 @@ void gamerender(void)
         || graphics.flipmode
         || game.slowdown < 30;
     bool draw_mode_indicator_text = mode_indicator_alpha > 100 && any_mode_active;
-
-    if (graphics.fademode == FADE_NONE
-    && !game.intimetrial
-    && !game.isingamecompletescreen()
-    && (!game.swnmode || game.swngame != SWN_SUPERGRAVITRON)
-    && game.showingametimer
-    && !roomname_translator::enabled
-    && (!game.swnmode || game.swngame != SWN_START_GRAVITRON_STEP_3)
-    && obj.trophytext <= 0 && obj.oldtrophytext <= 0
-    && !draw_return_editor_text
-    && !draw_mode_indicator_text)
-    {
-        const char* tempstring = loc::gettext("TIME:");
-        int label_len = font::len(0, tempstring);
-        font::print(PR_BOR | PR_RTL_XFLIP, 6, 6, tempstring, 255,255,255);
-        char buffer[SCREEN_WIDTH_CHARS + 1];
-        game.timestringcenti(buffer, sizeof(buffer));
-        font::print(PR_BOR | PR_RTL_XFLIP, 6+label_len, 6, buffer, 196,196,196);
-    }
 
     bool force_roomname_hidden = false;
     bool roomname_untranslated = false;
@@ -2426,13 +2412,69 @@ void gamerender(void)
     }
 
     graphics.cutscenebars();
+
     graphics.drawfade();
+
+    if (game.showingametimer)
+    {
+        int off = 0;
+        if (script.running)
+        {
+            off = 8;
+        }
+        const char* tempstring = loc::gettext("TIME:");
+        int label_len = font::len(0, tempstring);
+        font::print(PR_BOR | PR_RTL_XFLIP, 6, 6 + off, tempstring, 255, 255, 255);
+        char buffer[SCREEN_WIDTH_CHARS + 1];
+        game.timestringcenti(buffer, sizeof(buffer));
+        font::print(PR_BOR | PR_RTL_XFLIP, 6 + label_len, 6 + off, buffer, 196, 196, 196);
+    }
+
+    if (game.showhelltime)
+    {
+        const char* tempstring = loc::gettext("290 COUNTER:");
+        int label_len = font::len(0, tempstring);
+        font::print(PR_BOR | PR_RTL_XFLIP | PR_CEN, -1, 200, tempstring, 255, 255, 255);
+        char buffer[SCREEN_WIDTH_CHARS + 1];
+        help.format_time(buffer, sizeof(buffer), help.hms_to_seconds(game.hell_hours, game.hell_minutes, game.hell_seconds), game.hell_frames, true);
+        int r = 196;
+        int g = 196;
+        int b = 196;
+        if (game.hell_minutes < 3)
+        {
+            r = graphics.getcol(3).r;
+            g = graphics.getcol(3).g;
+            b = graphics.getcol(3).b;
+        }
+        else if ((game.hell_minutes * 60 + game.hell_seconds) < 210)
+        {
+            r = 255;
+            g = 198;
+            b = 104;
+        }
+        else if (game.hell_minutes < 4)
+        {
+            r = 161;
+            g = 175;
+            b = 183 + (help.glow / 2);
+        }
+        font::print(PR_BOR | PR_RTL_XFLIP | PR_CEN, -1, 216, buffer, r, g, b);
+    }
 
     graphics.drawgui();
 
     if (draw_mode_indicator_text && !draw_return_editor_text)
     {
         mode_indicator_text(mode_indicator_alpha);
+    }
+
+    if (game.scary)
+    {
+        graphics.set_blendmode(SDL_BLENDMODE_BLEND);
+        graphics.fill_rect(graphics.getRGBA(0, 0, 0, 127 + (127 * SDL_max(0, ((game.roomx - 109.0) / 5.0)))));
+        graphics.set_blendmode(SDL_BLENDMODE_MUL);
+        graphics.fill_rect(graphics.getRGBA(127.0 * SDL_max(0, ((game.roomx - 109.0) / 5.0)), 0, 0, 127));
+        graphics.set_blendmode(SDL_BLENDMODE_NONE);
     }
 
     graphics.set_render_target(graphics.gameTexture);
@@ -2744,6 +2786,32 @@ void gamerender(void)
         graphics.drawtrophytext();
     }
 
+    if (game.bossbattle)
+    {
+        graphics.drawpixeltextbox(16, 240 - 16 - 4 - 4, 320 - 32, 16 + 2, 25, 33, 66);
+        font::print(
+            PR_1X | PR_FONT_INTERFACE,
+            16 + 8,
+            240 - 16 + 2 - 4,
+            "BOSS",
+            196, 196, 255 - help.glow
+        );
+        graphics.draw8x8effect(16 + 8 + 32, 240 - 16 + 2 - 4, 8);
+
+        float hp = 0;
+        for (size_t i = 0; i < obj.entities.size(); i++)
+        {
+            if (obj.entities[i].type == 115)
+            {
+                hp = obj.entities[i].life;
+                break;
+            }
+        }
+
+        float percentage = hp / PRESS_HP;
+        graphics.fill_rect(16 + 8 + 32 + 16, 240 - 16 + 2 - 4, (320 - 32 - 16 - 32 - 8 - 8) * percentage, 6, 234, 25, 62);
+    }
+
     level_debugger::render();
 
     graphics.renderwithscreeneffects();
@@ -2990,7 +3058,7 @@ void maprender(void)
     case 0:
         rendermap();
 
-        if (map.finalmode || (map.custommode&&!map.customshowmm))
+        if (map.finalmode || (map.custommode&&!map.customshowmm) || true)
         {
             // Cover the whole map
             for (int j = 0; j < 20; j++)
@@ -3090,7 +3158,7 @@ void maprender(void)
             );
             font::print_wrap(PR_CEN, -1, 105, buffer, 196, 196, 255 - help.glow);
         }
-        else if(map.custommode){
+        else if(map.custommode && false){
             LevelMetaData& meta = cl.ListOfMetaData[game.playcustomlevel];
 
             uint32_t title_flags = meta.title_is_gettext ? PR_FONT_INTERFACE : PR_FONT_LEVEL;
@@ -3150,30 +3218,29 @@ void maprender(void)
             }
             else
             {
-                for (int i = 0; i < 3; i++)
+                graphics.drawcrewman(16, 32 + (1 * 64), 0, !game.scary);
+                if (!game.scary)
                 {
-                    graphics.drawcrewman(16, 32 + (i * 64), i, game.crewstats[i]);
-                    if (game.crewstats[i])
-                    {
-                        graphics.printcrewname(44, 32 + (i * 64)+4, i);
-                    }
-                    else
-                    {
-                        graphics.printcrewnamedark(44, 32 + (i * 64)+4, i);
-                    }
-                    graphics.printcrewnamestatus(44, 32 + (i * 64)+4+10, i, game.crewstats[i]);
-
-                    graphics.drawcrewman(16+160, 32 + (i * 64), i+3, game.crewstats[i+3]);
-                    if (game.crewstats[i+3])
-                    {
-                        graphics.printcrewname(44+160, 32 + (i * 64)+4, i+3);
-                    }
-                    else
-                    {
-                        graphics.printcrewnamedark(44+160, 32 + (i * 64)+4, i+3);
-                    }
-                    graphics.printcrewnamestatus(44+160, 32 + (i * 64)+4+10, i+3, game.crewstats[i+3]);
+                    graphics.printcrewname(44, 32 + (1 * 64) + 4, 0);
                 }
+                else
+                {
+                    graphics.printcrewnamedark(44, 32 + (1 * 64) + 4, 0);
+                }
+                graphics.printcrewnamestatus(44, 32 + (1 * 64) + 4 + 10, 0, !game.scary);
+
+                bool rescued = obj.flags[0];
+
+                graphics.drawcrewman(16 + 192 - 16, 32 + (1 * 64), 1, rescued);
+                if (rescued)
+                {
+                    graphics.printcrewname(44 + 192 - 16, 32 + (1 * 64) + 4, 1);
+                }
+                else
+                {
+                    graphics.printcrewnamedark(44 + 192 - 16, 32 + (1 * 64) + 4, 1);
+                }
+                graphics.printcrewnamestatus(44 + 192 - 16, 32 + (1 * 64) + 4 + 10, 1, rescued);
             }
         }
         break;
@@ -3232,6 +3299,16 @@ void maprender(void)
         if (game.gamesavefailed)
         {
             font::print_wrap(PR_CEN, -1, 115, loc::gettext("ERROR: Could not save game!"), 146, 146, 180);
+            break;
+        }
+        if (game.scary)
+        {
+            font::print_wrap(PR_CEN, -1, 115, loc::gettext("Cannot Save Her"), 146, 146, 180);
+            break;
+        }
+        if (true)
+        {
+            font::print_wrap(PR_CEN, -1, 115, loc::gettext("Cannot Save in Prologue"), 146, 146, 180);
             break;
         }
 

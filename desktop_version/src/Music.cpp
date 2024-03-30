@@ -786,6 +786,10 @@ void musicclass::init(void)
     soundTracks.push_back(SoundTrack( "sounds/spur_shoot_2.wav" ));
     soundTracks.push_back(SoundTrack( "sounds/spur_shoot_3.wav" ));
     soundTracks.push_back(SoundTrack( "sounds/spur_charged.wav" ));
+    soundTracks.push_back(SoundTrack( "sounds/csteleport.wav" ));
+    soundTracks.push_back(SoundTrack( "sounds/coolhurt.wav" ));
+    soundTracks.push_back(SoundTrack( "sounds/squeakhurt.wav" ));
+    soundTracks.push_back(SoundTrack( "sounds/smb_pipe.wav" ));
 
 #ifdef VVV_COMPILEMUSIC
     binaryBlob musicWriteBlob;

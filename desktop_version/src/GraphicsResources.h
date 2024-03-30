@@ -24,9 +24,13 @@ public:
     SDL_Texture* im_tiles;
     SDL_Texture* im_tiles_white;
     SDL_Texture* im_tiles_tint;
+    SDL_Texture* im_tilesgray;
+    SDL_Texture* im_tilesgray_white;
+    SDL_Texture* im_tilesgray_tint;
     SDL_Texture* im_tiles2;
     SDL_Texture* im_tiles2_tint;
     SDL_Texture* im_tileshell;
+    SDL_Texture* im_tilessmb;
     SDL_Texture* im_tiles3;
     SDL_Texture* im_entcolours;
     SDL_Texture* im_entcolours_tint;
@@ -47,6 +51,9 @@ public:
     SDL_Texture* im_image11;
     SDL_Texture* im_image12;
     SDL_Texture* im_8x8effects;
+    SDL_Texture* im_32x32effects;
+    SDL_Texture* im_heavypress;
+    SDL_Texture* im_swellow;
 
     SDL_Texture* im_sprites_translated;
     SDL_Texture* im_flipsprites_translated;

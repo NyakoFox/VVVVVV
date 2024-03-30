@@ -2232,6 +2232,7 @@ void entityclass::createentity(int xp, int yp, int t, int meta1, int meta2, int 
           entity.cx = 4;
           entity.cy = 32 - 4;
           entity.statedelay = 0;
+          entity.onshot = 3;
           break;
       }
       case 104: // Small falling rock
@@ -2246,6 +2247,7 @@ void entityclass::createentity(int xp, int yp, int t, int meta1, int meta2, int 
           entity.cy = 16 - 4;
           entity.statedelay = 0;
           entity.behave = meta1;
+          entity.onshot = 3;
           if (entity.behave == 1)
           {
               entity.vy = -4;
@@ -2350,7 +2352,7 @@ void entityclass::createentity(int xp, int yp, int t, int meta1, int meta2, int 
           entity.state = 0;
           entity.w = 24;
           entity.h = 24;
-          entity.life = 8;
+          entity.life = 8 * 4;
           entity.onshot = 1;
           entity.behave = 0;
           entity.statedelay = 0;
@@ -2364,7 +2366,7 @@ void entityclass::createentity(int xp, int yp, int t, int meta1, int meta2, int 
           entity.state = 0;
           entity.w = 16;
           entity.h = 24;
-          entity.life = 8;
+          entity.life = 8 * 4;
           entity.onshot = 1;
           entity.behave = 0;
           entity.para = 0;
@@ -2414,7 +2416,7 @@ void entityclass::createentity(int xp, int yp, int t, int meta1, int meta2, int 
           entity.cx = 7;
           entity.cy = 6;
           entity.dir = meta1;
-          entity.life = 8;
+          entity.life = 8 * 4;
           entity.behave = 0;
           entity.onshot = 1;
           entity.gravity = true;
@@ -2496,6 +2498,55 @@ void entityclass::createentity(int xp, int yp, int t, int meta1, int meta2, int 
           {
               entity.vy = -8;
           }
+          break;
+      }
+      case 114: // Sword Brutes
+      {
+          entity.rule = 114;
+          entity.type = 114;
+          entity.size = 114;
+          entity.state = 0;
+          entity.w = 12;
+          entity.h = 15;
+          entity.cx = 5;
+          entity.cy = 0;
+          entity.gravity = true;
+          entity.dir = meta1;
+          entity.onshot = 1;
+          entity.statedelay = 0;
+          entity.state2 = 0;
+          entity.statedelay2 = 0;
+          entity.para = 0;
+          break;
+      }
+      case 115: // Heavy Press
+      {
+          entity.rule = 115;
+          entity.type = 115;
+          entity.size = 115;
+          entity.state = 0;
+          entity.w = 80;
+          entity.h = 122;
+          entity.cx = 0;
+          entity.cy = 0;
+          entity.onshot = 1;
+          entity.life = PRESS_HP;
+          entity.state2 = 0;
+          entity.statedelay2 = 30;
+
+          createblock(BLOCK, 128, 128, 80, 16);
+          createblock(SAFE, 128, 128, 32-8, 16-2);
+          createblock(SAFE, 176 + 8, 128, 32-8, 16-2);
+          break;
+      }
+      case 116: // Smoke
+      {
+          entity.rule = 116;
+          entity.type = 116;
+          entity.size = 116;
+          entity.life = 7 * 2;
+          entity.w = 16;
+          entity.h = 16;
           break;
       }
     }
@@ -3798,12 +3849,28 @@ bool entityclass::updateentities( int i )
 
                 if (entities[i].state == 1)
                 {
+                    if (entities[i].size == 104)
+                    {
+                        createentity(entities[i].xp + entities[i].w / 2 - 6, entities[i].yp, 116);
+                    }
+                    else
+                    {
+                        createentity(entities[i].xp - 2, entities[i].yp + 16, 116);
+                        createentity(entities[i].xp - 2 + 16, entities[i].yp + 16, 116);
+                    }
                     music.playef(Sound_BLOCK_HIT);
                     entities[i].onywall = 2;
                     entities[i].vy = -3;
                     entities[i].state = 2;
                 }
             }
+
+            if (entities[i].state == 3)
+            {
+                music.playef(Sound_COIN);
+                entities[i].state = 2;
+            }
+
             break;
         case 105:
             if (entities[i].state == 1)
@@ -3827,6 +3894,13 @@ bool entityclass::updateentities( int i )
             entities[i].state2--;
             if (entities[i].state == 1 || entities[i].state2 <= 0)
             {
+                for (int x = entities[i].xp; x < entities[i].xp + entities[i].w; x += 8)
+                {
+                    for (int y = entities[i].yp; y < entities[i].yp + entities[i].h; y += 8)
+                    {
+                        createentity(x + fRandom() * 8 - 4, y + fRandom() * 8 - 4, 116);
+                    }
+                }
                 disableentity(i);
             }
             break;
@@ -3838,8 +3912,8 @@ bool entityclass::updateentities( int i )
                 entities[i].state = 2;
                 entities[i].life -= entities[i].shotstrength;
                 entities[i].behave = 8;
-                entities[i].onshot = 0;
-                music.playef(Sound_FLASH);
+                entities[i].onshot = 1;
+                music.playef(Sound_COOLHURT);
 
                 if (entities[i].life <= 0)
                 {
@@ -3868,9 +3942,31 @@ bool entityclass::updateentities( int i )
                     {
                         game.flashlight = 2;
                         music.playef(Sound_DESTROY);
-                        disableentity(i);
                         map.remove_large_tile_at(entities[i].xp + 4, entities[i].yp - 4);
                         map.remove_large_tile_at(entities[i].xp + 4, entities[i].yp - 4 + 16);
+
+                        int player = getplayer();
+                        // if the player is within a radius of 32 pixels, kill
+                        int xdiff = entities[i].xp - entities[player].xp;
+                        int ydiff = entities[i].yp - entities[player].yp;
+                        int dist = SDL_sqrt(xdiff * xdiff + ydiff * ydiff);
+
+                        if (dist < 32)
+                        {
+                            if (game.deathseq <= 0 && !map.invincibility && game.respawnseq <= 0)
+                            {
+                                game.deathseq = 30;
+                            }
+                        }
+
+                        for (int j = 0; j < 20; j++)
+                        {
+                            int x = fRandom() * 60 - 30;
+                            int y = fRandom() * 60 - 30;
+                            createentity(entities[i].xp + x, entities[i].yp + y, 116);
+                        }
+
+                        disableentity(i);
                     }
                     else
                     {
@@ -3902,6 +3998,7 @@ bool entityclass::updateentities( int i )
             {
                 entities[i].para = 2;
                 music.playef(Sound_BLOCK_HIT);
+                createentity(entities[i].xp, entities[i].yp + 16, 116);
             }
 
             if (entities[i].state == 1)
@@ -3909,8 +4006,9 @@ bool entityclass::updateentities( int i )
                 entities[i].state = 2;
                 entities[i].life -= entities[i].shotstrength;
                 entities[i].behave = 8;
-                entities[i].onshot = 0;
-                music.playef(Sound_FLASH);
+                entities[i].onshot = 1;
+
+                music.playef(Sound_COOLHURT);
 
                 if (entities[i].life <= 0)
                 {
@@ -3932,6 +4030,8 @@ bool entityclass::updateentities( int i )
             }
             if (entities[i].state == 3)
             {
+                createentity(entities[i].xp, entities[i].yp + 16, 116);
+                createentity(entities[i].xp, entities[i].yp, 116);
                 disableblockat(entities[i].xp, entities[i].yp);
                 disableentity(i);
                 game.flashlight = 2;
@@ -4033,8 +4133,9 @@ bool entityclass::updateentities( int i )
                 entities[i].state = 2;
                 entities[i].life -= entities[i].shotstrength;
                 entities[i].behave = 8;
-                entities[i].onshot = 0;
-                music.playef(Sound_FLASH);
+                entities[i].onshot = 1;
+
+                music.playef(Sound_COOLHURT);
 
                 if (entities[i].life <= 0)
                 {
@@ -4169,7 +4270,7 @@ bool entityclass::updateentities( int i )
 
             if (entities[i].state == 1)
             {
-                music.playef(Sound_FLASH);
+                music.playef(Sound_SQUEAKHURT);
 
                 entities[i].state2 = 2;
                 entities[i].state = 3;
@@ -4291,7 +4392,7 @@ bool entityclass::updateentities( int i )
             }
             if (entities[i].state == 1)
             {
-                music.playef(Sound_FLASH);
+                music.playef(Sound_SQUEAKHURT);
 
                 entities[i].state2 = 2;
                 entities[i].state = 3;
@@ -4362,6 +4463,407 @@ bool entityclass::updateentities( int i )
             }
             break;
         }
+        case 114:
+        {
+
+            if (entities[i].state == 5)
+            {
+                // We hit a wall, jump
+                entities[i].onxwall = 0;
+                entities[i].state = 0;
+                entities[i].state2 = 4;
+                entities[i].vy = -8;
+                entities[i].onground = 0;
+            }
+
+            if (entities[i].state < 3)
+            {
+                if (entities[i].state2 == 0)
+                {
+                    // We were just spawned -- wait until Viridian is in the direction we're facing, AND within like, 96 pixels
+                    int j = getplayer();
+                    if (INBOUNDS_VEC(j, entities))
+                    {
+                        if (entities[i].dir == 1 && entities[j].xp > entities[i].xp && entities[j].xp <= entities[i].xp + 96)
+                        {
+                            entities[i].state2 = 1;
+                        }
+                        else if (entities[i].dir == 0 && entities[j].xp < entities[i].xp && entities[j].xp >= entities[i].xp - 96)
+                        {
+                            entities[i].state2 = 1;
+                        }
+                    }
+                }
+
+                if (entities[i].state2 == 1)
+                {
+                    // Okay, we should be "activated" now. Just stand still for a bit, we need to make a decision
+                    entities[i].state2 = 2;
+                    entities[i].statedelay2 = 30;
+                }
+
+                entities[i].statedelay2--;
+
+                if (entities[i].statedelay2 <= 0 && entities[i].state2 == 2)
+                {
+                    // Decision time, let's choose a direction and run that way!
+                    int j = getplayer();
+                    if (INBOUNDS_VEC(j, entities))
+                    {
+                        if (entities[j].xp < entities[i].xp)
+                        {
+                            entities[i].dir = 0;
+                        }
+                        else
+                        {
+                            entities[i].dir = 1;
+                        }
+                    }
+                    entities[i].state2 = 3;
+                    entities[i].oldxp = entities[i].xp - 1;
+                }
+
+                if (entities[i].statedelay2 <= 0 && entities[i].state2 == 3)
+                {
+                    // If we're close (or past) the player (in the direction we're facing), jump
+
+                    entities[i].onxwall = 5;
+
+                    // Well, run that direction
+                    if (entities[i].dir == 0)
+                    {
+                        entities[i].vx = -6;
+                    }
+                    else
+                    {
+                        entities[i].vx = 6;
+                    }
+
+                    int j = getplayer();
+                    if (INBOUNDS_VEC(j, entities))
+                    {
+                        if (entities[i].dir == 0 && entities[j].xp > entities[i].xp && entities[i].onground > 0)
+                        {
+                            entities[i].state2 = 4;
+                            entities[i].vy = -8;
+                            entities[i].onground = 0;
+                            entities[i].onxwall = 0;
+                        }
+                        else if (entities[i].dir == 1 && entities[j].xp < entities[i].xp && entities[i].onground > 0)
+                        {
+                            entities[i].state2 = 4;
+                            entities[i].vy = -8;
+                            entities[i].onground = 0;
+                            entities[i].onxwall = 0;
+                        }
+                        if (entities[i].oldxp == entities[i].xp && entities[i].onground > 0)
+                        {
+                            // sometimes onxwall doesnt work so let's do it ourselves...
+                            entities[i].state2 = 4;
+                            entities[i].vy = -8;
+                            entities[i].onground = 0;
+                            entities[i].onxwall = 0;
+                        }
+                    }
+                }
+
+                if (entities[i].state2 == 4)
+                {
+                    // We're in the air! Let's wait until we hit the ground
+                    if (entities[i].onground > 0)
+                    {
+                        entities[i].state2 = 1; // Go back to initial state
+                        entities[i].vx = 0;
+                        entities[i].vy = 0;
+                    }
+                }
+            }
+
+            if (entities[i].state == 1)
+            {
+                if (entities[i].state2 >= 3)
+                {
+                    music.playef(Sound_SQUEAKHURT);
+
+                    entities[i].onxwall = 0;
+                    entities[i].state2 = 2;
+                    entities[i].state = 3;
+                    entities[i].onshot = 0;
+                    entities[i].behave = 30;
+                    entities[i].life = 5;
+                    entities[i].vy = -4;
+                    entities[i].gravity = true;
+                    if (entities[i].dir == 1)
+                    {
+                        entities[i].vx = -2;
+                    }
+                    else
+                    {
+                        entities[i].vx = 2;
+                    }
+                    entities[i].onywall = 4;
+                }
+                else
+                {
+                    music.playef(Sound_COIN);
+                    entities[i].state = 0;
+                }
+            }
+
+            if (entities[i].state == 2)
+            {
+                entities[i].onxwall = 0;
+                entities[i].behave--;
+                if (entities[i].behave <= 0)
+                {
+                    entities[i].behave = 0;
+                    entities[i].state = 0;
+                    entities[i].onshot = 1;
+                }
+            }
+            if (entities[i].state == 4)
+            {
+                if (entities[i].behave == 30)
+                {
+                    music.playef(Sound_CRY);
+                }
+
+                entities[i].onxwall = 0;
+                entities[i].invis = false;
+                if (entities[i].behave == 25) entities[i].invis = true;
+                if (entities[i].behave == 20) entities[i].invis = true;
+                if (entities[i].behave == 16) entities[i].invis = true;
+                if (entities[i].behave == 14) entities[i].invis = true;
+                if (entities[i].behave == 12) entities[i].invis = true;
+                if (entities[i].behave < 10) entities[i].invis = true;
+
+                entities[i].behave--;
+                if (entities[i].behave <= 0)
+                {
+                    disableentity(i);
+                }
+            }
+            break;
+        }
+        case 115:
+        {
+            if (entities[i].state < 3)
+            {
+                if (game.bossbattle)
+                {
+                    if (game.framecounter % 120 == 0)
+                    {
+                        createentity(48, 256, 111, -4);
+                    }
+                    if (game.framecounter % 120 == 60)
+                    {
+                        createentity(272, 256, 111, -4);
+                    }
+
+                    entities[i].statedelay2--;
+                    if (entities[i].statedelay2 <= 0)
+                    {
+                        int xp = entities[i].xp;
+                        int yp = entities[i].yp;
+
+                        if (entities[i].state2 == 0)
+                        {
+                            entities[i].statedelay2 = 30;
+                            entities[i].state2 = 1;
+                            music.playef(Sound_CSTELEPORT);
+                        }
+                        else if (entities[i].state2 == 1)
+                        {
+                            entities[i].statedelay2 = 10;
+                            entities[i].state2 = 2;
+                            music.playef(Sound_SPUR_SHOOT_3);
+                            music.playef(Sound_FLASH);
+                            createblock(DAMAGE, xp + 33 - 1, yp + 108 + 8, 16 + 2 - 1, 96 - 8);
+                        }
+                        else if (entities[i].state2 == 2)
+                        {
+                            entities[i].statedelay2 = 90;
+                            entities[i].state2 = 0;
+                            disableblockat(xp + 33 - 1, yp + 108 + 8);
+                        }
+                    }
+                }
+            }
+            if (entities[i].state == 1 && !game.bossbattle)
+            {
+                music.playef(Sound_COIN);
+                entities[i].state = 0;
+            }
+            if (entities[i].state == 1 && game.bossbattle)
+            {
+                entities[i].state = 2;
+                entities[i].life -= entities[i].shotstrength;
+                entities[i].behave = 8;
+                music.playef(Sound_COOLHURT);
+
+                if (entities[i].life <= PRESS_HP * (7.0f / 8.0f) && entities[i].para == 0)
+                {
+                    music.playef(Sound_DESTROY);
+                    entities[i].para++;
+                    for (int x = 0; x < 5; x++)
+                    {
+                        map.remove_large_tile_at(entities[i].xp + x * 16, entities[i].yp + 7 * 16);
+                    }
+                }
+                if (entities[i].life <= PRESS_HP * (6.0f / 8.0f) && entities[i].para == 1)
+                {
+                    music.playef(Sound_DESTROY);
+                    entities[i].para++;
+                    for (int x = 0; x < 5; x++)
+                    {
+                        map.remove_large_tile_at(entities[i].xp + x * 16, entities[i].yp + 6 * 16);
+                    }
+                }
+                if (entities[i].life <= PRESS_HP * (5.0f / 8.0f) && entities[i].para == 2)
+                {
+                    music.playef(Sound_DESTROY);
+                    entities[i].para++;
+                    for (int x = 0; x < 5; x++)
+                    {
+                        map.remove_large_tile_at(entities[i].xp + x * 16, entities[i].yp + 5 * 16);
+                    }
+                }
+                if (entities[i].life <= PRESS_HP * (4.0f / 8.0f) && entities[i].para == 3)
+                {
+                    music.playef(Sound_DESTROY);
+                    entities[i].para++;
+                    for (int x = 0; x < 5; x++)
+                    {
+                        map.remove_large_tile_at(entities[i].xp + x * 16, entities[i].yp + 4 * 16);
+                    }
+                }
+                if (entities[i].life <= PRESS_HP * (3.0f / 8.0f) && entities[i].para == 4)
+                {
+                    music.playef(Sound_DESTROY);
+                    entities[i].para++;
+                    for (int x = 0; x < 5; x++)
+                    {
+                        map.remove_large_tile_at(entities[i].xp + x * 16, entities[i].yp + 3 * 16);
+                    }
+                }
+                if (entities[i].life <= PRESS_HP * (2.0f / 8.0f) && entities[i].para == 5)
+                {
+                    music.playef(Sound_DESTROY);
+                    entities[i].para++;
+                    for (int x = 0; x < 5; x++)
+                    {
+                        map.remove_large_tile_at(entities[i].xp + x * 16, entities[i].yp + 2 * 16);
+                    }
+                }
+                if (entities[i].life <= PRESS_HP * (1.0f / 8.0f) && entities[i].para == 6)
+                {
+                    music.playef(Sound_DESTROY);
+                    entities[i].para++;
+                    for (int x = 0; x < 5; x++)
+                    {
+                        map.remove_large_tile_at(entities[i].xp + x * 16, entities[i].yp + 1 * 16);
+                    }
+                }
+                if (entities[i].life <= PRESS_HP * (0.0f / 8.0f) && entities[i].para == 7)
+                {
+                    music.playef(Sound_DESTROY);
+                    entities[i].para++;
+                    for (int x = 0; x < 5; x++)
+                    {
+                        map.remove_large_tile_at(entities[i].xp + x * 16, entities[i].yp + 0 * 16);
+                    }
+                }
+
+                if (entities[i].life <= 0)
+                {
+                    entities[i].state = 3;
+                    entities[i].onshot = 0;
+                    entities[i].behave = 0;
+                    entities[i].life = 5;
+                    entities[i].state2 = 0;
+                    music.haltdasmusik();
+                    game.bossbattle = false;
+                    // Delete the rollings in the room
+                    for (size_t j = 0; j < entities.size(); j++)
+                    {
+                        if (entities[j].type == 109)
+                        {
+                            disableentity(j);
+                        }
+                    }
+
+                    disableblockat(128, 128);
+                    disableblockat(176 + 8, 128);
+                }
+            }
+            if (entities[i].state == 2)
+            {
+                entities[i].onshot = 1;
+                entities[i].behave--;
+                if (entities[i].behave <= 0)
+                {
+                    entities[i].behave = 0;
+                    entities[i].state = 0;
+                }
+            }
+
+            if (entities[i].state >= 3)
+            {
+                int x = entities[i].xp + fRandom() * (entities[i].w - 16);
+                int y = entities[i].yp + fRandom() * (entities[i].h - 16);
+                createentity(x, y, 116);
+            }
+
+            if (entities[i].state == 3)
+            {
+                entities[i].onshot = 0;
+                entities[i].behave--;
+                if (entities[i].behave <= 0)
+                {
+                    if (entities[i].life <= 0)
+                    {
+                        entities[i].state = 4;
+                        entities[i].onywall = 5;
+                        music.playef(Sound_DESTROY);
+                        entities[i].gravity = true;
+                    }
+                    else
+                    {
+                        entities[i].life--;
+                        entities[i].behave = 10;
+                        music.playef(Sound_DESTROY);
+                    }
+                }
+            }
+            if (entities[i].state == 5)
+            {
+                entities[i].state = 6;
+                music.playef(Sound_DESTROY);
+                map.settile(7, 14, 0);
+                map.settile(8, 14, 0);
+                map.settile(9, 14, 0);
+                map.settile(10, 14, 0);
+                map.settile(11, 14, 0);
+                map.settile(12, 14, 0);
+                map.settile(13, 14, 0);
+                entities[i].vy = -4;
+            }
+            if (entities[i].state == 6)
+            {
+                if (entities[i].yp > (map.room_height + 4) * 16)
+                {
+                    disableentity(i);
+                }
+            }
+            break;
+        }
+        case 116:
+            entities[i].life--;
+            if (entities[i].life < 0)
+            {
+                disableentity(i);
+            }
+            break;
         }
     }
     else
@@ -4391,14 +4893,14 @@ void entityclass::animateentities( int _i )
         case 0:
             if(entities[_i].dir==1)
             {
-                entities[_i].drawframe=entities[_i].tile;
+                entities[_i].drawframe=entities[_i].tile + (game.scary ? 264 : 0);
             }
             else
             {
-                entities[_i].drawframe=entities[_i].tile+3;
+                entities[_i].drawframe=entities[_i].tile+3 + (game.scary ? 264 : 0);
             }
 
-            if (map.jumpmode())
+            if (map.cavestorymode() || map.smbmode())
             {
                 entities[_i].walkingframe = 0;
 
@@ -4489,9 +4991,9 @@ void entityclass::animateentities( int _i )
 
             if (game.deathseq > -1)
             {
-                entities[_i].drawframe=13;
-                if (entities[_i].dir == 1) entities[_i].drawframe = 12;
-                if (game.gravitycontrol == 1) entities[_i].drawframe += 2;
+                entities[_i].drawframe= (game.scary ? 264 : 13);
+                if (entities[_i].dir == 1) entities[_i].drawframe = (game.scary ? 266 : 13);
+                if (game.gravitycontrol == 1) entities[_i].drawframe += (game.scary ? 6 : 2);
             }
             break;
         case 1:
@@ -4847,7 +5349,7 @@ void entityclass::animatehumanoidcollision(const int i)
         entity->collisiondrawframe = entity->tile + 3;
     }
 
-    if (map.jumpmode())
+    if (map.cavestorymode() || map.smbmode())
     {
         entity->collisionwalkingframe = 0;
 
@@ -5549,6 +6051,9 @@ bool entityclass::testwallsx( int t, int tx, int ty, const bool skipdirblocks )
             {
                 map.large_contents[tileindex] = 38;
                 music.playef(Sound_BLOCK_DESTROY);
+                int xp = game.lastcollidedwallx;
+                int yp = game.lastcollidedwally;
+                createentity(xp * 16, yp * 16, 116);
                 return false;
             }
         }
@@ -5603,9 +6108,26 @@ bool entityclass::testwallsy( int t, int tx, int ty )
 
     const bool invincible = map.invincibility && entities[t].ishumanoid();
 
+    if (dr == 106)
+    {
+        for (int i = 0; i < blocks.size(); i++)
+        {
+            if (blocks[i].type == SAFE && help.intersects(blocks[i].rect, temprect))
+            {
+                return false;
+            }
+        }
+    }
+
     //Ok, now we check walls
     if (checkwall(invincible, temprect, dx, dy, dr, skipblocks, false))
     {
+        if ((entities[t].type == 115))
+        {
+            entities[t].xp = entities[t].newxp;
+            entities[t].yp = entities[t].newyp;
+            return false;
+        }
         if (entities[t].type == 111 && entities[t].state2 == 3)
         {
             entities[t].vy = -entities[t].vy;
@@ -5620,6 +6142,9 @@ bool entityclass::testwallsy( int t, int tx, int ty )
             {
                 map.large_contents[tileindex] = 38;
                 music.playef(Sound_BLOCK_DESTROY);
+                int xp = game.lastcollidedwallx;
+                int yp = game.lastcollidedwally;
+                createentity(xp * 16, yp * 16, 116);
                 return false;
             }
         }
@@ -5660,12 +6185,12 @@ void entityclass::applyfriction( int t, float xrate, float yrate )
         return;
     }
 
-    if (game.currently_boosting)
+    if (game.currently_boosting && entities[t].rule == 0)
     {
         return;
     }
 
-    if (map.jumpmode())
+    if (map.cavestorymode())
     {
         if (entities[t].onground > 0)
         {
@@ -5688,7 +6213,10 @@ void entityclass::applyfriction( int t, float xrate, float yrate )
             if (entities[t].vx < -1.5859375 * 2) entities[t].vx = -1.5859375 * 2;
         }
 
-        if (entities[t].vy > 3.0 * 2) entities[t].vy = 3.0 * 2;
+        if ((entities[t].type != 115))
+        {
+            if (entities[t].vy > 3.0 * 2) entities[t].vy = 3.0 * 2;
+        }
 
         return;
     }
@@ -5717,7 +6245,7 @@ void entityclass::updateentitylogic( int t )
     entities[t].oldxp = entities[t].xp;
     entities[t].oldyp = entities[t].yp;
 
-    if (!map.jumpmode())
+    if (!map.cavestorymode())
     {
         entities[t].vx = entities[t].vx + entities[t].ax;
         entities[t].vy = entities[t].vy + entities[t].ay;
@@ -5730,11 +6258,18 @@ void entityclass::updateentitylogic( int t )
         {
             if(game.gravitycontrol==0)
             {
-                if (!map.jumpmode()) entities[t].ay = 3;
+                if (map.smbmode())
+                {
+                    entities[t].ay = 0.65;
+                }
+                else
+                {
+                    if (!map.cavestorymode()) entities[t].ay = 3;
+                }
             }
             else
             {
-                if (!map.jumpmode()) entities[t].ay = -3;
+                if (!map.cavestorymode()) entities[t].ay = -3;
             }
         }
         else if (entities[t].rule == 7)
@@ -5882,7 +6417,7 @@ void entityclass::entitycollisioncheck(void)
 {
     for (size_t i = 0; i < entities.size(); i++)
     {
-        if (entities[i].rule == 106) // If bullet
+        if (entities[i].rule == 106 && entities[i].state == 0) // If bullet, and not hit something
         {
             for (size_t j = 0; j < entities.size(); j++)
             {
@@ -5895,6 +6430,11 @@ void entityclass::entitycollisioncheck(void)
                 {
                     entities[j].state = entities[j].onshot;
                     entities[j].shotstrength = entities[i].shotstrength;
+                    entities[i].state = 1;
+                }
+                if (entities[j].type == 109 && entitycollide(i, j))
+                {
+                    music.playef(Sound_COIN);
                     entities[i].state = 1;
                 }
             }
@@ -6112,6 +6652,7 @@ void entityclass::collisioncheck(int i, int j, bool scm /*= false*/)
     case 110: // Person versus Mesa
     case 111: // Person versus Flying Brute
     case 112: // Person versus Bow Brute
+    case 114: // Person versus Sword Brute
     {
         if (entitycollide(i, j) && !map.invincibility && entities[j].state < 3 && game.respawnseq <= 0)
         {
@@ -6122,6 +6663,14 @@ void entityclass::collisioncheck(int i, int j, bool scm /*= false*/)
     case 113: // Person versus Arrow
     {
         if (entitycollide(i, j) && !map.invincibility && entities[j].state == 0 && game.respawnseq <= 0)
+        {
+            game.deathseq = 30;
+        }
+        break;
+    }
+    case 115: // Person versus Heavy Press
+    {
+        if (entitycollide(i, j) && !map.invincibility && entities[j].state > 3 && game.respawnseq <= 0)
         {
             game.deathseq = 30;
         }

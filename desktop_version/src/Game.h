@@ -184,6 +184,7 @@ enum SpecialModes
 {
     SpecialMode_NONE,
     SpecialMode_CAVE,
+    SpecialMode_SMB,
 };
 
 class Game
@@ -615,6 +616,13 @@ public:
     bool canboost;
     bool currently_boosting;
     bool started_boosting;
+    bool bossbattle;
+    bool scary;
+    bool showhelltime;
+    int hell_hours;
+    int hell_minutes;
+    int hell_seconds;
+    int hell_frames;
 
     int spur_charge;
 

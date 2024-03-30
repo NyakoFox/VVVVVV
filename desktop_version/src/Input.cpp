@@ -7,6 +7,7 @@
 #include "Editor.h"
 #include "Entity.h"
 #include "Enums.h"
+#include "Exit.h"
 #include "FileSystemUtils.h"
 #include "Game.h"
 #include "GlitchrunnerMode.h"
@@ -427,48 +428,54 @@ static void menuactionpress(void)
         {
 #if !defined(MAKEANDPLAY)
         case 0:
+        {
             //Play
-            if (!game.save_exists() && !game.anything_unlocked())
-            {
-                //No saves exist, just start a new game
-                music.playef(Sound_VIRIDIAN);
-                startmode(Start_MAINGAME);
+            music.playef(Sound_VIRIDIAN);
+
+            game.levelpage = 0;
+            game.playcustomlevel = 0;
+            game.menustart = true;
+
+            std::string playtestname = "levels/aprilfools.vvvvvv";
+
+            LevelMetaData meta;
+            CliPlaytestArgs pt_args;
+            if (cl.getLevelMetaDataAndPlaytestArgs(playtestname, meta, &pt_args)) {
+                cl.ListOfMetaData.clear();
+                cl.ListOfMetaData.push_back(meta);
             }
             else
             {
-                //Bring you to the normal playmenu
-                music.playef(Sound_VIRIDIAN);
-                game.createmenu(Menu::play);
-                map.nexttowercolour();
+                vlog_error("Level not found");
+                VVV_exit(1);
             }
+
+            game.loadcustomlevelstats();
+            game.customleveltitle = cl.ListOfMetaData[game.playcustomlevel].title;
+            game.customlevelfilename = cl.ListOfMetaData[game.playcustomlevel].filename;
+            startmode(Start_CUSTOM);
             break;
+        }
 #endif
         case 1:
-            //Bring you to the normal playmenu
-            music.playef(Sound_VIRIDIAN);
-            game.editor_disabled = !BUTTONGLYPHS_keyboard_is_available();
-            game.createmenu(Menu::playerworlds);
-            map.nexttowercolour();
-            break;
-        case 2:
             //Options
             music.playef(Sound_VIRIDIAN);
             game.createmenu(Menu::options);
             map.nexttowercolour();
             break;
-        case 3:
+        case 2:
             //Translator
             music.playef(Sound_VIRIDIAN);
             game.createmenu(Menu::translator_main);
             map.nexttowercolour();
             break;
-        case 4:
+        case 3:
             //Credits
             music.playef(Sound_VIRIDIAN);
             game.createmenu(Menu::credits);
             map.nexttowercolour();
             break;
-        case 5:
+        case 4:
             music.playef(Sound_VIRIDIAN);
             game.createmenu(Menu::youwannaquit);
             map.nexttowercolour();
@@ -812,9 +819,7 @@ static void menuactionpress(void)
             break;
         case 4:
             // toggle in game timer
-            game.showingametimer = !game.showingametimer;
-            game.savestatsandsettings_menu();
-            music.playef(Sound_VIRIDIAN);
+            music.playef(Sound_CRY);
             break;
         case 5:
             // english sprites
@@ -2171,7 +2176,7 @@ static void menuactionpress(void)
     case Menu::gameover2:
         //back
         music.playef(Sound_VIRIDIAN);
-        music.play(Music_PRESENTINGVVVVVV);
+        music.play(Music_PIPEDREAM);
         game.returntomenu(Menu::playmodes);
         map.nexttowercolour();
         break;
@@ -2241,7 +2246,7 @@ static void menuactionpress(void)
         case 0:
             //back
             music.playef(Sound_VIRIDIAN);
-            music.play(Music_PRESENTINGVVVVVV);
+            music.play(Music_PIPEDREAM);
             game.returntomenu(Menu::timetrials);
             map.nexttowercolour();
 
@@ -2263,7 +2268,7 @@ static void menuactionpress(void)
         break;
     case Menu::gamecompletecontinue:
     case Menu::nodeathmodecomplete2:
-        music.play(Music_PRESENTINGVVVVVV);
+        music.play(Music_PIPEDREAM);
         music.playef(Sound_VIRIDIAN);
         game.returnmenu();
         map.nexttowercolour();
@@ -2526,7 +2531,7 @@ void titleinput(void)
             if (!game.menustart)
             {
                 game.menustart = true;
-                music.play(Music_PRESENTINGVVVVVV);
+                music.play(Music_PIPEDREAM);
                 music.playef(Sound_GAMESAVED);
                 game.screenshake = 10;
                 game.flashlight = 5;
@@ -2574,7 +2579,7 @@ void gameinput(void)
         {
             game.press_right = true;
         }
-        if (!map.jumpmode())
+        if (!map.cavestorymode())
         {
             if (key.isDown(KEYBOARD_z) || key.isDown(KEYBOARD_SPACE) || key.isDown(KEYBOARD_v)
                 || key.isDown(KEYBOARD_UP) || key.isDown(KEYBOARD_DOWN) || key.isDown(KEYBOARD_w) || key.isDown(KEYBOARD_s) || key.isDown(game.controllerButton_flip))
@@ -2595,7 +2600,7 @@ void gameinput(void)
         holding_down = key.isDown(KEYBOARD_DOWN) || key.isDown(KEYBOARD_s) || key.controllerWantsDown();
         holding_shoot = key.isDown(SDLK_x) || key.isDown(SDL_CONTROLLER_BUTTON_X);
 
-        if (key.isDown(KEYBOARD_e) || key.isDown(game.controllerButton_interact) && !map.jumpmode())
+        if (key.isDown(KEYBOARD_e) || key.isDown(game.controllerButton_interact) && !map.cavestorymode())
         {
             game.press_interact = true;
         }
@@ -2808,7 +2813,7 @@ void gameinput(void)
                     obj.entities[ie].ax = -3;
                     obj.entities[ie].dir = 0;
                     game.walksoundtimer++;
-                    if (map.jumpmode() && !game.currently_boosting)
+                    if (map.cavestorymode() && !game.currently_boosting)
                     {
                         if (obj.entities[ie].onground > 0)
                         {
@@ -2826,7 +2831,7 @@ void gameinput(void)
                     game.walksoundtimer++;
                     obj.entities[ie].ax = 3;
                     obj.entities[ie].dir = 1;
-                    if (map.jumpmode() && !game.currently_boosting)
+                    if (map.cavestorymode() && !game.currently_boosting)
                     {
                         if (obj.entities[ie].onground > 0)
                         {
@@ -2843,7 +2848,7 @@ void gameinput(void)
                     game.walksoundtimer = 0;
                 }
 
-                if (game.walksoundtimer % 6 == 0 && obj.entities[ie].onground > 0 && map.jumpmode() && holding_dir)
+                if (game.walksoundtimer % 6 == 0 && obj.entities[ie].onground > 0 && map.cavestorymode() && holding_dir)
                 {
                     music.playef(Sound_QUOTE_WALK);
                 }
@@ -2859,7 +2864,7 @@ void gameinput(void)
         }
         else
         {
-            if (game.tapleft <= 4 && game.tapleft > 0 && !map.jumpmode())
+            if (game.tapleft <= 4 && game.tapleft > 0 && !map.cavestorymode())
             {
                 for (size_t ie = 0; ie < obj.entities.size(); ++ie)
                 {
@@ -2880,7 +2885,7 @@ void gameinput(void)
         }
         else
         {
-            if (game.tapright <= 4 && game.tapright > 0 && !map.jumpmode())
+            if (game.tapright <= 4 && game.tapright > 0 && !map.cavestorymode())
             {
                 for (size_t ie = 0; ie < obj.entities.size(); ++ie)
                 {
@@ -2919,7 +2924,7 @@ void gameinput(void)
             }
         }
 
-        if (holding_shoot && !game.completestop)
+        if (holding_shoot && !game.completestop && map.cavestorymode())
         {
             game.spur_charge++;
             if (game.spur_charge % 2 == 0)
@@ -2942,7 +2947,7 @@ void gameinput(void)
                 music.playef(Sound_SPUR_CHARGED);
             }
         }
-        else if (!game.completestop)
+        else if (!game.completestop && map.cavestorymode())
         {
             game.shoot_held = false;
 
@@ -2994,7 +2999,7 @@ void gameinput(void)
             game.spur_charge = 0;
         }
 
-        if (map.jumpmode())
+        if (map.cavestorymode())
         {
             for (size_t j = 0; j < player_entities.size(); j++)
             {
@@ -3033,7 +3038,7 @@ void gameinput(void)
         }
 
         game.currently_boosting = false;
-        if (map.jumpmode() && (game.boosting > 0) && game.jumpheld && game.canboost && !game.completestop)
+        if (map.cavestorymode() && (game.boosting > 0) && game.jumpheld && game.canboost && !game.completestop)
         {
             game.boosting--;
 
@@ -3103,7 +3108,7 @@ void gameinput(void)
             game.jumppressed--;
             if (obj.entities[ie].onground > 0 && game.gravitycontrol == 0)
             {
-                if (!map.jumpmode())
+                if (!map.cavestorymode() && !map.smbmode())
                 {
                     game.gravitycontrol = 1;
                 }
@@ -3113,9 +3118,14 @@ void gameinput(void)
                     const size_t e = player_entities[j];
                     if (obj.entities[e].onground > 0 || obj.entities[e].onroof > 0)
                     {
-                        if (map.jumpmode())
+                        if (map.cavestorymode())
                         {
                             obj.entities[e].vy = -2.5 * 2;
+                        }
+                        else if (map.smbmode())
+                        {
+                            obj.entities[e].vy = -10;
+                            obj.entities[e].ay = -8;
                         }
                         else
                         {
@@ -3124,7 +3134,14 @@ void gameinput(void)
                         }
                     }
                 }
-                music.playef(map.jumpmode() ? Sound_QUOTE_JUMP : Sound_FLIP);
+                if (map.cavestorymode())
+                {
+                    music.playef(Sound_QUOTE_JUMP);
+                }
+                else if (!game.scary)
+                {
+                    music.playef(Sound_FLIP);
+                }
                 game.jumppressed = 0;
                 game.totalflips++;
             }
@@ -3141,7 +3158,10 @@ void gameinput(void)
                         obj.entities[e].ay = 3;
                     }
                 }
-                music.playef(Sound_UNFLIP);
+                if (!game.scary)
+                {
+                    music.playef(Sound_UNFLIP);
+                }
                 game.jumppressed = 0;
                 game.totalflips++;
             }
@@ -3297,7 +3317,7 @@ void mapinput(void)
         else
         {
             game.quittomenu();
-            music.play(Music_PRESENTINGVVVVVV); // should be after game.quittomenu()
+            music.play(Music_PIPEDREAM); // should be after game.quittomenu()
             game.fadetomenu = false;
         }
     }
@@ -3477,7 +3497,7 @@ static void mapmenuactionpress(const bool version2_2)
     }
         break;
     case 3:
-    if (!game.gamesaved && !game.gamesavefailed && !game.inspecial())
+    if (!game.gamesaved && !game.gamesavefailed && !game.inspecial() && false)
     {
         game.flashlight = 5;
         game.screenshake = 10;

@@ -648,6 +648,7 @@ void mapclass::remove_large_tile_at(int x, int y)
     if (x < 0 || x >= room_width || y < 0 || y >= room_height) return;
 
     large_contents[x + y * room_width] = 0;
+    obj.createentity(x * 16, y * 16, 116);
 }
 
 bool mapclass::collide(int x, int y, const bool invincible)
@@ -659,49 +660,88 @@ bool mapclass::collide(int x, int y, const bool invincible)
 
         if (x < 0 || x >= room_width || y < 0 || y >= room_height) return false;
 
-        switch (large_contents[x + y * room_width])
+        if (smbmode())
         {
-        case 1:
-        //case 2: // SLOPES
-        //case 3: // SLOPES
-        //case 4: // SLOPES
-        //case 5: // SLOPES
-        case 16:
-        case 17:
-        case 18:
-        case 19:
-        case 20:
-        case 21:
-        case 32:
-        case 33:
-        case 35:
-        case 36:
-        //case 50: // SLOPES
-        //case 51: // SLOPES
-        //case 52: // SLOPES
-        //case 53: // SLOPES
-        case 56: // Rolling spawner
-        case 61: // Breakable block
-        case 65:
-        case 70:
-        case 71:
-        case 72:
-        case 73:
-        case 76:
-        case 77:
-        case 81:
-        case 86:
-        case 88:
-        case 89:
-        case 92:
-        case 93:
-        case 110:
-        case 111:
-            game.lastcollidedwallx = x;
-            game.lastcollidedwally = y;
-            return true;
-        default:
-            return false;
+            if (x <= 0 || x >= room_width - 1)
+            {
+                return true;
+            }
+
+            switch (large_contents[x + y * room_width])
+            {
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+            case 7:
+            case 8:
+            case 11:
+            case 12:
+            case 13:
+            case 16:
+            case 17:
+            case 18:
+            case 19:
+            case 20:
+            case 32:
+            case 33:
+            case 34:
+            case 35:
+            case 36:
+            case 41:
+            case 42:
+                return true;
+            default:
+                return false;
+            }
+        }
+
+        if (cavestorymode())
+        {
+            switch (large_contents[x + y * room_width])
+            {
+            case 1:
+            case 2: // SLOPES
+                //case 3: // SLOPES
+                //case 4: // SLOPES
+            case 5: // SLOPES
+            case 16:
+            case 17:
+            case 18:
+            case 19:
+            case 20:
+            case 21:
+            case 32:
+            case 33:
+            case 35:
+            case 36:
+            case 50: // SLOPES
+                //case 51: // SLOPES
+                //case 52: // SLOPES
+            case 53: // SLOPES
+            case 56: // Rolling spawner
+            case 61: // Breakable block
+            case 65:
+            case 70:
+            case 71:
+            case 72:
+            case 73:
+            case 76:
+            case 77:
+            case 81:
+            case 86:
+            case 88:
+            case 89:
+            case 92:
+            case 93:
+            case 110:
+            case 111:
+                game.lastcollidedwallx = x;
+                game.lastcollidedwally = y;
+                return true;
+            default:
+                return false;
+            }
         }
 
         return false;
@@ -762,6 +802,8 @@ void mapclass::settile(int xp, int yp, int t)
         if (xp >= 0 && xp < room_width && yp >= 0 && yp < room_height)
         {
             large_contents[xp + yp * room_width] = t;
+            // spawn dust
+            obj.createentity(xp * 16, yp * 16, 116);
         }
         return;
     }
@@ -849,8 +891,18 @@ void mapclass::resetplayer(void)
 void mapclass::resetplayer(const bool player_died)
 {
     bool was_in_tower = towermode;
-    if (game.roomx != game.saverx || game.roomy != game.savery)
+    if ((game.roomx != game.saverx || game.roomy != game.savery) || game.bossbattle || smbmode())
     {
+        if (game.bossbattle)
+        {
+            music.haltdasmusik();
+            game.bossbattle = false;
+        }
+        if (smbmode())
+        {
+            music.play(3);
+            xpos = 0;
+        }
         gotoroom(game.saverx, game.savery);
     }
 
@@ -1376,9 +1428,14 @@ static void copy_short_to_int(int* dest, const short* src, const size_t size)
     }
 }
 
-bool mapclass::jumpmode()
+bool mapclass::cavestorymode()
 {
     return game.specialmode == SpecialMode_CAVE;
+}
+
+bool mapclass::smbmode()
+{
+    return game.specialmode == SpecialMode_SMB;
 }
 
 void mapclass::setplayer()
@@ -1390,6 +1447,13 @@ void mapclass::setplayer()
         {
         case SpecialMode_CAVE:
             obj.entities[i].tile = 192;
+            obj.entities[i].w = 14;
+            obj.entities[i].h = 15;
+            obj.entities[i].cx = 5;
+            obj.entities[i].cy = 8;
+            break;
+        case SpecialMode_SMB:
+            obj.entities[i].tile = 0;
             obj.entities[i].w = 14;
             obj.entities[i].h = 15;
             obj.entities[i].cx = 5;
@@ -1412,6 +1476,34 @@ void mapclass::setplayer()
 
 void mapclass::load_large_map(int rx, int ry)
 {
+    if (rx == 100 && ry == 101)
+    {
+        static const short room_contents[] = {
+            0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,51,52,53,0,0,0,0,0,0,0,0,0,0,0,0,0,0,51,52,52,53,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,51,52,53,0,0,0,0,0,0,0,0,0,0,0,0,0,0,51,52,52,53,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,51,52,53,0,0,0,0,0,0,0,0,0,0,0,0,0,0,51,52,52,53,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,51,52,53,0,0,0,0,0,0,0,0,0,0,0,0,0,0,51,52,52,53,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,51,52,53,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,51,52,53,0,0,0,0,0,0,0,0,67,68,69,0,0,0,0,0,51,52,52,52,53,0,0,0,0,67,68,68,69,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,51,52,53,0,0,0,0,0,0,0,0,67,68,69,0,0,0,0,0,51,52,52,52,53,0,0,0,0,67,68,68,69,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,51,52,53,0,0,0,0,0,0,0,0,67,68,69,0,0,0,0,0,51,52,52,52,53,0,0,0,0,67,68,68,69,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,51,52,53,0,0,0,0,0,0,0,0,67,68,69,0,0,0,0,0,51,52,52,52,53,0,0,0,0,67,68,68,69,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,51,52,53,0,0,0,0,0,0,0,0,67,68,69,0,0,0,0,0,51,52,52,52,53,0,0,0,0,0,0,0,0,67,68,69,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,67,68,68,68,69,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,67,68,69,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,67,68,68,68,69,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,67,68,69,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,67,68,68,68,69,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,67,68,69,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,67,68,68,68,69,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,67,68,69,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,67,68,68,68,69,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,2,0,0,0,2,2,2,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,0,0,0,0,0,0,0,0,0,0,0,2,2,2,0,0,0,0,2,3,3,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,4,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,4,4,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,4,4,4,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,11,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,4,4,4,4,0,0,0,0,0,0,0,0,5,0,0,0,0,21,21,21,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,2,7,2,3,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,17,0,0,0,0,0,0,0,0,0,12,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,7,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,0,0,0,0,0,2,41,0,0,0,0,3,0,0,3,0,0,3,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,2,2,0,0,0,0,0,0,4,0,0,4,0,0,0,0,0,0,0,0,0,0,4,4,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,2,2,3,2,0,0,0,0,0,0,0,0,0,0,0,0,4,4,4,4,4,4,0,0,0,0,0,0,0,0,5,0,0,0,0,38,37,39,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,17,0,0,0,0,0,0,32,33,0,0,9,0,0,0,0,0,0,32,33,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,4,0,0,4,4,0,0,0,0,9,0,0,0,4,4,4,0,0,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,4,4,4,4,4,4,0,0,0,0,9,0,0,0,5,0,0,0,21,22,22,22,21,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,24,25,26,0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0,0,0,0,0,0,0,0,0,16,17,0,0,0,0,0,0,0,0,32,33,0,0,0,0,0,0,32,33,0,24,25,26,0,0,0,0,0,32,33,0,0,0,0,0,0,9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,24,25,26,0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,4,4,0,0,4,4,4,0,0,24,25,26,0,4,4,4,4,0,0,4,4,4,0,0,0,9,0,16,17,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,17,0,4,4,4,4,4,4,4,4,0,0,0,24,25,26,0,0,5,0,0,0,37,37,23,37,37,0,0,9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,24,25,10,25,26,0,0,0,0,0,0,48,49,49,49,50,24,25,26,0,0,0,0,48,49,50,0,0,32,33,0,0,0,0,0,0,0,0,32,33,0,48,49,49,50,0,32,33,24,25,10,25,26,0,0,0,0,32,33,48,49,49,49,50,24,25,26,0,0,0,0,48,49,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,48,49,49,50,0,0,0,24,25,10,25,26,0,0,0,0,0,0,48,49,49,49,50,24,25,26,0,0,0,0,48,49,50,0,0,0,0,0,0,0,0,0,0,0,0,4,4,4,4,49,49,4,4,4,4,24,25,10,25,4,4,4,4,4,0,0,4,4,4,4,50,24,25,26,32,33,0,0,48,49,50,0,0,0,0,0,0,0,0,0,32,33,4,4,4,4,4,4,4,4,4,0,0,24,25,10,25,26,0,4,0,0,0,37,37,40,42,37,50,24,25,26,0,0,0,0,48,49,50,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+        };
+
+        room_width = 224;
+        room_height = 15;
+
+        large_contents.assign(room_contents, room_contents + SDL_arraysize(room_contents));
+
+        setroomname("World 1-1");
+
+        obj.createblock(TRIGGER, 288, 0, 16, 208, 0, "custom_smbintro_load");
+        obj.createblock(TRIGGER, 1104, 240, 32, 16, 1, "custom_kill_load");
+        obj.createblock(TRIGGER, 1376, 240, 48, 16, 2, "custom_kill_load");
+        obj.createblock(TRIGGER, 2448, 240, 32, 16, 3, "custom_kill_load");
+        obj.createblock(TRIGGER, 3168, 48, 16, 48, 4, "custom_flag_load");
+
+        obj.customactivitytext = "Press {button} to enter pipe";
+        obj.customscript = "enter_pipe_load";
+        obj.createblock(ACTIVITY, 912, 128, 32, 16, 35);
+
+        obj.customactivitytext = "Press {button} to enter castle";
+        obj.customscript = "enter_castle_load";
+        obj.createblock(ACTIVITY, 3264, 176, 16, 32, 35);
+    }
+
     if (rx == 101 && ry == 100)
     {
         static const short room_contents[] = {
@@ -1516,6 +1608,8 @@ void mapclass::load_large_map(int rx, int ry)
 
         obj.createentity(0, 0, 105, obj.flags[4] ? 2 : 1);
 
+        obj.createentity(1424 + 8, 224, 10, 1, 6972); // Checkpoint
+
         obj.createblock(TRIGGER, 1520, 32, 16, 144, 0, "custom_lore3");
         obj.createblock(TRIGGER, 2400, 240, 32, 16, 1, "custom_lore4");
         obj.createblock(TRIGGER, 2400, 256, 32, 16, 2, "custom_door2_load");
@@ -1553,6 +1647,10 @@ void mapclass::load_large_map(int rx, int ry)
         obj.createblock(TRIGGER, 160, 144, 16, 80, 20, "custom_heavypress_load");
 
         obj.createblock(TRIGGER, 1568, 192, 16, 32, 32, "custom_lore5");
+
+        obj.createblock(TRIGGER, 224, 144, 16, 80, 33, "custom_setcheckpoint_load");
+
+        obj.createblock(TRIGGER, 128, 256, 80, 16, 34, "custom_endhell_load");
 
         // Checkpoint
         obj.createentity(2456, 112, 10, 1, 6970); // Checkpoint
@@ -1612,6 +1710,18 @@ void mapclass::load_large_map(int rx, int ry)
         obj.createentity(528, 96, 112, 1);
         obj.createentity(496, 96, 112, 1);
 
+        // Sword brutes
+        obj.createentity(2384, 208, 114, 1);
+        obj.createentity(2272, 208, 114, 1);
+        obj.createentity(2208, 192, 114, 1);
+        obj.createentity(2096, 192, 114, 1);
+        obj.createentity(2080, 208, 114, 1);
+        obj.createentity(2016, 224, 114, 1);
+        obj.createentity(1984, 208, 114, 1);
+        obj.createentity(1952, 208, 114, 1);
+        obj.createentity(1744, 80, 114, 1);
+        obj.createentity(1728, 80, 114, 1);
+
         // Flying brutes (NOT spawners)
         obj.createentity(512, 160, 111, 0);
         obj.createentity(528, 144, 111, 0);
@@ -1622,41 +1732,47 @@ void mapclass::load_large_map(int rx, int ry)
 
         // Trinkle
         obj.createentity(512, 16, 9, 0);
+
+        // Heavy Press
+        obj.createentity(128, 16 + 4, 115);
     }
 
-    for (size_t i = 0; i < large_contents.size(); i++)
+    if (cavestorymode())
     {
-        int x = (i % room_width) * 16;
-        int y = (i / room_width) * 16;
-        int tile = large_contents[i];
-
-        switch (tile)
+        for (size_t i = 0; i < large_contents.size(); i++)
         {
-        case 61:
-            // BREAKABLE BLOCK
-            break;
-        case 68:
-            // SPIKE - LEFT
-            obj.createblock(DAMAGE, x + 8, y, 8, 16);
-            break;
-        case 69:
-            // SPIKE - UP
-            obj.createblock(DAMAGE, x, y + 8, 16, 8);
-            break;
-        case 84:
-            // SPIKE - RIGHT
-            obj.createblock(DAMAGE, x, y, 8, 16);
-            break;
-        case 85:
-            // SPIKE - DOWN
-            obj.createblock(DAMAGE, x, y, 16, 8);
-            break;
-        case 65:
-            // DELEET - TOP BLOCK
-            obj.createentity(x -4, y + 4, 107);
-            break;
-        default:
-            break;
+            int x = (i % room_width) * 16;
+            int y = (i / room_width) * 16;
+            int tile = large_contents[i];
+
+            switch (tile)
+            {
+            case 61:
+                // BREAKABLE BLOCK
+                break;
+            case 68:
+                // SPIKE - LEFT
+                obj.createblock(DAMAGE, x + 8, y, 8, 16);
+                break;
+            case 69:
+                // SPIKE - UP
+                obj.createblock(DAMAGE, x, y + 8, 16, 8);
+                break;
+            case 84:
+                // SPIKE - RIGHT
+                obj.createblock(DAMAGE, x, y, 8, 16);
+                break;
+            case 85:
+                // SPIKE - DOWN
+                obj.createblock(DAMAGE, x, y, 16, 8);
+                break;
+            case 65:
+                // DELEET - TOP BLOCK
+                obj.createentity(x - 4, y + 4, 107);
+                break;
+            default:
+                break;
+            }
         }
     }
 }
@@ -2098,11 +2214,6 @@ void mapclass::loadlevel(int rx, int ry)
         {
             if (!obj.flags[3])
             {
-                game.showingametimer = true;
-                game.hours = 0;
-                game.minutes = 0;
-                game.seconds = 0;
-                game.frames = 0;
                 obj.flags[3] = true;
             }
             largermode = true;
@@ -2120,6 +2231,19 @@ void mapclass::loadlevel(int rx, int ry)
                 large_contents[i] = 0;
             }*/
             return;
+        }
+
+        if (rx == 100 && ry == 101)
+        {
+            roomtexton = false;
+            roomtext.clear();
+
+            largermode = true;
+            game.specialmode = SpecialMode_SMB;
+
+            load_large_map(rx, ry);
+
+            setplayer();
         }
 
         const RoomProperty* const room = cl.getroomprop(rx - 100, ry - 100);

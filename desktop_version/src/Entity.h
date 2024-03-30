@@ -10,6 +10,8 @@
 #include "BlockV.h"
 #include "Game.h"
 
+#define PRESS_HP (120 * 4)
+
 enum
 {
     BLOCK = 0,

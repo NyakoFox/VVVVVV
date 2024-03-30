@@ -718,6 +718,10 @@ void scriptclass::run(void)
                 {
                     textbox_image = TEXTIMAGE_GAMECOMPLETE;
                 }
+                else if (words[1] == "swellow")
+                {
+                    textbox_image = TEXTIMAGE_SWELLOW;
+                }
                 else
                 {
                     textbox_image = TEXTIMAGE_NONE;
@@ -2535,6 +2539,60 @@ void scriptclass::run(void)
                 map.settile(x, y, t);
                 graphics.foregrounddrawn = false;
             }
+            else if (words[0] == "startheavypress")
+            {
+                game.bossbattle = true;
+            }
+            else if (words[0] == "killplayer")
+            {
+                game.deathseq = 30;
+            }
+            else if (words[0] == "scary")
+            {
+                game.scary = true;
+                graphics.foregrounddrawn = false;
+                graphics.backgrounddrawn = false;
+
+                int i = obj.getplayer();
+                if (INBOUNDS_VEC(i, obj.entities))
+                {
+                    obj.entities[i].tile = 0;
+                }
+            }
+            else if (words[0] == "unscary")
+            {
+                game.scary = false;
+                graphics.foregrounddrawn = false;
+                graphics.backgrounddrawn = false;
+            }
+            else if (words[0] == "activatetimer")
+            {
+                game.showingametimer = true;
+                game.hours = 0;
+                game.minutes = 0;
+                game.seconds = 0;
+                game.frames = 0;
+            }
+            else if (words[0] == "stoptimer")
+            {
+                game.showingametimer = false;
+                game.hell_hours = game.hours;
+                game.hell_minutes = game.minutes;
+                game.hell_seconds = game.seconds;
+                game.hell_frames = game.frames;
+            }
+            else if (words[0] == "setplayer")
+            {
+                map.setplayer();
+            }
+            else if (words[0] == "normalmode")
+            {
+                game.specialmode = SpecialMode_NONE;
+            }
+            else if (words[0] == "showhelltime")
+            {
+                game.showhelltime = true;
+            }
 
             position++;
         }
@@ -2566,7 +2624,7 @@ static void gotoerrorloadinglevel(void)
     game.quittomenu();
     game.createmenu(Menu::errorloadinglevel);
     music.currentsong = -1; /* otherwise music.play won't work */
-    music.play(Music_PRESENTINGVVVVVV);
+    music.play(Music_PIPEDREAM);
 }
 
 #define DECLARE_MODE_FUNC(funcname, modename) \
@@ -3228,6 +3286,22 @@ void scriptclass::hardreset(void)
     game.disabletemporaryaudiopause = true;
 
     game.ingame_titlemode = false;
+
+    SpecialModes specialmode;
+    game.walksoundtimer = 0;
+    game.boosting = 0;
+    game.canboost = false;
+    game.currently_boosting = false;
+    game.started_boosting = false;
+    game.bossbattle = false;
+    game.scary = false;
+    game.showhelltime = false;
+    game.hell_hours = 0;
+    game.hell_minutes = 0;
+    game.hell_seconds = 0;
+    game.hell_frames = 0;
+
+    game.spur_charge = 0;
 
     //dwgraphicsclass
     graphics.backgrounddrawn = false;

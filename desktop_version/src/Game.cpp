@@ -384,6 +384,9 @@ void Game::init(void)
     canboost = true;
     currently_boosting = false;
     started_boosting = false;
+    bossbattle = false;
+    scary = false;
+    showhelltime = false;
 
     shoot_held = false;
 
@@ -1895,7 +1898,7 @@ void Game::updatestate(void)
             break;
         case 81:
             quittomenu();
-            music.play(Music_PRESENTINGVVVVVV); //should be after quittomenu()
+            music.play(Music_PIPEDREAM); //should be after quittomenu()
             setstate(0);
             break;
 
@@ -2510,7 +2513,7 @@ void Game::updatestate(void)
             }
 
             quittomenu();
-            music.play(Music_PRESENTINGVVVVVV); //should be after quittomenu()
+            music.play(Music_PIPEDREAM); //should be after quittomenu()
             setstate(0);
             break;
 
@@ -3165,7 +3168,7 @@ void Game::updatestate(void)
             break;
         case 3101:
             quittomenu();
-            music.play(Music_PRESENTINGVVVVVV); //should be after quittomenu();
+            music.play(Music_PIPEDREAM); //should be after quittomenu();
             setstate(0);
             break;
 
@@ -4834,11 +4837,6 @@ void Game::deserializesettings(tinyxml2::XMLElement* dataNode, struct ScreenSett
             GlitchrunnerMode_set(GlitchrunnerMode_string_to_enum(pText));
         }
 
-        if (SDL_strcmp(pKey, "showingametimer") == 0)
-        {
-            showingametimer = help.Int(pText);
-        }
-
         if (SDL_strcmp(pKey, "vsync") == 0)
         {
             screen_settings->useVsync = help.Int(pText);
@@ -5123,8 +5121,6 @@ void Game::serializesettings(tinyxml2::XMLElement* dataNode, const struct Screen
         GlitchrunnerMode_enum_to_string(GlitchrunnerMode_get())
     );
 
-    xml::update_tag(dataNode, "showingametimer", (int) showingametimer);
-
     xml::update_tag(dataNode, "vsync", (int) screen_settings->useVsync);
 
     xml::update_tag(dataNode, "musicvolume", music.user_music_volume);
@@ -5342,6 +5338,10 @@ void Game::deathsequence(void)
     }
     if (deathseq == 30)
     {
+        if (map.smbmode())
+        {
+            music.haltdasmusik();
+        }
         if (nodeathmode)
         {
             music.fadeout();
@@ -6421,6 +6421,7 @@ void Game::gameclock(void)
     {
         return;
     }
+    if (script.running) return;
 
     frames++;
     if (frames >= 30)
@@ -6489,7 +6490,7 @@ void Game::returnmenu(void)
     || currentmenuname == Menu::gameover2
     || currentmenuname == Menu::nodeathmodecomplete2)
     {
-        music.play(Music_PRESENTINGVVVVVV);
+        music.play(Music_PIPEDREAM);
     }
     enum Menu::MenuName camefrom = currentmenuname;
 
@@ -6580,7 +6581,6 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
 #if !defined(MAKEANDPLAY)
         option(loc::gettext("play"));
 #endif
-        option(loc::gettext("levels"));
         option(loc::gettext("options"));
         if (loc::show_translator_menu)
         {

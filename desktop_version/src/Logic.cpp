@@ -28,7 +28,7 @@ void titlelogic(void)
         {
             if (game.menudest == Menu::mainmenu)
             {
-                music.play(Music_PRESENTINGVVVVVV);
+                music.play(Music_PIPEDREAM);
             }
             else if (game.menudest == Menu::gameover2)
             {
@@ -164,7 +164,7 @@ void gamelogic(void)
             {
                 if (obj.entities[i].onground <= 0)
                 {
-                    if (obj.entities[i].rule == 0 && map.jumpmode())
+                    if (obj.entities[i].rule == 0 && map.cavestorymode())
                     {
                         music.playef(Sound_HIT_GROUND);
                     }
@@ -511,6 +511,11 @@ void gamelogic(void)
                 game.gravitycontrol = game.savegc;
                 graphics.textboxremove();
                 map.resetplayer(true);
+                if (game.bossbattle)
+                {
+                    // Set music to none
+                    music.haltdasmusik();
+                }
             }
         }
     }
@@ -1302,6 +1307,14 @@ void gamelogic(void)
             int player = obj.getplayer();
             int target_x = obj.entities[player].xp - 160;
             int target_y = obj.entities[player].yp - 120;
+
+            if (map.smbmode())
+            {
+                if (target_x < map.xpos)
+                {
+                    target_x = map.xpos;
+                }
+            }
 
             map.xpos = lerp(map.xpos, target_x, 35);
             map.ypos = lerp(map.ypos, target_y, 35);

@@ -157,6 +157,8 @@ public:
 
     void drawimage(int t, int xp, int yp, bool cent=false);
 
+    void drawswellow(void);
+
     void drawimagecol(int t, int xp, int yp, SDL_Color ct, bool cent= false);
 
     void draw_texture(SDL_Texture* image, int x, int y);
@@ -299,6 +301,7 @@ public:
     void drawtile(int x, int y, int t);
 
     void drawtilehell(int x, int y, int t);
+    void drawtilesmb(int x, int y, int t);
 
     void draw8x8effect(int x, int y, int t);
 
