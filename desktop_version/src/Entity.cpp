@@ -2318,7 +2318,7 @@ void entityclass::createentity(int xp, int yp, int t, int meta1, int meta2, int 
               thin = 16 - 8;
               coordoff -= 4 + 4;
               off = 4;
-              entity.shotstrength = 2;
+              entity.shotstrength = 3;
               break;
           }
 

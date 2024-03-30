@@ -10,7 +10,7 @@
 #include "BlockV.h"
 #include "Game.h"
 
-#define PRESS_HP (120 * 4)
+#define PRESS_HP (120 * 3.4)
 
 enum
 {

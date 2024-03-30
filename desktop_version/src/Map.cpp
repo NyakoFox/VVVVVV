@@ -15,6 +15,7 @@
 #include "Script.h"
 #include "Unused.h"
 #include "UtilityClass.h"
+#include "VFormat.h"
 
 mapclass::mapclass(void)
 {
@@ -1474,6 +1475,23 @@ void mapclass::setplayer()
     }
 }
 
+static void shoot_textbox(textboxclass* THIS)
+{
+    THIS->lines.clear();
+
+    char buffer[SCREEN_WIDTH_CHARS * 3 + 1];
+    vformat_buf(
+        buffer, sizeof(buffer),
+        loc::gettext("Press {button} to shoot"),
+        "button:but",
+        vformat_button(ActionSet_InGame, Action_InGame_Interact)
+    );
+    THIS->lines.push_back(buffer);
+    THIS->wrap(4);
+    THIS->centertext();
+    THIS->pad(2, 2);
+}
+
 void mapclass::load_large_map(int rx, int ry)
 {
     if (rx == 100 && ry == 101)
@@ -1624,6 +1642,17 @@ void mapclass::load_large_map(int rx, int ry)
 
         room_width = 160;
         room_height = 16;
+
+        if (!obj.flags[10])
+        {
+            obj.flags[10] = true;
+            graphics.createtextbox("", -1, 25, TEXT_COLOUR("gray"));
+            graphics.textboxprintflags(PR_FONT_INTERFACE);
+            graphics.textboxcenterx();
+            graphics.textboxtimer(60);
+            graphics.textboxtranslate(TEXTTRANSLATE_FUNCTION, shoot_textbox);
+            graphics.textboxapplyposition();
+        }
 
         large_contents.assign(room_contents, room_contents + SDL_arraysize(room_contents));
 
