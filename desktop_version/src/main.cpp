@@ -396,7 +396,7 @@ int main(int argc, char *argv[])
             puts(
                 "VVVVVV " RELEASE_VERSION
 #ifdef MAKEANDPLAY
-                " [M&P]"
+                //" [M&P]"
 #endif
             );
 #ifdef INTERIM_VERSION_EXISTS
@@ -627,6 +627,7 @@ int main(int argc, char *argv[])
 
     map.ypos = (700-29) * 8;
     map.oldypos = map.ypos;
+    map.oldxpos = 0;
     map.setbgobjlerp(graphics.towerbg);
     map.setbgobjlerp(graphics.titlebg);
 

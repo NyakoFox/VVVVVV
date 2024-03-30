@@ -514,7 +514,6 @@ public:
 
     bool press_left, press_right, press_action, press_map, press_interact;
     bool interactheld;
-    bool separate_interact;
 
     //Some stats:
     int totalflips;

@@ -245,6 +245,11 @@ void gamelogic(void)
 
     obj.oldtrophytext = obj.trophytext;
 
+    if (map.largermode)
+    {
+        map.oldypos = map.ypos;
+        map.oldxpos = map.xpos;
+    }
     if (map.towermode)
     {
         map.oldypos = map.ypos;

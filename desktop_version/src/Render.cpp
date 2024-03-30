@@ -212,7 +212,7 @@ static void menurender(void)
         graphics.draw_sprite((160 - 96) + 4 * 32, temp, 23, tr, tg, tb);
         graphics.draw_sprite((160 - 96) + 5 * 32, temp, 23, tr, tg, tb);
 #if defined(MAKEANDPLAY)
-        font::print(PR_RIGHT, 264, temp+35, loc::gettext("MAKE AND PLAY EDITION"), tr, tg, tb);
+        //font::print(PR_RIGHT, 264, temp+35, loc::gettext("MAKE AND PLAY EDITION"), tr, tg, tb);
 #endif
 #ifdef INTERIM_VERSION_EXISTS
         font::print(PR_RIGHT | PR_FONT_8X8, 310, 200, COMMIT_DATE, tr/2, tg/2, tb/2);
@@ -349,17 +349,6 @@ static void menurender(void)
             //Advanced options
             font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Advanced Options"), tr, tg, tb);
             font::print_wrap(PR_CEN, -1, 65, loc::gettext("All other gameplay settings."), tr, tg, tb);
-        }
-        else if (game.currentmenuoption == gameplayoptionsoffset + 3)
-        {
-            //Clear Data
-            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Clear Data"), tr, tg, tb);
-            font::print_wrap(PR_CEN, -1, 65, loc::gettext("Delete your main game save data and unlocked play modes."), tr, tg, tb);
-        }
-        else if (game.currentmenuoption == gameplayoptionsoffset + 4)
-        {
-            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Clear Data"), tr, tg, tb);
-            font::print_wrap(PR_CEN, -1, 65, loc::gettext("Delete your custom level save data and completion stars."), tr, tg, tb);
         }
 
         break;
@@ -752,10 +741,10 @@ static void menurender(void)
             font::print(PR_CEN, -1, 75+spacing*3, buffer_a, tr, tg, tb);
 
             SDL_snprintf(buffer_a, sizeof(buffer_a), "%s%s",
-                loc::gettext("Interact is bound to: "),
+                loc::gettext("Custom is bound to: "),
                 BUTTONGLYPHS_get_all_gamepad_buttons(buffer_b, sizeof(buffer_b), ActionSet_InGame, Action_InGame_Interact)
             );
-            font::print(PR_CEN | PR_BRIGHTNESS(game.separate_interact ? 255 : 128), -1, 75+spacing*4, buffer_a, tr, tg, tb);
+            font::print(PR_CEN, -1, 75+spacing*4, buffer_a, tr, tg, tb);
             break;
         }
         }
@@ -1045,16 +1034,9 @@ static void menurender(void)
             const char* button;
 
             font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Interact Button"), tr, tg, tb);
-            int next_y = font::print_wrap(PR_CEN, -1, 65, loc::gettext("Toggle whether you interact with prompts using ENTER or E."), tr, tg, tb);
+            int next_y = font::print_wrap(PR_CEN, -1, 65, loc::gettext("This has been disabled."), tr, tg, tb);
 
-            if (game.separate_interact)
-            {
-                button = loc::gettext("E");
-            }
-            else
-            {
-                button = loc::gettext("ENTER");
-            }
+            button = loc::gettext("ENTER");
 
             vformat_buf(buffer, sizeof(buffer), loc::gettext("Interact button: {button}"), "button:str", button);
             font::print_wrap(PR_CEN, -1, next_y, buffer, tr, tg, tb);
@@ -1866,7 +1848,7 @@ void titlerender(void)
         graphics.draw_sprite((160 - 96) + 4 * 32, temp, 23, tr, tg, tb);
         graphics.draw_sprite((160 - 96) + 5 * 32, temp, 23, tr, tg, tb);
 #if defined(MAKEANDPLAY)
-        font::print(PR_RIGHT, 264, temp+35, loc::gettext("MAKE AND PLAY EDITION"), tr, tg, tb);
+        //font::print(PR_RIGHT, 264, temp+35, loc::gettext("MAKE AND PLAY EDITION"), tr, tg, tb);
 #endif
 
         char buffer[SCREEN_WIDTH_CHARS*2 + 1];
@@ -2190,7 +2172,7 @@ static const char* interact_prompt(
         buffer, buffer_size,
         raw,
         "button:but",
-        vformat_button(ActionSet_InGame, Action_InGame_Interact)
+        vformat_button(ActionSet_InGame, Action_InGame_Map)
     );
 
     return buffer;
@@ -3191,30 +3173,29 @@ void maprender(void)
         {
             if (graphics.flipmode)
             {
-                for (int i = 0; i < 3; i++)
+                graphics.drawcrewman(16, 32 + (1 * 64), 0, !game.scary);
+                if (!game.scary)
                 {
-                    graphics.drawcrewman(16, 32 + (i * 64), 2-i, game.crewstats[2-i]);
-                    if (game.crewstats[(2-i)])
-                    {
-                        graphics.printcrewname(44, 32 + (i * 64)+4+10, 2-i);
-                    }
-                    else
-                    {
-                        graphics.printcrewnamedark(44, 32 + (i * 64)+4+10, 2-i);
-                    }
-                    graphics.printcrewnamestatus(44, 32 + (i * 64)+4, 2-i, game.crewstats[(2-i)]);
-
-                    graphics.drawcrewman(16+160, 32 + (i * 64), (2-i)+3, game.crewstats[(2-i)+3]);
-                    if (game.crewstats[(2-i)+3])
-                    {
-                        graphics.printcrewname(44+160, 32 + (i * 64)+4+10, (2-i)+3);
-                    }
-                    else
-                    {
-                        graphics.printcrewnamedark(44+160, 32 + (i * 64)+4+10, (2-i)+3);
-                    }
-                    graphics.printcrewnamestatus(44+160, 32 + (i * 64)+4, (2-i)+3, game.crewstats[(2-i)+3]);
+                    graphics.printcrewname(44, 32 + (1 * 64) + 4 + 10, 0);
                 }
+                else
+                {
+                    graphics.printcrewnamedark(44, 32 + (1 * 64) + 4 + 10, 0);
+                }
+                graphics.printcrewnamestatus(44, 32 + (1 * 64) + 4, 0, !game.scary);
+
+                bool rescued = obj.flags[0];
+
+                graphics.drawcrewman(16 + 192 - 16, 32 + (1 * 64), 1, rescued);
+                if (rescued)
+                {
+                    graphics.printcrewname(44 + 192 - 16, 32 + (1 * 64) + 4 + 10, 1);
+                }
+                else
+                {
+                    graphics.printcrewnamedark(44 + 192 - 16, 32 + (1 * 64) + 4 + 10, 1);
+                }
+                graphics.printcrewnamestatus(44 + 192 - 16, 32 + (1 * 64) + 4, 1, rescued);
             }
             else
             {

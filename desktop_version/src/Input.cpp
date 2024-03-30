@@ -409,9 +409,9 @@ static void menuactionpress(void)
             option_id = id; \
         } \
         option_seq++;
-#if !defined(MAKEANDPLAY)
+//#if !defined(MAKEANDPLAY)
         OPTION_ID(0) /* play */
-#endif
+//#endif
         OPTION_ID(1) /* levels */
         OPTION_ID(2) /* options */
         if (loc::show_translator_menu)
@@ -426,7 +426,7 @@ static void menuactionpress(void)
 
         switch (option_id)
         {
-#if !defined(MAKEANDPLAY)
+//#if !defined(MAKEANDPLAY)
         case 0:
         {
             //Play
@@ -456,7 +456,7 @@ static void menuactionpress(void)
             startmode(Start_CUSTOM);
             break;
         }
-#endif
+//#endif
         case 1:
             //Options
             music.playef(Sound_VIRIDIAN);
@@ -807,9 +807,7 @@ static void menuactionpress(void)
             break;
         case 2:
             /* Interact button toggle */
-            music.playef(Sound_VIRIDIAN);
-            game.separate_interact = !game.separate_interact;
-            game.savestatsandsettings_menu();
+            music.playef(Sound_CRY);
             break;
         case 3:
             // toggle fake load screen
@@ -1010,20 +1008,7 @@ static void menuactionpress(void)
             game.createmenu(Menu::advancedoptions);
             map.nexttowercolour();
         }
-        else if (game.currentmenuoption == gameplayoptionsoffset + 3)
-        {
-            //Clear Data
-            music.playef(Sound_VIRIDIAN);
-            game.createmenu(Menu::cleardatamenu);
-            map.nexttowercolour();
-        }
-        else if (game.currentmenuoption == gameplayoptionsoffset + 4)
-        {
-            music.playef(Sound_VIRIDIAN);
-            game.createmenu(Menu::clearcustomdatamenu);
-            map.nexttowercolour();
-        }
-        else if (game.currentmenuoption == gameplayoptionsoffset + 5) {
+        else if (game.currentmenuoption == gameplayoptionsoffset + 3) {
             //return to previous menu
             music.playef(Sound_VIRIDIAN);
             game.returnmenu();
@@ -2379,7 +2364,7 @@ void titleinput(void)
         if (    game.currentmenuname == Menu::controller &&
                 game.currentmenuoption > 0 &&
                 game.currentmenuoption < 6 &&
-                (game.separate_interact || game.currentmenuoption < 5) &&
+
                 key.controllerButtonDown()      )
         {
             updatebuttonmappings(game.currentmenuoption);
@@ -2598,12 +2583,7 @@ void gameinput(void)
 
         holding_up = key.isDown(KEYBOARD_UP) || key.isDown(KEYBOARD_w) || key.controllerWantsUp();
         holding_down = key.isDown(KEYBOARD_DOWN) || key.isDown(KEYBOARD_s) || key.controllerWantsDown();
-        holding_shoot = key.isDown(SDLK_x) || key.isDown(SDL_CONTROLLER_BUTTON_X);
-
-        if (key.isDown(KEYBOARD_e) || key.isDown(game.controllerButton_interact) && !map.cavestorymode())
-        {
-            game.press_interact = true;
-        }
+        holding_shoot = key.isDown(SDLK_x) || key.isDown(game.controllerButton_interact);
     }
 
     game.press_map = false;
@@ -2681,7 +2661,7 @@ void gameinput(void)
     {
         if ((game.press_map || key.isDown(27)) && !game.mapheld)
         {
-            if (!game.separate_interact
+            if (true
             && game.press_map
             && (INBOUNDS_VEC(game.activeactivity, obj.blocks)
             || (game.activetele && game.readytotele > 20)))
@@ -2700,15 +2680,7 @@ void gameinput(void)
     bool has_control = false;
     bool enter_pressed = game.press_map && !game.mapheld;
     bool enter_already_processed = false;
-    bool interact_pressed;
-    if (game.separate_interact)
-    {
-        interact_pressed = game.press_interact && !game.interactheld;
-    }
-    else
-    {
-        interact_pressed = enter_pressed;
-    }
+    bool interact_pressed = enter_pressed;
     for (size_t ie = 0; ie < obj.entities.size(); ++ie)
     {
         if (obj.entities[ie].rule == 0)
@@ -2719,10 +2691,7 @@ void gameinput(void)
                 if (interact_pressed)
                 {
                     game.interactheld = true;
-                    if (!game.separate_interact)
-                    {
-                        game.mapheld = true;
-                    }
+                    game.mapheld = true;
                 }
 
                 if (interact_pressed && !script.running)
@@ -3187,7 +3156,7 @@ void gameinput(void)
     /* The rest of the if-tree runs only if enter is pressed and it has not
      * already been processed with 'separate interact' off.
      */
-    if (!enter_pressed || (enter_already_processed && !game.separate_interact))
+    if (!enter_pressed || (enter_already_processed))
     {
         // Do nothing
     }
@@ -3604,13 +3573,9 @@ void teleporterinput(void)
         if (key.isDown(KEYBOARD_RIGHT) || key.isDown(KEYBOARD_d)|| key.controllerWantsRight(false) ) game.press_right = true;
         if (key.isDown(KEYBOARD_z) || key.isDown(KEYBOARD_SPACE) || key.isDown(KEYBOARD_v)
                 || key.isDown(KEYBOARD_UP) || key.isDown(KEYBOARD_DOWN)||  key.isDown(KEYBOARD_w)||  key.isDown(KEYBOARD_s) || key.isDown(game.controllerButton_flip)) game.press_action = true;
-        if (!game.separate_interact && (key.isDown(KEYBOARD_ENTER) || key.isDown(game.controllerButton_map)))
+        if ((key.isDown(KEYBOARD_ENTER) || key.isDown(game.controllerButton_map)))
         {
             game.press_map = true;
-        }
-        if (key.isDown(KEYBOARD_e) || key.isDown(game.controllerButton_interact))
-        {
-            game.press_interact = true;
         }
 
         //In the menu system, all keypresses are single taps rather than holds. Therefore this test has to be done for all presses
@@ -3685,7 +3650,7 @@ void teleporterinput(void)
             while (!map.isexplored(tempx, tempy));
         }
 
-        if ((game.separate_interact && game.press_interact) || game.press_map)
+        if (game.press_map)
         {
             tempx = map.teleporters[game.teleport_to_teleporter].x;
             tempy = map.teleporters[game.teleport_to_teleporter].y;

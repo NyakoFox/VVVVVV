@@ -177,7 +177,6 @@ void Game::init(void)
     press_map = false;
     press_interact = false;
     interactheld = false;
-    separate_interact = false;
     mapheld = false;
 
 
@@ -4862,11 +4861,6 @@ void Game::deserializesettings(tinyxml2::XMLElement* dataNode, struct ScreenSett
             music.user_sound_volume = help.Int(pText);
         }
 
-        if (SDL_strcmp(pKey, "separate_interact") == 0)
-        {
-            separate_interact = help.Int(pText);
-        }
-
         if (SDL_strcmp(pKey, "flipButton") == 0)
         {
             SDL_GameControllerButton newButton;
@@ -5126,8 +5120,6 @@ void Game::serializesettings(tinyxml2::XMLElement* dataNode, const struct Screen
     xml::update_tag(dataNode, "musicvolume", music.user_music_volume);
 
     xml::update_tag(dataNode, "soundvolume", music.user_sound_volume);
-
-    xml::update_tag(dataNode, "separate_interact", (int) separate_interact);
 
     // Delete all controller buttons we had previously.
     // dataNode->FirstChildElement() shouldn't be NULL at this point...
@@ -6578,9 +6570,9 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
             SDL_assert(0 && "Entering main menu from in-game options!");
             break;
         }
-#if !defined(MAKEANDPLAY)
+//#if !defined(MAKEANDPLAY)
         option(loc::gettext("play"));
-#endif
+//#endif
         option(loc::gettext("options"));
         if (loc::show_translator_menu)
         {
@@ -6748,8 +6740,8 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         option(loc::gettext("toggle fps"));
         option(loc::gettext("speedrun options"));
         option(loc::gettext("advanced options"));
-        option(loc::gettext("clear main game data"));
-        option(loc::gettext("clear custom level data"));
+        //option(loc::gettext("clear main game data"));
+        //option(loc::gettext("clear custom level data"));
         option(loc::gettext("return"));
         menuyoff = -10;
         maxspacing = 15;
@@ -6898,7 +6890,7 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         option(loc::gettext("bind enter"));
         option(loc::gettext("bind menu"));
         option(loc::gettext("bind restart"));
-        option(loc::gettext("bind interact"), separate_interact);
+        option(loc::gettext("bind custom"));
         option(loc::gettext("return"));
         menuyoff = 0;
         maxspacing = 10;

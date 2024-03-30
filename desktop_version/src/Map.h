@@ -150,6 +150,7 @@ public:
 
     // Large map mode
     bool largermode;
+    int oldxpos;
     int xpos;
     std::vector<int> large_contents;
     int room_width;

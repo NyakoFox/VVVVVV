@@ -2065,8 +2065,8 @@ void Graphics::drawentity(const int i, const int yoff)
 
     if (map.largermode)
     {
-        xpos = map.xpos;
-        ypos = map.ypos;
+        xpos = lerp(map.oldxpos, map.xpos);
+        ypos = lerp(map.oldypos, map.ypos);
     }
 
     SDL_Point tpoint;
@@ -3266,6 +3266,9 @@ void Graphics::drawlargemap(bool foreground)
     //set_render_target(foregroundTexture);
     //clear(0, 0, 0, 0);
 
+    float xpos = lerp(map.oldxpos, map.xpos);
+    float ypos = lerp(map.oldypos, map.ypos);
+
     for (int y = 0; y < map.room_height; y++)
     {
         for (int x = 0; x < map.room_width; x++)
@@ -3275,11 +3278,11 @@ void Graphics::drawlargemap(bool foreground)
             {
                 if (map.cavestorymode())
                 {
-                    drawtilehell(x * 16 - map.xpos, y * 16 - map.ypos, tile);
+                    drawtilehell(x * 16.0 - xpos, y * 16.0 - ypos, tile);
                 }
                 else if (map.smbmode())
                 {
-                    drawtilesmb(x * 16 - map.xpos, y * 16 - map.ypos, tile);
+                    drawtilesmb(x * 16.0 - xpos, y * 16.0 - ypos, tile);
                 }
             }
         }

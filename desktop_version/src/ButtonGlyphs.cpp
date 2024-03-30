@@ -339,19 +339,9 @@ const char* BUTTONGLYPHS_get_button(const ActionSet actionset, const Action acti
         case Action_InGame_Interact:
             if (show_controller)
             {
-                /* FIXME: this really does depend on the Enter/E speedrunner option...
-                 * This is messy, but let's not show the wrong thing here... */
-                if (game.separate_interact)
-                {
                     return glyph_for_vector(game.controllerButton_interact, binding);
-                }
-                return glyph_for_vector(game.controllerButton_map, binding);
             }
-            if (game.separate_interact)
-            {
-                return "E";
-            }
-            return loc::gettext("ENTER");
+                return "X";
 
         case Action_InGame_Map:
             if (show_controller)
