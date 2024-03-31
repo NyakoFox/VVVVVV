@@ -1511,7 +1511,7 @@ void mapclass::load_large_map(int rx, int ry)
         obj.createblock(TRIGGER, 1104, 240, 32, 16, 1, "custom_kill_load");
         obj.createblock(TRIGGER, 1376, 240, 48, 16, 2, "custom_kill_load");
         obj.createblock(TRIGGER, 2448, 240, 32, 16, 3, "custom_kill_load");
-        obj.createblock(TRIGGER, 3168, 48, 16, 48, 4, "custom_flag_load");
+        obj.createblock(TRIGGER, 3168, 48, 16, 144, 4, "custom_flag_load");
 
         obj.customactivitytext = "Press {button} to enter pipe";
         obj.customscript = "enter_pipe_load";
