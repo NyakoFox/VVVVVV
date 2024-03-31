@@ -41,27 +41,23 @@ jobs:
     - name: Install dependencies
       run: brew install ninja sdl2
 
-    - name: CMake configure (default version)
+    - name: CMake configure
       run: |
         mkdir ${SRC_DIR_PATH}/build && cd ${SRC_DIR_PATH}/build
-        cmake -GNinja ..
-    - name: Build (default version)
+        cmake -GNinja -DOFFICIAL_BUILD=ON -DMAKEANDPLAY=ON ..
+    - name: Build
       run: ninja -C ${SRC_DIR_PATH}/build
 
-    - name: CMake configure (official)
-      run: |
-        cd ${SRC_DIR_PATH}/build
-        cmake -DOFFICIAL_BUILD=ON ..
-    - name: Build (official)
-      run: |
-        ninja -C ${SRC_DIR_PATH}/build
 
-    - name: CMake configure (M&P)
+    - name: Fix dylib paths
       run: |
-        cd ${SRC_DIR_PATH}/build
-        cmake -DOFFICIAL_BUILD=OFF -DMAKEANDPLAY=ON ..
-    - name: Build (M&P)
-      run: ninja -C ${SRC_DIR_PATH}/build
+        install_name_tool -change '/usr/local/opt/sdl2/lib/libSDL2-2.0.0.dylib' '@rpath/libSDL2-2.0.0.dylib' ${SRC_DIR_PATH}/build/VVVVVV
+
+    - name: Upload binary
+      uses: actions/upload-artifact@v1
+      with:
+        name: VVVVVV-macos-${{ github.sha }}
+        path: ${{ env.SRC_DIR_PATH }}/build/VVVVVV
 
   build-lin:
     name: Build (CentOS 7)
@@ -78,27 +74,18 @@ jobs:
       with:
         submodules: true
 
-    - name: CMake configure (default version)
+    - name: CMake configure
       run: |
         mkdir ${SRC_DIR_PATH}/build && cd ${SRC_DIR_PATH}/build
-        cmake ..
-    - name: Build (default version)
+        cmake -DOFFICIAL_BUILD=ON -DMAKEANDPLAY=ON ..
+    - name: Build
       run: make -j $(nproc) -C ${SRC_DIR_PATH}/build
 
-    - name: CMake configure (official)
-      run: |
-        cd ${SRC_DIR_PATH}/build
-        cmake -DOFFICIAL_BUILD=ON ..
-    - name: Build (official)
-      run: |
-        make -j $(nproc) -C ${SRC_DIR_PATH}/build
-
-    - name: CMake configure (M&P)
-      run: |
-        cd ${SRC_DIR_PATH}/build
-        cmake -DOFFICIAL_BUILD=OFF -DMAKEANDPLAY=ON ..
-    - name: Build (M&P)
-      run: make -j $(nproc) -C ${SRC_DIR_PATH}/build
+    - name: Upload binary
+      uses: actions/upload-artifact@v1
+      with:
+        name: VVVVVV-ubuntu-${{ github.sha }}
+        path: ${{ env.SRC_DIR_PATH }}/build/VVVVVV
 
   build-win:
     name: Build (windows-latest)
@@ -147,31 +134,19 @@ jobs:
         $env:LDFLAGS =  "/LIBPATH:C:\SDL2-$env:SDL_VERSION\lib\x86 "
         cmake -G "Visual Studio 17 2022" -A Win32 `
               -DSDL2_INCLUDE_DIRS="C:\SDL2-$env:SDL_VERSION\include" `
-              -DSDL2_LIBRARIES="SDL2;SDL2main" ..
+              -DSDL2_LIBRARIES="SDL2;SDL2main" -DCMAKE_BUILD_TYPE=Release ..
 
-    - name: CMake configure (default version)
+    - name: CMake configure
       run: |
         cd $env:SRC_DIR_PATH/build
-        cmake ..
-    - name: Build (default version)
+        cmake -DOFFICIAL_BUILD=ON -DMAKEANDPLAY=ON ..
+    - name: Build
       run: |
         cd $env:SRC_DIR_PATH/build
-        cmake --build .
+        cmake --build . --config Release
 
-    - name: CMake configure (official)
-      run: |
-        cd $env:SRC_DIR_PATH/build
-        cmake -DOFFICIAL_BUILD=ON ..
-    - name: Build (official)
-      run: |
-        cd $env:SRC_DIR_PATH/build
-        cmake --build .
-
-    - name: CMake configure (M&P)
-      run: |
-        cd $env:SRC_DIR_PATH/build
-        cmake -DOFFICIAL_BUILD=OFF -DMAKEANDPLAY=ON ..
-    - name: Build (M&P)
-      run: |
-        cd $env:SRC_DIR_PATH/build
-        cmake --build .
+    - name: Upload binary
+      uses: actions/upload-artifact@v1
+      with:
+        name: VVVVVV-windows-${{ github.sha }}
+        path: ${{ env.SRC_DIR_PATH }}/build/Release/VVVVVV.exe
