@@ -1310,12 +1310,12 @@ void entityclass::createentity(int xp, int yp, int t, int meta1, int meta2, int 
     {
     case 0: //Player
         entity.rule = 0; //Playable character
-        entity.tile = 0;
+        entity.tile = 192;
         entity.colour = 0;
-        entity.cx = 6;
-        entity.cy = 2;
-        entity.w = 12;
-        entity.h = 21;
+        entity.cx = 7;
+        entity.cy = 9;
+        entity.w = 10;
+        entity.h = 14;
         entity.dir = 1;
 
         /* Fix wrong y-position if spawning in on conveyor */
@@ -3472,7 +3472,74 @@ void entityclass::animateentities( int _i )
         switch(entities[_i].type)
         {
         case 0:
+            if (true)
+            {
+                // Veep!
+
+                if (entities[_i].dir == 1)
+                {
+                    entities[_i].drawframe = entities[_i].tile;
+                }
+                else
+                {
+                    entities[_i].drawframe = entities[_i].tile + 4;
+                }
+
+                entities[_i].walkingframe = 0;
+
+                if (entities[_i].visualonground > 0)
+                {
+                    if (entities[_i].vx > 0.00f || entities[_i].vx < -0.00f)
+                    {
+                        /* Walking */
+
+                        if (entities[_i].framedelay < 0) entities[_i].framedelay = 0;
+                        entities[_i].framedelay++;
+
+                        if (entities[_i].framedelay < 4)
+                        {
+                            entities[_i].drawframe += 1;
+                        }
+                        else if (entities[_i].framedelay < 8)
+                        {
+                            entities[_i].drawframe += 0;
+                        }
+                        else if (entities[_i].framedelay < 12)
+                        {
+                            entities[_i].framedelay = 0;
+                            entities[_i].drawframe += 1;
+                        }
+                    }
+                    else
+                    {
+                        /* Standing */
+                        entities[_i].framedelay = 0;
+                        entities[_i].drawframe += 0;
+                    }
+                }
+                else
+                {
+                    if (entities[_i].vy < 0)
+                    {
+                        entities[_i].drawframe += 2;
+                    }
+                    else
+                    {
+                        entities[_i].drawframe += 1;
+                    }
+                }
+
+                if (game.deathseq > -1)
+                {
+                    entities[_i].drawframe = 199;
+                    if (entities[_i].dir == 1) entities[_i].drawframe = 195;
+                }
+
+                return;
+            }
+
             entities[_i].framedelay--;
+
             if(entities[_i].dir==1)
             {
                 entities[_i].drawframe=entities[_i].tile;
@@ -3861,6 +3928,76 @@ void entityclass::animatehumanoidcollision(const int i)
 
     if (entity->statedelay > 0)
     {
+        return;
+    }
+
+    if (true)
+    {
+        // Veep!
+
+        if (entity->dir == 1)
+        {
+            entity->collisiondrawframe = entity->tile;
+        }
+        else
+        {
+            entity->collisiondrawframe = entity->tile + 4;
+        }
+
+        entity->collisionwalkingframe = 0;
+
+        if (entity->visualonground > 0)
+        {
+            if (entity->vx > 0.00f || entity->vx < -0.00f)
+            {
+                /* Walking */
+
+                if (entity->collisionframedelay < 0) entity->collisionframedelay = 0;
+                entity->collisionframedelay++;
+
+                if (entity->collisionframedelay < 4)
+                {
+                    entity->collisiondrawframe += 1;
+                }
+                else if (entity->collisionframedelay < 8)
+                {
+                    entity->collisiondrawframe += 0;
+                }
+                else if (entity->collisionframedelay < 12)
+                {
+                    entity->collisionframedelay = 0;
+                    entity->collisiondrawframe += 1;
+                }
+            }
+            else
+            {
+                /* Standing */
+                entity->collisionframedelay = 0;
+                entity->collisiondrawframe += 0;
+            }
+        }
+        else
+        {
+            if (entity->vy < 0)
+            {
+                entity->collisiondrawframe += 2;
+            }
+            else
+            {
+                entity->collisiondrawframe += 1;
+            }
+        }
+
+        if (game.deathseq > -1)
+        {
+            entity->collisiondrawframe = 199;
+            if (entity->dir == 1) entity->collisiondrawframe = 195;
+        }
+
+        entity->framedelay = entity->collisionframedelay;
+        entity->drawframe = entity->collisiondrawframe;
+        entity->walkingframe = entity->collisionwalkingframe;
+
         return;
     }
 
@@ -4582,8 +4719,8 @@ void entityclass::applyfriction( int t, float xrate, float yrate )
     if (entities[t].vx < 0.00f) entities[t].vx += xrate;
     if (entities[t].vy > 0.00f) entities[t].vy -= yrate;
     if (entities[t].vy < 0.00f) entities[t].vy += yrate;
-    if (entities[t].vy > 10.00f) entities[t].vy = 10.0f;
-    if (entities[t].vy < -10.00f) entities[t].vy = -10.0f;
+    if (entities[t].vy > 14.00f) entities[t].vy = 14.0f;
+    if (entities[t].vy < -14.00f) entities[t].vy = -14.0f;
     if (entities[t].vx > 6.00f) entities[t].vx = 6.0f;
     if (entities[t].vx < -6.00f) entities[t].vx = -6.0f;
 
@@ -4612,7 +4749,7 @@ void entityclass::updateentitylogic( int t )
         {
             if(game.gravitycontrol==0)
             {
-                entities[t].ay = 3;
+                entities[t].ay = 1;
             }
             else
             {

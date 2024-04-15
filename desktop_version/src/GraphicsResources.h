@@ -46,6 +46,8 @@ public:
     SDL_Texture* im_image11;
     SDL_Texture* im_image12;
 
+    SDL_Texture* im_logo;
+
     SDL_Texture* im_sprites_translated;
     SDL_Texture* im_flipsprites_translated;
 };

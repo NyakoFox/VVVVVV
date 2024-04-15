@@ -1,6 +1,6 @@
 #ifndef RELEASEVERSION_H
 #define RELEASEVERSION_H
 
-#define RELEASE_VERSION "v2.4.2"
+#define RELEASE_VERSION "v0.0.1"
 
 #endif /* RELEASEVERSION_H */

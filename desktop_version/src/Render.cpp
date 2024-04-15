@@ -204,13 +204,10 @@ static void menurender(void)
     {
     case Menu::mainmenu:
     {
-        const int temp = 50;
-        graphics.draw_sprite((160 - 96) + 0 * 32, temp, 23, tr, tg, tb);
-        graphics.draw_sprite((160 - 96) + 1 * 32, temp, 23, tr, tg, tb);
-        graphics.draw_sprite((160 - 96) + 2 * 32, temp, 23, tr, tg, tb);
-        graphics.draw_sprite((160 - 96) + 3 * 32, temp, 23, tr, tg, tb);
-        graphics.draw_sprite((160 - 96) + 4 * 32, temp, 23, tr, tg, tb);
-        graphics.draw_sprite((160 - 96) + 5 * 32, temp, 23, tr, tg, tb);
+        graphics.set_texture_color_mod(graphics.grphx.im_logo, tr, tg, tb);
+        graphics.draw_texture(graphics.grphx.im_logo, 92, 50);
+        graphics.set_texture_color_mod(graphics.grphx.im_logo, 255, 255, 255);
+
 #if defined(MAKEANDPLAY)
         font::print(PR_RIGHT, 264, temp+35, loc::gettext("MAKE AND PLAY EDITION"), tr, tg, tb);
 #endif
@@ -1858,13 +1855,10 @@ void titlerender(void)
         tg = graphics.col_tg;
         tb = graphics.col_tb;
 
-        int temp = 50;
-        graphics.draw_sprite((160 - 96) + 0 * 32, temp, 23, tr, tg, tb);
-        graphics.draw_sprite((160 - 96) + 1 * 32, temp, 23, tr, tg, tb);
-        graphics.draw_sprite((160 - 96) + 2 * 32, temp, 23, tr, tg, tb);
-        graphics.draw_sprite((160 - 96) + 3 * 32, temp, 23, tr, tg, tb);
-        graphics.draw_sprite((160 - 96) + 4 * 32, temp, 23, tr, tg, tb);
-        graphics.draw_sprite((160 - 96) + 5 * 32, temp, 23, tr, tg, tb);
+        graphics.set_texture_color_mod(graphics.grphx.im_logo, tr, tg, tb);
+        graphics.draw_texture(graphics.grphx.im_logo, 92, 50);
+        graphics.set_texture_color_mod(graphics.grphx.im_logo, 255, 255, 255);
+
 #if defined(MAKEANDPLAY)
         font::print(PR_RIGHT, 264, temp+35, loc::gettext("MAKE AND PLAY EDITION"), tr, tg, tb);
 #endif

@@ -2489,6 +2489,78 @@ void scriptclass::run(void)
                     }
                 }
             }
+            else if (words[0] == "pausegame")
+            {
+                game.completestop = true;
+            }
+            else if (words[0] == "resumegame")
+            {
+                game.completestop = false;
+            }
+            else if (words[0] == "setvelocity")
+            {
+                int i = obj.getplayer();
+                if (INBOUNDS_VEC(i, obj.entities))
+                {
+                    obj.entities[i].vx = ss_toi(words[1]);
+                    obj.entities[i].vy = ss_toi(words[2]);
+                }
+            }
+            else if (words[0] == "settile")
+            {
+                int x = ss_toi(words[1]);
+                int y = ss_toi(words[2]);
+                int t = ss_toi(words[3]);
+
+                map.settile(x, y, t);
+                graphics.foregrounddrawn = false;
+            }
+            else if (words[0] == "befadeout")
+            {
+                graphics.setfade(440);
+                graphics.fademode = FADE_FULLY_BLACK;
+            }
+            else if (words[0] == "setbars")
+            {
+                graphics.setbars(ss_toi(words[1]));
+            }
+            else if (words[0] == "chirp")
+            {
+                textcrewmateposition = TextboxCrewmatePosition();
+
+                j = -1;
+                i = obj.getplayer();
+                if (INBOUNDS_VEC(i, obj.entities))
+                {
+                    j = obj.entities[i].dir;
+                }
+
+                if (INBOUNDS_VEC(i, obj.entities) && (j == 0 || j == 1))
+                {
+                    textcrewmateposition.text_above = true;
+
+                    textx = 0;
+                    texty = 0;
+                    textcrewmateposition.x = obj.entities[i].xp + (argexists[1] ? ss_toi(words[1]) : 0);
+                    textcrewmateposition.override_x = true;
+                    textcrewmateposition.y = obj.entities[i].yp + (argexists[2] ? ss_toi(words[2]) : 0);
+                    textcrewmateposition.override_y = true;
+
+                    textcrewmateposition.dir = j;
+                }
+
+                textbox_sprites.clear();
+
+                graphics.createtextboxreal("Virp!", textx, texty, textbox_colours["player"].r, textbox_colours["player"].g, textbox_colours["player"].b, textflipme);
+                graphics.textboxtimer(15);
+                graphics.setimage(TEXTIMAGE_NONE);
+
+                graphics.textboxcrewmateposition(&textcrewmateposition);
+                graphics.textboxoriginalcontextauto();
+                graphics.textboxapplyposition();
+
+                music.playef(Sound_VIRP);
+            }
 
             position++;
         }
@@ -2812,6 +2884,12 @@ void scriptclass::startgamemode(const enum StartMode mode)
             }
         }
 
+        if (key.isDown(SDLK_LSHIFT) || key.isDown(SDLK_RSHIFT))
+        {
+            cl.findstartpoint();
+            load("custom_intro");
+        }
+
         game.customstart();
         ed.ghosts.clear();
 
@@ -2859,6 +2937,7 @@ void scriptclass::startgamemode(const enum StartMode mode)
             {
                 music.currentsong = -1;
             }
+            load("custom_intro");
             break;
         case Start_CUSTOM_QUICKSAVE:
             game.customloadquick(cl.ListOfMetaData[game.playcustomlevel].filename);
@@ -3304,12 +3383,18 @@ bool scriptclass::loadcustom(const std::string& t)
 
     //Ok, we've got the relavent script segment, we do a pass to assess it, then run it!
     int customcutscenemode=0;
+    bool overridden = false;
     for(size_t i=0; i<lines.size(); i++){
         tokenize(lines[i]);
-        if(words[0] == "say"){
+        if(words[0] == "say" && !overridden){
             customcutscenemode=1;
-        }else if(words[0] == "reply"){
+        }else if(words[0] == "reply" && !overridden){
             customcutscenemode=1;
+        }
+        if ((words[0] == "setbars") || (words[0] == "cutscene"))
+        {
+            overridden = true;
+            customcutscenemode = 0;
         }
     }
 
@@ -3320,6 +3405,7 @@ bool scriptclass::loadcustom(const std::string& t)
     int customtextmode=0;
     int speakermode=0; //0, terminal, numbers for crew
     int squeakmode=0;//default on
+    bool internalmode = false;
     //Now run the script
     for(size_t i=0; i<lines.size(); i++){
         words[0]="nothing"; //Default!
@@ -3329,7 +3415,20 @@ bool scriptclass::loadcustom(const std::string& t)
         {
             words[0][ii] = SDL_tolower(words[0][ii]);
         }
-        if(words[0] == "music"){
+        if (words[0] == "[")
+        {
+            internalmode = true;
+        }
+        else if (words[0] == "]")
+        {
+            internalmode = false;
+        }
+        else if (internalmode)
+        {
+            if (customtextmode == 1) { add("endtext"); customtextmode = 0; }
+            add(lines[i]);
+        }
+        else if (words[0] == "music") {
             if(customtextmode==1){ add("endtext"); customtextmode=0;}
             if(words[1]=="0"){
                 tstring="stopmusic()";
@@ -3344,8 +3443,12 @@ bool scriptclass::loadcustom(const std::string& t)
                 }else { tstring="play("+words[1]+")"; }
             }
             add(tstring);
-        }else if(words[0] == "playremix"){
+        }
+        else if (words[0] == "playremix") {
             add("play(15)");
+        }
+        else if (words[0] == "chirp") {
+            add("chirp()");
         }else if(words[0] == "flash"){
             if(customtextmode==1){ add("endtext"); customtextmode=0;}
             add("flash(5)");

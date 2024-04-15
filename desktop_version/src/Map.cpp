@@ -838,10 +838,10 @@ void mapclass::resetplayer(const bool player_died)
         if (!GlitchrunnerMode_less_than_or_equal(Glitchrunner2_2))
         {
             obj.entities[i].size = 0;
-            obj.entities[i].cx = 6;
-            obj.entities[i].cy = 2;
-            obj.entities[i].w = 12;
-            obj.entities[i].h = 21;
+            obj.entities[i].cx = 7;
+            obj.entities[i].cy = 9;
+            obj.entities[i].w = 10;
+            obj.entities[i].h = 14;
         }
 
         // If we entered a tower as part of respawn, reposition camera

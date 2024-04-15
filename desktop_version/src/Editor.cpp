@@ -3034,7 +3034,7 @@ static void start_at_checkpoint(void)
         }
     }
 
-    if (testeditor == -1)
+    if (testeditor == -1 && (!key.isDown(SDLK_LSHIFT) && !key.isDown(SDLK_RSHIFT)))
     {
         ed.show_note(loc::gettext("ERROR: No checkpoint to spawn at"));
     }
@@ -3042,38 +3042,45 @@ static void start_at_checkpoint(void)
     {
         ed.current_ghosts = 0;
 
-        game.edsavex = (customentities[testeditor].x) * 8 - 4;
-        game.edsavey = customentities[testeditor].y * 8;
-        game.edsaverx = 100 + customentities[testeditor].rx;
-        game.edsavery = 100 + customentities[testeditor].ry;
-
-        game.edsavedir = 0;
-        game.edsavegc = 0;
-
-        if (!startpoint)
+        if (key.isDown(SDLK_LSHIFT) || key.isDown(SDLK_RSHIFT))
         {
-            // Checkpoint spawn
-            if (customentities[testeditor].t == 14) {
-                // Actually, teleporter!
-                game.edsavex += 48;
-                game.edsavey += 44;
-                game.edsavedir = 1;
-            }
-            else if (customentities[testeditor].p1 == 0) // NOT a bool check!
-            {
-                game.edsavegc = 1;
-                game.edsavey -= 2;
-            }
-            else
-            {
-                game.edsavey -= 7;
-            }
+
         }
         else
         {
-            // Start point spawn
-            game.edsavey++;
-            game.edsavedir = 1 - customentities[testeditor].p1;
+            game.edsavex = (customentities[testeditor].x) * 8 - 4;
+            game.edsavey = customentities[testeditor].y * 8;
+            game.edsaverx = 100 + customentities[testeditor].rx;
+            game.edsavery = 100 + customentities[testeditor].ry;
+
+            if (!startpoint)
+            {
+                // Checkpoint spawn
+                if (customentities[testeditor].t == 14) {
+                    // Actually, teleporter!
+                    game.edsavex += 48;
+                    game.edsavey += 44;
+                    game.edsavedir = 1;
+                }
+                else if (customentities[testeditor].p1 == 0) // NOT a bool check!
+                {
+                    game.edsavegc = 1;
+                    game.edsavey -= 2;
+                }
+                else
+                {
+                    game.edsavegc = 0;
+                    game.edsavey -= 7;
+                }
+                game.edsavedir = 0;
+            }
+            else
+            {
+                // Start point spawn
+                game.edsavegc = 0;
+                game.edsavey++;
+                game.edsavedir = 1 - customentities[testeditor].p1;
+            }
         }
 
         music.haltdasmusik();

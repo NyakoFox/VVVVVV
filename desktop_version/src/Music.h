@@ -60,7 +60,8 @@ enum
     Sound_COMBINE = 24,
     Sound_NEWRECORD = 25,
     Sound_TROPHY = 26,
-    Sound_RESCUE = 27
+    Sound_RESCUE = 27,
+    Sound_VIRP = 28,
 };
 
 class musicclass

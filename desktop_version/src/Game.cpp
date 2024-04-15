@@ -6643,9 +6643,9 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
             SDL_assert(0 && "Entering main menu from in-game options!");
             break;
         }
-#if !defined(MAKEANDPLAY)
+//#if !defined(MAKEANDPLAY)
         option(loc::gettext("play"));
-#endif
+//#endif
         option(loc::gettext("levels"));
         option(loc::gettext("options"));
         if (loc::show_translator_menu)
@@ -7137,146 +7137,10 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         break;
     case Menu::play:
     {
-        //Ok, here's where the unlock stuff comes into it:
-        //First up, time trials:
-        int temp = 0;
-        if (unlock[Unlock_SPACESTATION1_COMPLETE]
-            && stat_trinkets >= 3
-            && !unlocknotify[Unlock_TIMETRIAL_SPACESTATION1])
-        {
-            temp++;
-        }
-        if (unlock[Unlock_LABORATORY_COMPLETE]
-            && stat_trinkets >= 6
-            && !unlocknotify[Unlock_TIMETRIAL_LABORATORY])
-        {
-            temp++;
-        }
-        if (unlock[Unlock_TOWER_COMPLETE]
-            && stat_trinkets >= 9
-            && !unlocknotify[Unlock_TIMETRIAL_TOWER])
-        {
-            temp++;
-        }
-        if (unlock[Unlock_SPACESTATION2_COMPLETE]
-            && stat_trinkets >= 12
-            && !unlocknotify[Unlock_TIMETRIAL_SPACESTATION2])
-        {
-            temp++;
-        }
-        if (unlock[Unlock_WARPZONE_COMPLETE]
-            && stat_trinkets >= 15
-            && !unlocknotify[Unlock_TIMETRIAL_WARPZONE])
-        {
-            temp++;
-        }
-        if (unlock[UnlockTrophy_GAME_COMPLETE]
-            && stat_trinkets >= 18
-            && !unlocknotify[Unlock_TIMETRIAL_FINALLEVEL])
-        {
-            temp++;
-        }
-        if (temp > 0)
-        {
-            //you've unlocked a time trial!
-            if (unlock[Unlock_SPACESTATION1_COMPLETE] && stat_trinkets >= 3)
-            {
-                unlocknotify[Unlock_TIMETRIAL_SPACESTATION1] = true;
-                unlock[Unlock_TIMETRIAL_SPACESTATION1] = true;
-            }
-            if (unlock[Unlock_LABORATORY_COMPLETE] && stat_trinkets >= 6)
-            {
-                unlocknotify[Unlock_TIMETRIAL_LABORATORY] = true;
-                unlock[Unlock_TIMETRIAL_LABORATORY] = true;
-            }
-            if (unlock[Unlock_TOWER_COMPLETE] && stat_trinkets >= 9)
-            {
-                unlocknotify[Unlock_TIMETRIAL_TOWER] = true;
-                unlock[Unlock_TIMETRIAL_TOWER] = true;
-            }
-            if (unlock[Unlock_SPACESTATION2_COMPLETE] && stat_trinkets >= 12)
-            {
-                unlocknotify[Unlock_TIMETRIAL_SPACESTATION2] = true;
-                unlock[Unlock_TIMETRIAL_SPACESTATION2] = true;
-            }
-            if (unlock[Unlock_WARPZONE_COMPLETE] && stat_trinkets >= 15)
-            {
-                unlocknotify[Unlock_TIMETRIAL_WARPZONE] = true;
-                unlock[Unlock_TIMETRIAL_WARPZONE] = true;
-            }
-            if (unlock[UnlockTrophy_GAME_COMPLETE] && stat_trinkets >= 18)
-            {
-                unlocknotify[Unlock_TIMETRIAL_FINALLEVEL] = true;
-                unlock[Unlock_TIMETRIAL_FINALLEVEL] = true;
-            }
-
-            if (temp == 1)
-            {
-                createmenu(Menu::unlocktimetrial, true);
-                savestatsandsettings();
-            }
-            else if (temp > 1)
-            {
-                createmenu(Menu::unlocktimetrials, true);
-                savestatsandsettings();
-            }
-        }
-        else
-        {
-            //Alright, we haven't unlocked any time trials. How about no death mode?
-            if (can_unlock_ndm())
-            {
-                unlock_ndm();
-            }
-            //Alright then! Flip mode?
-            else if (unlock[UnlockTrophy_GAME_COMPLETE]
-                && !unlocknotify[Unlock_FLIPMODE])
-            {
-                unlock[Unlock_FLIPMODE] = true;
-                unlocknotify[Unlock_FLIPMODE] = true;
-                createmenu(Menu::unlockflipmode, true);
-                savestatsandsettings();
-            }
-            //What about the intermission levels?
-            else if (unlock[Unlock_INTERMISSION2_COMPLETE]
-                && !unlocknotify[Unlock_INTERMISSION_REPLAYS])
-            {
-                unlock[Unlock_INTERMISSION_REPLAYS] = true;
-                unlocknotify[Unlock_INTERMISSION_REPLAYS] = true;
-                createmenu(Menu::unlockintermission, true);
-                savestatsandsettings();
-            }
-            else
-            {
-                if (save_exists())
-                {
-                    option(loc::gettext("continue"));
-                }
-                else
-                {
-                    option(loc::gettext("new game"));
-                }
-                //ok, secret lab! no notification, but test:
-                if (unlock[Unlock_SECRETLAB])
-                {
-                    option(loc::gettext("secret lab"));
-                }
-                option(loc::gettext("play modes"));
-                if (save_exists())
-                {
-                    option(loc::gettext("new game"));
-                }
-                option(loc::gettext("return"));
-                if (unlock[Unlock_SECRETLAB])
-                {
-                    menuyoff = -30;
-                }
-                else
-                {
-                    menuyoff = -40;
-                }
-            }
-        }
+        option(loc::gettext("continue"));
+        option(loc::gettext("new game"));
+        option(loc::gettext("return"));
+        menuyoff = -40;
         break;
     }
     case Menu::unlocktimetrial:

@@ -306,8 +306,8 @@ int FILESYSTEM_init(char *argvZero, char* baseDir, char *assetsPath, char* langD
         doesFontsDirExist = true;
     }
 
-    PHYSFS_File* dataZip = PHYSFS_openRead("/apk/assets/data.zip");
-    if (!dataZip || !PHYSFS_mountHandle(dataZip, "data.zip", NULL, 1))
+    PHYSFS_File* dataZip = PHYSFS_openRead("/apk/assets/veep.zip");
+    if (!dataZip || !PHYSFS_mountHandle(dataZip, "veep.zip", NULL, 1))
 #else
     doesLangDirExist = mount_pre_datazip(mainLangDir, "lang", "lang/", langDir);
     vlog_info("Languages directory: %s", mainLangDir);
@@ -323,21 +323,21 @@ int FILESYSTEM_init(char *argvZero, char* baseDir, char *assetsPath, char* langD
     {
         SDL_snprintf(output, sizeof(output), "%s%s",
             basePath,
-            "data.zip"
+            "veep.zip"
         );
     }
     if (!PHYSFS_mount(output, NULL, 1))
 #endif
     {
-        vlog_error("Error: data.zip missing!");
-        vlog_error("You do not have data.zip!");
+        vlog_error("Error: veep.zip missing!");
+        vlog_error("You do not have veep.zip!");
         vlog_error("Grab it from your purchased copy of the game,");
         vlog_error("or get it from the free Make and Play Edition.");
 
         SDL_ShowSimpleMessageBox(
             SDL_MESSAGEBOX_ERROR,
-            "data.zip missing!",
-            "You do not have data.zip!"
+            "veep.zip missing!",
+            "You do not have veep.zip!"
             "\n\nGrab it from your purchased copy of the game,"
             "\nor get it from the free Make and Play Edition.",
             NULL
