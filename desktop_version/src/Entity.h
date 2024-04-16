@@ -2,6 +2,7 @@
 #define ENTITY_H
 
 #include <SDL.h>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -123,12 +124,12 @@ public:
 
     bool checkplatform(const SDL_Rect& temprect, int* px, int* py);
 
-    bool checkblocks(const SDL_Rect& temprect, float dx, float dy, int dr, bool skipdirblocks);
+    bool checkblocks(const SDL_Rect& temprect, float dx, float dy, int dr, bool skipdirblocks, int t);
 
     bool checktowerspikes(int t);
 
-    bool checkwall(bool invincible, const SDL_Rect& temprect, float dx, float dy, int dr, bool skipblocks, bool skipdirblocks);
-    bool checkwall(bool invincible, const SDL_Rect& temprect);
+    bool checkwall(bool invincible, const SDL_Rect& temprect, float dx, float dy, int dr, bool skipblocks, bool skipdirblocks, int ent);
+    bool checkwall(bool invincible, const SDL_Rect& temprect, int ent);
 
     float hplatformat(int px, int py);
 
@@ -177,6 +178,7 @@ public:
     std::vector<blockclass> blocks;
     bool flags[100];
     bool collect[100];
+    std::set<int> coincollect;
     bool customcollect[100];
 
     int platformtile;

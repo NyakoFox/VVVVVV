@@ -1528,7 +1528,7 @@ void entityclass::createentity(int xp, int yp, int t, int meta1, int meta2, int 
 
         //Check if it's already been collected
         entity.para = meta1;
-        if (!INBOUNDS_ARR(meta1, collect) || collect[meta1]) return;
+        if (coincollect.find(meta1) != coincollect.end()) return;
         break;
     case 9: //Something Shiny
         entity.rule = 3;
@@ -2579,6 +2579,62 @@ bool entityclass::updateentities( int i )
                 }
                 break;
             }
+            case 19:
+            {
+                //Z, Start moving right
+                if (entities[i].state == 0)   //Init
+                {
+                    entities[i].state = 2; // Start right
+                    bool entitygone = updateentities(i);
+                    if (entitygone) return true;
+                }
+                else if (entities[i].state == 1)
+                {
+                    if (entities[i].outside()) entities[i].state = entities[i].onwall;
+                }
+                else if (entities[i].state == 2) // Going right
+                {
+                    entities[i].vx = entities[i].para;
+                    entities[i].vy = 0;
+                    entities[i].onwall = 3; // Down when hit wall
+                    entities[i].state = 1;
+                }
+                else if (entities[i].state == 3) // Going down
+                {
+                    entities[i].vx = 0;
+                    entities[i].vy = entities[i].para;
+                    entities[i].onwall = 4; // Right (2) when hit wall
+                    entities[i].state = 1;
+                }
+                else if (entities[i].state == 4) // Going right
+                {
+                    entities[i].vx = entities[i].para;
+                    entities[i].vy = 0;
+                    entities[i].onwall = 5; // Left when hit wall
+                    entities[i].state = 1;
+                }
+                else if (entities[i].state == 5) // Going left
+                {
+                    entities[i].vx = -entities[i].para;
+                    entities[i].vy = 0;
+                    entities[i].onwall = 6; // Up when hit wall
+                    entities[i].state = 1;
+                }
+                else if (entities[i].state == 6) // Going up
+                {
+                    entities[i].vx = 0;
+                    entities[i].vy = -entities[i].para;
+                    entities[i].onwall = 7; // Left when hit wall
+                    entities[i].state = 1;
+                }
+                else if (entities[i].state == 7)
+                {
+                    entities[i].vx = -entities[i].para;
+                    entities[i].vy = 0;
+                    entities[i].onwall = 2; // Right when hit wall
+                    entities[i].state = 1;
+                }
+            }
             break;
         case 2: //Disappearing platforms
             //wait for collision
@@ -2672,10 +2728,7 @@ bool entityclass::updateentities( int i )
             if (entities[i].state == 1)
             {
                 music.playef(Sound_COIN);
-                if (INBOUNDS_ARR(entities[i].para, collect))
-                {
-                    collect[(int) entities[i].para] = true;
-                }
+                coincollect.insert(entities[i].para);
 
                 return disableentity(i);
             }
@@ -4301,15 +4354,15 @@ bool entityclass::checkplatform(const SDL_Rect& temprect, int* px, int* py)
     return false;
 }
 
-bool entityclass::checkblocks(const SDL_Rect& temprect, const float dx, const float dy, const int dr, const bool skipdirblocks)
+bool entityclass::checkblocks(const SDL_Rect& temprect, const float dx, const float dy, const int dr, const bool skipdirblocks, int t)
 {
     for (size_t i = 0; i < blocks.size(); i++)
     {
         if(!skipdirblocks && blocks[i].type == DIRECTIONAL)
         {
-            if (dy > 0 && blocks[i].trigger == 0) if (help.intersects(blocks[i].rect, temprect)) return true;
+            if (dy >= 0 && blocks[i].trigger == 0) if (help.intersects(blocks[i].rect, temprect)) return true;
             if (dy <= 0 && blocks[i].trigger == 1) if (help.intersects(blocks[i].rect, temprect)) return true;
-            if (dx > 0 && blocks[i].trigger == 2) if (help.intersects(blocks[i].rect, temprect)) return true;
+            if (dx >= 0 && blocks[i].trigger == 2) if (help.intersects(blocks[i].rect, temprect)) return true;
             if (dx <= 0 && blocks[i].trigger == 3) if (help.intersects(blocks[i].rect, temprect)) return true;
         }
         if (blocks[i].type == BLOCK && help.intersects(blocks[i].rect, temprect))
@@ -4324,12 +4377,12 @@ bool entityclass::checkblocks(const SDL_Rect& temprect, const float dx, const fl
     return false;
 }
 
-bool entityclass::checkwall(const bool invincible, const SDL_Rect& temprect, const float dx, const float dy, const int dr, const bool skipblocks, const bool skipdirblocks)
+bool entityclass::checkwall(const bool invincible, const SDL_Rect& temprect, const float dx, const float dy, const int dr, const bool skipblocks, const bool skipdirblocks, int ent)
 {
     //Returns true if entity setup in temprect collides with a wall
     if(skipblocks)
     {
-        if (checkblocks(temprect, dx, dy, dr, skipdirblocks)) return true;
+        if (checkblocks(temprect, dx, dy, dr, skipdirblocks, ent)) return true;
     }
 
     int tempx = getgridpoint(temprect.x);
@@ -4367,10 +4420,10 @@ bool entityclass::checkwall(const bool invincible, const SDL_Rect& temprect, con
     return false;
 }
 
-bool entityclass::checkwall(const bool invincible, const SDL_Rect& temprect)
+bool entityclass::checkwall(const bool invincible, const SDL_Rect& temprect, int t)
 {
     // Same as above but use default arguments for blocks
-    return checkwall(invincible, temprect, 0, 0, 0, true, false);
+    return checkwall(invincible, temprect, 0, 0, 0, true, false, t);
 }
 
 float entityclass::hplatformat(const int px, const int py)
@@ -4590,7 +4643,7 @@ bool entityclass::entitycollidefloor( int t )
 
     const bool invincible = map.invincibility && entities[t].ishumanoid();
 
-    if (checkwall(invincible, temprect)) return true;
+    if (checkwall(invincible, temprect, t)) return true;
     return false;
 }
 
@@ -4610,7 +4663,7 @@ bool entityclass::entitycollideroof( int t )
 
     const bool invincible = map.invincibility && entities[t].ishumanoid();
 
-    if (checkwall(invincible, temprect)) return true;
+    if (checkwall(invincible, temprect, t)) return true;
     return false;
 }
 
@@ -4637,7 +4690,7 @@ bool entityclass::testwallsx( int t, int tx, int ty, const bool skipdirblocks )
     const bool invincible = map.invincibility && entities[t].ishumanoid();
 
     //Ok, now we check walls
-    if (checkwall(invincible, temprect, dx, dy, dr, skipblocks, skipdirblocks))
+    if (checkwall(invincible, temprect, dx, dy, dr, skipblocks, skipdirblocks, t))
     {
         if (entities[t].vx > 1.0f)
         {
@@ -4684,7 +4737,7 @@ bool entityclass::testwallsy( int t, int tx, int ty )
     const bool invincible = map.invincibility && entities[t].ishumanoid();
 
     //Ok, now we check walls
-    if (checkwall(invincible, temprect, dx, dy, dr, skipblocks, false))
+    if (checkwall(invincible, temprect, dx, dy, dr, skipblocks, false, t))
     {
         if (entities[t].vy > 1)
         {
@@ -4719,8 +4772,8 @@ void entityclass::applyfriction( int t, float xrate, float yrate )
     if (entities[t].vx < 0.00f) entities[t].vx += xrate;
     if (entities[t].vy > 0.00f) entities[t].vy -= yrate;
     if (entities[t].vy < 0.00f) entities[t].vy += yrate;
-    if (entities[t].vy > 14.00f) entities[t].vy = 14.0f;
-    if (entities[t].vy < -14.00f) entities[t].vy = -14.0f;
+    if (entities[t].vy > 10.00f) entities[t].vy = 10.0f;
+    if (entities[t].vy < -10.00f) entities[t].vy = -10.0f;
     if (entities[t].vx > 6.00f) entities[t].vx = 6.0f;
     if (entities[t].vx < -6.00f) entities[t].vx = -6.0f;
 

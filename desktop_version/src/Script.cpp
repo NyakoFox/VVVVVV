@@ -899,6 +899,40 @@ void scriptclass::run(void)
                 words[8] = word8;
                 words[9] = word9;
             }
+            else if (words[0] == "createblock")
+            {
+                int i = BLOCK;
+                if (words[1] == "block")
+                {
+                    i = BLOCK;
+                }
+                else if (words[1] == "trigger" || words[1] == "script")
+                {
+                    i = TRIGGER;
+                }
+                else if (words[1] == "damage")
+                {
+                    i = DAMAGE;
+                }
+                else if (words[1] == "directional")
+                {
+                    i = DIRECTIONAL;
+                }
+                else if (words[1] == "safe")
+                {
+                    i = SAFE;
+                }
+                else if (words[1] == "activity")
+                {
+                    i = ACTIVITY;
+                }
+                else
+                {
+                    i = ss_toi(words[1]);
+                }
+
+                obj.createblock(i, ss_toi(words[2]), ss_toi(words[3]), ss_toi(words[4]), ss_toi(words[5]), ss_toi(words[6]), words[7], true);
+            }
             else if (words[0] == "createcrewman")
             {
                 // Note: Do not change the "r" variable, it's used in custom levels
@@ -1437,6 +1471,7 @@ void scriptclass::run(void)
                     obj.collect[i] = false;
                     obj.customcollect[i] = false;
                 }
+                obj.coincollect.clear();
                 game.deathcounts = 0;
                 game.advancetext = false;
                 game.hascontrol = true;
@@ -3321,6 +3356,8 @@ void scriptclass::hardreset(void)
     SDL_memset(obj.collect, false, sizeof(obj.collect));
     SDL_memset(obj.customcollect, false, sizeof(obj.customcollect));
     i = 100; //previously a for-loop iterating over collect/customcollect set this to 100
+
+    obj.coincollect.clear();
 
     int theplayer = obj.getplayer();
     if (INBOUNDS_VEC(theplayer, obj.entities)){

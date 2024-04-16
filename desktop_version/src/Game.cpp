@@ -477,6 +477,22 @@ void Game::deletecustomlevelstats(void)
     }
 }
 
+#define LOAD_SET_RENAME(SET_NAME, DEST) \
+    if (SDL_strcmp(pKey, #SET_NAME) == 0 && pText[0] != '\0') \
+    { \
+        /* We're loading in 32-bit integers. If we need more than 16 chars,
+         * something is seriously wrong */ \
+             char buffer[16]; \
+             size_t start = 0; \
+             size_t i = 0; \
+             \
+             while (next_split_s(buffer, sizeof(buffer), &start, pText, ',')) \
+             { \
+                 DEST.insert(help.Int(buffer)); \
+                 ++i; \
+             } \
+    }
+
 #define LOAD_ARRAY_RENAME(ARRAY_NAME, DEST) \
     if (SDL_strcmp(pKey, #ARRAY_NAME) == 0 && pText[0] != '\0') \
     { \
@@ -5825,6 +5841,8 @@ void Game::customloadquick(const std::string& savfile)
 
         LOAD_ARRAY_RENAME(collect, obj.collect)
 
+        LOAD_SET_RENAME(coincollect, obj.coincollect)
+
         LOAD_ARRAY_RENAME(customcollect, obj.customcollect)
 
         if (SDL_strcmp(pKey, "finalmode") == 0)
@@ -7468,6 +7486,11 @@ int Game::trinkets(void)
         }
     }
     return temp;
+}
+
+int Game::coins(void)
+{
+    return (int) obj.coincollect.size();
 }
 
 int Game::crewmates(void)

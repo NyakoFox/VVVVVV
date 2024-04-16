@@ -956,6 +956,23 @@ int customlevelclass::findtrinket(int t)
     return 0;
 }
 
+int customlevelclass::findcoin(int t)
+{
+    int coins = 0;
+    for (int i = 0; i < (int)customentities.size(); i++)
+    {
+        if (i == t)
+        {
+            return coins;
+        }
+        if (customentities[i].t == 8)
+        {
+            coins++;
+        }
+    }
+    return 0;
+}
+
 int customlevelclass::findcrewmate(int t)
 {
     int ttrinket=0;
@@ -1213,6 +1230,15 @@ bool customlevelclass::load(std::string _path)
                 edEntityEl->QueryIntAttribute("p4", &entity.p4);
                 edEntityEl->QueryIntAttribute("p5", &entity.p5);
                 edEntityEl->QueryIntAttribute("p6", &entity.p6);
+
+                const char* activitytext = "";
+                const char* activitycolour = "";
+
+                edEntityEl->QueryStringAttribute("activitytext", &activitytext);
+                edEntityEl->QueryStringAttribute("activitycolour", &activitycolour);
+
+                entity.activitytext = activitytext;
+                entity.activitycolour = activitycolour;
 
                 customentities.push_back(entity);
             }
@@ -1569,6 +1595,14 @@ bool customlevelclass::save(const std::string& _path)
         edentityElement->SetAttribute( "p4", customentities[i].p4);
         edentityElement->SetAttribute( "p5", customentities[i].p5);
         edentityElement->SetAttribute(  "p6", customentities[i].p6);
+        if (!customentities[i].activitytext.empty())
+        {
+            edentityElement->SetAttribute("activitytext", customentities[i].activitytext.c_str());
+        }
+        if (!customentities[i].activitycolour.empty())
+        {
+            edentityElement->SetAttribute("activitycolour", customentities[i].activitycolour.c_str());
+        }
         edentityElement->LinkEndChild( doc.NewText( customentities[i].scriptname.c_str() )) ;
         msg->LinkEndChild( edentityElement );
     }
@@ -1954,6 +1988,19 @@ int customlevelclass::numtrinkets(void)
     for (size_t i = 0; i < customentities.size(); i++)
     {
         if (customentities[i].t == 9 && inbounds(&customentities[i]))
+        {
+            temp++;
+        }
+    }
+    return temp;
+}
+
+int customlevelclass::numcoins(void)
+{
+    int temp = 0;
+    for (size_t i = 0; i < customentities.size(); i++)
+    {
+        if (customentities[i].t == 8 && inbounds(&customentities[i]))
         {
             temp++;
         }
