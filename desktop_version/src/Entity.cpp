@@ -1398,6 +1398,7 @@ void entityclass::createentity(int xp, int yp, int t, int meta1, int meta2, int 
         if (meta1 >= 2  && meta1 <= 5) horplatforms = true;
         if (meta1 == 14 || meta1 == 15) horplatforms = true; //special case for last part of Space Station
         if (meta1 >= 6  && meta1 <= 7) vertplatforms = true;
+        if (meta1 == 24) vertplatforms = true; //special case for "Public Transit"
 
         if (meta1 >= 10  && meta1 <= 11)
         {
@@ -2224,7 +2225,7 @@ bool entityclass::updateentities( int i )
             break;
         case 1:  //Movement behaviors
             //Enemies can have a number of different behaviors:
-            switch(entities[i].behave)
+            switch (entities[i].behave)
             {
             case 0: //Bounce, Start moving down
                 if (entities[i].state == 0)   //Init
@@ -2340,9 +2341,9 @@ bool entityclass::updateentities( int i )
                 {
                     entities[i].vx = 0;
                     entities[i].onwall = 0;
-                    entities[i].xp -=  static_cast<int>(entities[i].para);
-                    entities[i].statedelay=8;
-                    entities[i].state=0;
+                    entities[i].xp -= static_cast<int>(entities[i].para);
+                    entities[i].statedelay = 8;
+                    entities[i].state = 0;
                 }
                 break;
             case 6: //Always move up
@@ -2356,9 +2357,9 @@ bool entityclass::updateentities( int i )
                 {
                     entities[i].vy = static_cast<int>(-entities[i].para);
                     entities[i].onwall = 0;
-                    entities[i].yp -=  (entities[i].para);
-                    entities[i].statedelay=8;
-                    entities[i].state=0;
+                    entities[i].yp -= (entities[i].para);
+                    entities[i].statedelay = 8;
+                    entities[i].state = 0;
                 }
                 break;
             case 7: //Always move down
@@ -2381,7 +2382,7 @@ bool entityclass::updateentities( int i )
                 //Emitter: shoot an enemy every so often
                 if (entities[i].state == 0)
                 {
-                    createentity(entities[i].xp+28, entities[i].yp, 1, 10, 1);
+                    createentity(entities[i].xp + 28, entities[i].yp, 1, 10, 1);
                     entities[i].state = 1;
                     entities[i].statedelay = 12;
                 }
@@ -2404,7 +2405,7 @@ bool entityclass::updateentities( int i )
                     }
                     if (game.roomx == 117)
                     {
-                        if (entities[i].xp >= (33*8)-32)
+                        if (entities[i].xp >= (33 * 8) - 32)
                         {
                             return disableentity(i);
                         }
@@ -2452,7 +2453,7 @@ bool entityclass::updateentities( int i )
                 {
                     for (size_t j = 0; j < entities.size(); j++)
                     {
-                        if (entities[j].type == 2 && entities[j].state== 3 && entities[j].xp == (entities[i].xp-32) )
+                        if (entities[j].type == 2 && entities[j].state == 3 && entities[j].xp == (entities[i].xp - 32))
                         {
                             entities[i].state = 3;
                             bool entitygone = updateentities(i);
@@ -2482,7 +2483,7 @@ bool entityclass::updateentities( int i )
                 {
                     for (size_t j = 0; j < entities.size(); j++)
                     {
-                        if (entities[j].type == 2 && entities[j].state==3 && entities[j].xp==entities[i].xp+32)
+                        if (entities[j].type == 2 && entities[j].state == 3 && entities[j].xp == entities[i].xp + 32)
                         {
                             entities[i].state = 3;
                             bool entitygone = updateentities(i);
@@ -2515,8 +2516,8 @@ bool entityclass::updateentities( int i )
                     if (INBOUNDS_VEC(player, entities) && entities[player].yp > 14 * 8)
                     {
                         entities[i].tile = 120;
-                        entities[i].yp = (28*8)-62;
-                        entities[i].lerpoldyp = (28*8)-62;
+                        entities[i].yp = (28 * 8) - 62;
+                        entities[i].lerpoldyp = (28 * 8) - 62;
                     }
                     else
                     {
@@ -2566,8 +2567,8 @@ bool entityclass::updateentities( int i )
                 if (entities[i].state == 0)   //Init
                 {
                     entities[i].statedelay = 6;
-                    entities[i].xp -=  int(entities[i].para);
-                    entities[i].lerpoldxp -=  int(entities[i].para);
+                    entities[i].xp -= int(entities[i].para);
+                    entities[i].lerpoldxp -= int(entities[i].para);
                 }
                 break;
             case 18: //Special for ASCII Snake (right)
@@ -2578,7 +2579,6 @@ bool entityclass::updateentities( int i )
                     entities[i].lerpoldxp += int(entities[i].para);
                 }
                 break;
-            }
             case 19:
             {
                 //Z, Start moving right
@@ -2634,6 +2634,198 @@ bool entityclass::updateentities( int i )
                     entities[i].onwall = 2; // Right when hit wall
                     entities[i].state = 1;
                 }
+                break;
+            }
+            case 20: //Square, Start moving down
+                if (entities[i].state == 0)   //Init
+                {
+                    entities[i].state = 2;
+                    bool entitygone = updateentities(i);
+                    if (entitygone) return true;
+                }
+                else if (entities[i].state == 1)
+                {
+                    if (entities[i].outside()) entities[i].state = entities[i].onwall;
+                }
+                else if (entities[i].state == 2) // Down
+                {
+                    entities[i].vx = 0;
+                    entities[i].vy = entities[i].para;
+                    entities[i].onwall = 3;
+                    entities[i].state = 1;
+                }
+                else if (entities[i].state == 3) // Left
+                {
+                    entities[i].vy = 0;
+                    entities[i].vx = -entities[i].para;
+                    entities[i].onwall = 4;
+                    entities[i].state = 1;
+                }
+                else if (entities[i].state == 4) // Up
+                {
+                    entities[i].vx = 0;
+                    entities[i].vy = -entities[i].para;
+                    entities[i].onwall = 5;
+                    entities[i].state = 1;
+                }
+                else if (entities[i].state == 5) // Right
+                {
+                    entities[i].vy = 0;
+                    entities[i].vx = entities[i].para;
+                    entities[i].onwall = 2;
+                    entities[i].state = 1;
+                }
+                break;
+            case 21: //Square, Start moving up
+                if (entities[i].state == 0)   //Init
+                {
+                    entities[i].state = 2;
+                    bool entitygone = updateentities(i);
+                    if (entitygone) return true;
+                }
+                else if (entities[i].state == 1)
+                {
+                    if (entities[i].outside()) entities[i].state = entities[i].onwall;
+                }
+                else if (entities[i].state == 2) // Up
+                {
+                    entities[i].vx = 0;
+                    entities[i].vy = -entities[i].para;
+                    entities[i].onwall = 3;
+                    entities[i].state = 1;
+                }
+                else if (entities[i].state == 3) // Right
+                {
+                    entities[i].vy = 0;
+                    entities[i].vx = entities[i].para;
+                    entities[i].onwall = 4;
+                    entities[i].state = 1;
+                }
+                else if (entities[i].state == 4) // Down
+                {
+                    entities[i].vx = 0;
+                    entities[i].vy = entities[i].para;
+                    entities[i].onwall = 5;
+                    entities[i].state = 1;
+                }
+                else if (entities[i].state == 5) // Left
+                {
+                    entities[i].vy = 0;
+                    entities[i].vx = -entities[i].para;
+                    entities[i].onwall = 2;
+                    entities[i].state = 1;
+                }
+                break;
+            case 22: //Square, Start moving left
+                if (entities[i].state == 0)   //Init
+                {
+                    entities[i].state = 2;
+                    bool entitygone = updateentities(i);
+                    if (entitygone) return true;
+                }
+                else if (entities[i].state == 1)
+                {
+                    if (entities[i].outside()) entities[i].state = entities[i].onwall;
+                }
+                else if (entities[i].state == 2) // Left
+                {
+                    entities[i].vy = 0;
+                    entities[i].vx = -entities[i].para;
+                    entities[i].onwall = 3;
+                    entities[i].state = 1;
+                }
+                else if (entities[i].state == 3) // Up
+                {
+                    entities[i].vx = 0;
+                    entities[i].vy = -entities[i].para;
+                    entities[i].onwall = 4;
+                    entities[i].state = 1;
+                }
+                else if (entities[i].state == 4) // Right
+                {
+                    entities[i].vx = entities[i].para;
+                    entities[i].vy = 0;
+                    entities[i].onwall = 5;
+                    entities[i].state = 1;
+                }
+                else if (entities[i].state == 5) // Down
+                {
+                    entities[i].vx = 0;
+                    entities[i].vy = entities[i].para;
+                    entities[i].onwall = 2;
+                    entities[i].state = 1;
+                }
+                break;
+            case 23: //Square, Start moving right
+                if (entities[i].state == 0)   //Init
+                {
+                    entities[i].state = 2;
+                    bool entitygone = updateentities(i);
+                    if (entitygone) return true;
+                }
+                else if (entities[i].state == 1)
+                {
+                    if (entities[i].outside()) entities[i].state = entities[i].onwall;
+                }
+                else if (entities[i].state == 2) // Right
+                {
+                    entities[i].vy = 0;
+                    entities[i].vx = entities[i].para;
+                    entities[i].onwall = 3;
+                    entities[i].state = 1;
+                }
+                else if (entities[i].state == 3) // Down
+                {
+                    entities[i].vx = 0;
+                    entities[i].vy = entities[i].para;
+                    entities[i].onwall = 4;
+                    entities[i].state = 1;
+                }
+                else if (entities[i].state == 4) // Left
+                {
+                    entities[i].vx = -entities[i].para;
+                    entities[i].vy = 0;
+                    entities[i].onwall = 5;
+                    entities[i].state = 1;
+                }
+                else if (entities[i].state == 5) // Up
+                {
+                    entities[i].vx = 0;
+                    entities[i].vy = -entities[i].para;
+                    entities[i].onwall = 2;
+                    entities[i].state = 1;
+                }
+                break;
+            case 24: // Very special hack (Ally): as one, but doesn't move in specific circumstances
+                if (entities[i].state == 0) //Init
+                {
+                    for (size_t j = 0; j < entities.size(); j++)
+                    {
+                        if (entities[j].type == 2 && entities[j].state == 3 && entities[j].yp == (entities[i].yp - 8))
+                        {
+                            entities[i].state = 3;
+                            bool entitygone = updateentities(i);
+                            if (entitygone) return true;
+                        }
+                    }
+                }
+                else if (entities[i].state == 1)
+                {
+                    if (entities[i].outside()) entities[i].state = entities[i].onwall;
+                }
+                else if (entities[i].state == 2)
+                {
+                    entities[i].vy = entities[i].para;
+                    entities[i].onwall = 3;
+                    entities[i].state = 1;
+                }
+                else if (entities[i].state == 3)
+                {
+                    entities[i].vy = -entities[i].para;
+                    entities[i].onwall = 2;
+                    entities[i].state = 1;
+                }
+                break;
             }
             break;
         case 2: //Disappearing platforms
@@ -2645,16 +2837,51 @@ bool entityclass::updateentities( int i )
                 entities[i].onentity = 0;
 
                 music.playef(Sound_DISAPPEAR);
+                if (entities[i].para == 1)
+                {
+                    entities[i].life = 0;
+                }
             }
             else if (entities[i].state == 2)
             {
-                entities[i].life--;
-                if (entities[i].life % 3 == 0) entities[i].walkingframe++;
-                if (entities[i].life <= 0)
+                if (entities[i].para == 1)
                 {
-                    disableblockat(entities[i].xp, entities[i].yp);
-                    entities[i].state = 3;// = false;
-                    entities[i].invis = true;
+                    entities[i].life++;
+                    entities[i].ay = 0.1 * entities[i].life;
+
+                    disableblockat(entities[i].oldxp, entities[i].oldyp);
+
+                    int oldvx = entities[i].vx;
+                    int oldvy = entities[i].vy;
+                    entities[i].oldxp = entities[i].xp;
+                    entities[i].oldyp = entities[i].yp;
+
+                    updateentitylogic(i);
+
+                    // ok, new block at xp, yp
+                    createblock(BLOCK, entities[i].xp, entities[i].yp, 32, 8);
+
+                    entities[i].xp = entities[i].oldxp;
+                    entities[i].yp = entities[i].oldyp;
+                    entities[i].vx = oldvx;
+                    entities[i].vy = oldvy;
+
+                    if (entities[i].yp > 240)
+                    {
+                        disableblockat(entities[i].xp, entities[i].yp);
+                        return disableentity(i);
+                    }
+                }
+                else
+                {
+                    entities[i].life--;
+                    if (entities[i].life % 3 == 0) entities[i].walkingframe++;
+                    if (entities[i].life <= 0)
+                    {
+                        disableblockat(entities[i].xp, entities[i].yp);
+                        entities[i].state = 3;// = false;
+                        entities[i].invis = true;
+                    }
                 }
             }
             else if (entities[i].state == 3)

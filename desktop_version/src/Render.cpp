@@ -2395,7 +2395,7 @@ void gamerender(void)
         graphics.draw_grid_tile(graphics.grphx.im_tiles_white, 48, 311, 231, 8, 8, graphics.getRGB(0, 0, 0));
     }
 
-    graphics.draw_grid_tile(graphics.grphx.im_tiles_white, 48, 311, 230, 8, 8, graphics.getRGB(color, color, 196));
+    graphics.draw_grid_tile(graphics.grphx.im_tiles_white, 48, 311, 230, 8, 8, graphics.huetilegetcol());
 
     if (map.roomtexton)
     {

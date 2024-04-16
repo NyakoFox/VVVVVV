@@ -1842,7 +1842,7 @@ void mapclass::loadlevel(int rx, int ry)
             int bx1 = 0, by1 = 0, bx2 = 0, by2 = 0;
 
             bool enemy = ent.t == 1;
-            bool moving_plat = ent.t == 2 && ent.p1 <= 4;
+            bool moving_plat = ent.t == 2 && (ent.p1 <= 4 || ent.p1 > 9);
             if (enemy || moving_plat)
             {
                 if (enemy)
@@ -1877,7 +1877,7 @@ void mapclass::loadlevel(int rx, int ry)
             {
             case 1: // Enemies
                 obj.customenemy = room->enemytype;
-                obj.createentity(ex, ey, 56, ent.p1, 4, bx1, by1, bx2, by2);
+                obj.createentity(ex, ey, 56, ent.p1, 4 + room->enemyv, bx1, by1, bx2, by2);
                 break;
             case 2: // Platforms and conveyors
                 if (ent.p1 <= 4)
@@ -1888,9 +1888,13 @@ void mapclass::loadlevel(int rx, int ry)
                 {
                     obj.createentity(ex, ey, 2, ent.p1 + 3, 4);
                 }
+                else if (ent.p1 > 9) // More platforms
+                {
+                    obj.createentity(ex, ey, 2, ent.p1, room->platv, bx1, by1, bx2, by2);
+                }
                 break;
             case 3: // Disappearing platforms
-                obj.createentity(ex, ey, 3);
+                obj.createentity(ex, ey, 3, 0, ent.p1);
                 break;
             case 8: // Coins
                 obj.createentity(ex, ey, 8, cl.findcoin(edi));
