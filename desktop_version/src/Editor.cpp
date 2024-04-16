@@ -1245,6 +1245,18 @@ static void draw_entities(void)
                 graphics.draw_rect(x, y, entity->p1 * 8, entity->p2 * 8, graphics.getRGB(164, 164, 255));
                 graphics.draw_rect(x, y, 8, 8, graphics.getRGB(255, 255, 255));
                 break;
+            case 25: // Trigger boxes
+            {
+                graphics.draw_rect(x, y, entity->p1 * 8, entity->p2 * 8, graphics.getRGB(255, 164, 255));
+                graphics.draw_rect(x, y, 8, 8, graphics.getRGB(255, 255, 255));
+
+                int arrow_x = x + (entity->p1 - 1) * 4;
+                int arrow_y = y + (entity->p2 - 1) * 4;
+
+                font::print(PR_FONT_LEVEL | PR_BOR | PR_CJK_HIGH, arrow_x, arrow_y, help.String(entity->p3), 255, 255, 255);
+
+                break;
+            }
             case 50: // Warp Lines
                 if (entity->p1 >= 2) // Horizontal
                 {

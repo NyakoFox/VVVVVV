@@ -1398,7 +1398,7 @@ void entityclass::createentity(int xp, int yp, int t, int meta1, int meta2, int 
         if (meta1 >= 2  && meta1 <= 5) horplatforms = true;
         if (meta1 == 14 || meta1 == 15) horplatforms = true; //special case for last part of Space Station
         if (meta1 >= 6  && meta1 <= 7) vertplatforms = true;
-        if (meta1 == 24) vertplatforms = true; //special case for "Public Transit"
+        if (meta1 == 24 || meta1 == 25) vertplatforms = true; //special case for "Public Transit"
 
         if (meta1 >= 10  && meta1 <= 11)
         {
@@ -2837,51 +2837,16 @@ bool entityclass::updateentities( int i )
                 entities[i].onentity = 0;
 
                 music.playef(Sound_DISAPPEAR);
-                if (entities[i].para == 1)
-                {
-                    entities[i].life = 0;
-                }
             }
             else if (entities[i].state == 2)
             {
-                if (entities[i].para == 1)
+                entities[i].life--;
+                if (entities[i].life % 3 == 0) entities[i].walkingframe++;
+                if (entities[i].life <= 0)
                 {
-                    entities[i].life++;
-                    entities[i].ay = 0.1 * entities[i].life;
-
-                    disableblockat(entities[i].oldxp, entities[i].oldyp);
-
-                    int oldvx = entities[i].vx;
-                    int oldvy = entities[i].vy;
-                    entities[i].oldxp = entities[i].xp;
-                    entities[i].oldyp = entities[i].yp;
-
-                    updateentitylogic(i);
-
-                    // ok, new block at xp, yp
-                    createblock(BLOCK, entities[i].xp, entities[i].yp, 32, 8);
-
-                    entities[i].xp = entities[i].oldxp;
-                    entities[i].yp = entities[i].oldyp;
-                    entities[i].vx = oldvx;
-                    entities[i].vy = oldvy;
-
-                    if (entities[i].yp > 240)
-                    {
-                        disableblockat(entities[i].xp, entities[i].yp);
-                        return disableentity(i);
-                    }
-                }
-                else
-                {
-                    entities[i].life--;
-                    if (entities[i].life % 3 == 0) entities[i].walkingframe++;
-                    if (entities[i].life <= 0)
-                    {
-                        disableblockat(entities[i].xp, entities[i].yp);
-                        entities[i].state = 3;// = false;
-                        entities[i].invis = true;
-                    }
+                    disableblockat(entities[i].xp, entities[i].yp);
+                    entities[i].state = 3;// = false;
+                    entities[i].invis = true;
                 }
             }
             else if (entities[i].state == 3)

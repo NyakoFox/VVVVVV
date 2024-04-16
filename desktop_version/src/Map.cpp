@@ -1894,7 +1894,7 @@ void mapclass::loadlevel(int rx, int ry)
                 }
                 break;
             case 3: // Disappearing platforms
-                obj.createentity(ex, ey, 3, 0, ent.p1);
+                obj.createentity(ex, ey, 3);
                 break;
             case 8: // Coins
                 obj.createentity(ex, ey, 8, cl.findcoin(edi));
@@ -1993,6 +1993,9 @@ void mapclass::loadlevel(int rx, int ry)
                 break;
             case 24: // Safe Box
                 obj.createblock(SAFE, ex, ey, ent.p1 * 8, ent.p2 * 8);
+                break;
+            case 25: // Trigger
+                obj.createblock(TRIGGER, ex, ey, ent.p1 * 8, ent.p2 * 8, ent.p3);
                 break;
             case 50: // Warp Lines
                 obj.customwarpmode=true;

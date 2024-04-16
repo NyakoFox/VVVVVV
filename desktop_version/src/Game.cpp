@@ -4629,6 +4629,19 @@ void Game::updatestate(void)
             advancetext = false;
             state = 0;
             break;
+        // Veep stuff starts here!
+        case 5000: // Respawn platforms
+        {
+            for (size_t i = 0; i < obj.entities.size(); i++)
+            {
+                if (obj.entities[i].type == 2 && obj.entities[i].state == 3)
+                {
+                    obj.entities[i].state = 4;
+                }
+            }
+            setstate(0);
+            break;
+        }
         }
     }
 }
