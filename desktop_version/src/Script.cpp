@@ -3057,13 +3057,17 @@ void scriptclass::teleport(void)
     game.companion = 0;
 
     i = obj.getplayer(); //less likely to have a serious collision error if the player is centered
-    if (INBOUNDS_VEC(i, obj.entities))
+
+    if (game.teleportscript == "" || game.teleportscript == "levelonecomplete" || game.teleportscript == "gamecomplete")
     {
-        obj.entities[i].xp = 150;
-        obj.entities[i].yp = 110;
-        if(game.teleport_to_x==17 && game.teleport_to_y==17 && !map.custommode) obj.entities[i].xp = 88; //prevent falling!
-        obj.entities[i].lerpoldxp = obj.entities[i].xp;
-        obj.entities[i].lerpoldyp = obj.entities[i].yp;
+        if (INBOUNDS_VEC(i, obj.entities))
+        {
+            obj.entities[i].xp = 150;
+            obj.entities[i].yp = 110;
+            if (game.teleport_to_x == 17 && game.teleport_to_y == 17 && !map.custommode) obj.entities[i].xp = 88; //prevent falling!
+            obj.entities[i].lerpoldxp = obj.entities[i].xp;
+            obj.entities[i].lerpoldyp = obj.entities[i].yp;
+        }
     }
 
     if (game.teleportscript == "levelonecomplete")
@@ -3078,69 +3082,75 @@ void scriptclass::teleport(void)
     }
 
     game.gravitycontrol = 0;
-    map.gotoroom(100+game.teleport_to_x, 100+game.teleport_to_y);
-    j = obj.getteleporter();
-    if (INBOUNDS_VEC(j, obj.entities))
-    {
-        obj.entities[j].state = 2;
-    }
+
     game.teleport_to_new_area = false;
 
-    if (INBOUNDS_VEC(j, obj.entities))
+    if (game.teleportscript == "" || game.teleportscript == "levelonecomplete" || game.teleportscript == "gamecomplete")
     {
-        game.savepoint = obj.entities[j].para;
-        game.savex = obj.entities[j].xp + 44;
-        game.savey = obj.entities[j].yp + 44;
-    }
-    game.savegc = 0;
+        map.gotoroom(100 + game.teleport_to_x, 100 + game.teleport_to_y);
 
-    game.saverx = game.roomx;
-    game.savery = game.roomy;
-    int player = obj.getplayer();
-    if (INBOUNDS_VEC(player, obj.entities))
-    {
-        game.savedir = obj.entities[player].dir;
-    }
+        j = obj.getteleporter();
+        if (INBOUNDS_VEC(j, obj.entities))
+        {
+            obj.entities[j].state = 2;
+        }
 
-    if (map.custommode)
-    {
-        game.state = 4100;
-    }
-    else if(game.teleport_to_x==0 && game.teleport_to_y==0)
-    {
-        game.setstate(4020);
-    }
-    else if(game.teleport_to_x==0 && game.teleport_to_y==16)
-    {
-        game.setstate(4030);
-    }
-    else if(game.teleport_to_x==7 && game.teleport_to_y==9)
-    {
-        game.setstate(4040);
-    }
-    else if(game.teleport_to_x==8 && game.teleport_to_y==11)
-    {
-        game.setstate(4050);
-    }
-    else if(game.teleport_to_x==14 && game.teleport_to_y==19)
-    {
-        game.setstate(4030);
-    }
-    else if(game.teleport_to_x==17 && game.teleport_to_y==12)
-    {
-        game.setstate(4020);
-    }
-    else if(game.teleport_to_x==17 && game.teleport_to_y==17)
-    {
-        game.setstate(4020);
-    }
-    else if(game.teleport_to_x==18 && game.teleport_to_y==7)
-    {
-        game.setstate(4060);
-    }
-    else
-    {
-        game.setstate(4010);
+        if (INBOUNDS_VEC(j, obj.entities))
+        {
+            game.savepoint = obj.entities[j].para;
+            game.savex = obj.entities[j].xp + 44;
+            game.savey = obj.entities[j].yp + 44;
+        }
+        game.savegc = 0;
+
+        game.saverx = game.roomx;
+        game.savery = game.roomy;
+        int player = obj.getplayer();
+        if (INBOUNDS_VEC(player, obj.entities))
+        {
+            game.savedir = obj.entities[player].dir;
+        }
+
+        if (map.custommode)
+        {
+            game.state = 4100;
+        }
+        else if(game.teleport_to_x==0 && game.teleport_to_y==0)
+        {
+            game.setstate(4020);
+        }
+        else if(game.teleport_to_x==0 && game.teleport_to_y==16)
+        {
+            game.setstate(4030);
+        }
+        else if(game.teleport_to_x==7 && game.teleport_to_y==9)
+        {
+            game.setstate(4040);
+        }
+        else if(game.teleport_to_x==8 && game.teleport_to_y==11)
+        {
+            game.setstate(4050);
+        }
+        else if(game.teleport_to_x==14 && game.teleport_to_y==19)
+        {
+            game.setstate(4030);
+        }
+        else if(game.teleport_to_x==17 && game.teleport_to_y==12)
+        {
+            game.setstate(4020);
+        }
+        else if(game.teleport_to_x==17 && game.teleport_to_y==17)
+        {
+            game.setstate(4020);
+        }
+        else if(game.teleport_to_x==18 && game.teleport_to_y==7)
+        {
+            game.setstate(4060);
+        }
+        else
+        {
+            game.setstate(4010);
+        }
     }
 
     if (game.teleportscript != "")

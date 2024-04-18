@@ -2826,6 +2826,24 @@ bool entityclass::updateentities( int i )
                     entities[i].state = 1;
                 }
                 break;
+            case 25: // Bouncy, reacts to gravity lines!
+                entities[i].life++;
+                entities[i].vy = entities[i].life * 0.2;
+                // For all gravity lines
+                for (size_t j = 0; j < entities.size(); j++)
+                {
+                    if (entities[j].type == 9)
+                    {
+                        if (entityhlinecollide(i, j))
+                        {
+                            music.playef(Sound_GRAVITYLINE);
+                            entities[i].vy = -4;
+                            entities[i].life = -4 / 0.2;
+                            entities[i].yp = entities[i].oldyp;
+                            break;
+                        }
+                    }
+                }
             }
             break;
         case 2: //Disappearing platforms
@@ -3015,16 +3033,20 @@ bool entityclass::updateentities( int i )
 
 
                 music.playef(Sound_GRAVITYLINE);
-                game.gravitycontrol = (game.gravitycontrol + 1) % 2;
+                //game.gravitycontrol = (game.gravitycontrol + 1) % 2;
                 game.totalflips++;
                 int temp = getplayer();
-                if (game.gravitycontrol == 0)
+                entities[temp].vy *= -0.8;
+                entities[temp].ay *= -0.8;
+                if (game.gravitycontrol == 1)
                 {
-                    if (INBOUNDS_VEC(temp, entities) && entities[temp].vy < 3) entities[temp].vy = 3;
+                    if (INBOUNDS_VEC(temp, entities) && entities[temp].vy < 8) entities[temp].vy = 8;
+                    if (INBOUNDS_VEC(temp, entities) && entities[temp].ay < 3) entities[temp].ay = 3;
                 }
                 else
                 {
-                    if (INBOUNDS_VEC(temp, entities) && entities[temp].vy > -3) entities[temp].vy = -3;
+                    if (INBOUNDS_VEC(temp, entities) && entities[temp].vy > -8) entities[temp].vy = -8;
+                    if (INBOUNDS_VEC(temp, entities) && entities[temp].ay > -3) entities[temp].ay = -3;
                 }
             }
             else if (entities[i].state == 2)
@@ -4960,12 +4982,14 @@ void entityclass::applyfriction( int t, float xrate, float yrate )
         return;
     }
 
+    const float max_y = 10.0f;
+
     if (entities[t].vx > 0.00f) entities[t].vx -= xrate;
     if (entities[t].vx < 0.00f) entities[t].vx += xrate;
     if (entities[t].vy > 0.00f) entities[t].vy -= yrate;
     if (entities[t].vy < 0.00f) entities[t].vy += yrate;
-    if (entities[t].vy > 10.00f) entities[t].vy = 10.0f;
-    if (entities[t].vy < -10.00f) entities[t].vy = -10.0f;
+    if (entities[t].vy > max_y) entities[t].vy = max_y;
+    if (entities[t].vy < -max_y) entities[t].vy = -max_y;
     if (entities[t].vx > 6.00f) entities[t].vx = 6.0f;
     if (entities[t].vx < -6.00f) entities[t].vx = -6.0f;
 
@@ -5264,15 +5288,20 @@ void entityclass::collisioncheck(int i, int j, bool scm /*= false*/)
                 if (entityhlinecollide(i, j))
                 {
                     music.playef(Sound_GRAVITYLINE);
-                    game.gravitycontrol = (game.gravitycontrol + 1) % 2;
+                    //game.gravitycontrol = (game.gravitycontrol + 1) % 2;
                     game.totalflips++;
-                    if (game.gravitycontrol == 0)
+                    entities[i].yp = entities[i].oldyp;
+                    entities[i].vy *= -0.8;
+                    entities[i].ay *= -0.8;
+                    if (game.gravitycontrol == 1)
                     {
-                        if (entities[i].vy < 1) entities[i].vy = 1;
+                        if (entities[i].vy < 8) entities[i].vy = 8;
+                        if (entities[i].ay < 3) entities[i].ay = 3;
                     }
                     else
                     {
-                        if (entities[i].vy > -1) entities[i].vy = -1;
+                        if (entities[i].vy > -8) entities[i].vy = -8;
+                        if (entities[i].ay > -3) entities[i].ay = -3;
                     }
 
                     entities[j].state = entities[j].onentity;
