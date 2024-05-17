@@ -7577,6 +7577,8 @@ void Game::quittomenu(void)
         return;
     }
 
+    music.haltdasmusik();
+    music.currentsong = -1;
     gamestate = IDLEMODE;
     graphics.fademode = FADE_START_FADEIN;
     FILESYSTEM_unmountAssets();
@@ -7624,6 +7626,8 @@ static void resetbg(void)
 
 void Game::returntoeditor(void)
 {
+    music.haltdasmusik();
+    music.currentsong = -1;
     gamestate = IDLEMODE;
 
     graphics.textboxes.clear();

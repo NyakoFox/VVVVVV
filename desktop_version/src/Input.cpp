@@ -2613,23 +2613,10 @@ void gameinput(void)
     }
 
     //Returning to editor mode must always be possible
-    if (map.custommode && !map.custommodeforreal)
+    if (key.isDown(27) && !game.mapheld)
     {
-        if ((game.press_map || key.isDown(27)) && !game.mapheld)
-        {
-            if (!game.separate_interact
-            && game.press_map
-            && (INBOUNDS_VEC(game.activeactivity, obj.blocks)
-            || (game.activetele && game.readytotele > 20)))
-            {
-                /* Pass, let code block below handle it */
-            }
-            else
-            {
-                game.returntoeditor();
-                game.mapheld = true;
-            }
-        }
+        game.returntoeditor();
+        game.mapheld = true;
     }
 
     //Entity type 0 is player controled
