@@ -108,6 +108,8 @@ extern "C" DECLSPEC void SDLCALL set_sound_volume(int volume)
 
 extern "C" DECLSPEC void SDLCALL return_to_idlemode(void)
 {
+    music.haltdasmusik();
+    music.currentsong = -1;
     game.quittomenu();
 }
 
