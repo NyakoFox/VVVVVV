@@ -14,6 +14,7 @@
 #include "ConsoleInput.h"
 #include "CustomLevels.h"
 #include "Entity.h"
+#include "Exit.h"
 #include "FileSystemUtils.h"
 #include "Font.h"
 #include "Game.h"
@@ -408,13 +409,79 @@ namespace multiplayer
                 {
                     if (args[0] == "say")
                     {
+                        std::string message = command.substr(4, std::string::npos);
+                        if (message.empty())
+                        {
+                            vlog_error("Usage: say <message>");
+                        }
+                        else
+                        {
+                            for (int i = 0; i < players.size(); i++)
+                            {
+                                Packet packet = Packet("message", ENET_PACKET_FLAG_RELIABLE);
+                                packet.write_string("Server");
+                                packet.write_string(message);
+                                players[i].send(&packet);
+                            }
+                            vlog_info("Sent message to %i players.", (int) players.size());
+                        }
+                    }
+                    else if (args[0] == "list")
+                    {
+                        vlog_info("Online players:");
                         for (int i = 0; i < players.size(); i++)
                         {
-                            Packet packet = Packet("message", ENET_PACKET_FLAG_RELIABLE);
-                            packet.write_string("Server");
-                            packet.write_string(command.substr(4, std::string::npos));
-                            players[i].send(&packet);
+                            vlog_info("- %s", players[i].name.c_str());
                         }
+                    }
+                    else if (args[0] == "kick")
+                    {
+                        if (args.size() > 1)
+                        {
+                            bool found = false;
+                            for (int i = 0; i < players.size(); i++)
+                            {
+                                if (players[i].name == args[1])
+                                {
+                                    enet_peer_disconnect(players[i].peer, 0);
+                                    found = true;
+                                    break;
+                                }
+                            }
+                            if (found)
+                            {
+                                vlog_info("Kicked player %s.", args[1].c_str());
+                            }
+                            else
+                            {
+                                vlog_info("Player %s not found.", args[1].c_str());
+                            }
+                        }
+                        else
+                        {
+                            vlog_error("Usage: kick <player>");
+                        }
+                    }
+                    else if (args[0] == "shutdown" || args[0] == "exit" || args[0] == "stop")
+                    {
+                        for (int i = 0; i < players.size(); i++)
+                        {
+                            enet_peer_disconnect(players[i].peer, 0);
+                        }
+                        vlog_info("Shutting down server.");
+                        VVV_exit(0);
+                    }
+                    else if (args[0] == "help")
+                    {
+                        vlog_info("Available commands:");
+                        vlog_info("- say <message> - Send a message to all players.");
+                        vlog_info("- list - List all online players.");
+                        vlog_info("- kick <player> - Kick a player.");
+                        vlog_info("- shutdown/exit/stop - Shutdown the server.");
+                    }
+                    else
+                    {
+                        vlog_error("Unknown command.");
                     }
                 }
             }
