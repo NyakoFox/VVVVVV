@@ -407,22 +407,9 @@ static void emscriptenloop(void)
 }
 #endif
 
-<<<<<<< HEAD
 static void keep_console_open(const bool open_console)
 {
-    if (!open_console)
-    {
-        return;
-    }
-
-    printf("Press ENTER to quit.");
-
-    int c;
-    do
-    {
-        c = getchar();
-    }
-    while (c != '\n' && c != EOF);
+    return;
 }
 
 extern "C" DECLSPEC int SDLCALL mainLoop(int argc, char *argv[])
