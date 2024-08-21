@@ -315,8 +315,12 @@ else()
     set_source_files_properties(${VVV_CXX_SRC} PROPERTIES COMPILE_FLAGS "-std=c++98 -fno-exceptions -fno-rtti")
 
     # Dependencies (as needed)
-    set_source_files_properties(${FAUDIO_SRC} PROPERTIES COMPILE_FLAGS -std=c99)
-    set_source_files_properties(${CHM_SRC} PROPERTIES COMPILE_FLAGS -std=c99)
+    set_source_files_properties(${FAUDIO_SRC} PROPERTIES COMPILE_FLAGS "-std=c99 -shared -fPIC")
+    set_source_files_properties(${CHM_SRC} PROPERTIES COMPILE_FLAGS "-std=c99 -shared -fPIC")
+    set_source_files_properties(${XML2_SRC} PROPERTIES COMPILE_FLAGS "-shared -fPIC")
+    set_source_files_properties(${PFS_SRC} PROPERTIES COMPILE_FLAGS "-shared -fPIC")
+    set_source_files_properties(${PNG_SRC} PROPERTIES COMPILE_FLAGS "-shared -fPIC")
+    set_source_files_properties(${SBIDI_SRC} PROPERTIES COMPILE_FLAGS "-shared -fPIC")
 endif()
 
 # Unfortunately, it doesn't seem like distros package LodePNG
