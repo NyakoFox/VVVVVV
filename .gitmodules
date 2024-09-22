@@ -16,3 +16,6 @@
 [submodule "third_party/SheenBidi"]
 	path = third_party/SheenBidi
 	url = https://github.com/Tehreer/SheenBidi
+[submodule "third_party/naett"]
+	path = third_party/naett
+	url = https://github.com/erkkah/naett

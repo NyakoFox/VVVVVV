@@ -154,6 +154,7 @@ if(BUNDLE_DEPENDENCIES)
         ../third_party/FAudio/include
         ../third_party/FAudio/src
         ../third_party/SheenBidi/Headers
+        ../third_party/naett
     )
 else()
     target_include_directories(
@@ -165,6 +166,7 @@ else()
         ../third_party/c-hashmap
         ../third_party/FAudio/src
         ../third_party/SheenBidi/Headers
+        ../third_party/naett
     )
 endif()
 
@@ -209,6 +211,7 @@ endif()
 set(PNG_SRC src/lodepng_wrapper.c)
 set(CHM_SRC ../third_party/c-hashmap/map.c)
 set(SBIDI_SRC ../third_party/SheenBidi/Source/SheenBidi.c)
+set(NAETT_SRC ../third_party/naett/naett.c)
 
 if(NOT OFFICIAL_BUILD)
     # Add interim commit hash and its date to the build
@@ -335,10 +338,19 @@ target_include_directories(sheenbidi-static PRIVATE
     ../third_party/SheenBidi/Headers
 )
 
+add_library(naett-static STATIC ${NAETT_SRC})
+
+if(WIN32)
+	target_link_libraries(VVVVVV winhttp)
+elseif (NOT ANDROID AND NOT APPLE)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lcurl")
+    target_link_libraries(VVVVVV curl pthread)
+endif()
+
 if(BUNDLE_DEPENDENCIES)
-    list(APPEND STATIC_LIBRARIES physfs-static tinyxml2-static lodepng-static c-hashmap-static faudio-static sheenbidi-static)
+    list(APPEND STATIC_LIBRARIES physfs-static tinyxml2-static lodepng-static c-hashmap-static faudio-static sheenbidi-static naett-static)
 else()
-    list(APPEND STATIC_LIBRARIES lodepng-static c-hashmap-static sheenbidi-static)
+    list(APPEND STATIC_LIBRARIES lodepng-static c-hashmap-static sheenbidi-static naett-static)
 endif()
 
 if(BUNDLE_DEPENDENCIES)

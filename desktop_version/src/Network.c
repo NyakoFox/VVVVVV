@@ -1,6 +1,9 @@
 #include <stdint.h>
 
+#include <naett.h>
+
 #include "MakeAndPlay.h"
+#include "Network.h"
 #include "Unused.h"
 
 #ifdef MAKEANDPLAY
@@ -74,7 +77,16 @@ int NETWORK_init(void)
     #else
     UNUSED(i);
     #endif
+
+    naettInit(NULL);
     return any;
+}
+
+NETWORK_Response* NETWORK_fetch(const char* url, NETWORK_RequestMethod* method)
+{
+    NETWORK_Request* request = naettRequest(url, method, naettHeader("accept", "application/json"));
+    NETWORK_Response* response = naettMake(request);
+    return response;
 }
 
 void NETWORK_shutdown(void)

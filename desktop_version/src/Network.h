@@ -3,11 +3,23 @@
 
 #include <stdint.h>
 
+#include <naett.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+#define NETWORK_Request naettReq
+#define NETWORK_Response naettRes
+#define NETWORK_IsResponsePending(response) (!naettComplete(response))
+#define NETWORK_GetStatus(response) (naettGetStatus(response))
+#define NETWORK_GetBody(response, length) (naettGetBody(response, length))
+#define NETWORK_GET naettMethod("GET")
+#define NETWORK_RequestMethod naettOption
+
 int32_t NETWORK_init(void);
+
+NETWORK_Response* NETWORK_fetch(const char* url, NETWORK_RequestMethod* method);
 
 void NETWORK_shutdown(void);
 
