@@ -612,6 +612,8 @@ public:
     bool screenshot_saved_success;
 
     int languagepage;
+
+    bool compact_levels_list;
 };
 
 #ifndef GAME_DEFINITION

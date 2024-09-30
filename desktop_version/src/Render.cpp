@@ -296,16 +296,17 @@ static void menurender(void)
         {
             font::print_wrap(PR_CEN, -1, 90, loc::gettext("ERROR: No levels found."), tr, tg, tb);
         }
-        int tmp=game.currentmenuoption+(game.levelpage*8);
+        int levels_per_page = game.compact_levels_list ? 8 : 3;
+        int tmp = game.currentmenuoption + (game.levelpage * levels_per_page);
         if (INBOUNDS_VEC(tmp, cl.ListOfMetaData))
         {
-            const bool nextlastoptions = cl.ListOfMetaData.size() > 8;
+            const bool nextlastoptions = cl.ListOfMetaData.size() > levels_per_page;
             //Don't show next/previous page or return to menu options here!
-            if (nextlastoptions && game.menuoptions.size() - game.currentmenuoption<=3)
+            if (nextlastoptions && game.menuoptions.size() - game.currentmenuoption <= 3)
             {
 
             }
-            else
+            else if (game.compact_levels_list)
             {
                 uint32_t level_flags = PR_FONT_IDX(
                     cl.ListOfMetaData[tmp].level_main_font_idx,

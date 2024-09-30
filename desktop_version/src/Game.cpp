@@ -387,6 +387,8 @@ void Game::init(void)
     languagepage = 0;
 
     setdefaultcontrollerbuttons();
+
+    compact_levels_list = false;
 }
 
 void Game::setdefaultcontrollerbuttons(void)
@@ -6632,14 +6634,14 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         int offset = 0;
 #if !defined(MAKEANDPLAY)
         option(loc::gettext("play"));
-        touch::create_menu_button(80, 96 - 8 + 16, 160, 26, loc::gettext("play"), offset++);
+        touch::create_menu_button(80, 80 + 16, 160, 26, loc::gettext("play"), offset++);
 #endif
         option(loc::gettext("levels"));
         option(loc::gettext("options"));
-        offset++;
-        // Temporarily commented out
-        //touch::create_menu_button(80, 130 - 8, 160, 26, loc::gettext("levels"), offset++);
-        touch::create_menu_button(80, 164 - 8 - 34 + 16, 128, 26, loc::gettext("options"), offset++);
+
+        touch::create_menu_button(80, 112 + 16, 160, 26, loc::gettext("levels"), offset++);
+        touch::create_menu_button(80, 144 + 16, 128, 26, loc::gettext("options"), offset++);
+
         if (loc::show_translator_menu)
         {
             option(loc::gettext("translator"));
@@ -6649,13 +6651,13 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         option(loc::gettext("quit"));
 
         // Create the language button
-        TouchButton button = touch::create_button(214, 164 - 8 - 34 + 16, 26, 26, "");
+        TouchButton button = touch::create_button(214, 144 + 16, 26, 26, "");
         button.type = TOUCH_BUTTON_TYPE_MENU_LANGUAGE;
         button.id = -1;
 
         touch::register_button(button);
 
-        touch::create_menu_button(80, 198 - 8 - 34 + 16, 160, 26, loc::gettext("credits"), offset++);
+        touch::create_menu_button(80, 176 + 16, 160, 26, loc::gettext("credits"), offset++);
 
         menuyoff = -10;
         maxspacing = 15;
@@ -6686,16 +6688,17 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         menuyoff = 60;
         break;
     case Menu::levellist:
-        if(cl.ListOfMetaData.size()==0)
+        if (cl.ListOfMetaData.size() == 0)
         {
             option(loc::gettext("ok"));
             menuyoff = -20;
         }
         else
         {
-            for(int i=0; i<(int) cl.ListOfMetaData.size(); i++) // FIXME: int/size_t! -flibit
+            int levels_per_page = compact_levels_list ? 8 : 3;
+            for (int i = 0; i < (int) cl.ListOfMetaData.size(); i++) // FIXME: int/size_t! -flibit
             {
-                if(i>=levelpage*8 && i< (levelpage*8)+8)
+                if (i >= levelpage * levels_per_page && i < (levelpage * levels_per_page) + levels_per_page)
                 {
                     const std::string filename = cl.ListOfMetaData[i].filename.substr(7);
                     int score = 0;
@@ -6761,33 +6764,49 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
                             cl.ListOfMetaData[i].level_main_font_idx, font::is_rtl(PR_FONT_INTERFACE)
                         )) | PR_RTL_XFLIP
                     );
+
+                    const int button_height = 56;
+                    const int button_offset = menuoptions.size() - 1;
+                    TouchButton button = touch::create_button(16, 8 + (button_height + 8) * button_offset, 320 - 32, button_height, "");
+                    button.type = TOUCH_BUTTON_TYPE_MENU_LEVEL;
+                    button.level = &cl.ListOfMetaData[i];
+                    button.id = menuoptions.size() - 1;
+
+                    touch::register_button(button);
                 }
             }
-            if (cl.ListOfMetaData.size() > 8)
+            if (cl.ListOfMetaData.size() > levels_per_page)
             {
-                if((size_t) ((levelpage*8)+8) <cl.ListOfMetaData.size())
+                if((size_t) ((levelpage * levels_per_page) + levels_per_page) < cl.ListOfMetaData.size())
                 {
                     option(loc::gettext("next page"));
+                    touch::create_menu_button(198 + 16, 200, 76, 26, loc::gettext("next"), menuoptions.size() - 1);
                 }
                 else
                 {
                     option(loc::gettext("first page"));
+                    touch::create_menu_button(198 + 16, 200, 76, 26, loc::gettext("first"), menuoptions.size() - 1);
                 }
                 if (levelpage == 0)
                 {
                     option(loc::gettext("last page"));
+                    touch::create_menu_button(46 - 16, 200, 76, 26, loc::gettext("last"), menuoptions.size() - 1);
                 }
                 else
                 {
                     option(loc::gettext("previous page"));
+                    touch::create_menu_button(46 - 16, 200, 76, 26, loc::gettext("previous"), menuoptions.size() - 1);
                 }
             }
             option(loc::gettext("return"));
+            touch::create_menu_button(122, 200, 76, 26, loc::gettext("return"), menuoptions.size() - 1);
 
             menuxoff = 20;
             menuyoff = 70-(menuoptions.size()*10);
             menuspacing = 5;
+            buttonyoff = -40;
             auto_center = false;
+            auto_buttons = false;
         }
         break;
     case Menu::quickloadlevel:

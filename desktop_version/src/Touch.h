@@ -6,6 +6,8 @@
 #include <string>
 #include <vector>
 
+#include "CustomLevels.h"
+
 struct VVV_Finger
 {
     float x;
@@ -62,7 +64,8 @@ enum TouchButtonType
     TOUCH_BUTTON_TYPE_MENU_LANGUAGE,
     TOUCH_BUTTON_TYPE_MENU_TOGGLE,
     TOUCH_BUTTON_TYPE_MENU_SLIDER,
-    TOUCH_BUTTON_TYPE_MAP
+    TOUCH_BUTTON_TYPE_MENU_LEVEL,
+    TOUCH_BUTTON_TYPE_MAP,
 };
 
 struct TouchButton
@@ -82,6 +85,7 @@ struct TouchButton
     int min; // If this is a slider, this is the minimum value
     int max; // If this is a slider, this is the maximum value
     int* var; // If this is a slider, this is the variable to modify
+    LevelMetaData* level; // If this is a level list button, this is the level
     std::string text; // The text for the button, if it doesn't have an image
     Uint8 flags; // Print flags
     SDL_Texture* image; // The image that gets displayed on the button, can be NULL

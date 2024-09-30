@@ -499,7 +499,8 @@ void menuactionpress(void)
     }
     case Menu::levellist:
     {
-        const bool nextlastoptions = cl.ListOfMetaData.size() > 8;
+        const int levels_per_page = game.compact_levels_list ? 8 : 3;
+        const bool nextlastoptions = cl.ListOfMetaData.size() > levels_per_page;
         if(game.currentmenuoption==(int)game.menuoptions.size()-1){
             //go back to menu
             music.playef(Sound_VIRIDIAN);
@@ -508,32 +509,32 @@ void menuactionpress(void)
         }else if(nextlastoptions && game.currentmenuoption==(int)game.menuoptions.size()-2){
             //previous page
             music.playef(Sound_VIRIDIAN);
-            if(game.levelpage==0){
-                game.levelpage=(cl.ListOfMetaData.size()-1)/8;
-            }else{
+            if (game.levelpage == 0){
+                game.levelpage = (cl.ListOfMetaData.size() - 1) / levels_per_page;
+            } else {
                 game.levelpage--;
             }
             game.createmenu(Menu::levellist, true);
-            game.currentmenuoption=game.menuoptions.size()-2;
+            game.currentmenuoption = game.menuoptions.size() - 2;
             map.nexttowercolour();
-        }else if(nextlastoptions && game.currentmenuoption==(int)game.menuoptions.size()-3){
+        }else if(nextlastoptions && game.currentmenuoption == (int) game.menuoptions.size() - 3){
             //next page
             music.playef(Sound_VIRIDIAN);
-            if((size_t) ((game.levelpage*8)+8) >= cl.ListOfMetaData.size()){
-                game.levelpage=0;
-            }else{
+            if ((size_t) ((game.levelpage * levels_per_page) + levels_per_page) >= cl.ListOfMetaData.size()){
+                game.levelpage = 0;
+            } else {
                 game.levelpage++;
             }
             game.createmenu(Menu::levellist, true);
-            game.currentmenuoption=game.menuoptions.size()-3;
+            game.currentmenuoption = game.menuoptions.size() - 3;
             map.nexttowercolour();
         }else{
             //Ok, launch the level!
             //PLAY CUSTOM LEVEL HOOK
             music.playef(Sound_VIRIDIAN);
-            game.playcustomlevel=(game.levelpage*8)+game.currentmenuoption;
-            game.customleveltitle=cl.ListOfMetaData[game.playcustomlevel].title;
-            game.customlevelfilename=cl.ListOfMetaData[game.playcustomlevel].filename;
+            game.playcustomlevel = (game.levelpage * levels_per_page) + game.currentmenuoption;
+            game.customleveltitle = cl.ListOfMetaData[game.playcustomlevel].title;
+            game.customlevelfilename = cl.ListOfMetaData[game.playcustomlevel].filename;
 
             std::string name = "saves/" + cl.ListOfMetaData[game.playcustomlevel].filename.substr(7) + ".vvv";
             tinyxml2::XMLDocument doc;

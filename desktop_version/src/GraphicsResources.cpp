@@ -434,6 +434,8 @@ void GraphicsResources::init(void)
     im_button_map = LoadImage("graphics/buttons/button_map.png");
     im_button_globe = LoadImage("graphics/buttons/button_globe.png");
 
+    im_default_thumbnail = LoadImage("graphics/thumbnail.png");
+
     im_sprites_translated = NULL;
     im_flipsprites_translated = NULL;
 
@@ -486,6 +488,8 @@ void GraphicsResources::destroy(void)
     CLEAR(im_button_right);
     CLEAR(im_button_map);
     CLEAR(im_button_globe);
+
+    CLEAR(im_default_thumbnail);
 #undef CLEAR
 
     VVV_freefunc(SDL_FreeSurface, im_sprites_surf);

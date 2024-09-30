@@ -22,6 +22,7 @@
 #include "Music.h"
 #include "Screen.h"
 #include "Script.h"
+#include "UTF8.h"
 #include "UtilityClass.h"
 
 namespace touch
@@ -197,6 +198,7 @@ namespace touch
             SDL_FALLTHROUGH;
         case TOUCH_BUTTON_TYPE_MENU:
         case TOUCH_BUTTON_TYPE_MENU_LANGUAGE:
+        case TOUCH_BUTTON_TYPE_MENU_LEVEL:
             game.currentmenuoption = button->id;
             menuactionpress();
             break;
@@ -642,6 +644,18 @@ namespace touch
                             graphics.set_texture_color_mod(graphics.grphx.im_button_globe, 196, 196, 255 - help.glow);
                             graphics.draw_texture(graphics.grphx.im_button_globe, (button->x + 4 + offset) * scale, (button->y + 4 + offset) * scale, scale, scale);
                             graphics.set_texture_color_mod(graphics.grphx.im_button_globe, 255, 255, 255);
+                        }
+                        else if (button->type == TOUCH_BUTTON_TYPE_MENU_LEVEL)
+                        {
+                            graphics.draw_texture(graphics.grphx.im_default_thumbnail, button->x + (4 + offset) * scale, button->y + (4 + offset) * scale, scale, scale);
+                            Uint8 flags = PR_CJK_LOW | font_scale | button->flags;
+
+                            // Truncate the title...
+
+                            // TODO: Truncate the title Lol !
+
+                            font::print(flags, button->x + (98 + offset) * scale, button->y + (6 + offset * scale), button->level->title.c_str(), 196, 196, 255 - help.glow);
+                            font::print_wrap(flags, button->x + (98 + offset) * scale, button->y + (18 + offset * scale), button->level->creator.c_str(), 147, 147, 196 - help.glow, -1, 180);
                         }
                         else
                         {
