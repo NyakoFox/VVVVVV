@@ -648,13 +648,21 @@ namespace touch
                         else if (button->type == TOUCH_BUTTON_TYPE_MENU_LEVEL)
                         {
                             graphics.draw_texture(graphics.grphx.im_default_thumbnail, button->x + (4 + offset) * scale, button->y + (4 + offset) * scale, scale, scale);
-                            Uint8 flags = PR_CJK_LOW | font_scale | button->flags;
+                            Uint8 flags = PR_CJK_LOW | font_scale | button->flags | (button->level->title_is_gettext ? PR_FONT_INTERFACE : PR_FONT_IDX(
+                                button->level->level_main_font_idx, font::is_rtl(PR_FONT_INTERFACE)
+                            )) | PR_RTL_XFLIP;
 
                             // Truncate the title...
 
                             // TODO: Truncate the title Lol !
 
-                            font::print(flags, button->x + (98 + offset) * scale, button->y + (6 + offset * scale), button->level->title.c_str(), 196, 196, 255 - help.glow);
+                            const char* title = button->level->title.c_str();
+                            if (button->level->title_is_gettext)
+                            {
+                                title = loc::gettext(title);
+                            }
+
+                            font::print(flags, button->x + (98 + offset) * scale, button->y + (6 + offset * scale), title, 196, 196, 255 - help.glow);
                             font::print_wrap(flags, button->x + (98 + offset) * scale, button->y + (18 + offset * scale), button->level->creator.c_str(), 147, 147, 196 - help.glow, -1, 180);
                         }
                         else
