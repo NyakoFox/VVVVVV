@@ -18,7 +18,8 @@ enum
     DAMAGE = 2,
     DIRECTIONAL = 3,
     SAFE = 4,
-    ACTIVITY = 5
+    ACTIVITY = 5,
+    GRAVITY = 6
 };
 
 enum
@@ -121,6 +122,8 @@ public:
     int checktrigger(int* block_idx);
 
     int checkactivity(void);
+
+    int checkgravity(void);
 
     bool checkplatform(const SDL_Rect& temprect, int* px, int* py);
 

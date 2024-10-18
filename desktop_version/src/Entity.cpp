@@ -1085,6 +1085,13 @@ void entityclass::createblock( int t, int xp, int yp, int w, int h, int trig /*=
             break;
         }
         break;
+    case GRAVITY: // Gravity
+        block.type = GRAVITY;
+        block.wp = w;
+        block.hp = h;
+        block.rectset(xp, yp, w, h);
+        block.trigger = trig;
+        break;
     }
 
     if (customactivitytext != "")
@@ -4561,6 +4568,31 @@ int entityclass::checkactivity(void)
             for (size_t j=0; j<blocks.size(); j++)
             {
                 if (blocks[j].type == ACTIVITY && help.intersects(blocks[j].rect, temprect))
+                {
+                    return j;
+                }
+            }
+        }
+    }
+    return -1;
+}
+
+int entityclass::checkgravity(void)
+{
+    //Returns an int player entity (rule 0) collides with an activity
+    for (size_t i = 0; i < entities.size(); i++)
+    {
+        if (entities[i].rule == 0)
+        {
+            SDL_Rect temprect;
+            temprect.x = entities[i].xp + entities[i].cx;
+            temprect.y = entities[i].yp + entities[i].cy;
+            temprect.w = entities[i].w;
+            temprect.h = entities[i].h;
+
+            for (size_t j = 0; j < blocks.size(); j++)
+            {
+                if (blocks[j].type == GRAVITY && help.intersects(blocks[j].rect, temprect))
                 {
                     return j;
                 }

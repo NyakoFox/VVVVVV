@@ -1997,6 +1997,9 @@ void mapclass::loadlevel(int rx, int ry)
             case 25: // Trigger
                 obj.createblock(TRIGGER, ex, ey, ent.p1 * 8, ent.p2 * 8, ent.p3);
                 break;
+            case 26: // Gravity
+                obj.createblock(GRAVITY, ex, ey, ent.p1 * 8, ent.p2 * 8, ent.p3);
+                break;
             case 50: // Warp Lines
                 obj.customwarpmode=true;
                 switch (ent.p1)

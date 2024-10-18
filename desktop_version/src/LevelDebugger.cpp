@@ -440,6 +440,10 @@ namespace level_debugger
                 {
                     render_info(line++, "Direction", help.String(block->trigger));
                 }
+                else if (block->type == GRAVITY)
+                {
+                    render_info(line++, "Direction", help.String(block->trigger));
+                }
 
                 graphics.draw_rect(hover_box.x, hover_box.y, hover_box.w, hover_box.h, graphics.getRGB(255 - help.glow, 32, 32));
             }

@@ -1257,6 +1257,35 @@ static void draw_entities(void)
 
                 break;
             }
+            case 26: // Gravity Boxes
+            {
+                // Move x and y to the center of the box
+                int arrow_x = x + (entity->p1 - 1) * 4;
+                int arrow_y = y + (entity->p2 - 1) * 4;
+
+                if (customentities[i].p3 == 0)
+                {
+                    // UP ARROW
+                    font::print(PR_FONT_LEVEL | PR_BOR | PR_CJK_HIGH, arrow_x, arrow_y, "\xE2\x86\x91", 255, 255, 255);
+                }
+                else if (customentities[i].p3 == 1)
+                {
+                    // DOWN ARROW
+                    font::print(PR_FONT_LEVEL | PR_BOR | PR_CJK_HIGH, arrow_x, arrow_y, "\xE2\x86\x93", 255, 255, 255);
+                }
+                else if (customentities[i].p3 == 2)
+                {
+                    // LEFT ARROW
+                    font::print(PR_FONT_LEVEL | PR_BOR | PR_CJK_HIGH, arrow_x, arrow_y, "\xE2\x86\x90", 255, 255, 255);
+                }
+                else if (customentities[i].p3 == 3)
+                {
+                    // RIGHT ARROW
+                    font::print(PR_FONT_LEVEL | PR_BOR | PR_CJK_HIGH, arrow_x, arrow_y, "\xE2\x86\x92", 255, 255, 255);
+                }
+                graphics.draw_rect(x, y, entity->p1 * 8, entity->p2 * 8, graphics.getRGB(255, 255, 255));
+                break;
+            }
             case 50: // Warp Lines
                 if (entity->p1 >= 2) // Horizontal
                 {

@@ -926,6 +926,10 @@ void scriptclass::run(void)
                 {
                     i = ACTIVITY;
                 }
+                else if (words[1] == "gravity")
+                {
+                    i = GRAVITY;
+                }
                 else
                 {
                     i = ss_toi(words[1]);
