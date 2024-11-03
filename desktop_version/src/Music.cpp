@@ -772,6 +772,7 @@ void musicclass::init(void)
     soundTracks.push_back(SoundTrack( "sounds/newrecord.wav" ));
     soundTracks.push_back(SoundTrack( "sounds/trophy.wav" ));
     soundTracks.push_back(SoundTrack( "sounds/rescue.wav" ));
+    soundTracks.push_back(SoundTrack( "sounds/dripple.wav" ));
 
 #ifdef VVV_COMPILEMUSIC
     binaryBlob musicWriteBlob;

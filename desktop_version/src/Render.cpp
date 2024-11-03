@@ -2312,6 +2312,12 @@ static void mode_indicator_text(const int alpha)
 
 void gamerender(void)
 {
+    graphics.set_render_target(graphics.shadowTexture);
+    graphics.clear(0, 0, 0, 0);
+
+    graphics.set_render_target(graphics.darknessTexture);
+    graphics.clear();
+
     graphics.set_render_target(graphics.gameplayTexture);
     graphics.set_color(0, 0, 0, 255);
 
@@ -2356,6 +2362,19 @@ void gamerender(void)
             graphics.drawtowerspikes();
         }
     }
+
+    // Lighting
+    SDL_Texture* target = SDL_GetRenderTarget(gameScreen.m_renderer);
+    graphics.set_render_target(graphics.darknessTexture);
+    SDL_SetTextureBlendMode(graphics.shadowTexture, graphics.grphx.mode_revsub_alpha);
+    graphics.draw_texture(graphics.shadowTexture, 0, 0);
+
+    graphics.set_render_target(target);
+
+    SDL_SetTextureBlendMode(graphics.darknessTexture, SDL_BLENDMODE_BLEND);
+    graphics.draw_texture(graphics.darknessTexture, 0, 0);
+
+    // End lighting
 
     int return_editor_alpha = 0;
     bool draw_return_editor_text = false;

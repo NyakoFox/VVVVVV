@@ -1,3 +1,4 @@
+#include "Graphics.h"
 #define GRAPHICS_DEFINITION
 #include "Graphics.h"
 
@@ -112,6 +113,8 @@ void Graphics::init(void)
     tempShakeTexture = NULL;
     backgroundTexture = NULL;
     foregroundTexture = NULL;
+    shadowTexture = NULL;
+    darknessTexture = NULL;
     tempScreenshot = NULL;
     tempScreenshot2x = NULL;
     towerbg = TowerBG();
@@ -189,6 +192,8 @@ void Graphics::create_buffers(void)
     ghostTexture = CREATE_TEXTURE;
     tempShakeTexture = CREATE_TEXTURE;
     foregroundTexture = CREATE_TEXTURE;
+    shadowTexture = CREATE_TEXTURE;
+    darknessTexture = CREATE_TEXTURE;
     backgroundTexture = CREATE_SCROLL_TEXTURE;
     tempScrollingTexture = CREATE_SCROLL_TEXTURE;
     towerbg.texture = CREATE_SCROLL_TEXTURE;
@@ -221,6 +226,8 @@ void Graphics::destroy_buffers(void)
     VVV_freefunc(SDL_DestroyTexture, tempScrollingTexture);
     VVV_freefunc(SDL_DestroyTexture, towerbg.texture);
     VVV_freefunc(SDL_DestroyTexture, titlebg.texture);
+    VVV_freefunc(SDL_DestroyTexture, shadowTexture);
+    VVV_freefunc(SDL_DestroyTexture, darknessTexture);
     VVV_freefunc(SDL_FreeSurface, tempFilterSrc);
     VVV_freefunc(SDL_FreeSurface, tempFilterDest);
     VVV_freefunc(SDL_FreeSurface, tempScreenshot);
@@ -1163,6 +1170,11 @@ void Graphics::drawpartimage(const int t, const int xp, const int yp, const int 
 
 void Graphics::draw_texture(SDL_Texture* image, const int x, const int y)
 {
+    draw_texture(image, x, y, 1, 1);
+}
+
+void Graphics::draw_texture(SDL_Texture* image, const int x, const int y, const float scalex, const float scaley)
+{
     int w, h;
 
     if (query_texture(image, NULL, NULL, &w, &h) != 0)
@@ -1170,9 +1182,47 @@ void Graphics::draw_texture(SDL_Texture* image, const int x, const int y)
         return;
     }
 
-    const SDL_Rect dstrect = {x, y, w, h};
+    const SDL_Rect dstrect = {x, y, w * scalex, h * scaley};
 
     copy_texture(image, NULL, &dstrect);
+}
+
+void Graphics::draw_light(SDL_Texture* image, const int x, const int y, const float scalex, const float scaley, const int alpha)
+{
+    SDL_Texture* target = SDL_GetRenderTarget(gameScreen.m_renderer);
+    set_render_target(shadowTexture);
+    SDL_SetTextureBlendMode(image, SDL_BLENDMODE_BLEND);
+
+    int w, h;
+
+    if (query_texture(image, NULL, NULL, &w, &h) != 0)
+    {
+        return;
+    }
+
+    set_texture_alpha_mod(image, alpha);
+    draw_texture(image, x - (w * scalex) / 2, y - (h * scaley) / 2, scalex, scaley);
+    set_texture_alpha_mod(image, 255);
+
+    SDL_SetTextureBlendMode(image, SDL_BLENDMODE_NONE);
+    set_render_target(target);
+}
+
+void Graphics::draw_light(SDL_Texture* image, const int x, const int y)
+{
+    draw_light(image, x, y, 1, 1, 255);
+}
+
+void Graphics::draw_point_light(const int x, const int y, const int radius = 64, const int alpha = 255)
+{
+    int w, h;
+
+    if (query_texture(grphx.im_light_point, NULL, NULL, &w, &h) != 0)
+    {
+        return;
+    }
+
+    draw_light(grphx.im_light_point, x, y, (float)radius / w, (float)radius / h, alpha);
 }
 
 void Graphics::draw_texture_part(SDL_Texture* image, const int x, const int y, const int x2, const int y2, const int w, const int h, const int scalex, const int scaley)
@@ -2073,6 +2123,10 @@ void Graphics::drawentity(const int i, const int yoff)
 
         draw_grid_tile(sprites, obj.entities[i].drawframe, drawRect.x, drawRect.y, 32, 32, ct);
 
+        int x = drawRect.x + obj.entities[i].cx + (obj.entities[i].w / 2);
+        int y = drawRect.y + obj.entities[i].cy + (obj.entities[i].h / 2);
+        draw_point_light(x, y, obj.entities[i].light_radius, obj.entities[i].light_strength);
+
         // screenwrapping!
         SDL_Point wrappedPoint;
         bool wrapX = false;
@@ -2109,6 +2163,9 @@ void Graphics::drawentity(const int i, const int yoff)
             drawRect.x += wrappedPoint.x;
             drawRect.y += tpoint.y;
             draw_grid_tile(sprites, obj.entities[i].drawframe, drawRect.x, drawRect.y, 32, 32, ct);
+            int x = drawRect.x + obj.entities[i].cx + (obj.entities[i].w / 2);
+            int y = drawRect.y + obj.entities[i].cy + (obj.entities[i].h / 2);
+            draw_point_light(x, y, obj.entities[i].light_radius, obj.entities[i].light_strength);
         }
         if (wrapY && map.warpy)
         {
@@ -2116,6 +2173,9 @@ void Graphics::drawentity(const int i, const int yoff)
             drawRect.x += tpoint.x;
             drawRect.y += wrappedPoint.y;
             draw_grid_tile(sprites, obj.entities[i].drawframe, drawRect.x, drawRect.y, 32, 32, ct);
+            int x = drawRect.x + obj.entities[i].cx + (obj.entities[i].w / 2);
+            int y = drawRect.y + obj.entities[i].cy + (obj.entities[i].h / 2);
+            draw_point_light(x, y, obj.entities[i].light_radius, obj.entities[i].light_strength);
         }
         if (wrapX && wrapY && map.warpx && map.warpy)
         {
@@ -2123,6 +2183,9 @@ void Graphics::drawentity(const int i, const int yoff)
             drawRect.x += wrappedPoint.x;
             drawRect.y += wrappedPoint.y;
             draw_grid_tile(sprites, obj.entities[i].drawframe, drawRect.x, drawRect.y, 32, 32, ct);
+            int x = drawRect.x + obj.entities[i].cx + (obj.entities[i].w / 2);
+            int y = drawRect.y + obj.entities[i].cy + (obj.entities[i].h / 2);
+            draw_point_light(x, y, obj.entities[i].light_radius, obj.entities[i].light_strength);
         }
         break;
     }
@@ -2190,6 +2253,7 @@ void Graphics::drawentity(const int i, const int yoff)
         break;
     case 7: // Teleporter
         drawtele(xp, yp - yoff, obj.entities[i].drawframe, obj.entities[i].realcol);
+        draw_light(grphx.im_light_teleporter, xp + 48, yp + 48, 1, 1, (obj.entities[i].colour != 100) ? 255 : 127);
         break;
     // case 8:    // Special: Moving platform, 8 tiles
         // Note: This code is in the 4-tile code
@@ -2321,6 +2385,23 @@ void Graphics::drawentity(const int i, const int yoff)
     {
         // Special for epilogue: huge hero!
         draw_grid_tile(grphx.im_sprites, obj.entities[i].drawframe, xp, yp - yoff, sprites_rect.w, sprites_rect.h, obj.entities[i].realcol, 6, 6);
+        break;
+    }
+    case 14:
+    {
+        int frame = 0;
+        if (obj.entities[i].state >= 1)
+        {
+            frame = ((game.framecounter / 5) % 5) + 1;
+            draw_point_light(xp + 6, yp + 7, 96, 255);
+            draw_point_light(xp + 6, yp + 7, 96, 255);
+        }
+        else
+        {
+            draw_point_light(xp + 6, yp + 7, 64, 127);
+        }
+
+        draw_grid_tile(grphx.im_dripplelamps, frame, xp, yp - yoff, 12, 20);
         break;
     }
     }
@@ -2801,6 +2882,7 @@ void Graphics::updatebackground(int t)
 
 void Graphics::drawmap(void)
 {
+    bool using_lights = false;
     if (!foregrounddrawn)
     {
         SDL_Texture* target = SDL_GetRenderTarget(gameScreen.m_renderer);
@@ -2831,6 +2913,11 @@ void Graphics::drawmap(void)
                     if (tileset == 0)
                     {
                         drawtile(x * 8, y * 8, tile);
+                        if (tile == 6 || tile == 7 || tile == 8 || tile == 9 || tile == 49 || tile == 50)
+                        {
+                            draw_point_light(x * 8 + 4, y * 8 + 4, 32, 64);
+                            using_lights = true;
+                        }
                     }
                     else if (tileset == 1)
                     {
@@ -2845,7 +2932,11 @@ void Graphics::drawmap(void)
         }
 
         set_render_target(target);
-        foregrounddrawn = true;
+
+        if (!using_lights)
+        {
+            foregrounddrawn = true;
+        }
     }
 
     copy_texture(foregroundTexture, NULL, NULL);

@@ -1965,6 +1965,9 @@ void mapclass::loadlevel(int rx, int ry)
                     break;
                 }
                 break;
+            case 200:
+                obj.createentity(ex + 6, ey + 5, 200);
+                break;
             }
         }
 

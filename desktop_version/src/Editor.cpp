@@ -48,6 +48,7 @@ editorclass::editorclass(void)
     register_tool(EditorTool_WARP_LINES, "Warp Lines", "I", SDLK_i, false);
     register_tool(EditorTool_CREWMATES, "Crewmates", "O", SDLK_o, false);
     register_tool(EditorTool_START_POINT, "Start Point", "P", SDLK_p, false);
+    register_tool(EditorTool_DRIPPLE_LAMPS, "Dripple Lamps", "^1", SDLK_1, true);
 
     static const short basic[] = {
         121, 121, 121, 121, 121, 121, 121, 160, 121, 121, 121, 121, 121, 121, 121,
@@ -1131,6 +1132,11 @@ static void draw_entities(void)
                     graphics.draw_rect(x, y, 8, 8, graphics.getRGB(164, 255, 255));
                 }
                 break;
+            case 200: // Dripple Lamps
+                graphics.draw_grid_tile(graphics.grphx.im_dripplelamps, 0, x + 6, y + 5, 12, 20);
+
+                graphics.draw_rect(x, y, 24, 24, graphics.getRGB(194, 255, 255));
+                break;
             }
         }
 
@@ -1382,6 +1388,10 @@ static void draw_cursor(void)
     case EditorTool_START_POINT:
         // 2x3
         graphics.draw_rect(x, y, 16, 24, blue);
+        break;
+    case EditorTool_DRIPPLE_LAMPS:
+        // 3x3
+        graphics.draw_rect(x, y, 24, 24, blue);
         break;
     default:
         break;
@@ -1757,6 +1767,8 @@ void editorclass::draw_tool(EditorTools tool, int x, int y)
     case EditorTool_START_POINT:
         graphics.draw_sprite(x, y, 184, graphics.col_crewcyan);
         break;
+    case EditorTool_DRIPPLE_LAMPS:
+        graphics.draw_grid_tile(graphics.grphx.im_dripplelamps, 1, x + 2, y, 12, 20);
     default:
         break;
     }
@@ -2644,6 +2656,10 @@ void editorclass::tool_place()
             }
         }
         add_entity(levx, levy, tilex, tiley, 16, 0);
+        lclickdelay = 1;
+        break;
+    case EditorTool_DRIPPLE_LAMPS:
+        add_entity(levx, levy, tilex, tiley, 200);
         lclickdelay = 1;
         break;
     default:

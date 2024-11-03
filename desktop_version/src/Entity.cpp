@@ -1569,11 +1569,13 @@ void entityclass::createentity(int xp, int yp, int t, int meta1, int meta2, int 
         entity.onentity = 1;
         entity.animate = 100;
         entity.para = meta2;
+        entity.light_strength = 127;
 
         if (game.savepoint == meta2)
         {
             entity.colour = 5;
             entity.onentity = 0;
+            entity.light_strength = 255;
         }
 
         if (game.nodeathmode)
@@ -2154,6 +2156,24 @@ void entityclass::createentity(int xp, int yp, int t, int meta1, int meta2, int 
 
         entityclonefix(&entity);
         break;
+
+    case 200:
+        entity.rule = 3;
+        entity.type = 200;
+        entity.size = 14;
+
+        entity.behave = 0;
+        entity.para = 0;
+        entity.w = 12 + 24;
+        entity.h = 12 + 24;
+        entity.cx = 0 - 12;
+        entity.cy = 1 - 12;
+        entity.state = 0;
+        entity.onentity = 1;
+
+        entity.harmful = false;
+
+        break;
     }
 
     entity.lerpoldxp = entity.xp;
@@ -2721,10 +2741,12 @@ bool entityclass::updateentities( int i )
                     {
                         entities[j].colour = 4;
                         entities[j].onentity = 1;
+                        entities[j].light_strength = 127;
                     }
                 }
                 entities[i].colour = 5;
                 entities[i].onentity = 0;
+                entities[i].light_strength = 255;
                 game.savepoint = entities[i].para;
                 music.playef(Sound_CHECKPOINT);
 
@@ -3387,6 +3409,7 @@ bool entityclass::updateentities( int i )
                         {
                             entities[j].colour = 4;
                             entities[j].onentity = 1;
+                            entities[j].light_strength = 127;
                         }
                     }
                     game.savepoint = static_cast<int>(entities[i].para);
@@ -3420,6 +3443,14 @@ bool entityclass::updateentities( int i )
                 game.teleblock.h = 160;
 
                 entities[i].state = 0;
+            }
+            break;
+        case 200:
+            if (entities[i].state == 1)
+            {
+                entities[i].state = 2;
+                entities[i].onentity = 2;
+                music.playef(Sound_DRIPPLE);
             }
             break;
         }

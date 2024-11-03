@@ -68,6 +68,9 @@ void entclass::clear(void)
     SDL_zero(realcol);
     lerpoldxp = 0;
     lerpoldyp = 0;
+
+    light_strength = 255;
+    light_radius = 64;
 }
 
 bool entclass::outside(void)

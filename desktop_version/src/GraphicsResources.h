@@ -48,6 +48,13 @@ public:
 
     SDL_Texture* im_sprites_translated;
     SDL_Texture* im_flipsprites_translated;
+
+    SDL_Texture* im_light_point;
+    SDL_Texture* im_light_teleporter;
+
+    SDL_Texture* im_dripplelamps;
+
+    SDL_BlendMode mode_revsub_alpha;
 };
 
 SDL_Surface* LoadImageSurface(const char* filename);

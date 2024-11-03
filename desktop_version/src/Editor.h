@@ -49,6 +49,7 @@ enum EditorTools
     EditorTool_WARP_LINES,
     EditorTool_CREWMATES,
     EditorTool_START_POINT,
+    EditorTool_DRIPPLE_LAMPS,
 
     NUM_EditorTools
 };

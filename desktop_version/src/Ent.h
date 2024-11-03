@@ -55,6 +55,9 @@ public:
 
     SDL_Color realcol;
     int lerpoldxp, lerpoldyp;
+
+    int light_strength;
+    int light_radius;
 };
 
 #endif /* ENT_H */

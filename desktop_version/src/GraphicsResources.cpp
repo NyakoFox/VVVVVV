@@ -442,6 +442,20 @@ void GraphicsResources::init(void)
         SDL_assert(0 && "Failed to create minimap texture! See stderr.");
         return;
     }
+
+    im_light_point = LoadImage("graphics/lights/point.png");
+    im_light_teleporter = LoadImage("graphics/lights/teleporter.png");
+
+    im_dripplelamps = LoadImage("graphics/dripplelamps.png");
+
+    mode_revsub_alpha = SDL_ComposeCustomBlendMode(
+        SDL_BLENDFACTOR_SRC_COLOR,
+        SDL_BLENDFACTOR_DST_COLOR,
+        SDL_BLENDOPERATION_ADD,
+        SDL_BLENDFACTOR_SRC_ALPHA,
+        SDL_BLENDFACTOR_DST_ALPHA,
+        SDL_BLENDOPERATION_REV_SUBTRACT
+    );
 }
 
 
@@ -476,6 +490,11 @@ void GraphicsResources::destroy(void)
 
     CLEAR(im_sprites_translated);
     CLEAR(im_flipsprites_translated);
+
+    CLEAR(im_light_point);
+    CLEAR(im_light_teleporter);
+
+    CLEAR(im_dripplelamps);
 #undef CLEAR
 
     VVV_freefunc(SDL_FreeSurface, im_sprites_surf);
