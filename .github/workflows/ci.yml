@@ -54,7 +54,7 @@ jobs:
       run: ninja -C ${SRC_DIR_PATH}/build
 
     - name: Upload binary
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v4
       with:
         name: Vlib-macos
         path: ${{ env.SRC_DIR_PATH }}/build/libVVVVVV.dylib
@@ -79,7 +79,7 @@ jobs:
       run: make -j $(nproc) -C ${SRC_DIR_PATH}/build
 
     - name: Upload binary
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v4
       with:
         name: Vlib-ubuntu
         path: ${{ env.SRC_DIR_PATH }}/build/libVVVVVV.so
@@ -128,7 +128,7 @@ jobs:
         cmake --build . --config Release
 
     - name: Upload binary (Win32)
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v4
       with:
         name: Vlib-win32-windows
         path: ${{ env.SRC_DIR_PATH }}/build/Release/VVVVVV.dll
@@ -165,7 +165,7 @@ jobs:
         cmake --build . --config Release
 
     - name: Upload binary (x64)
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v4
       with:
         name: Vlib-x64-windows
         path: ${{ env.SRC_DIR_PATH }}/build-64/Release/VVVVVV.dll
