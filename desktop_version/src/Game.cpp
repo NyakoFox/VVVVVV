@@ -5234,75 +5234,19 @@ static bool settings_loaded = false;
 
 void Game::loadsettings(struct ScreenSettings* screen_settings)
 {
-    tinyxml2::XMLDocument doc;
-    tinyxml2::XMLHandle hDoc(&doc);
-    tinyxml2::XMLElement* dataNode;
-
     settings_loaded = true;
 
-    if (!FILESYSTEM_loadTiXml2Document("saves/settings.vvv", doc))
-    {
-        savesettings(screen_settings);
-        return;
-    }
-
-    if (doc.Error())
-    {
-        vlog_error("Error parsing settings.vvv: %s", doc.ErrorStr());
-        return;
-    }
-
-    dataNode = hDoc
-        .FirstChildElement()
-        .FirstChildElement("Data")
-        .FirstChildElement()
-        .ToElement();
-
-    deserializesettings(dataNode, screen_settings);
+    return;
 }
 
 bool Game::savesettings(void)
 {
-    struct ScreenSettings screen_settings;
-    SDL_zero(screen_settings);
-    gameScreen.GetSettings(&screen_settings);
-
-    return savesettings(&screen_settings);
+    return true;
 }
 
 bool Game::savesettings(const struct ScreenSettings* screen_settings)
 {
-    tinyxml2::XMLDocument doc;
-    bool already_exists;
-
-    if (!settings_loaded)
-    {
-        vlog_warn("Settings not loaded! Not writing settings.vvv.");
-        return false;
-    }
-
-    already_exists = FILESYSTEM_loadTiXml2Document("saves/settings.vvv", doc);
-    if (!already_exists)
-    {
-        vlog_info("No settings.vvv found. Creating new file");
-    }
-    else if (doc.Error())
-    {
-        vlog_error("Error parsing existing settings.vvv: %s", doc.ErrorStr());
-        vlog_info("Creating new settings.vvv");
-    }
-
-    xml::update_declaration(doc);
-
-    tinyxml2::XMLElement* root = xml::update_element(doc, "Settings");
-
-    xml::update_comment(root, " Settings (duplicated from unlock.vvv) ");
-
-    tinyxml2::XMLElement* dataNode = xml::update_element(root, "Data");
-
-    serializesettings(dataNode, screen_settings);
-
-    return FILESYSTEM_saveTiXml2Document("saves/settings.vvv", doc);
+    return true;
 }
 
 void Game::customstart(void)
