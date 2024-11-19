@@ -204,7 +204,7 @@ public:
         uint8_t b
     );
 
-    const char* get_texture_id(SDL_Texture* texture);
+    std::string get_texture_id(SDL_Texture* texture);
 
     SDL_Texture* get_render_target(void);
 
@@ -450,8 +450,6 @@ public:
     void print_roomtext(int x, int y, const char* text, bool rtl);
 
     SDL_Texture* render_target;
-
-    std::map<std::string, SDL_Point> texture_sizes;
 };
 
 #ifndef GRAPHICS_DEFINITION

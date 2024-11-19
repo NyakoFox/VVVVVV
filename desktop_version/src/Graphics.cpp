@@ -208,6 +208,17 @@ void Graphics::create_buffers(void)
         tempShakeTexture,
         gameScreen.isFiltered ? SDL_ScaleModeLinear : SDL_ScaleModeNearest
     );
+
+    gameTexture->id = "gameTexture";
+    gameplayTexture->id = "gameplayTexture";
+    menuTexture->id = "menuTexture";
+    ghostTexture->id = "ghostTexture";
+    tempShakeTexture->id = "tempShakeTexture";
+    foregroundTexture->id = "foregroundTexture";
+    backgroundTexture->id = "backgroundTexture";
+    tempScrollingTexture->id = "tempScrollingTexture";
+    towerbg.texture->id = "towerbgTexture";
+    titlebg.texture->id = "titlebgTexture";
 }
 
 void Graphics::destroy_buffers(void)
@@ -446,94 +457,15 @@ void Graphics::print_level_creator(
     font::print(print_flags, text_x, y, creator, r, g, b);
 }
 
-#define DEFINE_TEXTURE(name) \
-    else if (texture == name) \
-    { \
-        return #name; \
-    }
-
-#define DEFINE_TEXTURE_WITH_NAME(name, texture_name) \
-    else if (texture == name) \
-    { \
-        return texture_name; \
-    }
-const char* Graphics::get_texture_id(SDL_Texture* texture)
+std::string Graphics::get_texture_id(SDL_Texture* texture)
 {
-    FontContainer* fonts_main = font::get_fonts_main();
-    FontContainer* fonts_custom = font::get_fonts_custom();
-
-    if (fonts_main != NULL)
-    {
-        for (size_t i = 0; i < fonts_main->count; i++)
-        {
-            if (texture == fonts_main->fonts[i].image)
-            {
-                static char buffer[256];
-                SDL_snprintf(buffer, sizeof(buffer), "font_main_%s", fonts_main->fonts[i].name);
-                return buffer;
-            }
-        }
-    }
-
-    if (fonts_custom != NULL)
-    {
-        for (size_t i = 0; i < fonts_custom->count; i++)
-        {
-            if (texture == fonts_custom->fonts[i].image)
-            {
-                static char buffer[256];
-                SDL_snprintf(buffer, sizeof(buffer), "font_custom_%s", fonts_custom->fonts[i].name);
-                return buffer;
-            }
-        }
-    }
-
     if (texture == NULL)
     {
         return "main";
     }
-    DEFINE_TEXTURE(gameTexture)
-    DEFINE_TEXTURE(gameplayTexture)
-    DEFINE_TEXTURE(menuTexture)
-    DEFINE_TEXTURE(ghostTexture)
-    DEFINE_TEXTURE(tempShakeTexture)
-    DEFINE_TEXTURE(foregroundTexture)
-    DEFINE_TEXTURE(backgroundTexture)
-    DEFINE_TEXTURE(tempScrollingTexture)
-    DEFINE_TEXTURE_WITH_NAME(towerbg.texture, "towerbgTexture")
-    DEFINE_TEXTURE_WITH_NAME(titlebg.texture, "titlebgTexture")
-    DEFINE_TEXTURE_WITH_NAME(images[IMAGE_CUSTOMMINIMAP], "generatedMinimapTexture")
-    DEFINE_TEXTURE_WITH_NAME(grphx.im_sprites, "spritesTexture")
-    DEFINE_TEXTURE_WITH_NAME(grphx.im_tiles, "tilesTexture")
-    DEFINE_TEXTURE_WITH_NAME(grphx.im_tiles_white, "tilesWhiteTexture")
-    DEFINE_TEXTURE_WITH_NAME(grphx.im_tiles_tint, "tilesTintTexture")
-    DEFINE_TEXTURE_WITH_NAME(grphx.im_tiles2, "tiles2Texture")
-    DEFINE_TEXTURE_WITH_NAME(grphx.im_tiles2_tint, "tiles2TintTexture")
-    DEFINE_TEXTURE_WITH_NAME(grphx.im_tiles3, "tiles3Texture")
-    DEFINE_TEXTURE_WITH_NAME(grphx.im_teleporter, "teleporterTexture")
-    DEFINE_TEXTURE_WITH_NAME(grphx.im_entcolours, "entcoloursTexture")
-    DEFINE_TEXTURE_WITH_NAME(grphx.im_entcolours_tint, "entcoloursTintTexture")
-    DEFINE_TEXTURE_WITH_NAME(grphx.im_image0, "image0Texture")
-    DEFINE_TEXTURE_WITH_NAME(grphx.im_image1, "image1Texture")
-    DEFINE_TEXTURE_WITH_NAME(grphx.im_image2, "image2Texture")
-    DEFINE_TEXTURE_WITH_NAME(grphx.im_image3, "image3Texture")
-    DEFINE_TEXTURE_WITH_NAME(grphx.im_image4, "image4Texture")
-    DEFINE_TEXTURE_WITH_NAME(grphx.im_image5, "image5Texture")
-    DEFINE_TEXTURE_WITH_NAME(grphx.im_image6, "image6Texture")
-    DEFINE_TEXTURE_WITH_NAME(grphx.im_image7, "image7Texture")
-    DEFINE_TEXTURE_WITH_NAME(grphx.im_image8, "image8Texture")
-    DEFINE_TEXTURE_WITH_NAME(grphx.im_image9, "image9Texture")
-    DEFINE_TEXTURE_WITH_NAME(grphx.im_image10, "image10Texture")
-    DEFINE_TEXTURE_WITH_NAME(grphx.im_image11, "image11Texture")
-    DEFINE_TEXTURE_WITH_NAME(grphx.im_image12, "image12Texture")
-    else
-    {
-        WHINE_ONCE_ARGS(("Unknown texture passed to get_render_id"));
-        return "unknown";
-    }
+
+    return texture->id;
 }
-#undef DEFINE_TEXTURE
-#undef DEFINE_TEXTURE_WITH_NAME
 
 SDL_Texture* Graphics::get_render_target(void)
 {
@@ -545,8 +477,7 @@ int Graphics::set_render_target(SDL_Texture* texture)
     render_target = texture;
     draw_message message;
     message.type = DRAW_SET_TARGET;
-    //message.texture = SDL_strdup(get_texture_id(texture));
-    SDL_strlcpy(message.texture, get_texture_id(texture), sizeof(message.texture));
+    SDL_strlcpy(message.texture, get_texture_id(texture).c_str(), sizeof(message.texture));
     push_draw_message(message);
     return 0;
 }
@@ -555,7 +486,7 @@ int Graphics::set_texture_color_mod(SDL_Texture* texture, const Uint8 r, const U
 {
     draw_message message;
     message.type = DRAW_SET_TINT_COLOR;
-    SDL_strlcpy(message.texture, get_texture_id(texture), sizeof(message.texture));
+    SDL_strlcpy(message.texture, get_texture_id(texture).c_str(), sizeof(message.texture));
     message.color.r = r;
     message.color.g = g;
     message.color.b = b;
@@ -567,7 +498,7 @@ int Graphics::set_texture_alpha_mod(SDL_Texture* texture, const Uint8 alpha)
 {
     draw_message message;
     message.type = DRAW_SET_TINT_ALPHA;
-    SDL_strlcpy(message.texture, get_texture_id(texture), sizeof(message.texture));
+    SDL_strlcpy(message.texture, get_texture_id(texture).c_str(), sizeof(message.texture));
     message.color.a = alpha;
     push_draw_message(message);
     return 0;
@@ -575,16 +506,8 @@ int Graphics::set_texture_alpha_mod(SDL_Texture* texture, const Uint8 alpha)
 
 int Graphics::query_texture(SDL_Texture* texture, Uint32* format, int* access, int* w, int* h)
 {
-    // OK, we're here for width and height, nothing else. This is a bit hacky, but it's the best we can do.
-    // We have a map of widths and heights, so let's grab them from there.
-    const char* texture_id = get_texture_id(texture);
-    if (texture_sizes.count(texture_id) == 0)
-    {
-        WHINE_ONCE_ARGS(("Could not query texture: texture not found"));
-        return -1;
-    }
-    if (w != NULL) *w = texture_sizes[texture_id].x;
-    if (h != NULL) *h = texture_sizes[texture_id].y;
+    if (w != NULL) *w = texture->w;
+    if (h != NULL) *h = texture->h;
     return 0;
 }
 
@@ -678,7 +601,7 @@ int Graphics::copy_texture(SDL_Texture* texture, const SDL_Rect* src, const SDL_
 
     draw_message message;
     message.type = DRAW_TEXTURE;
-    SDL_strlcpy(message.texture, get_texture_id(texture), sizeof(message.texture));
+    SDL_strlcpy(message.texture, get_texture_id(texture).c_str(), sizeof(message.texture));
     if (src == NULL)
     {
         message.src_whole = true;
@@ -719,7 +642,7 @@ int Graphics::copy_texture(SDL_Texture* texture, const SDL_Rect* src, const SDL_
 
     draw_message message;
     message.type = DRAW_TEXTURE_EXT;
-    SDL_strlcpy(message.texture, get_texture_id(texture), sizeof(message.texture));
+    SDL_strlcpy(message.texture, get_texture_id(texture).c_str(), sizeof(message.texture));
     if (src == NULL)
     {
         message.src_whole = true;
@@ -3923,6 +3846,7 @@ bool Graphics::checktexturesize(
 ) {
     int texturewidth;
     int textureheight;
+
     if (query_texture(texture, NULL, NULL, &texturewidth, &textureheight) != 0)
     {
         /* Just give it the benefit of the doubt. */

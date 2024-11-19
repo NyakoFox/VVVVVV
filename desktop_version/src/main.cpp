@@ -145,8 +145,6 @@ static void idlerenderfixed(void)
 static void idlerender(void)
 {
     font::print(PR_CEN, -1, 32, loc::gettext("VVVVVV is waiting for instructions"), 196 - help.glow, 196 - help.glow, 255 - help.glow);
-
-    font::print_wrap(PR_CEN, -1, 200, loc::gettext("If stuck, press ESC, no idea why this happens"), 196 - help.glow, 196 - help.glow, 255 - help.glow);
     graphics.render();
 }
 
@@ -752,6 +750,7 @@ extern "C" DECLSPEC int SDLCALL mainLoop(int argc, char *argv[])
         min_lang_set = 1;
     }
 
+    /*
     if (loc::lang_set < min_lang_set && !loc::languagelist.empty())
     {
         loc::pre_title_lang_menu = true;
@@ -823,6 +822,7 @@ extern "C" DECLSPEC int SDLCALL mainLoop(int argc, char *argv[])
     {
         game.unlockAchievement("vvvvvvtimetrial_final_fixed");
     }
+    */
 
     obj.init();
 

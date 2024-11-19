@@ -27,11 +27,22 @@ VVV_Texture* VVV_CreateTexture(int width, int height)
     texture->id = "unknown";
     texture->w = width;
     texture->h = height;
+    textures.push_back(texture);
     return texture;
 }
 
 void VVV_DestroyTexture(VVV_Texture* texture)
 {
+    for (int i = textures.size() - 1; i >= 0; i--)
+    {
+        VVV_Texture* new_texture = textures[i];
+        if (new_texture == texture)
+        {
+            textures.erase(textures.begin() + i);
+            break;
+        }
+    }
+
     delete texture;
 }
 
@@ -230,15 +241,22 @@ extern "C" DECLSPEC void SDLCALL simulate_mousemoveevent(int x, int y)
 
 extern "C" DECLSPEC void SDLCALL play_level_init(void)
 {
-    graphics.texture_sizes.clear();
 }
 
 extern "C" DECLSPEC void SDLCALL set_texture_size(const char* texture, int w, int h)
 {
-    SDL_Point point;
-    point.x = w;
-    point.y = h;
-    graphics.texture_sizes[texture] = point;
+    for (int i = 0; i < textures.size(); i++)
+    {
+        VVV_Texture* new_texture = textures[i];
+        if (new_texture->id == texture)
+        {
+            new_texture->w = w;
+            new_texture->h = h;
+            return;
+        }
+    }
+    vlog_error("Texture not found: %s", texture);
+    return;
 }
 
 extern "C" DECLSPEC void SDLCALL play_level(const char* level_data, const char* playassets)

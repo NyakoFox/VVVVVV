@@ -287,6 +287,19 @@ static uint8_t load_font(FontContainer* container, const char* name)
     }
 
     f->image = LoadImage(name_png, white_teeth ? TEX_COLOR : TEX_WHITE);
+
+    std::string id = "font_";
+    if (container == &fonts_main)
+    {
+        id += "main_";
+    }
+    else
+    {
+        id += "custom_";
+    }
+
+    f->image->id = id + f->name;
+
     SDL_zeroa(f->glyph_page);
 
     if (f->image == NULL)

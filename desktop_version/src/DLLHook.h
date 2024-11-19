@@ -13,7 +13,7 @@
 #define SDL_Texture VVV_Texture
 #define SDL_DestroyTexture(texture) VVV_DestroyTexture(texture)
 #define SDL_CreateTexture(renderer, format, access, w, h) VVV_CreateTexture(w, h)
-#define SDL_CreateTextureFromSurface(renderer, surface) VVV_CreateTexture(surface->w, surface->h)
+#define SDL_CreateTextureFromSurface(renderer, surface) VVV_CreateTexture(0, 0)
 #define SDL_SetTextureScaleMode(a, b)
 
 struct VVV_Texture
@@ -129,6 +129,8 @@ typedef struct {
 } draw_message;
 
 static std::vector<draw_message> draw_messages;
+
+static std::vector<VVV_Texture*> textures;
 
 extern "C" DECLSPEC draw_message SDLCALL pop_draw_messages(void);
 

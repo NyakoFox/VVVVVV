@@ -172,31 +172,15 @@ static SDL_Texture* LoadTextureFromRaw(const char* filename, SDL_Surface* loaded
     {
         vlog_error("Failed creating texture: %s. SDL error: %s\n", filename, SDL_GetError());
     }
+    texture->id = filename;
 
     return texture;
 }
 
 SDL_Texture* LoadImage(const char *filename, const TextureLoadType loadtype)
 {
-    unsigned char* data;
-
-    SDL_Surface* loadedImage = LoadImageRaw(filename, &data);
-
-    SDL_Texture* texture = LoadTextureFromRaw(filename, loadedImage, loadtype);
-
-    if (loadedImage != NULL)
-    {
-        VVV_freefunc(SDL_FreeSurface, loadedImage);
-    }
-
-    VVV_free(data);
-
-    if (texture == NULL)
-    {
-        vlog_error("Image not found: %s", filename);
-        SDL_assert(0 && "Image not found! See stderr.");
-    }
-
+    VVV_Texture* texture = VVV_CreateTexture(0, 0);
+    texture->id = filename;
     return texture;
 }
 
@@ -208,45 +192,24 @@ static SDL_Texture* LoadImage(const char* filename)
 /* Any unneeded variants can be NULL */
 static void LoadVariants(const char* filename, SDL_Texture** colored, SDL_Texture** white, SDL_Texture** grayscale)
 {
-    unsigned char* data;
-    SDL_Surface* loadedImage = LoadImageRaw(filename, &data);
-
     if (colored != NULL)
     {
-        *colored = LoadTextureFromRaw(filename, loadedImage, TEX_COLOR);
-        if (*colored == NULL)
-        {
-            vlog_error("Image not found: %s", filename);
-            SDL_assert(0 && "Image not found! See stderr.");
-        }
+        *colored = LoadImage(filename, TEX_COLOR);
     }
 
     if (grayscale != NULL)
     {
-        *grayscale = LoadTextureFromRaw(filename, loadedImage, TEX_GRAYSCALE);
-        if (*grayscale == NULL)
-        {
-            vlog_error("Image not found: %s", filename);
-            SDL_assert(0 && "Image not found! See stderr.");
-        }
+        char filename_gray[256];
+        SDL_snprintf(filename_gray, sizeof(filename_gray), "%s-tint", filename);
+        *grayscale = LoadImage(filename_gray, TEX_GRAYSCALE);
     }
 
     if (white != NULL)
     {
-        *white = LoadTextureFromRaw(filename, loadedImage, TEX_WHITE);
-        if (*white == NULL)
-        {
-            vlog_error("Image not found: %s", filename);
-            SDL_assert(0 && "Image not found! See stderr.");
-        }
+        char filename_white[256];
+        SDL_snprintf(filename_white, sizeof(filename_white), "%s-white", filename);
+        *white = LoadImage(filename_white, TEX_WHITE);
     }
-
-    if (loadedImage != NULL)
-    {
-        VVV_freefunc(SDL_FreeSurface, loadedImage);
-    }
-
-    VVV_free(data);
 }
 
 /* The pointers `texture` and `surface` cannot be NULL */
@@ -436,6 +399,7 @@ void GraphicsResources::init(void)
     init_translations();
 
     im_image12 = SDL_CreateTexture(gameScreen.m_renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, 240, 180);
+    im_image12->id = "generatedMinimapTexture";
 
     if (im_image12 == NULL)
     {
