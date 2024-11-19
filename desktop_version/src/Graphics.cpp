@@ -1333,6 +1333,12 @@ void Graphics::draw_grid_tile(SDL_Texture* texture, const int t, const int x, co
         return;
     }
 
+    if (tex_width <= 0)
+    {
+        WHINE_ONCE_ARGS(("Texture %s has invalid width: %d", texture->id.c_str(), tex_width));
+        return;
+    }
+
     const int x2 = (t % (tex_width / width)) * width;
     const int y2 = (t / (tex_width / width)) * height;
     draw_texture_part(texture, x, y, x2, y2, width, height, scalex, scaley);
