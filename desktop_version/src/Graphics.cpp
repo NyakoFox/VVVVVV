@@ -12,6 +12,7 @@
 #include "FileSystemUtils.h"
 #include "Font.h"
 #include "GraphicsUtil.h"
+#include "IMERender.h"
 #include "Localization.h"
 #include "Map.h"
 #include "Maths.h"
@@ -928,13 +929,20 @@ void Graphics::drawgui(void)
             size_t j;
             for (j = 0; j < textboxes[i].lines.size(); j++)
             {
-                font::print(
-                    print_flags | PR_BOR,
-                    text_xp,
-                    yp + text_yoff + text_sign * (j * (font_height + textboxes[i].linegap)),
-                    textbox_line(buffer, sizeof(buffer), i, j),
-                    0, 0, 0
-                );
+                const int x = text_xp;
+                const int y = yp + text_yoff + text_sign * (j * (font_height + textboxes[i].linegap));
+                if (!textboxes[i].force_outline)
+                {
+                    font::print(print_flags | PR_BOR, x, y, textbox_line(buffer, sizeof(buffer), i, j), 0, 0, 0);
+                }
+                else if (textboxes[i].outline)
+                {
+                    // We're forcing an outline, so we'll have to draw it ourselves instead of relying on PR_BOR.
+                    font::print(print_flags, x - 1, y, textbox_line(buffer, sizeof(buffer), i, j), 0, 0, 0);
+                    font::print(print_flags, x + 1, y, textbox_line(buffer, sizeof(buffer), i, j), 0, 0, 0);
+                    font::print(print_flags, x, y - 1, textbox_line(buffer, sizeof(buffer), i, j), 0, 0, 0);
+                    font::print(print_flags, x, y + 1, textbox_line(buffer, sizeof(buffer), i, j), 0, 0, 0);
+                }
             }
             for (j = 0; j < textboxes[i].lines.size(); j++)
             {
@@ -1270,6 +1278,15 @@ void Graphics::draw_grid_tile(
     draw_grid_tile(texture, t, x, y, width, height, color, 1, 1);
 }
 
+void Graphics::draw_region_image(int t, int xp, int yp, int wp, int hp)
+{
+    if (!INBOUNDS_ARR(t, customminimaps) || customminimaps[t] == NULL)
+    {
+        return;
+    }
+    draw_texture_part(customminimaps[t], xp, yp, 0, 0, wp, hp, 1, 1);
+}
+
 void Graphics::cutscenebars(void)
 {
     const int usethispos = lerp(oldcutscenebarspos, cutscenebarspos);
@@ -1471,6 +1488,18 @@ void Graphics::setimage(TextboxImage image)
     }
 
     textboxes[m].setimage(image);
+}
+
+void Graphics::textboxoutline(bool enabled)
+{
+    if (!INBOUNDS_VEC(m, textboxes))
+    {
+        vlog_error("textboxoutline() out-of-bounds!");
+        return;
+    }
+
+    textboxes[m].force_outline = true;
+    textboxes[m].outline = enabled;
 }
 
 void Graphics::addline( const std::string& t )
@@ -1832,6 +1861,11 @@ void Graphics::drawgravityline(const int t, const int x, const int y, const int 
     if (!INBOUNDS_VEC(t, obj.entities))
     {
         WHINE_ONCE("drawgravityline() out-of-bounds!");
+        return;
+    }
+
+    if (w <= 0 && h <= 0)
+    {
         return;
     }
 
@@ -3194,6 +3228,19 @@ SDL_Color Graphics::bigchunkygetcol(int t)
     return color;
 }
 
+void Graphics::textboxabsolutepos(int x, int y)
+{
+    if (!INBOUNDS_VEC(m, textboxes))
+    {
+        vlog_error("textboxabsolutepos() out-of-bounds!");
+        return;
+    }
+
+    textboxes[m].position_absolute = true;
+    textboxes[m].xp = x;
+    textboxes[m].yp = y;
+}
+
 void Graphics::textboxcenterx(void)
 {
     if (!INBOUNDS_VEC(m, textboxes))
@@ -3529,6 +3576,7 @@ void Graphics::get_stretch_info(SDL_Rect* rect)
 
 void Graphics::render(void)
 {
+    ime_render();
     draw_screenshot_border();
 
     if (gameScreen.badSignalEffect)
@@ -3541,10 +3589,12 @@ void Graphics::render(void)
 
     draw_window_background();
 
-    SDL_Rect rect;
-    get_stretch_info(&rect);
+    SDL_Rect stretch_info;
+    get_stretch_info(&stretch_info);
 
-    copy_texture(gameTexture, NULL, &rect, 0, NULL, flipmode ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE);
+    ime_set_rect(&stretch_info);
+
+    copy_texture(gameTexture, NULL, &stretch_info, 0, NULL, flipmode ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE);
 }
 
 void Graphics::renderwithscreeneffects(void)

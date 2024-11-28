@@ -3324,11 +3324,13 @@ static void handle_draw_input()
         const int plat_speed = cl.roomproperties[room].platv;
         const int enemy_speed = cl.roomproperties[room].enemyv;
 
+        const bool ctrl = key.keymap[SDLK_LCTRL] || key.keymap[SDLK_RCTRL];
+        const bool shift = key.keymap[SDLK_LSHIFT] || key.keymap[SDLK_RSHIFT];
         if (key.keymap[SDLK_COMMA])
         {
-            if (key.keymap[SDLK_LCTRL] || key.keymap[SDLK_RCTRL])
+            if (ctrl)
             {
-                if (key.keymap[SDLK_LSHIFT] || key.keymap[SDLK_RSHIFT])
+                if (shift)
                 {
                     cl.roomproperties[room].enemyv = enemy_speed - 1;
                 }
@@ -3345,9 +3347,9 @@ static void handle_draw_input()
         }
         else if (key.keymap[SDLK_PERIOD])
         {
-            if (key.keymap[SDLK_LCTRL] || key.keymap[SDLK_RCTRL])
+            if (ctrl)
             {
-                if (key.keymap[SDLK_LSHIFT] || key.keymap[SDLK_RSHIFT])
+                if (shift)
                 {
                     cl.roomproperties[room].enemyv = enemy_speed + 1;
                 }

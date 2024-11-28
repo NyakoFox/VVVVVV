@@ -125,6 +125,8 @@ public:
 
     bool large;
 
+    bool position_absolute;
+
     bool should_centerx;
     bool should_centery;
 
@@ -134,6 +136,9 @@ public:
 
     std::vector<TextboxSprite> sprites;
     TextboxImage image;
+
+    bool force_outline;
+    bool outline;
 
     TextboxCrewmatePosition crewmate_position;
     TextboxOriginalContext original;

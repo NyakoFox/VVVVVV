@@ -94,6 +94,8 @@ public:
         int r, int g, int b
     );
 
+    void textboxabsolutepos(int x, int y);
+
     void textboxcenterx(void);
 
     int textboxwidth(void);
@@ -135,6 +137,8 @@ public:
 
     void setimage(TextboxImage image);
 
+    void textboxoutline(bool enabled);
+
     void textboxindex(int index);
 
     void textboxremove(void);
@@ -171,6 +175,8 @@ public:
     void draw_grid_tile(SDL_Texture* texture, int t, int x, int y, int width, int height, int r, int g, int b);
     void draw_grid_tile(SDL_Texture* texture, int t, int x, int y, int width, int height, SDL_Color color, int scalex, int scaley);
     void draw_grid_tile(SDL_Texture* texture, int t, int x, int y, int width, int height, SDL_Color color);
+
+    void draw_region_image(int t, int xp, int yp, int wp, int hp);
 
     void updatetextboxes(void);
     const char* textbox_line(char* buffer, size_t buffer_len, size_t textbox_i, size_t line_i);
@@ -336,6 +342,8 @@ public:
     std::vector <SDL_Surface*> flipsprites_surf;
 
     SDL_Texture* images[NUM_IMAGES];
+
+    SDL_Texture* customminimaps[401];
 
     bool flipmode;
     bool setflipmode;

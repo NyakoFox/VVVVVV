@@ -25,7 +25,7 @@ option(REMOVE_ABSOLUTE_PATHS "If supported by the compiler, replace all absolute
 
 
 # Architecture Flags
-if(APPLE)
+if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     # Wow, Apple is a huge jerk these days huh?
     set(OSX_10_9_SDK_PATH /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk)
     if(NOT CMAKE_OSX_SYSROOT)
@@ -38,6 +38,8 @@ if(APPLE)
     set(CMAKE_OSX_DEPLOYMENT_TARGET 10.9)
     link_directories(/usr/local/lib)
     add_compile_options(-Werror=partial-availability)
+elseif(CMAKE_SYSTEM_NAME STREQUAL "iOS")
+    set(CMAKE_OSX_DEPLOYMENT_TARGET 12.0) # SDL goes back to iOS 8.0, but modern Xcode doesn't
 endif()
 
 project(VVVVVV)
@@ -48,7 +50,10 @@ endif()
 
 # RPATH
 if(NOT WIN32)
-    if(APPLE)
+    if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
+        set(BIN_LIBROOT "Frameworks")
+        set(BIN_RPATH "@executable_path/Frameworks")
+    elseif(APPLE)
         set(BIN_LIBROOT "osx")
         set(BIN_RPATH "@executable_path/osx")
     elseif(CMAKE_SIZEOF_VOID_P MATCHES "8")
@@ -65,7 +70,7 @@ if(NOT WIN32)
 endif()
 
 # Source Lists
-set(VVV_SRC
+set(VVV_CXX_SRC
     src/BinaryBlob.cpp
     src/BlockV.cpp
     src/ButtonGlyphs.cpp
@@ -82,6 +87,7 @@ set(VVV_SRC
     src/Graphics.cpp
     src/GraphicsResources.cpp
     src/GraphicsUtil.cpp
+    src/IMERender.cpp
     src/Input.cpp
     src/KeyPoll.cpp
     src/Labclass.cpp
@@ -108,6 +114,8 @@ set(VVV_SRC
     src/WarpClass.cpp
     src/XMLUtils.cpp
     src/main.cpp
+)
+set(VVV_C_SRC
     src/DeferCallbacks.c
     src/GlitchrunnerMode.c
     src/Network.c
@@ -120,17 +128,46 @@ set(VVV_SRC
     ../third_party/physfs/extras/physfsrwops.c
 )
 if(STEAM)
-    list(APPEND VVV_SRC src/SteamNetwork.c)
+    list(APPEND VVV_C_SRC src/SteamNetwork.c)
 endif()
 if(GOG)
-    list(APPEND VVV_SRC src/GOGNetwork.c)
+    list(APPEND VVV_C_SRC src/GOGNetwork.c)
 endif()
+if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
+    list(APPEND VVV_C_SRC src/SDL_uikit_main.c)
+endif()
+
+set(VVV_SRC ${VVV_CXX_SRC} ${VVV_C_SRC})
 
 # Executable information
 if(WIN32)
     add_executable(VVVVVV WIN32 ${VVV_SRC} icon.rc)
 elseif(ANDROID)
     add_library(VVVVVV SHARED ${VVV_SRC})
+elseif(CMAKE_SYSTEM_NAME STREQUAL "iOS")
+    file(GLOB_RECURSE REPO_RESOURCES "fonts/*" "lang/*")
+
+    add_executable(VVVVVV MACOSX_BUNDLE ${VVV_SRC} ${DATA_ZIP} AppIcon.xcassets ${REPO_RESOURCES})
+    set_target_properties(VVVVVV PROPERTIES
+        XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "com.distractionware.vvvvvvmobile"
+        XCODE_ATTRIBUTE_PRODUCT_NAME "VVVVVV"
+        XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY "1,2" # iPhone, iPad
+        XCODE_ATTRIBUTE_CURRENT_PROJECT_VERSION "2.5"
+        XCODE_ATTRIBUTE_MARKETING_VERSION "2.5"
+        XCODE_ATTRIBUTE_ASSETCATALOG_COMPILER_APPICON_NAME AppIcon
+        XCODE_ATTRIBUTE_GENERATE_INFOPLIST_FILE YES
+        MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist"
+        XCODE_ATTRIBUTE_INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace YES
+        XCODE_ATTRIBUTE_INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents YES
+        RESOURCE "${DATA_ZIP};AppIcon.xcassets"
+    )
+
+    foreach(REPO_FILE ${REPO_RESOURCES})
+        file(RELATIVE_PATH REPO_FILE_REL "${CMAKE_CURRENT_SOURCE_DIR}" ${REPO_FILE})
+        get_filename_component(REPO_FILE_DIR ${REPO_FILE_REL} DIRECTORY)
+        set_property(SOURCE ${REPO_FILE} PROPERTY MACOSX_PACKAGE_LOCATION "Resources/${REPO_FILE_DIR}")
+        source_group("Resources/${REPO_FILE_DIR}" FILES "${REPO_FILE}")
+    endforeach()
 else()
     add_executable(VVVVVV ${VVV_SRC})
 endif()
@@ -208,35 +245,26 @@ set(SBIDI_SRC ../third_party/SheenBidi/Source/SheenBidi.c)
 if(NOT OFFICIAL_BUILD)
     # Add interim commit hash and its date to the build
 
-    # find_package sets GIT_FOUND and GIT_EXECUTABLE
-    find_package(Git)
+    # These filenames have to be qualified, because when we run
+    # the CMake script, its work dir gets set to the build folder
+    set(VERSION_INPUT_FILE ${CMAKE_CURRENT_SOURCE_DIR}/src/InterimVersion.in.c)
+    set(VERSION_OUTPUT_FILE ${CMAKE_CURRENT_SOURCE_DIR}/src/InterimVersion.out.c)
 
-    if(GIT_FOUND)
-        # These filenames have to be qualified, because when we run
-        # the CMake script, its work dir gets set to the build folder
-        set(VERSION_INPUT_FILE ${CMAKE_CURRENT_SOURCE_DIR}/src/InterimVersion.in.c)
-        set(VERSION_OUTPUT_FILE ${CMAKE_CURRENT_SOURCE_DIR}/src/InterimVersion.out.c)
+    add_custom_command(
+        # This OUTPUT line is required for this to be ran every time
+        OUTPUT ${VERSION_OUTPUT_FILE} ${CMAKE_CURRENT_SOURCE_DIR}/src/_dummy.c
+        COMMAND ${CMAKE_COMMAND}
+        # These args have to be passed through, otherwise the script can't see them
+        # Also, these args have to come BEFORE `-P`! (Otherwise it fails with an unclear error)
+        -DINPUT_FILE=${VERSION_INPUT_FILE}
+        -DOUTPUT_FILE=${VERSION_OUTPUT_FILE}
+        -P ${CMAKE_CURRENT_SOURCE_DIR}/version.cmake
+    )
 
-        add_custom_target(
-            GenerateVersion ALL
-            # This BYPRODUCTS line is required for this to be ran every time
-            BYPRODUCTS ${VERSION_OUTPUT_FILE}
-            COMMAND ${CMAKE_COMMAND}
-            # These args have to be passed through, otherwise the script can't see them
-            # Also, these args have to come BEFORE `-P`! (Otherwise it fails with an unclear error)
-            -DGIT_EXECUTABLE=${GIT_EXECUTABLE}
-            -DINPUT_FILE=${VERSION_INPUT_FILE}
-            -DOUTPUT_FILE=${VERSION_OUTPUT_FILE}
-            -P ${CMAKE_CURRENT_SOURCE_DIR}/version.cmake
-        )
+    target_compile_definitions(VVVVVV PRIVATE -DINTERIM_VERSION_EXISTS)
 
-        add_dependencies(VVVVVV GenerateVersion)
-
-        target_compile_definitions(VVVVVV PRIVATE -DINTERIM_VERSION_EXISTS)
-
-        add_library(InterimVersion STATIC src/InterimVersion.out.c)
-        list(APPEND STATIC_LIBRARIES InterimVersion)
-    endif()
+    add_library(InterimVersion STATIC src/InterimVersion.out.c)
+    list(APPEND STATIC_LIBRARIES InterimVersion)
 endif()
 
 # Build options
@@ -284,16 +312,15 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     target_compile_options(VVVVVV PRIVATE -Wno-c99-extensions)
 endif()
 
+# Set standards version, disable exceptions and RTTI
 if(MSVC)
     # MSVC doesn't have /std:c99 or /std:c++98 switches!
 
-    # Disable exceptions
+    # MSVC does not officially support disabling exceptions,
+    # so this is as far as we are willing to go to disable them.
     string(REGEX REPLACE "/EH[a-z]+" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
-
-    # Disable RTTI
     string(REPLACE "/GR" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /GR-")
+    set_source_files_properties(${VVV_CXX_SRC} PROPERTIES COMPILE_FLAGS "/EHsc /GR-")
 
     if(MSVC_VERSION GREATER 1900)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /utf-8")
@@ -301,18 +328,16 @@ if(MSVC)
     endif()
 else()
     string(REGEX REPLACE "-std=[a-z0-9]+" "" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
+    set_source_files_properties(${VVV_C_SRC} PROPERTIES COMPILE_FLAGS -std=c99)
 
     string(REGEX REPLACE "-std=[a-z0-9+]+" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++98")
-
-    # Disable exceptions
     string(REPLACE "-fexceptions" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-exceptions")
-
-    # Disable RTTI
     string(REPLACE "-frtti" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti")
+    set_source_files_properties(${VVV_CXX_SRC} PROPERTIES COMPILE_FLAGS "-std=c++98 -fno-exceptions -fno-rtti")
+
+    # Dependencies (as needed)
+    set_source_files_properties(${FAUDIO_SRC} PROPERTIES COMPILE_FLAGS -std=c99)
+    set_source_files_properties(${CHM_SRC} PROPERTIES COMPILE_FLAGS -std=c99)
 endif()
 
 # Unfortunately, it doesn't seem like distros package LodePNG
@@ -426,6 +451,15 @@ elseif (EMSCRIPTEN)
         target_compile_options(faudio-static PUBLIC -sUSE_SDL=2)
         target_link_libraries(faudio-static -sUSE_SDL=2)
     endif()
+elseif(DEFINED SDL2_FRAMEWORK)
+    message(STATUS "Using pre-defined SDL2 variable SDL2_FRAMEWORK")
+    target_include_directories(VVVVVV SYSTEM PRIVATE "$<BUILD_INTERFACE:${SDL2_FRAMEWORK}/Headers>")
+    target_link_libraries(VVVVVV ${SDL2_FRAMEWORK})
+    if(BUNDLE_DEPENDENCIES)
+        target_include_directories(faudio-static SYSTEM PRIVATE "$<BUILD_INTERFACE:${SDL2_FRAMEWORK}/Headers>")
+        target_link_libraries(faudio-static ${SDL2_FRAMEWORK})
+    endif()
+    set_target_properties(VVVVVV PROPERTIES XCODE_EMBED_FRAMEWORKS ${SDL2_FRAMEWORK})
 else()
     # Only try to autodetect if both SDL2 variables aren't explicitly set
     find_package(SDL2 CONFIG)

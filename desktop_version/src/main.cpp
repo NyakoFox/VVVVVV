@@ -599,9 +599,12 @@ int main(int argc, char *argv[])
     }
 
     SDL_SetHintWithPriority(SDL_HINT_IME_SHOW_UI, "1", SDL_HINT_OVERRIDE);
+    SDL_SetHintWithPriority(SDL_HINT_IME_SUPPORT_EXTENDED_TEXT, "1", SDL_HINT_OVERRIDE);
 
     /* We already do the button swapping in ButtonGlyphs, disable SDL's swapping */
     SDL_SetHintWithPriority(SDL_HINT_GAMECONTROLLER_USE_BUTTON_LABELS, "0", SDL_HINT_OVERRIDE);
+
+    SDL_SetHintWithPriority(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight", SDL_HINT_OVERRIDE);
 
     if(!FILESYSTEM_init(argv[0], baseDir, assetsPath, langDir, fontsDir))
     {
@@ -866,9 +869,10 @@ int main(int argc, char *argv[])
         f_time = SDL_GetTicks64();
 
         const Uint64 f_timetaken = f_time - f_timePrev;
-        if (!game.over30mode && f_timetaken < 34)
+        const int timestep = game.get_timestep();
+        if (!game.over30mode && f_timetaken < (Uint64) timestep)
         {
-            const volatile Uint64 f_delay = 34 - f_timetaken;
+            const volatile Uint64 f_delay = timestep - f_timetaken;
             SDL_Delay((Uint32) f_delay);
             f_time = SDL_GetTicks64();
         }

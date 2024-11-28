@@ -884,6 +884,12 @@ static void menuactionpress(void)
             game.savestatsandsettings_menu();
             music.playef(Sound_VIRIDIAN);
             break;
+        case 3:
+            // toggle checkpoint saving
+            game.checkpoint_saving = !game.checkpoint_saving;
+            game.savestatsandsettings_menu();
+            music.playef(Sound_VIRIDIAN);
+            break;
         default:
             //back
             music.playef(Sound_VIRIDIAN);

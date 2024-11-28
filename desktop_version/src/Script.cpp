@@ -53,6 +53,7 @@ scriptclass::scriptclass(void)
     textlarge = false;
     textbox_sprites.clear();
     textbox_image = TEXTIMAGE_NONE;
+    textbox_absolutepos = false;
 }
 
 void scriptclass::add_default_colours(void)
@@ -294,7 +295,7 @@ void scriptclass::run(void)
                 {
                     for (size_t edi = 0; edi < obj.entities.size(); edi++)
                     {
-                        if (obj.entities[edi].type == 9 || obj.entities[edi].type == 10)
+                        if (obj.entities[edi].type == EntityType_HORIZONTAL_GRAVITY_LINE || obj.entities[edi].type == EntityType_VERTICAL_GRAVITY_LINE)
                         {
                             obj.disableentity(edi);
                         }
@@ -304,7 +305,7 @@ void scriptclass::run(void)
                 {
                     for (size_t edi = 0; edi < obj.entities.size(); edi++)
                     {
-                        if (obj.entities[edi].type == 11)
+                        if (obj.entities[edi].type == EntityType_WARP_TOKEN)
                         {
                             obj.disableentity(edi);
                         }
@@ -331,7 +332,7 @@ void scriptclass::run(void)
                     for (size_t edi = 0; edi < obj.entities.size(); edi++)
                     {
                         obj.disableblockat(obj.entities[edi].xp, obj.entities[edi].yp);
-                        if (obj.entities[edi].type == 2 && obj.entities[edi].rule == 3)
+                        if (obj.entities[edi].type == EntityType_DISAPPEARING_PLATFORM && obj.entities[edi].rule == 3)
                         {
                             obj.disableentity(edi);
                         }
@@ -370,6 +371,23 @@ void scriptclass::run(void)
                 }else if(words[1]=="off"){
                     map.customshowmm=false;
                 }
+            }
+            else if (words[0] == "setregion")
+            {
+                map.setregion(
+                    ss_toi(words[1]),
+                    ss_toi(words[2]),
+                    ss_toi(words[3]),
+                    ss_toi(words[4]),
+                    ss_toi(words[5]));
+            }
+            else if (words[0] == "removeregion")
+            {
+                map.removeregion(ss_toi(words[1]));
+            }
+            else if (words[0] == "changeregion")
+            {
+                map.changeregion(ss_toi(words[1]));
             }
             if (words[0] == "delay")
             {
@@ -549,11 +567,15 @@ void scriptclass::run(void)
                 textcrewmateposition = TextboxCrewmatePosition();
                 textbox_sprites.clear();
                 textbox_image = TEXTIMAGE_NONE;
+                textbox_absolutepos = false;
+                textbox_force_outline = false;
+                textbox_outline = false;
             }
             else if (words[0] == "position")
             {
                 //are we facing left or right? for some objects we don't care, default at 0.
                 j = 0;
+                textbox_absolutepos = false;
 
                 //the first word is the object to position relative to
                 if (words[1] == "centerx")
@@ -574,6 +596,13 @@ void scriptclass::run(void)
                     j = -1;
                     textx = -500;
                     texty = -500;
+                }
+                else if (words[1] == "absolute")
+                {
+                    words[2] = "donothing";
+                    j = -1;
+                    textbox_absolutepos = true;
+
                 }
                 else // Well, are they asking for a crewmate...?
                 {
@@ -719,6 +748,23 @@ void scriptclass::run(void)
                     textbox_image = TEXTIMAGE_NONE;
                 }
             }
+            else if (words[0] == "textoutline")
+            {
+                if (words[1] == "default")
+                {
+                    textbox_force_outline = false;
+                }
+                else if (words[1] == "on")
+                {
+                    textbox_force_outline = true;
+                    textbox_outline = true;
+                }
+                else if (words[1] == "off")
+                {
+                    textbox_force_outline = true;
+                    textbox_outline = false;
+                }
+            }
             else if (words[0] == "flipme")
             {
                 textflipme = !textflipme;
@@ -757,16 +803,28 @@ void scriptclass::run(void)
 
                 graphics.setimage(textbox_image);
 
-                if (textx == -500 || textx == -1)
+                if (textbox_absolutepos)
                 {
-                    graphics.textboxcenterx();
-                    textcrewmateposition.override_x = false;
+                    graphics.textboxabsolutepos(textx, texty);
+                }
+                else
+                {
+                    if (textx == -500 || textx == -1)
+                    {
+                        graphics.textboxcenterx();
+                        textcrewmateposition.override_x = false;
+                    }
+
+                    if (texty == -500)
+                    {
+                        graphics.textboxcentery();
+                        textcrewmateposition.override_y = false;
+                    }
                 }
 
-                if (texty == -500)
+                if (textbox_force_outline)
                 {
-                    graphics.textboxcentery();
-                    textcrewmateposition.override_y = false;
+                    graphics.textboxoutline(textbox_outline);
                 }
 
                 TextboxOriginalContext context = TextboxOriginalContext();
@@ -1244,6 +1302,8 @@ void scriptclass::run(void)
                 {
                     game.savedir = obj.entities[i].dir;
                 }
+
+                game.checkpoint_save();
             }
             else if (words[0] == "gamestate")
             {
@@ -1366,6 +1426,28 @@ void scriptclass::run(void)
                 map.setexplored(19, 7, false);
                 map.setexplored(19, 8, false);
             }
+            else if (words[0] == "mapexplored")
+            {
+                if (words[1] == "none")
+                {
+                    map.resetmap();
+                }
+                else if (words[1] == "all")
+                {
+                    map.fullmap();
+                }
+            }
+            else if (words[0] == "mapreveal")
+            {
+                if (words[1] == "on")
+                {
+                    map.revealmap = true;
+                }
+                else if (words[1] == "off")
+                {
+                    map.revealmap = false;
+                }
+            }
             else if (words[0] == "showteleporters")
             {
                 map.showteleporters = true;
@@ -1451,7 +1533,7 @@ void scriptclass::run(void)
             {
                 game.unlocknum(Unlock_SECRETLAB);
                 game.insecretlab = true;
-                SDL_memset(map.explored, true, sizeof(map.explored));
+                map.fullmap();
             }
             else if (words[0] == "leavesecretlab")
             {
@@ -1605,7 +1687,7 @@ void scriptclass::run(void)
             {
                 for (j = 0; j < (int) obj.entities.size(); j++)
                 {
-                    if (obj.entities[j].type == 13)
+                    if (obj.entities[j].type == EntityType_TERMINAL)
                     {
                         obj.entities[j].colour = 4;
                     }
@@ -2762,6 +2844,16 @@ void scriptclass::startgamemode(const enum StartMode mode)
             graphics.showcutscenebars = true;
             graphics.setbars(320);
             load("intro");
+
+            if (!game.nocompetitive())
+            {
+                game.nodeatheligible = true;
+                vlog_debug("NDM trophy is eligible.");
+            }
+            else
+            {
+                game.invalidate_ndm_trophy();
+            }
         }
         break;
 
@@ -2823,7 +2915,7 @@ void scriptclass::startgamemode(const enum StartMode mode)
         {
             game.timetrialcountdown = 0;
             game.timetrialparlost = true;
-            SDL_memset(map.explored, true, sizeof(map.explored));
+            map.fullmap();
         }
 
         graphics.fademode = FADE_START_FADEIN;
@@ -2833,9 +2925,9 @@ void scriptclass::startgamemode(const enum StartMode mode)
         game.startspecial(0);
 
         /* Unlock the entire map */
-        SDL_memset(obj.collect, true, sizeof(obj.collect[0]) * 20);
+        map.fullmap();
         /* Give all 20 trinkets */
-        SDL_memset(map.explored, true, sizeof(map.explored));
+        SDL_memset(obj.collect, true, sizeof(obj.collect[0]) * 20);
         i = 400; /* previously a nested for-loop set this */
         game.insecretlab = true;
         map.showteleporters = true;
@@ -2935,6 +3027,7 @@ void scriptclass::startgamemode(const enum StartMode mode)
         map.custommode = true;
         map.custommodeforreal = false;
         map.customshowmm = true;
+        map.revealmap = true;
 
         if (cl.levmusic > 0)
         {
@@ -2961,6 +3054,7 @@ void scriptclass::startgamemode(const enum StartMode mode)
         cl.findstartpoint();
 
         map.customshowmm = true;
+        map.revealmap = true;
 
         music.fadeout();
         game.customstart();
@@ -3220,6 +3314,7 @@ void scriptclass::hardreset(void)
 
     game.nodeathmode = false;
     game.nocutscenes = false;
+    game.nodeatheligible = false;
 
     for (i = 0; i < (int) SDL_arraysize(game.crewstats); i++)
     {
@@ -3347,11 +3442,14 @@ void scriptclass::hardreset(void)
     map.cameraseekframe = 0;
     map.resumedelay = 0;
     graphics.towerbg.scrolldir = 0;
-    map.customshowmm=true;
+    map.customshowmm = true;
+    map.revealmap = true;
 
     SDL_memset(map.roomdeaths, 0, sizeof(map.roomdeaths));
     SDL_memset(map.roomdeathsfinal, 0, sizeof(map.roomdeathsfinal));
     map.resetmap();
+    map.currentregion = 0;
+    SDL_zeroa(map.region);
     //entityclass
     obj.nearelephant = false;
     obj.upsetmode = false;

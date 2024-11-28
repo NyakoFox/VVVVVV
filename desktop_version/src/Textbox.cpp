@@ -29,6 +29,8 @@ textboxclass::textboxclass(int gap)
 
     large = false;
 
+    position_absolute = false;
+
     should_centerx = false;
     should_centery = false;
 
@@ -40,6 +42,9 @@ textboxclass::textboxclass(int gap)
     sprites.clear();
 
     image = TEXTIMAGE_NONE;
+
+    force_outline = false;
+    outline = false;
 
     crewmate_position = TextboxCrewmatePosition();
     original = TextboxOriginalContext();
@@ -78,18 +83,21 @@ void textboxclass::centery(void)
 void textboxclass::applyposition(void)
 {
     resize();
-    reposition();
-    if (should_centerx)
+    if (!position_absolute)
     {
-        centerx();
-    }
-    if (should_centery)
-    {
-        centery();
-    }
-    if (translate == TEXTTRANSLATE_CUTSCENE)
-    {
-        adjust();
+        reposition();
+        if (should_centerx)
+        {
+            centerx();
+        }
+        if (should_centery)
+        {
+            centery();
+        }
+        if (translate == TEXTTRANSLATE_CUTSCENE)
+        {
+            adjust();
+        }
     }
 }
 

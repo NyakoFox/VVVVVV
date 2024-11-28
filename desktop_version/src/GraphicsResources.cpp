@@ -444,6 +444,33 @@ void GraphicsResources::init(void)
         SDL_assert(0 && "Failed to create minimap texture! See stderr.");
         return;
     }
+
+    SDL_zeroa(graphics.customminimaps);
+
+    EnumHandle handle = {};
+    const char* item;
+    char full_item[64];
+    while ((item = FILESYSTEM_enumerateAssets("graphics", &handle)) != NULL)
+    {
+        if (SDL_strncmp(item, "region", 6) != 0)
+        {
+            continue;
+        }
+        char* end;
+        int i = SDL_strtol(&item[6], &end, 10);
+        // make sure the region id is actually in bounds!
+        if (i < 1 || i > 400)
+        {
+            continue;
+        }
+        if (item == end || SDL_strcmp(end, ".png") != 0)
+        {
+            continue;
+        }
+        SDL_snprintf(full_item, sizeof(full_item), "graphics/%s", item);
+        graphics.customminimaps[i] = LoadImage(full_item);
+    }
+    FILESYSTEM_freeEnumerate(&handle);
 }
 
 
@@ -480,6 +507,11 @@ void GraphicsResources::destroy(void)
 
     CLEAR(im_sprites_translated);
     CLEAR(im_flipsprites_translated);
+
+    for (size_t i = 0; i < SDL_arraysize(graphics.customminimaps); i++)
+    {
+        CLEAR(graphics.customminimaps[i]);
+    }
 #undef CLEAR
 
     VVV_freefunc(SDL_FreeSurface, im_sprites_surf);
