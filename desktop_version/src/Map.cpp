@@ -1899,6 +1899,9 @@ void mapclass::loadlevel(int rx, int ry)
             case 13: // Warp Tokens
                 obj.createentity(ex, ey, 13, ent.p1, ent.p2);
                 break;
+            case 14: // Teleporter
+                obj.createentity(ex, ey, 14, 1);
+                break;
             case 15: // Collectable crewmate
                 obj.createentity(ex - 4, ey + 1, 55, cl.findcrewmate(edi), ent.p1, ent.p2);
                 break;

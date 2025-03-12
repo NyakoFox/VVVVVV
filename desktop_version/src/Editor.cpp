@@ -48,7 +48,8 @@ editorclass::editorclass(void)
     register_tool(EditorTool_WARP_LINES, "Warp Lines", "I", SDLK_i, false);
     register_tool(EditorTool_CREWMATES, "Crewmates", "O", SDLK_o, false);
     register_tool(EditorTool_START_POINT, "Start Point", "P", SDLK_p, false);
-    register_tool(EditorTool_COINS, "Coins", "^2", SDLK_2, true);
+    register_tool(EditorTool_COINS, "Coins", "^1", SDLK_1, true);
+    register_tool(EditorTool_TELEPORTERS, "Teleporters", "^2", SDLK_2, true);
 
     static const short basic[] = {
         121, 121, 121, 121, 121, 121, 121, 160, 121, 121, 121, 121, 121, 121, 121,
@@ -995,7 +996,7 @@ static void draw_entities(void)
                 graphics.draw_rect(x, y, 32, 8, graphics.getRGB(255, 255, 255));
                 break;
             case 8: // Coins
-                graphics.draw_grid_tile(graphics.grphx.im_tiles_white, 48, x, y, 8, 8, graphics.huetilegetcol());
+                graphics.draw_grid_tile(graphics.grphx.im_tiles_white, 48, x, y, 8, 8, graphics.getcol(26));
                 graphics.draw_rect(x, y, 8, 8, graphics.getRGB(255, 164, 164));
                 break;
             case 9: // Shiny Trinkets
@@ -1041,6 +1042,12 @@ static void draw_entities(void)
                 }
 
                 font::print(PR_BOR | PR_CJK_HIGH, x, y - 8, text, 210, 210, 255);
+                break;
+            }
+            case 14: // Teleporters
+            {
+                graphics.drawtele(x, y, 1, graphics.getcol(100));
+                graphics.draw_rect(x, y, 8 * 12, 8 * 12, graphics.getRGB(164, 164, 255));
                 break;
             }
             case 15: // Crewmates
@@ -1450,6 +1457,10 @@ static void draw_cursor(void)
         // 2x3
         graphics.draw_rect(x, y, 16, 24, blue);
         break;
+    case EditorTool_TELEPORTERS:
+        // 12x12
+        graphics.draw_rect(x, y, 96, 96, blue);
+        break;
     default:
         break;
     }
@@ -1830,6 +1841,15 @@ void editorclass::draw_tool(EditorTools tool, int x, int y)
         graphics.draw_grid_tile(graphics.grphx.im_tiles_white, 48, x, y + 8, 8, 8, graphics.getRGB(255, 255, 0));
         graphics.draw_grid_tile(graphics.grphx.im_tiles_white, 48, x + 9, y + 8, 8, 8, graphics.getRGB(255, 255, 0));
         break;
+    case EditorTool_TELEPORTERS:
+    {
+        graphics.fill_rect(x, y, 16, 16, graphics.getRGB(16, 16, 16));
+        SDL_Color color = graphics.getcol(100);
+        graphics.set_texture_color_mod(graphics.grphx.im_teleporter, color.r, color.g, color.b);
+        graphics.draw_texture_part(graphics.grphx.im_teleporter, x, y, 136, 40, 16, 16, 1, 1);
+        graphics.set_texture_color_mod(graphics.grphx.im_teleporter, 255, 255, 255);
+        break;
+    }
     default:
         break;
     }
@@ -2727,6 +2747,13 @@ void editorclass::tool_place()
     case EditorTool_COINS:
         add_entity(levx, levy, tilex, tiley, 8);
         break;
+    case EditorTool_TELEPORTERS:
+    {
+        lclickdelay = 1;
+
+        add_entity(levx, levy, tilex, tiley, 14);
+        break;
+    }
     default:
         break;
     }

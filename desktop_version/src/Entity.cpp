@@ -1632,6 +1632,11 @@ void entityclass::createentity(int xp, int yp, int t, int meta1, int meta2, int 
         entity.onentity = 1;
         entity.animate = 100;
         entity.para = meta2;
+        if (meta1 == 1)
+        {
+            entity.tile = 0; // don't do anything when touched, this is a visual teleporter
+            entity.colour = 100;
+        }
         break;
     case 15: // Crew Member (warp zone)
         entity.rule = 6;
