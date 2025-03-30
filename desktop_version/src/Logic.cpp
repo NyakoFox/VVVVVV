@@ -5,6 +5,7 @@
 #include "Game.h"
 #include "GlitchrunnerMode.h"
 #include "Graphics.h"
+#include "ItemHelpers.h"
 #include "LevelDebugger.h"
 #include "Map.h"
 #include "Music.h"
@@ -895,6 +896,13 @@ void gamelogic(void)
 
             obj.entitycollisioncheck();         // Check ent v ent collisions, update states
 
+            obj.entityblockcheck();
+
+            for (int ib = obj.blocks.size() - 1; ib >= 0; ib--)
+            {
+                obj.blocks[ib].update();
+            }
+
             if (map.towermode)
             {
                 //special for tower: is the player touching any spike blocks?
@@ -1488,6 +1496,26 @@ void gamelogic(void)
 
 #undef gotoroom
 #undef GOTOROOM
+
+    for (int i = game.item_get_displays.size() - 1; i >= 0; i--)
+    {
+        game.item_get_displays[i].timer++;
+        if (game.item_get_displays[i].timer > 58)
+        {
+            game.item_get_displays.erase(game.item_get_displays.begin() + i);
+        }
+    }
+
+    if (game.play_item_get)
+    {
+        music.playef(Sound_ITEMGET);
+        game.play_item_get = false;
+    }
+    if (game.play_splash)
+    {
+        music.playef(Sound_SPLASH);
+        game.play_splash = false;
+    }
 
     level_debugger::logic();
 }

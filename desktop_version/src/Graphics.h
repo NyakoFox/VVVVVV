@@ -179,6 +179,7 @@ public:
     void textboxtimer(int t);
 
     void addsprite(int x, int y, int tile, int col);
+    void additem(int x, int y, std::string item);
 
     void setimage(TextboxImage image);
 
@@ -290,6 +291,7 @@ public:
     int draw_rect(const SDL_Rect* rect, SDL_Color color);
     int draw_rect(int x, int y, int w, int h, SDL_Color color);
 
+    int draw_lines(const SDL_Point* points, const int count);
     int draw_line(int x, int y, int x2, int y2);
 
     int draw_points(const SDL_Point* points, int count);
@@ -345,7 +347,10 @@ public:
     void drawtile2(int x, int y, int t);
     void drawtile(int x, int y, int t);
 
-    void drawmap(void);
+    bool isbg(int t);
+
+    void drawmap(bool bg);
+    void drawwater(void);
 
     void drawtowermap(void);
 
@@ -390,6 +395,8 @@ public:
 
     SDL_Texture* customminimaps[401];
 
+    std::map<std::string, SDL_Texture*> item_sprites;
+
     bool flipmode;
     bool setflipmode;
     bool notextoutline;
@@ -400,8 +407,14 @@ public:
     SDL_Texture* menuTexture;
     SDL_Texture* ghostTexture;
     SDL_Texture* backgroundTexture;
+    SDL_Texture* backgroundTileTexture;
     SDL_Texture* foregroundTexture;
     SDL_Texture* tempScrollingTexture;
+
+    SDL_Texture* waterLineTexture;
+    SDL_Texture* waterLineUnderneathTexture;
+    SDL_Texture* waterTexture;
+
     SDL_Surface* tempScreenshot;
     SDL_Surface* tempScreenshot2x;
 

@@ -68,6 +68,9 @@ void entclass::clear(void)
     SDL_zero(realcol);
     lerpoldxp = 0;
     lerpoldyp = 0;
+
+    in_water = false;
+    last_water = -1;
 }
 
 bool entclass::outside(void)

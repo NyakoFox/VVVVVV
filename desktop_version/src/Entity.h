@@ -11,6 +11,8 @@
 #include "Game.h"
 #include "Maths.h"
 
+#define ENTITY_LEAVE_SPRING_MULT 3.0f
+
 enum
 {
     BLOCK = 0,
@@ -18,7 +20,8 @@ enum
     DAMAGE = 2,
     DIRECTIONAL = 3,
     SAFE = 4,
-    ACTIVITY = 5
+    ACTIVITY = 5,
+    WATER = 6
 };
 
 class entityclass
@@ -128,6 +131,8 @@ public:
 
     void customwarplinecheck(int i);
 
+    void mark_as_in_water(void);
+
     float entitycollideplatformroof(int t);
 
     float entitycollideplatformfloor(int t);
@@ -149,7 +154,10 @@ public:
 
     void movingplatformfix(int t, int j);
 
+    void entityblockcheck(void);
     void entitycollisioncheck(void);
+
+    bool wouldbeinwater(int i);
 
     void collisioncheck(int i, int j, bool scm = false);
 

@@ -114,6 +114,13 @@ set(VVV_CXX_SRC
     src/WarpClass.cpp
     src/XMLUtils.cpp
     src/main.cpp
+    src/Item.cpp
+    src/ItemSettings.cpp
+    src/ItemStack.cpp
+    src/ItemHelpers.cpp
+    src/FishItem.cpp
+    src/EquippableItem.cpp
+    src/FishingRodItem.cpp
 )
 set(VVV_C_SRC
     src/DeferCallbacks.c

@@ -2014,19 +2014,6 @@ int customlevelclass::numtrinkets(void)
     return temp;
 }
 
-int customlevelclass::numcoins(void)
-{
-    int temp = 0;
-    for (size_t i = 0; i < customentities.size(); i++)
-    {
-        if (customentities[i].t == 8 && inbounds(&customentities[i]))
-        {
-            temp++;
-        }
-    }
-    return temp;
-}
-
 int customlevelclass::numcrewmates(void)
 {
     int temp = 0;

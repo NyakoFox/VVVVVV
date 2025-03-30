@@ -444,6 +444,7 @@ void GraphicsResources::init(void)
     }
 
     SDL_zeroa(graphics.customminimaps);
+    graphics.item_sprites.clear();
 
     EnumHandle handle = {};
     const char* item;
@@ -469,6 +470,21 @@ void GraphicsResources::init(void)
         graphics.customminimaps[i] = LoadImage(full_item);
     }
     FILESYSTEM_freeEnumerate(&handle);
+
+    EnumHandle handle_items = {};
+    while ((item = FILESYSTEM_enumerate("graphics/items", &handle_items)) != NULL)
+    {
+        SDL_snprintf(full_item, sizeof(full_item), "graphics/items/%s", item);
+        // chop off .png
+        std::string name = item;
+        name = name.substr(0, name.size() - 4);
+        graphics.item_sprites[name] = LoadImage(full_item);
+    }
+    FILESYSTEM_freeEnumerate(&handle_items);
+
+    im_bobber = LoadImage("graphics/bobber.png");
+    im_fishingrod_anim = LoadImage("graphics/fishingrod_anim.png");
+    im_fishingrod_line_anim = LoadImage("graphics/fishingrod_line_anim.png");
 }
 
 
@@ -508,6 +524,16 @@ void GraphicsResources::destroy(void)
     {
         CLEAR(graphics.customminimaps[i]);
     }
+
+    for (auto& item : graphics.item_sprites)
+    {
+        CLEAR(item.second);
+    }
+
+    CLEAR(im_bobber);
+    CLEAR(im_fishingrod_anim);
+    CLEAR(im_fishingrod_line_anim);
+
 #undef CLEAR
 
     VVV_freefunc(SDL_FreeSurface, im_sprites_surf);

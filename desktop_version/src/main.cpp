@@ -19,6 +19,7 @@
 #include "GraphicsUtil.h"
 #include "Input.h"
 #include "InterimVersion.h"
+#include "ItemHelpers.h"
 #include "KeyPoll.h"
 #include "LevelDebugger.h"
 #include "Localization.h"
@@ -655,6 +656,8 @@ int main(int argc, char *argv[])
     vlog_info("\t\t");
     vlog_info("\t\t");
 
+    registerItems();
+
     // Set up screen
     graphics.init();
 
@@ -898,6 +901,8 @@ static void cleanup(void)
     {
         game.savestatsandsettings();
     }
+
+    cleanItems();
 
     graphics.grphx.destroy();
     graphics.destroy_buffers();

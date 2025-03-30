@@ -10,10 +10,14 @@
 #include "Editor.h"
 #include "Entity.h"
 #include "Enums.h"
+#include "EquippableItem.h"
 #include "Exit.h"
 #include "Font.h"
 #include "GlitchrunnerMode.h"
 #include "Graphics.h"
+#include "Item.h"
+#include "ItemHelpers.h"
+#include "ItemStack.h"
 #include "KeyPoll.h"
 #include "Localization.h"
 #include "LocalizationMaint.h"
@@ -52,8 +56,11 @@ scriptclass::scriptclass(void)
     textbuttons = false;
     textlarge = false;
     textbox_sprites.clear();
+    textbox_items.clear();
     textbox_image = TEXTIMAGE_NONE;
     textbox_absolutepos = false;
+
+    item = ItemStack(Items::FISHING_ROD, 1);
 }
 
 void scriptclass::add_default_colours(void)
@@ -439,7 +446,16 @@ void scriptclass::run(void)
             if (words[0] == "tofloor")
             {
                 int player = obj.getplayer();
-                if(INBOUNDS_VEC(player, obj.entities) && obj.entities[player].onroof>0)
+                if(INBOUNDS_VEC(player, obj.entities) && obj.entities[player].onroof > 0)
+                {
+                    game.press_action = true;
+                    scriptdelay = 1;
+                }
+            }
+            if (words[0] == "toceil")
+            {
+                int player = obj.getplayer();
+                if (INBOUNDS_VEC(player, obj.entities) && obj.entities[player].onground > 0)
                 {
                     game.press_action = true;
                     scriptdelay = 1;
@@ -448,6 +464,14 @@ void scriptclass::run(void)
             if (words[0] == "playef")
             {
                 music.playef(ss_toi(words[1]));
+            }
+            if (words[0] == "loopef")
+            {
+                music.loopef(ss_toi(words[1]));
+            }
+            if (words[0] == "stopef")
+            {
+                music.stopef(ss_toi(words[1]));
             }
             if (words[0] == "play")
             {
@@ -499,6 +523,10 @@ void scriptclass::run(void)
             if (words[0] == "endcutscene")
             {
                 graphics.showcutscenebars = false;
+            }
+            if (words[0] == "setbars")
+            {
+                graphics.setbars(ss_toi(words[1]));
             }
             if (words[0] == "audiopause")
             {
@@ -565,6 +593,7 @@ void scriptclass::run(void)
                 textboxtimer = 0;
                 textcrewmateposition = TextboxCrewmatePosition();
                 textbox_sprites.clear();
+                textbox_items.clear();
                 textbox_image = TEXTIMAGE_NONE;
                 textbox_absolutepos = false;
                 textbox_force_outline = false;
@@ -732,6 +761,14 @@ void scriptclass::run(void)
                 sprite.col = ss_toi(words[4]);
                 textbox_sprites.push_back(sprite);
             }
+            else if (words[0] == "textitem")
+            {
+                TextboxItem item;
+                item.x = ss_toi(words[1]);
+                item.y = ss_toi(words[2]);
+                item.item = words[3];
+                textbox_items.push_back(item);
+            }
             else if (words[0] == "textimage")
             {
                 if (words[1] == "levelcomplete")
@@ -798,6 +835,11 @@ void scriptclass::run(void)
                 for (size_t i = 0; i < textbox_sprites.size(); i++)
                 {
                     graphics.addsprite(textbox_sprites[i].x, textbox_sprites[i].y, textbox_sprites[i].tile, textbox_sprites[i].col);
+                }
+
+                for (size_t i = 0; i < textbox_items.size(); i++)
+                {
+                    graphics.additem(textbox_items[i].x, textbox_items[i].y, textbox_items[i].item);
                 }
 
                 graphics.setimage(textbox_image);
@@ -982,6 +1024,10 @@ void scriptclass::run(void)
                 else if (words[1] == "activity")
                 {
                     i = ACTIVITY;
+                }
+                else if (words[1] == "water")
+                {
+                    i = WATER;
                 }
                 else
                 {
@@ -1524,6 +1570,11 @@ void scriptclass::run(void)
             {
                 graphics.fademode = FADE_START_FADEOUT;
             }
+            else if (words[0] == "befadeout")
+            {
+                graphics.setfade(440);
+                graphics.fademode = FADE_FULLY_BLACK;
+            }
             else if (words[0] == "untilfade")
             {
                 if (FADEMODE_IS_FADING(graphics.fademode))
@@ -1561,6 +1612,15 @@ void scriptclass::run(void)
                     obj.customcollect[i] = false;
                 }
                 obj.coincollect.clear();
+                game.coins_collected = 0;
+                game.inventory.clear();
+                game.item_get_displays.clear();
+                game.play_item_get = false;
+                game.play_splash = false;
+                game.fishing_state = FishingState_IDLE;
+                game.fishing_timer = 0;
+                game.fishing_anim_timer = 0;
+                game.in_item_menu = false;
                 game.deathcounts = 0;
                 game.advancetext = false;
                 game.hascontrol = true;
@@ -1580,6 +1640,8 @@ void scriptclass::run(void)
                 map.final_mapcol = 0;
                 map.final_colorframe = 0;
                 map.finalstretch = false;
+
+                game.fishing_revealed = false;
             }
             else if (words[0] == "loadscript")
             {
@@ -2614,6 +2676,86 @@ void scriptclass::run(void)
                     }
                 }
             }
+            else if (words[0] == "pausegame")
+            {
+                game.completestop = true;
+            }
+            else if (words[0] == "resumegame")
+            {
+                game.completestop = false;
+            }
+            else if (words[0] == "settile")
+            {
+                int x = ss_toi(words[1]);
+                int y = ss_toi(words[2]);
+                int t = ss_toi(words[3]);
+
+                map.settile(x, y, t);
+                graphics.foregrounddrawn = false;
+            }
+            else if (words[0] == "killplayer")
+            {
+                game.deathseq = 30;
+            }
+            else if (words[0] == "revealfishing")
+            {
+                game.fishing_revealed = true;
+            }
+            else if (words[0] == "untilfloor")
+            {
+                int player = obj.getplayer();
+                if (INBOUNDS_VEC(player, obj.entities) && obj.entities[player].onground <= 0)
+                {
+                    scriptdelay = 1;
+                    position--;
+                }
+            }
+            else if (words[0] == "untilceil")
+            {
+                int player = obj.getplayer();
+                if (INBOUNDS_VEC(player, obj.entities) && obj.entities[player].onroof <= 0)
+                {
+                    scriptdelay = 1;
+                    position--;
+                }
+            }
+            else if (words[0] == "item")
+            {
+                Item* item_ptr = getItem(words[1]);
+                int count = 1;
+                if (argexists[2])
+                {
+                    count = ss_toi(words[2]);
+                }
+                if (item_ptr != NULL)
+                {
+                    item = ItemStack(item_ptr, count);
+                }
+                else
+                {
+                    item = ItemStack();
+                }
+                item.item->getDefaultComponents(&item);
+            }
+            else if (words[0] == "giveitem")
+            {
+                giveItem(item);
+            }
+            else if (words[0] == "addcomponent")
+            {
+                item.addComponent(words[1], words[2]);
+            }
+            else if (words[0] == "setequipped")
+            {
+                for (size_t i = 0; i < game.inventory.size(); i++)
+                {
+                    if (getItemID(game.inventory[i].item) == words[1])
+                    {
+                        game.inventory[i].setEquipped(true);
+                        break;
+                    }
+                }
+            }
 
             position++;
         }
@@ -3383,6 +3525,18 @@ void scriptclass::hardreset(void)
     i = 100; //previously a for-loop iterating over collect/customcollect set this to 100
 
     obj.coincollect.clear();
+    game.coins_collected = 0;
+
+    game.fishing_state = FishingState_IDLE;
+    game.fishing_timer = 0;
+    game.fishing_anim_timer = 0;
+    game.inventory.clear();
+    game.play_item_get = false;
+    game.play_splash = false;
+    game.item_get_displays.clear();
+    game.in_item_menu = false;
+
+    game.fishing_revealed = false;
 
     int theplayer = obj.getplayer();
     if (INBOUNDS_VEC(theplayer, obj.entities)){

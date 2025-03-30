@@ -85,8 +85,8 @@ static bool mount_pre_datazip(
     const char* user_path
 )
 {
-    /* Find and mount a directory (like the main language directory) in front of data.zip.
-     * This directory, if not user-supplied, can be either next to data.zip,
+    /* Find and mount a directory (like the main language directory) in front of data2.zip.
+     * This directory, if not user-supplied, can be either next to data2.zip,
      * or otherwise in desktop_version/ if that's found in the base path.
      *
      * out_path is assumed to be either NULL, or MAX_PATH long. If it isn't, boom */
@@ -106,7 +106,7 @@ static bool mount_pre_datazip(
         return false;
     }
 
-    /* Try to detect the directory, it's next to data.zip in distributed builds */
+    /* Try to detect the directory, it's next to data2.zip in distributed builds */
     bool dir_found = false;
     char buffer[MAX_PATH];
 
@@ -292,7 +292,7 @@ int FILESYSTEM_init(char *argvZero, char* baseDir, char *assetsPath, char* langD
     }
 
 #ifdef __ANDROID__
-    // This is kind of a mess, but that's not really solvable unless we expect the user to download the data.zip manually.
+    // This is kind of a mess, but that's not really solvable unless we expect the user to download the data2.zip manually.
     if (!PHYSFS_mount(PHYSFS_getBaseDir(), "/apk", 1))
     {
         vlog_error("Failed to mount apk!");
@@ -306,8 +306,8 @@ int FILESYSTEM_init(char *argvZero, char* baseDir, char *assetsPath, char* langD
         doesFontsDirExist = true;
     }
 
-    PHYSFS_File* dataZip = PHYSFS_openRead("/apk/assets/data.zip");
-    if (!dataZip || !PHYSFS_mountHandle(dataZip, "data.zip", NULL, 1))
+    PHYSFS_File* dataZip = PHYSFS_openRead("/apk/assets/data2.zip");
+    if (!dataZip || !PHYSFS_mountHandle(dataZip, "data2.zip", NULL, 1))
 #else
     doesLangDirExist = mount_pre_datazip(mainLangDir, "lang", "lang/", langDir);
     vlog_info("Languages directory: %s", mainLangDir);
@@ -323,23 +323,23 @@ int FILESYSTEM_init(char *argvZero, char* baseDir, char *assetsPath, char* langD
     {
         SDL_snprintf(output, sizeof(output), "%s%s",
             basePath,
-            "data.zip"
+            "data2.zip"
         );
     }
     if (!PHYSFS_mount(output, NULL, 1))
 #endif
     {
-        vlog_error("Error: data.zip missing!");
-        vlog_error("You do not have data.zip!");
-        vlog_error("Grab it from your purchased copy of the game,");
-        vlog_error("or get it from the free Make and Play Edition.");
+        vlog_error("Error: data2.zip missing!");
+        vlog_error("You do not have data2.zip!");
+        vlog_error("It should've been included in the download,");
+        vlog_error("so grab it from there.");
 
         SDL_ShowSimpleMessageBox(
             SDL_MESSAGEBOX_ERROR,
-            "data.zip missing!",
-            "You do not have data.zip!"
-            "\n\nGrab it from your purchased copy of the game,"
-            "\nor get it from the free Make and Play Edition.",
+            "data2.zip missing!",
+            "You do not have data2.zip!"
+            "\n\nIt should've been included in the download,"
+            "\nso grab it from there.",
             NULL
         );
         VVV_exit(1);

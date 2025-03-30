@@ -10,9 +10,11 @@
 #include "Entity.h"
 #include "Exit.h"
 #include "FileSystemUtils.h"
+#include "FishingRodItem.h"
 #include "Font.h"
 #include "GraphicsUtil.h"
 #include "IMERender.h"
+#include "ItemHelpers.h"
 #include "Localization.h"
 #include "Map.h"
 #include "Maths.h"
@@ -111,7 +113,13 @@ void Graphics::init(void)
     ghostTexture = NULL;
     tempShakeTexture = NULL;
     backgroundTexture = NULL;
+    backgroundTileTexture = NULL;
     foregroundTexture = NULL;
+
+    waterLineTexture = NULL;
+    waterLineUnderneathTexture = NULL;
+    waterTexture = NULL;
+
     tempScreenshot = NULL;
     tempScreenshot2x = NULL;
     towerbg = TowerBG();
@@ -188,11 +196,16 @@ void Graphics::create_buffers(void)
     menuTexture = CREATE_TEXTURE;
     ghostTexture = CREATE_TEXTURE;
     tempShakeTexture = CREATE_TEXTURE;
+    backgroundTileTexture = CREATE_TEXTURE;
     foregroundTexture = CREATE_TEXTURE;
     backgroundTexture = CREATE_SCROLL_TEXTURE;
     tempScrollingTexture = CREATE_SCROLL_TEXTURE;
     towerbg.texture = CREATE_SCROLL_TEXTURE;
     titlebg.texture = CREATE_SCROLL_TEXTURE;
+
+    waterLineTexture = CREATE_TEXTURE;
+    waterLineUnderneathTexture = CREATE_TEXTURE;
+    waterTexture = CREATE_TEXTURE;
 
 #undef CREATE_SCROLL_TEXTURE
 #undef CREATE_TEXTURE
@@ -214,6 +227,7 @@ void Graphics::destroy_buffers(void)
     VVV_freefunc(SDL_DestroyTexture, gameTexture);
     VVV_freefunc(SDL_DestroyTexture, gameplayTexture);
     VVV_freefunc(SDL_DestroyTexture, menuTexture);
+    VVV_freefunc(SDL_DestroyTexture, backgroundTileTexture);
     VVV_freefunc(SDL_DestroyTexture, ghostTexture);
     VVV_freefunc(SDL_DestroyTexture, tempShakeTexture);
     VVV_freefunc(SDL_DestroyTexture, foregroundTexture);
@@ -221,6 +235,11 @@ void Graphics::destroy_buffers(void)
     VVV_freefunc(SDL_DestroyTexture, tempScrollingTexture);
     VVV_freefunc(SDL_DestroyTexture, towerbg.texture);
     VVV_freefunc(SDL_DestroyTexture, titlebg.texture);
+
+    VVV_freefunc(SDL_DestroyTexture, waterLineTexture);
+    VVV_freefunc(SDL_DestroyTexture, waterLineUnderneathTexture);
+    VVV_freefunc(SDL_DestroyTexture, waterTexture);
+
     VVV_freefunc(SDL_FreeSurface, tempFilterSrc);
     VVV_freefunc(SDL_FreeSurface, tempFilterDest);
     VVV_freefunc(SDL_FreeSurface, tempScreenshot);
@@ -396,7 +415,7 @@ void Graphics::printcrewnamestatus( int x, int y, int t, bool rescued )
     }
     else if (rescued)
     {
-        status_text = loc::gettext_case("Rescued!", gender);
+        status_text = loc::gettext_case("Exploring!", gender);
     }
     else
     {
@@ -716,6 +735,16 @@ int Graphics::draw_rect(const int x, const int y, const int w, const int h, cons
     return draw_rect(x, y, w, h, color.r, color.g, color.b, color.a);
 }
 
+int Graphics::draw_lines(const SDL_Point* points, const int count)
+{
+    const int result = SDL_RenderDrawLines(gameScreen.m_renderer, points, count);
+    if (result != 0)
+    {
+        WHINE_ONCE_ARGS(("Could not draw lines: %s", SDL_GetError()));
+    }
+    return result;
+}
+
 int Graphics::draw_line(const int x, const int y, const int x2, const int y2)
 {
     const int result = SDL_RenderDrawLine(gameScreen.m_renderer, x, y, x2, y2);
@@ -778,6 +807,61 @@ bool Graphics::shouldrecoloroneway(const int tilenum, const bool mounted)
     return (tilenum >= 14 && tilenum <= 17
     && (!mounted
     || cl.onewaycol_override));
+}
+
+bool Graphics::isbg(int t)
+{
+    // ok, let's just copy solid tiles...
+
+    if (map.towermode)
+    {
+        if (t >= 12 && t <= 27) return false;
+    }
+    else if (map.tileset == 2)
+    {
+        if (t >= 12 && t <= 27) return false;
+    }
+    else
+    {
+        if (t == 1) return false;
+        if (map.tileset == 0 && t == 59) return false;
+        if (t >= 80 && t < 680) return false;
+        if (t == 740 && map.tileset == 1) return false;
+    }
+
+    // ok, so the tile is nonsolid. some should still show up in front of entities though, like the grass! so let's add a special case for those:
+    if (map.tileset == 1)
+    {
+        // GRASS:
+
+        if (t == 941 || t == 942 || t == 981 || t == 982) return false; // grass-to-wall tiles
+        if (t >= 944 && t <= 949) return false; // grass (top)
+        if (t >= 984 && t <= 989) return false; // grass (bottom)
+        if (t >= 1024 && t <= 1033) return false; // literally every other decal (row 1)
+        if (t >= 1064 && t <= 1073) return false; // literally every other decal (row 2)
+        if (t == 51 || t == 52 || t == 63 || t == 64) return false; // special spikes
+
+        // SAND:
+        if (t == 888 || t == 889) return false; // corner tiles for rocks (row 1)
+        if (t == 928 || t == 929) return false; // corner tiles for rocks (row 2)
+        if (t >= 891 && t <= 896) return false; // rock (top)
+        if (t >= 931 && t <= 936) return false; // rock (bottom)
+        if (t >= 971 && t <= 976) return false; // rock (left)
+        if (t >= 1011 && t <= 1016) return false; // rock (right)
+
+        if (t == 1048 || t == 1049) return false; // corner tiles for sand (row 1)
+        if (t == 1088 || t == 1089) return false; // corner tiles for sand (row 2)
+
+        if (t >= 1051 && t <= 1054) return false; // sand (top)
+        if (t >= 1091 && t <= 1094) return false; // sand (bottom)
+        if (t >= 1131 && t <= 1134) return false; // sand (left)
+        if (t >= 1171 && t <= 1174) return false; // sand (right)
+
+        if (t >= 1058 && t <= 1061) return false; // corner connectors (row 1)
+        if (t >= 1098 && t <= 1101) return false; // corner connectors (row 2)
+    }
+
+    return true;
 }
 
 void Graphics::drawtile(int x, int y, int t)
@@ -1080,6 +1164,21 @@ void Graphics::drawgui(void)
                 1,
                 (flipmode ? -1 : 1)
             );
+        }
+
+        for (size_t index = 0; index < textboxes[i].items.size(); index++)
+        {
+            TextboxItem* sprite = &textboxes[i].items[index];
+            int y = sprite->y + yp;
+            if (flipmode)
+            {
+                y = yp + textboxes[i].h - sprite->y - 16;
+            }
+            Item* item = getItem(sprite->item);
+            if (item != NULL)
+            {
+                item->draw(sprite->x + textboxes[i].xp, y);
+            }
         }
     }
 }
@@ -1478,6 +1577,16 @@ void Graphics::addsprite(int x, int y, int tile, int col)
     }
 
     textboxes[m].addsprite(x, y, tile, col);
+}
+
+void Graphics::additem(int x, int y, std::string item)
+{
+    if (!INBOUNDS_VEC(m, textboxes))
+    {
+        vlog_error("additem() out-of-bounds!");
+        return;
+    }
+    textboxes[m].additem(x, y, item);
 }
 
 void Graphics::setimage(TextboxImage image)
@@ -2061,6 +2170,129 @@ void Graphics::drawentity(const int i, const int yoff)
 
         draw_grid_tile(sprites, obj.entities[i].drawframe, drawRect.x, drawRect.y, 32, 32, ct);
 
+        if (obj.entities[i].rule == 0)
+        {
+            // the player! let's draw their fishing rod! if they have one
+            ItemStack* stack = getEquippedRod();
+            if (stack != NULL)
+            {
+            }
+
+            if (obj.entities[i].drawframe >= 204 && obj.entities[i].drawframe <= 251)
+            {
+                int scale_x = 1;
+                int scale_y = 1;
+
+                int rod_x = drawRect.x - 5;
+                int rod_y = drawRect.y - 9;
+
+                int drawframe = 0;
+
+                switch (obj.entities[i].drawframe)
+                {
+                case 204: case 216: case 228: case 240:
+                    drawframe = 0;
+                    break;
+                case 205: case 217: case 229: case 241:
+                    drawframe = 1;
+                    break;
+                case 206: case 218: case 230: case 242:
+                    drawframe = 2;
+                    break;
+                case 207: case 219: case 231: case 243:
+                    drawframe = 3;
+                    break;
+                case 208: case 220: case 232: case 244:
+                    drawframe = 4;
+                    break;
+                case 209: case 221: case 233: case 245:
+                    drawframe = 5;
+                    break;
+                case 210: case 222: case 234: case 246:
+                    drawframe = 6;
+                    break;
+                case 211: case 223: case 235: case 247:
+                    drawframe = 7;
+                    break;
+                case 212: case 224: case 236: case 248:
+                    drawframe = 8;
+                    break;
+                }
+
+                if (obj.entities[i].dir == 0)
+                {
+                    scale_x = -1;
+                    rod_x -= 2;
+                }
+                if (game.gravitycontrol == 1)
+                {
+                    rod_y += (3 + 8);
+                    scale_y = -1;
+                }
+
+                draw_grid_tile(grphx.im_fishingrod_anim, drawframe, rod_x, rod_y, 36, 32, getcol(200), scale_x, scale_y);
+                draw_grid_tile(grphx.im_fishingrod_line_anim, drawframe, rod_x, rod_y, 36, 32, getcol(201), scale_x, scale_y);
+            }
+
+            // draw lines to bobbers (should only exist if you casted your rod so no need for rod checks
+            for (int j = 0; j < obj.entities.size(); j++)
+            {
+                if (obj.entities[j].type == EntityType_BOBBER)
+                {
+                    // draw a line from the player to the bobber
+                    SDL_Point bobberPoint;
+                    bobberPoint.x = obj.entities[j].xp + obj.entities[j].cx + (obj.entities[j].w / 2);
+                    bobberPoint.y = obj.entities[j].yp + obj.entities[j].cy;
+                    if (game.gravitycontrol == 1)
+                    {
+                        bobberPoint.y += 3;
+                    }
+
+                    SDL_Point playerPoint;
+                    playerPoint.x = tpoint.x + 16 + 14;
+                    playerPoint.y = tpoint.y + 16 - 13;
+
+                    if (obj.entities[i].dir == 0)
+                    {
+                        playerPoint.x -= 37;
+                    }
+                    if (game.gravitycontrol == 1)
+                    {
+                        playerPoint.y += 21;
+                    }
+
+                    // TODO: maybe some actual physics for the midpoint...
+                    SDL_Point midPoint;
+                    midPoint.x = lerpReal(playerPoint.x, bobberPoint.x, 0.1);
+                    midPoint.y = lerpReal(playerPoint.y, bobberPoint.y, 0.9);
+
+                    set_color(255, 255, 255);
+
+                    SDL_Point points[FISHING_LINE_SMOOTHNESS + 1];
+                    for (int k = 0; k <= FISHING_LINE_SMOOTHNESS; k++)
+                    {
+                        float progress = (float)k / FISHING_LINE_SMOOTHNESS;
+                        float left_line_x = lerpReal(playerPoint.x, midPoint.x, progress);
+                        float left_line_y = lerpReal(playerPoint.y, midPoint.y, progress);
+                        float right_line_x = lerpReal(midPoint.x, bobberPoint.x, progress);
+                        float right_line_y = lerpReal(midPoint.y, bobberPoint.y, progress);
+
+                        SDL_Point coords;
+                        coords.x = lerpReal(left_line_x, right_line_x, progress);
+                        coords.y = lerpReal(left_line_y, right_line_y, progress);
+
+                        points[k] = coords;
+                    }
+
+                    draw_lines(points, SDL_arraysize(points));
+
+                    //draw_rect(playerPoint.x - 2, playerPoint.y - 2, 4, 4, 255, 0, 0);
+                    //draw_rect(midPoint.x - 2, midPoint.y - 2, 4, 4, 255, 0, 0);
+                    //draw_rect(bobberPoint.x - 2, bobberPoint.y - 2, 4, 4, 255, 0, 0);
+                }
+            }
+        }
+
         // screenwrapping!
         SDL_Point wrappedPoint;
         bool wrapX = false;
@@ -2309,6 +2541,22 @@ void Graphics::drawentity(const int i, const int yoff)
     {
         // Special for epilogue: huge hero!
         draw_grid_tile(grphx.im_sprites, obj.entities[i].drawframe, xp, yp - yoff, sprites_rect.w, sprites_rect.h, obj.entities[i].realcol, 6, 6);
+        break;
+    }
+    case 200:
+    {
+        int w, h;
+
+        if (query_texture(grphx.im_bobber, NULL, NULL, &w, &h) != 0)
+        {
+            return;
+        }
+
+        bool flipped = (game.gravitycontrol == 1);
+
+        const SDL_Rect dstrect = { xp, yp + (flipped ? -4 : 0), w, h};
+
+        copy_texture(grphx.im_bobber, NULL, &dstrect, 0, NULL, flipped ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE);
         break;
     }
     }
@@ -2787,7 +3035,233 @@ void Graphics::updatebackground(int t)
     }
 }
 
-void Graphics::drawmap(void)
+static float point_lerp(float a, float b, float t)
+{
+    return a + (b - a) * t;
+}
+
+// Catmull-Rom spline interpolation
+static SDL_FPoint catmull_rom(const SDL_FPoint& p0, const SDL_FPoint& p1, const SDL_FPoint& p2, const SDL_FPoint& p3, float t) {
+    float t2 = t * t;
+    float t3 = t2 * t;
+
+    float x = 0.5f * (
+        (2 * p1.x) +
+        (-p0.x + p2.x) * t +
+        (2 * p0.x - 5 * p1.x + 4 * p2.x - p3.x) * t2 +
+        (-p0.x + 3 * p1.x - 3 * p2.x + p3.x) * t3
+        );
+
+    float y = 0.5f * (
+        (2 * p1.y) +
+        (-p0.y + p2.y) * t +
+        (2 * p0.y - 5 * p1.y + 4 * p2.y - p3.y) * t2 +
+        (-p0.y + 3 * p1.y - 3 * p2.y + p3.y) * t3
+        );
+
+    return { x, y };
+}
+
+// Generate a smooth spline from a list of SDL_FPoints
+static std::vector<SDL_FPoint> generate_spline(const std::vector<SDL_FPoint>& points, int subdivisions) {
+    std::vector<SDL_FPoint> smoothPoints;
+
+    for (size_t i = 0; i < points.size() - 1; ++i) {
+        // Control points
+        SDL_FPoint p0 = (i > 0) ? points[i - 1] : points[i];
+        SDL_FPoint p1 = points[i];
+        SDL_FPoint p2 = points[i + 1];
+        SDL_FPoint p3 = (i < points.size() - 2) ? points[i + 2] : points[i + 1];
+
+        // Add the start point of the segment
+        smoothPoints.push_back(p1);
+
+        // Generate intermediate points using Catmull-Rom interpolation
+        for (int j = 1; j <= subdivisions; ++j) {
+            float t = static_cast<float>(j) / (subdivisions + 1);
+            SDL_FPoint interpolated = catmull_rom(p0, p1, p2, p3, t);
+            smoothPoints.push_back(interpolated);
+        }
+    }
+
+    // Add the final point
+    smoothPoints.push_back(points.back());
+
+    return smoothPoints;
+}
+
+void Graphics::drawwater(void)
+{
+    SDL_Texture* target = SDL_GetRenderTarget(gameScreen.m_renderer);
+
+    set_render_target(waterLineTexture);
+    clear(0, 0, 0, 0);
+    set_render_target(waterLineUnderneathTexture);
+    clear(0, 0, 0, 0);
+    set_render_target(waterTexture);
+    clear(0, 0, 0, 0);
+
+    for (size_t j = 0; j < obj.blocks.size(); j++)
+    {
+        blockclass block = obj.blocks[j];
+
+        if (block.type == WATER)
+        {
+            std::vector<SDL_FPoint> current_points;
+            std::vector<SDL_FPoint> current_bottom_points;
+
+            for (int i = 0; i < block.springs.size(); i++)
+            {
+                SDL_FPoint point;
+                point.x = block.xp + block.springs[i].x;
+                point.y = block.yp + block.springs[i].y;
+
+                current_points.push_back(point);
+            }
+            for (int i = 0; i < block.bottom_springs.size(); i++)
+            {
+                SDL_FPoint point;
+                point.x = block.xp + block.bottom_springs[i].x;
+                point.y = block.yp + block.bottom_springs[i].y;
+
+                current_bottom_points.push_back(point);
+            }
+
+            std::vector<SDL_FPoint> genned_points = generate_spline(current_points, 4);
+            std::vector<SDL_FPoint> genned_bottom_points = generate_spline(current_bottom_points, 4);
+
+            std::vector<SDL_Point> points;
+            std::vector<SDL_Point> bottom_points;
+            // Loop through the points, shift them all down a pixel, and copy them to our render vector
+            for (int i = 0; i < genned_points.size(); i++)
+            {
+                SDL_Point point;
+                point.x = genned_points[i].x;
+                point.y = genned_points[i].y + 1;
+                points.push_back(point);
+            }
+            for (int i = 0; i < genned_bottom_points.size(); i++)
+            {
+                SDL_Point point;
+                point.x = genned_bottom_points[i].x;
+                point.y = genned_bottom_points[i].y - 1;
+                bottom_points.push_back(point);
+            }
+
+            // From left to right, draw vertical lines to fill in the water area
+
+            for (int x = 0; x < block.wp; x++) {
+                int top_y = 0;
+                int bottom_y = 0;
+
+                // Figure out the top_y by finding the line (two points) above this x position -- and then we should interpolate between the two to find the position on the line.
+
+                // Left point:
+                int left_point_top = 0;
+                for (int i = 0; i < block.springs.size(); i++) {
+                    if (block.springs[i].x <= x) {
+                        left_point_top = i;
+                    }
+                }
+                int left_point_bottom = 0;
+                for (int i = 0; i < block.bottom_springs.size(); i++) {
+                    if (block.bottom_springs[i].x <= x) {
+                        left_point_bottom = i;
+                    }
+                }
+
+                // Right point:
+                int right_point_top = 0;
+                for (int i = 0; i < block.springs.size(); i++) {
+                    if (block.springs[i].x > x) {
+                        right_point_top = i;
+                        break;
+                    }
+                }
+                int right_point_bottom = 0;
+                for (int i = 0; i < block.bottom_springs.size(); i++) {
+                    if (block.bottom_springs[i].x > x) {
+                        right_point_bottom = i;
+                        break;
+                    }
+                }
+
+                // Interpolate between the two points
+                float val_top = (x - block.springs[left_point_top].x) / (block.springs[right_point_top].x - block.springs[left_point_top].x);
+                top_y = point_lerp(block.springs[left_point_top].y, block.springs[right_point_top].y, val_top);
+                float val_bottom = (x - block.bottom_springs[left_point_bottom].x) / (block.bottom_springs[right_point_bottom].x - block.bottom_springs[left_point_bottom].x);
+                bottom_y = point_lerp(block.bottom_springs[left_point_bottom].y, block.bottom_springs[right_point_bottom].y, val_bottom);
+
+                set_render_target(waterTexture);
+
+                // Draw the line
+                set_color(127, 192, 255);
+                SDL_RenderDrawLineF(gameScreen.m_renderer, block.xp + x, block.yp + top_y, block.xp + x, block.yp + bottom_y);
+            }
+
+            set_render_target(waterLineUnderneathTexture);
+
+            // Draw the springs as connected lines.
+            set_color(192, 255, 255);
+            SDL_RenderDrawLines(gameScreen.m_renderer, points.data(), points.size());
+            SDL_RenderDrawLines(gameScreen.m_renderer, bottom_points.data(), bottom_points.size());
+            set_color(255, 255, 255);
+
+            // Loop through the points and shift them all back up a pixel!
+
+            for (int i = 0; i < points.size(); i++)
+            {
+                points[i].y--;
+            }
+            for (int i = 0; i < bottom_points.size(); i++)
+            {
+                bottom_points[i].y++;
+            }
+
+            set_render_target(waterLineTexture);
+
+            // Draw the springs as connected lines
+            set_color(255, 255, 255);
+            SDL_RenderDrawLines(gameScreen.m_renderer, points.data(), points.size());
+            SDL_RenderDrawLines(gameScreen.m_renderer, bottom_points.data(), bottom_points.size());
+        }
+    }
+
+    set_render_target(target);
+
+    //static SDL_BlendMode mode = SDL_ComposeCustomBlendMode(
+    //);
+
+    // WATER
+
+    // FIRST PASS: Just the normal blend is fine thanks
+    set_blendmode(waterTexture, SDL_BLENDMODE_BLEND);
+    set_texture_alpha_mod(waterTexture, 96);
+    copy_texture(waterTexture, NULL, NULL);
+    set_texture_alpha_mod(waterTexture, 255);
+
+    // SECOND PASS: Make that shit multiply !!
+    set_blendmode(waterTexture, SDL_BLENDMODE_MUL);
+    set_texture_alpha_mod(waterTexture, 192);
+    copy_texture(waterTexture, NULL, NULL);
+    set_texture_alpha_mod(waterTexture, 255);
+
+    // UNDER WATER LINE
+    // ADDITIVE (128 alpha)
+    set_blendmode(waterLineUnderneathTexture, SDL_BLENDMODE_ADD);
+    set_texture_alpha_mod(waterLineUnderneathTexture, 128);
+    copy_texture(waterLineUnderneathTexture, NULL, NULL);
+    set_texture_alpha_mod(waterLineUnderneathTexture, 255);
+
+    // WATER LINE
+    // ADDITIVE
+    set_blendmode(waterLineTexture, SDL_BLENDMODE_ADD);
+    set_texture_alpha_mod(waterLineTexture, 255);
+    copy_texture(waterLineTexture, NULL, NULL);
+    set_texture_alpha_mod(waterLineTexture, 255);
+}
+
+void Graphics::drawmap(bool bg)
 {
     if (!foregrounddrawn)
     {
@@ -2795,6 +3269,9 @@ void Graphics::drawmap(void)
 
         set_render_target(foregroundTexture);
         set_blendmode(foregroundTexture, SDL_BLENDMODE_BLEND);
+        clear(0, 0, 0, 0);
+        set_render_target(backgroundTileTexture);
+        set_blendmode(backgroundTileTexture, SDL_BLENDMODE_BLEND);
         clear(0, 0, 0, 0);
 
         for (int y = 0; y < 30; y++)
@@ -2816,6 +3293,13 @@ void Graphics::drawmap(void)
 
                 if (tile > 0)
                 {
+                    if (isbg(tile)) {
+                        set_render_target(backgroundTileTexture);
+                    }
+                    else
+                    {
+                        set_render_target(foregroundTexture);
+                    }
                     if (tileset == 0)
                     {
                         drawtile(x * 8, y * 8, tile);
@@ -2836,7 +3320,7 @@ void Graphics::drawmap(void)
         foregrounddrawn = true;
     }
 
-    copy_texture(foregroundTexture, NULL, NULL);
+    copy_texture(bg ? backgroundTileTexture : foregroundTexture, NULL, NULL);
 }
 
 void Graphics::drawfinalmap(void)
@@ -2966,6 +3450,16 @@ void Graphics::updatetowerbackground(TowerBG& bg_obj)
 #define GETCOL_RANDOM (game.noflashingmode ? 0.5 : fRandom())
 SDL_Color Graphics::getcol( int t )
 {
+
+    SDL_Color gold_colors[] = {
+        getRGB(255, 255, 150),
+        getRGB(224, 198, 85),
+        getRGB(198, 173, 61),
+        getRGB(175, 143, 29),
+        getRGB(163, 129, 52),
+        getRGB(158, 112, 37)
+    };
+
     // Setup predefinied colours as per our zany palette
     switch(t)
     {
@@ -3176,6 +3670,109 @@ SDL_Color Graphics::getcol( int t )
             return getRGB(164 + (GETCOL_RANDOM * 64), 164 + (GETCOL_RANDOM * 64), 255 - (GETCOL_RANDOM * 64));
         }
     }
+
+    case 200: // Normal fishing rod
+    {
+        return getRGB(92 - help.glow / 4, 128 - help.glow / 4, 128 - help.glow / 4);
+    }
+    case 201: // Fishing line
+    {
+        const int temp = GETCOL_RANDOM * 24;
+        return getRGB(255 - temp, 255 - temp, 255 - temp);
+    }
+
+    case 202: // Largemouth bass layer 1
+    {
+        return getRGB(128 - help.glow / 2, 140 - help.glow / 2, 64 - help.glow / 2);
+    }
+    case 203: // Largemouth bass layer 2
+    {
+        return getRGB(210 - help.glow / 2, 210 - help.glow / 2, 152 - help.glow / 2);
+    }
+    case 204: // Worm layer 1
+    {
+        return getRGB(218 - help.glow / 2, 164 - help.glow / 2, 180 - help.glow / 2);
+    }
+    case 205: // Worm layer 2
+    {
+        return getRGB(255 - help.glow / 2, 128 - help.glow / 2, 164 - help.glow / 2);
+    }
+    case 206: // Smallmouth bass layer 1
+        return getRGB(152 - help.glow / 2, 128 - help.glow / 2, 96 - help.glow / 2);
+    case 207: // Smallmouth bass layer 2
+        return getRGB(180 - help.glow / 2, 180 - help.glow / 2, 140 - help.glow / 2);
+    case 208: // Bullhead layer 1
+        return getRGB(128 - help.glow / 2, 110 - help.glow / 2, 48 - help.glow / 2);
+    case 209: // Bullhead layer 2
+        return getRGB(175 - help.glow / 2, 148 - help.glow / 2, 80 - help.glow / 2);
+    case 210: // Chub layer 1
+        return getRGB(142 - help.glow / 2, 160 - help.glow / 2, 172 - help.glow / 2);
+    case 211: // Chub layer 2
+        return getRGB(200 - help.glow / 2, 92 - help.glow / 2, 38 - help.glow / 2);
+    case 212: // Pike layer 1
+        return getRGB(100 - help.glow / 2, 110 - help.glow / 2, 72 - help.glow / 2);
+    case 213: // Pike layer 2
+        return getRGB(160 - help.glow / 2, 150 - help.glow / 2, 116 - help.glow / 2);
+    case 214: // Walleye layer 1
+        return getRGB(128 - help.glow / 2, 145 - help.glow / 2, 90 - help.glow / 2);
+    case 215: // Walleye layer 2
+        return getRGB(190 - help.glow / 2, 200 - help.glow / 2, 140 - help.glow / 2);
+    case 216: // Carp layer 1
+        return getRGB(210 - help.glow / 2, 170 - help.glow / 2, 90 - help.glow / 2);
+    case 217: // Carp layer 2
+        return getRGB(245 - help.glow / 2, 205 - help.glow / 2, 140 - help.glow / 2);
+    case 218: // Perch layer 1
+        return getRGB(216 - help.glow / 2, 190 - help.glow / 2, 74 - help.glow / 2);
+    case 219: // Perch layer 2
+        return getRGB(236 - help.glow / 2, 230 - help.glow / 2, 190 - help.glow / 2);
+    case 220: // Catfish layer 1
+        return getRGB(104 - help.glow / 2, 94 - help.glow / 2, 76 - help.glow / 2);
+    case 221: // Catfish layer 2
+        return getRGB(152 - help.glow / 2, 142 - help.glow / 2, 117 - help.glow / 2);
+    case 222: // Minnow layer 1
+        return getRGB(160 - help.glow / 2, 157 - help.glow / 2, 115 - help.glow / 2);
+    case 223: // Minnow layer 2
+        return getRGB(104 - help.glow / 2, 93 - help.glow / 2, 82 - help.glow / 2);
+    case 224: // Koi layer 1
+        return getRGB(230 - help.glow / 2, 238 - help.glow / 2, 244 - help.glow / 2);
+    case 225: // Koi layer 2
+        return getRGB(255 - help.glow / 2, 82 - help.glow / 2, 58 - help.glow / 2);
+    case 226: // Rainbow trout layer 1
+        return getRGB(99 - help.glow / 2, 124 - help.glow / 2, 88 - help.glow / 2);
+    case 227: // Rainbow trout layer 2
+        return getRGB(196 - help.glow / 2, 198 - help.glow / 2, 170 - help.glow / 2);
+    case 228: // Rainbow trout layer 3
+        return getRGB(243 - help.glow / 2, 106 - help.glow / 2, 134 - help.glow / 2);
+    case 229: // Rainbow trout layer 4
+        return getRGB(203 - help.glow / 2, 171 - help.glow / 2, 88 - help.glow / 2);
+    case 230: // Golden trout layer 1
+        return getRGB(160 - help.glow / 2, 127 - help.glow / 2, 67 - help.glow / 2);
+    case 231: // Golden trout layer 2
+        return getRGB(228 - help.glow / 2, 184 - help.glow / 2, 48 - help.glow / 2);
+    case 232: // Golden trout layer 3
+        return getRGB(229 - help.glow / 2, 75 - help.glow / 2, 51 - help.glow / 2);
+    case 233: // Goldfish layer 1
+        return getRGB(236 - help.glow / 2, 126 - help.glow / 2, SDL_max((19 - help.glow / 2), 0));
+    case 234: // Goldfish layer 2
+        return getRGB(255 - help.glow / 2, 177 - help.glow / 2, SDL_max((19 - help.glow / 2), 0));
+    case 235: // Gold goldfish layer 1
+    case 236: // Gold goldfish layer 2
+    case 237: // Gold goldfish layer 3
+    case 238: // Gold goldfish layer 4
+    case 239: // Gold goldfish layer 5
+    case 240: // Gold goldfish layer 6
+    {
+        SDL_Color cur = gold_colors[(game.framecounter / 6 + (t - 235)) % 6];
+        SDL_Color next = gold_colors[(game.framecounter / 6 + (t - 235) + 1) % 6];
+        float time = (game.framecounter % 6) / 6.0f;
+        return getRGB(lerpReal(cur.r, next.r, time), lerpReal(cur.g, next.g, time), lerpReal(cur.b, next.b, time));
+    }
+    case 241: // Prismatic trout, rainbow cycle
+        return getRGB(
+            sinf(0.05 * game.framecounter + 0 * M_PI / 3) * 127 + 128,
+            sinf(0.05 * game.framecounter + 2 * M_PI / 3) * 127 + 128,
+            sinf(0.05 * game.framecounter + 4 * M_PI / 3) * 127 + 128
+        );
     }
 
     return getRGB(255, 255, 255);

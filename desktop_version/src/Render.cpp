@@ -13,6 +13,7 @@
 #include "Graphics.h"
 #include "GraphicsUtil.h"
 #include "InterimVersion.h"
+#include "ItemHelpers.h"
 #include "KeyPoll.h"
 #include "LevelDebugger.h"
 #include "Localization.h"
@@ -2409,22 +2410,27 @@ void gamerender(void)
             {
                 graphics.clear();
             }
+
             if ((map.finalmode || map.custommode) && map.final_colormode)
             {
                 graphics.drawfinalmap();
             }
             else
             {
-                graphics.drawmap();
+                graphics.drawmap(true);
             }
         }
 
 
         graphics.drawentities();
+
+        graphics.drawwater();
+
         if (map.towermode)
         {
             graphics.drawtowerspikes();
         }
+        graphics.drawmap(false);
     }
 
     int return_editor_alpha = 0;
@@ -2489,7 +2495,6 @@ void gamerender(void)
     }
 
     bool show_coins = game.coins() > 0;
-	show_coins = show_coins || (map.custommode && (cl.numcoins() > 0));
 
     if (show_coins)
     {
@@ -2852,6 +2857,93 @@ void gamerender(void)
         graphics.drawtrophytext();
     }
 
+    int player = obj.getplayer();
+    if (INBOUNDS_VEC(player, obj.entities))
+    {
+        int player_x = obj.entities[player].xp + obj.entities[player].cx;
+        int player_y = obj.entities[player].yp + obj.entities[player].cy;
+        int player_width = obj.entities[player].w;
+        int player_height = obj.entities[player].h;
+
+        int line_width = 8 * 16;
+
+        int line_x = player_x + player_width;
+        int line_y = player_y + (player_height / 2);
+
+        if (obj.entities[player].dir == 0)
+        {
+            line_x = player_x - line_width;
+        }
+
+        switch (game.fishing_state)
+        {
+        case FishingState_CHOOSING:
+            graphics.set_color(255, 255, 255);
+            graphics.draw_line(line_x, line_y, line_x + line_width, line_y);
+
+            // progress:
+
+            int bar = (float)line_width * game.fishing_strength;
+            if (obj.entities[player].dir == 0)
+            {
+                bar = (float)line_width * (1 - game.fishing_strength);
+            }
+            graphics.draw_line(line_x + bar, line_y - 4, line_x + bar, line_y + 4);
+            break;
+        }
+    }
+
+    for (int i = 0; i < game.item_get_displays.size(); i++)
+    {
+        ItemGetDisplay display = game.item_get_displays[i];
+
+        int width = 32;
+        int height = 32;
+
+        int x = 320;
+        int y = i * (height + 8);
+        bool display_item = false;
+
+        if (display.timer < 8)
+        {
+            float progress = easeOutCubic((float)display.timer / 8.0f);
+            x = lerpReal(320, 320 - width, progress);
+        }
+        else
+        {
+            x = 320 - width;
+        }
+
+        if (display.timer > 2 && display.timer < 10)
+        {
+            if ((display.timer / 2) % 2 == 0)
+            {
+                display_item = true;
+            }
+        }
+        else
+        {
+            display_item = true;
+        }
+
+        if (display.timer > 50)
+        {
+            float progress = easeInCubic((float)(display.timer - 50) / 8.0f);
+            x = lerpReal(320 - width, 320, progress);
+        }
+
+        graphics.drawpixeltextbox(x, y, width, height, 65, 185, 207);
+        if (display_item)
+        {
+            display.stack.item->draw(x + 8, y + 8);
+        }
+
+        if (display.stack.count > 1)
+        {
+            font::print(PR_RIGHT | PR_BOR, x + width + 1, y + height - 8 + 1, "x" + help.String(display.stack.count), 255 - (help.glow / 2), 196, 196);
+        }
+    }
+
     level_debugger::render();
 
     graphics.renderwithscreeneffects();
@@ -3046,6 +3138,10 @@ void maprender(void)
         {
             tab1 = loc::gettext("SHIP");
         }
+        else if (game.fishing_revealed)
+        {
+            tab1 = loc::gettext("ITEM");
+        }
         else
         {
             tab1 = loc::gettext("CREW");
@@ -3113,7 +3209,108 @@ void maprender(void)
         }
         break;
     case 1:
-        if (game.insecretlab)
+        if (game.fishing_revealed)
+        {
+            SDL_Rect rect;
+            rect.x = 0;
+            rect.y = 10;
+            rect.w = 320;
+            rect.h = 240 - 10 - 80;
+
+            SDL_RenderSetClipRect(gameScreen.m_renderer, &rect);
+            int box_width = 128;
+            int box_height = 32;
+
+            for (int i = 0; i < game.inventory.size(); i++)
+            {
+                int selected_index = game.current_item_x + game.current_item_y * 2;
+
+                bool current_selected = (selected_index == i) && game.in_item_menu;
+
+                int x = 32 + ((i % 2) * (box_width + 16));
+                int y = 32 + (((i / 2) - game.scroll_offset) * (box_height + 8));
+
+                SDL_Color col = graphics.getRGB(65, 185, 207);
+                if (current_selected)
+                {
+                    col = graphics.getRGB(255, 255, 255);
+                }
+
+                graphics.drawpixeltextbox(x, y, box_width, box_height, col.r, col.g, col.b);
+                //graphics.draw_rect(x, y, box_width, box_height, graphics.getRGB(0, 255, 255));
+
+                ItemStack item = game.inventory[i];
+
+                item.item->draw(x + 8, y + 8);
+
+                SDL_Color name_col = item.getNameColor();
+
+                int name_y = y + 8;
+                short lines;
+                font::string_wordwrap(PR_LEFT, item.getName().c_str(), 84, &lines);
+                if (lines == 1)
+                {
+                    name_y += 4;
+                }
+                font::print_wrap(PR_LEFT, x + 33, name_y, item.getName().c_str(), name_col.r, name_col.g, name_col.b, 8, 84);
+
+                if (item.count > 1)
+                {
+                    font::print(PR_RIGHT | PR_BOR, x + box_width + 1, y + box_height - 8 + 1, "x" + help.String(item.count), 255 - (help.glow / 2), 196, 196);
+                }
+            }
+
+            SDL_RenderSetClipRect(gameScreen.m_renderer, NULL);
+
+            graphics.drawpixeltextbox(0, 160, 320, 48, 65, 185, 207);
+
+            if (game.in_item_menu)
+            {
+                int selected_index = game.current_item_x + game.current_item_y * 2;
+                if (INBOUNDS_VEC(selected_index, game.inventory))
+                {
+                    ItemStack item = game.inventory[selected_index];
+                    item.item->draw(16, 168 + 8);
+                    int x = 48;
+                    int flags = PR_LEFT;
+                    SDL_Color col = item.getNameColor();
+                    font::print(flags, x, 168, item.getLongName().c_str(), col.r, col.g, col.b);
+                    x += font::len(flags, item.getLongName().c_str());
+                    if (item.count > 1)
+                    {
+                        char buffer[SCREEN_WIDTH_CHARS + 1];
+                        vformat_buf(
+                            buffer, sizeof(buffer),
+                            loc::gettext(" (x{count})"),
+                            "count:int",
+                            item.count
+                        );
+                        font::print(flags, x, 168, buffer, 196, 196, 196);
+                    }
+
+                    short lines;
+                    font::string_wordwrap(PR_LEFT, item.getDescription().c_str(), 264, &lines);
+                    int y = 184;
+                    if (lines > 2)
+                    {
+                        y -= 8;
+                    }
+                    font::print_wrap(PR_LEFT, 48, y, item.getDescription().c_str(), 196, 196, 196, 8, 264);
+                }
+            }
+            else
+            {
+                char buffer[SCREEN_WIDTH_CHARS + 1];
+                vformat_buf(
+                    buffer, sizeof(buffer),
+                    loc::gettext("[Press {button} to select ITEMs]"),
+                    "button:but",
+                    vformat_button(ActionSet_InGame, Action_InGame_ACTION)
+                );
+                font::print(PR_CEN, -1, 160 + 16, buffer, 196, 196, 255 - help.glow);
+            }
+        }
+        else if (game.insecretlab)
         {
             if (graphics.flipmode)
             {
@@ -3193,7 +3390,7 @@ void maprender(void)
             );
             font::print_wrap(PR_CEN, -1, 105, buffer, 196, 196, 255 - help.glow);
         }
-        else if(map.custommode){
+        else if(map.custommode && false){
             LevelMetaData& meta = cl.ListOfMetaData[game.playcustomlevel];
 
             uint32_t title_flags = meta.title_is_gettext ? PR_FONT_INTERFACE : PR_FONT_LEVEL;
@@ -3232,8 +3429,8 @@ void maprender(void)
             {
                 for (int i = 0; i < 3; i++)
                 {
-                    graphics.drawcrewman(16, 32 + (i * 64), 2-i, game.crewstats[2-i]);
-                    if (game.crewstats[(2-i)])
+                    graphics.drawcrewman(16, 32 + (i * 64), 2-i, game.crewstats[2-i] || true);
+                    if (game.crewstats[(2-i)] || true)
                     {
                         graphics.printcrewname(44, 32 + (i * 64)+4+10, 2-i);
                     }
@@ -3241,10 +3438,10 @@ void maprender(void)
                     {
                         graphics.printcrewnamedark(44, 32 + (i * 64)+4+10, 2-i);
                     }
-                    graphics.printcrewnamestatus(44, 32 + (i * 64)+4, 2-i, game.crewstats[(2-i)]);
+                    graphics.printcrewnamestatus(44, 32 + (i * 64)+4, 2-i, game.crewstats[(2-i)] || true);
 
-                    graphics.drawcrewman(16+160, 32 + (i * 64), (2-i)+3, game.crewstats[(2-i)+3]);
-                    if (game.crewstats[(2-i)+3])
+                    graphics.drawcrewman(16+160, 32 + (i * 64), (2-i)+3, game.crewstats[(2-i)+3] || true);
+                    if (game.crewstats[(2-i)+3] || true)
                     {
                         graphics.printcrewname(44+160, 32 + (i * 64)+4+10, (2-i)+3);
                     }
@@ -3252,15 +3449,15 @@ void maprender(void)
                     {
                         graphics.printcrewnamedark(44+160, 32 + (i * 64)+4+10, (2-i)+3);
                     }
-                    graphics.printcrewnamestatus(44+160, 32 + (i * 64)+4, (2-i)+3, game.crewstats[(2-i)+3]);
+                    graphics.printcrewnamestatus(44+160, 32 + (i * 64)+4, (2-i)+3, game.crewstats[(2-i)+3] || true);
                 }
             }
             else
             {
                 for (int i = 0; i < 3; i++)
                 {
-                    graphics.drawcrewman(16, 32 + (i * 64), i, game.crewstats[i]);
-                    if (game.crewstats[i])
+                    graphics.drawcrewman(16, 32 + (i * 64), i, game.crewstats[i] || true);
+                    if (game.crewstats[i] || true)
                     {
                         graphics.printcrewname(44, 32 + (i * 64)+4, i);
                     }
@@ -3268,10 +3465,10 @@ void maprender(void)
                     {
                         graphics.printcrewnamedark(44, 32 + (i * 64)+4, i);
                     }
-                    graphics.printcrewnamestatus(44, 32 + (i * 64)+4+10, i, game.crewstats[i]);
+                    graphics.printcrewnamestatus(44, 32 + (i * 64)+4+10, i, game.crewstats[i] || true);
 
-                    graphics.drawcrewman(16+160, 32 + (i * 64), i+3, game.crewstats[i+3]);
-                    if (game.crewstats[i+3])
+                    graphics.drawcrewman(16+160, 32 + (i * 64), i+3, game.crewstats[i+3] || true);
+                    if (game.crewstats[i+3] || true)
                     {
                         graphics.printcrewname(44+160, 32 + (i * 64)+4, i+3);
                     }
@@ -3279,7 +3476,7 @@ void maprender(void)
                     {
                         graphics.printcrewnamedark(44+160, 32 + (i * 64)+4, i+3);
                     }
-                    graphics.printcrewnamestatus(44+160, 32 + (i * 64)+4+10, i+3, game.crewstats[i+3]);
+                    graphics.printcrewnamestatus(44+160, 32 + (i * 64)+4+10, i+3, game.crewstats[i+3] || true);
                 }
             }
         }

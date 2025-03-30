@@ -8,6 +8,9 @@
 
 #include "Textbox.h"
 
+#include "Item.h"
+#include "ItemStack.h"
+
 #define filllines(lines) commands.insert(commands.end(), lines, lines + SDL_arraysize(lines))
 
 #ifdef SCRIPT_DEFINITION
@@ -121,6 +124,7 @@ public:
     bool textlarge;
     int textboxtimer;
     std::vector<TextboxSprite> textbox_sprites;
+    std::vector<TextboxItem> textbox_items;
     TextboxImage textbox_image;
     bool textbox_absolutepos;
     bool textbox_force_outline;
@@ -131,6 +135,8 @@ public:
 
     //Custom level stuff
     std::vector<Script> customscripts;
+
+    ItemStack item;
 };
 
 #ifndef SCRIPT_DEFINITION

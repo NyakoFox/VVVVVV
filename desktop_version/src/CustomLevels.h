@@ -159,7 +159,6 @@ public:
     static const int numrooms = maxwidth * maxheight;
     int contents[40 * 30 * numrooms];
     int numtrinkets(void);
-    int numcoins(void);
     int numcrewmates(void);
     RoomProperty roomproperties[numrooms]; //Maxwidth*maxheight
 

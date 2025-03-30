@@ -7,7 +7,11 @@
 #include <vector>
 
 #include "Font.h"
+#include "ItemStack.h"
 #include "ScreenSettings.h"
+
+struct ItemGetDisplay;
+enum FishingState;
 
 /* FIXME: Can't forward declare this enum in C++, unfortunately.
  * In C, enum sizes are always the same, so you can forward declare them.
@@ -515,7 +519,7 @@ public:
     int activeactivity, act_fade;
     int prev_act_fade;
 
-    bool press_left, press_right, press_action, press_map, press_interact;
+    bool press_left, press_right, press_action, press_map, press_interact, press_up, press_down;
     bool interactheld;
     bool separate_interact;
 
@@ -612,6 +616,26 @@ public:
     int old_screenshot_border_timer;
     int screenshot_border_timer;
     bool screenshot_saved_success;
+
+    int coins_collected;
+    bool fishing_revealed;
+
+    std::vector<ItemStack> inventory;
+
+    bool in_item_menu;
+    int current_item_x;
+    int current_item_y;
+    int scroll_offset;
+
+    std::vector<ItemGetDisplay> item_get_displays;
+    bool play_item_get;
+
+    FishingState fishing_state;
+    int fishing_timer;
+    int fishing_anim_timer;
+    float fishing_strength;
+
+    bool play_splash;
 };
 
 #ifndef GAME_DEFINITION

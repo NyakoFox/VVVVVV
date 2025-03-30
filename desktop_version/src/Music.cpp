@@ -182,7 +182,20 @@ end:
         VVV_free(ogg_file);
     }
 
-    void Play(void)
+    void Stop(void)
+    {
+        if (!valid)
+        {
+            return;
+        }
+
+        for (int i = 0; i < VVV_MAX_CHANNELS; i++)
+        {
+            FAudioSourceVoice_Stop(voices[i], 0, FAUDIO_COMMIT_NOW);
+        }
+    }
+
+    void Play(bool loop)
     {
         if (!valid)
         {
@@ -216,7 +229,7 @@ end:
                     0, /* playlength */
                     0, /* LoopBegin */
                     0, /* LoopLength */
-                    0, /* LoopCount */
+                    (loop ? FAUDIO_LOOP_INFINITE : 0), /* LoopCount */
                     NULL
                 };
                 if (vorbis != NULL)
@@ -248,6 +261,11 @@ end:
                 return;
             }
         }
+    }
+
+    void Play(void)
+    {
+        Play(false);
     }
 
     static void Init(int audio_rate)
@@ -772,6 +790,12 @@ void musicclass::init(void)
     soundTracks.push_back(SoundTrack( "sounds/newrecord.wav" ));
     soundTracks.push_back(SoundTrack( "sounds/trophy.wav" ));
     soundTracks.push_back(SoundTrack( "sounds/rescue.wav" ));
+    soundTracks.push_back(SoundTrack( "sounds/splash.wav" ));
+    soundTracks.push_back(SoundTrack( "sounds/menuopen.wav" ));
+    soundTracks.push_back(SoundTrack( "sounds/menuclose.wav" ));
+    soundTracks.push_back(SoundTrack( "sounds/itemget.wav" ));
+    soundTracks.push_back(SoundTrack( "sounds/reel.wav" ));
+    soundTracks.push_back(SoundTrack( "sounds/splash2.wav" ));
 
 #ifdef VVV_COMPILEMUSIC
     binaryBlob musicWriteBlob;
@@ -1279,6 +1303,24 @@ void musicclass::changemusicarea(int x, int y)
     }
 
     niceplay(track);
+}
+
+void musicclass::stopef(int t)
+{
+    if (!INBOUNDS_VEC(t, soundTracks))
+    {
+        return;
+    }
+    soundTracks[t].Stop();
+}
+
+void musicclass::loopef(int t)
+{
+    if (!INBOUNDS_VEC(t, soundTracks))
+    {
+        return;
+    }
+    soundTracks[t].Play(true);
 }
 
 void musicclass::playef(int t)

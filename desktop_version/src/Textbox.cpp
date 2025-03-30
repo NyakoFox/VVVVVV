@@ -40,6 +40,7 @@ textboxclass::textboxclass(int gap)
     fill_buttons = false;
 
     sprites.clear();
+    items.clear();
 
     image = TEXTIMAGE_NONE;
 
@@ -62,6 +63,15 @@ void textboxclass::addsprite(int x, int y, int tile, int col)
     sprite.tile = tile;
     sprite.col = col;
     sprites.push_back(sprite);
+}
+
+void textboxclass::additem(int x, int y, std::string item_id)
+{
+    TextboxItem item;
+    item.x = x;
+    item.y = y;
+    item.item = item_id;
+    items.push_back(item);
 }
 
 void textboxclass::setimage(TextboxImage new_image)

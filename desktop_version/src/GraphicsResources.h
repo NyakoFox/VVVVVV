@@ -48,6 +48,10 @@ public:
 
     SDL_Texture* im_sprites_translated;
     SDL_Texture* im_flipsprites_translated;
+
+    SDL_Texture* im_bobber;
+    SDL_Texture* im_fishingrod_anim;
+    SDL_Texture* im_fishingrod_line_anim;
 };
 
 SDL_Surface* LoadImageSurface(const char* filename);

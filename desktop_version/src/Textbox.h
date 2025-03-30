@@ -43,6 +43,13 @@ struct TextboxSprite
     int tile;
 };
 
+struct TextboxItem
+{
+    int x;
+    int y;
+    std::string item;
+};
+
 enum TextboxImage
 {
     TEXTIMAGE_NONE,
@@ -66,6 +73,7 @@ public:
     textboxclass(int gap);
 
     void addsprite(int x, int y, int tile, int col);
+    void additem(int x, int y, std::string item);
 
     void setimage(TextboxImage image);
 
@@ -135,6 +143,7 @@ public:
     bool fill_buttons;
 
     std::vector<TextboxSprite> sprites;
+    std::vector<TextboxItem> items;
     TextboxImage image;
 
     bool force_outline;

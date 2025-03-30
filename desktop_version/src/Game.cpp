@@ -16,6 +16,7 @@
 #include "FileSystemUtils.h"
 #include "GlitchrunnerMode.h"
 #include "Graphics.h"
+#include "ItemHelpers.h"
 #include "LevelDebugger.h"
 #include "Localization.h"
 #include "LocalizationStorage.h"
@@ -380,6 +381,17 @@ void Game::init(void)
     old_screenshot_border_timer = 0;
     screenshot_border_timer = 0;
     screenshot_saved_success = false;
+
+    coins_collected = 0;
+    inventory.clear();
+    item_get_displays.clear();
+    play_item_get = false;
+    play_splash = false;
+    fishing_state = FishingState_IDLE;
+    fishing_timer = 0;
+    fishing_anim_timer = 0;
+
+    fishing_revealed = false;
 
 #if defined(__ANDROID__) || defined(TARGET_OS_IPHONE)
     checkpoint_saving = true;
@@ -5809,6 +5821,11 @@ void Game::customloadquick(const std::string& savfile)
 
         LOAD_ARRAY_RENAME(customcollect, obj.customcollect)
 
+        if (SDL_strcmp(pKey, "coins_collected") == 0)
+        {
+            coins_collected = help.Int(pText);
+        }
+
         if (SDL_strcmp(pKey, "finalmode") == 0)
         {
             map.finalmode = help.Int(pText);
@@ -5830,6 +5847,57 @@ void Game::customloadquick(const std::string& savfile)
             map.final_colormode = true;
             map.final_mapcol = 0;
             map.final_colorframe = 1;
+        }
+
+        if (SDL_strcmp(pKey, "fishing_revealed") == 0)
+        {
+            fishing_revealed = help.Int(pText);
+        }
+
+        if (SDL_strcmp(pKey, "inventory") == 0)
+        {
+            tinyxml2::XMLElement* pElem2;
+            for (pElem2 = pElem->FirstChildElement(); pElem2 != NULL; pElem2 = pElem2->NextSiblingElement())
+            {
+                const char* pKey2 = pElem2->Value();
+                const char* pText2 = pElem2->GetText();
+                if (pText2 == NULL)
+                {
+                    pText2 = "";
+                }
+                if (SDL_strcmp(pKey2, "item") == 0)
+                {
+                    ItemStack stack;
+                    std::string itemname = pElem2->Attribute("item") == NULL ? "null" : pElem2->Attribute("item");
+                    std::string count = pElem2->Attribute("count") == NULL ? "1" : pElem2->Attribute("count");
+
+                    Item* item = getItem(itemname);
+                    if (item == NULL) continue;
+
+                    stack.item = item;
+                    stack.count = ss_toi(count);
+
+                    stack.item->getDefaultComponents(&stack);
+
+                    // TODO: deserialize components... they are children of this item element. if they exist anyway
+                    tinyxml2::XMLElement* pElem3;
+                    for (pElem3 = pElem2->FirstChildElement(); pElem3 != NULL; pElem3 = pElem3->NextSiblingElement())
+                    {
+                        const char* pKey3 = pElem3->Value();
+                        const char* pText3 = pElem3->GetText();
+                        if (pText3 == NULL)
+                        {
+                            pText3 = "";
+                        }
+                        if (pElem3->Attribute("key"))
+                        {
+                            stack.addComponent(pElem3->Attribute("key"), pText3);
+                        }
+                    }
+
+                    inventory.push_back(stack);
+                }
+            }
         }
 
 
@@ -6383,6 +6451,16 @@ bool Game::customsavequick(const std::string& savfile)
         customcollect += help.String((int) obj.customcollect[i]) + ",";
     }
     xml::update_tag(msgs, "customcollect", customcollect.c_str());
+
+    xml::update_tag(msgs, "fishing_revealed", fishing_revealed);
+
+    xml::update_tag(msgs, "coins_collected", coins_collected);
+
+    tinyxml2::XMLElement* inventory_el = xml::update_element_delete_contents(msgs, "inventory");
+    for (size_t i = 0; i < inventory.size(); i++)
+    {
+        inventory_el->LinkEndChild(inventory[i].serialize(&doc));
+    }
 
     //Position
 
@@ -7212,146 +7290,10 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         break;
     case Menu::play:
     {
-        //Ok, here's where the unlock stuff comes into it:
-        //First up, time trials:
-        int temp = 0;
-        if (unlock[Unlock_SPACESTATION1_COMPLETE]
-            && stat_trinkets >= 3
-            && !unlocknotify[Unlock_TIMETRIAL_SPACESTATION1])
-        {
-            temp++;
-        }
-        if (unlock[Unlock_LABORATORY_COMPLETE]
-            && stat_trinkets >= 6
-            && !unlocknotify[Unlock_TIMETRIAL_LABORATORY])
-        {
-            temp++;
-        }
-        if (unlock[Unlock_TOWER_COMPLETE]
-            && stat_trinkets >= 9
-            && !unlocknotify[Unlock_TIMETRIAL_TOWER])
-        {
-            temp++;
-        }
-        if (unlock[Unlock_SPACESTATION2_COMPLETE]
-            && stat_trinkets >= 12
-            && !unlocknotify[Unlock_TIMETRIAL_SPACESTATION2])
-        {
-            temp++;
-        }
-        if (unlock[Unlock_WARPZONE_COMPLETE]
-            && stat_trinkets >= 15
-            && !unlocknotify[Unlock_TIMETRIAL_WARPZONE])
-        {
-            temp++;
-        }
-        if (unlock[UnlockTrophy_GAME_COMPLETE]
-            && stat_trinkets >= 18
-            && !unlocknotify[Unlock_TIMETRIAL_FINALLEVEL])
-        {
-            temp++;
-        }
-        if (temp > 0)
-        {
-            //you've unlocked a time trial!
-            if (unlock[Unlock_SPACESTATION1_COMPLETE] && stat_trinkets >= 3)
-            {
-                unlocknotify[Unlock_TIMETRIAL_SPACESTATION1] = true;
-                unlock[Unlock_TIMETRIAL_SPACESTATION1] = true;
-            }
-            if (unlock[Unlock_LABORATORY_COMPLETE] && stat_trinkets >= 6)
-            {
-                unlocknotify[Unlock_TIMETRIAL_LABORATORY] = true;
-                unlock[Unlock_TIMETRIAL_LABORATORY] = true;
-            }
-            if (unlock[Unlock_TOWER_COMPLETE] && stat_trinkets >= 9)
-            {
-                unlocknotify[Unlock_TIMETRIAL_TOWER] = true;
-                unlock[Unlock_TIMETRIAL_TOWER] = true;
-            }
-            if (unlock[Unlock_SPACESTATION2_COMPLETE] && stat_trinkets >= 12)
-            {
-                unlocknotify[Unlock_TIMETRIAL_SPACESTATION2] = true;
-                unlock[Unlock_TIMETRIAL_SPACESTATION2] = true;
-            }
-            if (unlock[Unlock_WARPZONE_COMPLETE] && stat_trinkets >= 15)
-            {
-                unlocknotify[Unlock_TIMETRIAL_WARPZONE] = true;
-                unlock[Unlock_TIMETRIAL_WARPZONE] = true;
-            }
-            if (unlock[UnlockTrophy_GAME_COMPLETE] && stat_trinkets >= 18)
-            {
-                unlocknotify[Unlock_TIMETRIAL_FINALLEVEL] = true;
-                unlock[Unlock_TIMETRIAL_FINALLEVEL] = true;
-            }
-
-            if (temp == 1)
-            {
-                createmenu(Menu::unlocktimetrial, true);
-                savestatsandsettings();
-            }
-            else if (temp > 1)
-            {
-                createmenu(Menu::unlocktimetrials, true);
-                savestatsandsettings();
-            }
-        }
-        else
-        {
-            //Alright, we haven't unlocked any time trials. How about no death mode?
-            if (can_unlock_ndm())
-            {
-                unlock_ndm();
-            }
-            //Alright then! Flip mode?
-            else if (unlock[UnlockTrophy_GAME_COMPLETE]
-                && !unlocknotify[Unlock_FLIPMODE])
-            {
-                unlock[Unlock_FLIPMODE] = true;
-                unlocknotify[Unlock_FLIPMODE] = true;
-                createmenu(Menu::unlockflipmode, true);
-                savestatsandsettings();
-            }
-            //What about the intermission levels?
-            else if (unlock[Unlock_INTERMISSION2_COMPLETE]
-                && !unlocknotify[Unlock_INTERMISSION_REPLAYS])
-            {
-                unlock[Unlock_INTERMISSION_REPLAYS] = true;
-                unlocknotify[Unlock_INTERMISSION_REPLAYS] = true;
-                createmenu(Menu::unlockintermission, true);
-                savestatsandsettings();
-            }
-            else
-            {
-                if (save_exists())
-                {
-                    option(loc::gettext("continue"));
-                }
-                else
-                {
-                    option(loc::gettext("new game"));
-                }
-                //ok, secret lab! no notification, but test:
-                if (unlock[Unlock_SECRETLAB])
-                {
-                    option(loc::gettext("secret lab"));
-                }
-                option(loc::gettext("play modes"));
-                if (save_exists())
-                {
-                    option(loc::gettext("new game"));
-                }
-                option(loc::gettext("return"));
-                if (unlock[Unlock_SECRETLAB])
-                {
-                    menuyoff = -30;
-                }
-                else
-                {
-                    menuyoff = -40;
-                }
-            }
-        }
+        option(loc::gettext("continue"));
+        option(loc::gettext("new game"));
+        option(loc::gettext("return"));
+        menuyoff = -20;
         break;
     }
     case Menu::unlocktimetrial:
@@ -7683,7 +7625,7 @@ int Game::trinkets(void)
 
 int Game::coins(void)
 {
-    return (int) obj.coincollect.size();
+    return coins_collected;
 }
 
 int Game::crewmates(void)

@@ -60,7 +60,13 @@ enum
     Sound_COMBINE = 24,
     Sound_NEWRECORD = 25,
     Sound_TROPHY = 26,
-    Sound_RESCUE = 27
+    Sound_RESCUE = 27,
+    Sound_SPLASH = 28,
+    Sound_MENUOPEN = 29,
+    Sound_MENUCLOSE = 30,
+    Sound_ITEMGET = 31,
+    Sound_REEL = 32,
+    Sound_SPLASH2 = 33
 };
 
 class musicclass
@@ -95,6 +101,8 @@ public:
     int haltedsong;
 
     void playef(int t);
+    void loopef(int t);
+    void stopef(int t);
     void pauseef(void);
     void resumeef(void);
 

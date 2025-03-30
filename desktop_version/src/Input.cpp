@@ -7,11 +7,13 @@
 #include "Editor.h"
 #include "Entity.h"
 #include "Enums.h"
+#include "Exit.h"
 #include "FileSystemUtils.h"
 #include "Game.h"
 #include "GlitchrunnerMode.h"
 #include "Graphics.h"
 #include "GraphicsUtil.h"
+#include "ItemHelpers.h"
 #include "KeyPoll.h"
 #include "LevelDebugger.h"
 #include "Localization.h"
@@ -463,21 +465,44 @@ static void menuactionpress(void)
         {
 #if !defined(MAKEANDPLAY)
         case 0:
+        {
             //Play
-            if (!game.save_exists() && !game.anything_unlocked())
-            {
-                //No saves exist, just start a new game
-                music.playef(Sound_VIRIDIAN);
-                startmode(Start_MAINGAME);
+            music.playef(Sound_VIRIDIAN);
+
+            game.levelpage = 0;
+            game.playcustomlevel = 0;
+            game.menustart = true;
+
+            std::string playtestname = "levels/fishing.vvvvvv";
+
+            LevelMetaData meta;
+            CliPlaytestArgs pt_args;
+            if (cl.getLevelMetaDataAndPlaytestArgs(playtestname, meta, &pt_args)) {
+                cl.ListOfMetaData.clear();
+                cl.ListOfMetaData.push_back(meta);
             }
             else
             {
-                //Bring you to the normal playmenu
-                music.playef(Sound_VIRIDIAN);
+                vlog_error("Level not found");
+                VVV_exit(1);
+            }
+
+            game.loadcustomlevelstats();
+            game.customleveltitle = cl.ListOfMetaData[game.playcustomlevel].title;
+            game.customlevelfilename = cl.ListOfMetaData[game.playcustomlevel].filename;
+
+            std::string name = "saves/fishing.vvvvvv.vvv";
+            tinyxml2::XMLDocument doc;
+            if (!FILESYSTEM_loadTiXml2Document(name.c_str(), doc)) {
+                startmode(Start_CUSTOM);
+            }
+            else {
                 game.createmenu(Menu::play);
                 map.nexttowercolour();
             }
+
             break;
+        }
 #endif
         case 1:
             //Bring you to the normal playmenu
@@ -1916,60 +1941,19 @@ static void menuactionpress(void)
         break;
     case Menu::play:
     {
-        //Do we have the Secret Lab option?
-        int sloffset = game.unlock[Unlock_SECRETLAB] ? 0 : -1;
-        //Do we have a telesave or quicksave?
-        int ngoffset = game.save_exists() ? 0 : -1;
         if (game.currentmenuoption == 0)
         {
-            //continue
-            //right, this depends on what saves you've got
-            if (!game.save_exists())
-            {
-                //You have no saves but have something unlocked, or you couldn't have gotten here
-                music.playef(Sound_VIRIDIAN);
-                startmode(Start_MAINGAME);
-            }
-            else if (!game.last_telesave.exists)
-            {
-                //You at least have a quicksave, or you couldn't have gotten here
-                music.playef(Sound_VIRIDIAN);
-                startmode(Start_MAINGAME_QUICKSAVE);
-            }
-            else if (!game.last_quicksave.exists)
-            {
-                //You at least have a telesave, or you couldn't have gotten here
-                music.playef(Sound_VIRIDIAN);
-                startmode(Start_MAINGAME_TELESAVE);
-            }
-            else
-            {
-                //go to a menu!
-                music.playef(Sound_VIRIDIAN);
-                game.loadsummary(); //Prepare save slots to display
-                game.createmenu(Menu::continuemenu);
-            }
-        }
-        else if (game.currentmenuoption == 1 && game.unlock[Unlock_SECRETLAB])
-        {
             music.playef(Sound_VIRIDIAN);
-            startmode(Start_SECRETLAB);
+            startmode(Start_CUSTOM_QUICKSAVE);
         }
-        else if (game.currentmenuoption == sloffset+2)
-        {
-            //play modes
-            music.playef(Sound_VIRIDIAN);
-            game.createmenu(Menu::playmodes);
-            map.nexttowercolour();
-        }
-        else if (game.currentmenuoption == sloffset+3 && game.save_exists())
+        else if (game.currentmenuoption == 1)
         {
             //newgame
             music.playef(Sound_VIRIDIAN);
             game.createmenu(Menu::newgamewarning);
             map.nexttowercolour();
         }
-        else if (game.currentmenuoption == sloffset+ngoffset+4)
+        else if (game.currentmenuoption == 2)
         {
             //back
             music.playef(Sound_VIRIDIAN);
@@ -1984,9 +1968,8 @@ static void menuactionpress(void)
         case 0:
             //yep
             music.playef(Sound_VIRIDIAN);
-            startmode(Start_MAINGAME);
-            game.deletequick();
-            game.deletetele();
+            startmode(Start_CUSTOM);
+            game.customdeletequick(game.customlevelfilename);
             break;
         default:
             //back
@@ -2644,6 +2627,96 @@ void gameinput(void)
         game.press_map = true;
     }
 
+    if (game.fishing_state != FishingState_IDLE)
+    {
+        game.press_left = false;
+        game.press_right = false;
+        game.press_action = false;
+        game.press_interact = false;
+
+        switch (game.fishing_state)
+        {
+        case FishingState_CHOOSING:
+            game.fishing_timer++;
+            game.fishing_anim_timer++;
+
+            game.fishing_strength = (float)((float)game.fishing_timer / (FISHING_CHOOSE_MAX_TIME / 2));
+            if (game.fishing_timer >= FISHING_CHOOSE_MAX_TIME / 2)
+            {
+                game.fishing_strength = 1.0f - (float)(((float)game.fishing_timer - FISHING_CHOOSE_MAX_TIME / 2) / (FISHING_CHOOSE_MAX_TIME / 2));
+            }
+
+            if (game.fishing_timer >= FISHING_CHOOSE_MAX_TIME)
+            {
+                game.fishing_timer -= FISHING_CHOOSE_MAX_TIME;
+            }
+
+            if (!key.isDown(KEYBOARD_x))
+            {
+                game.fishing_state = FishingState_POSTCHOOSING;
+                game.fishing_timer = 0;
+                game.fishing_anim_timer = 0;
+            }
+            break;
+        case FishingState_POSTCHOOSING:
+        {
+            game.fishing_timer++;
+            game.fishing_anim_timer++;
+
+            if (game.fishing_timer == (3 * 2) - 1)
+            {
+                int player_idx = obj.getplayer();
+                if (INBOUNDS_VEC(player_idx, obj.entities))
+                {
+                    entclass player = obj.entities[player_idx];
+                    int xvel = 8;
+                    int yvel = -4;
+
+                    xvel *= easeOutCirc(game.fishing_strength);
+
+                    if (game.gravitycontrol == 1)
+                    {
+                        yvel = 4;
+                    }
+
+                    int yoff = -8;
+                    if (game.gravitycontrol == 1)
+                    {
+                        yoff = player.h + 8;
+                    }
+
+                    if (player.dir == 0)
+                    {
+                        obj.createentity(player.xp + player.cx + (player.w / 2) + 8, player.yp + player.cy + yoff, 200, -xvel, yvel);
+                    }
+                    else
+                    {
+                        obj.createentity(player.xp + player.cx + (player.w / 2) - 8, player.yp + player.cy + yoff, 200, xvel, yvel);
+                    }
+                }
+                game.fishing_state = FishingState_CASTING;
+                game.fishing_timer = 0;
+                game.fishing_anim_timer = 0;
+            }
+
+            break;
+        }
+        case FishingState_CASTING:
+        {
+            game.fishing_timer++;
+            game.fishing_anim_timer++;
+            break;
+        }
+        }
+    }
+    else
+    {
+        if (key.isDown(KEYBOARD_x) && (getEquippedRod() != NULL))
+        {
+            game.fishing_state = FishingState_CHOOSING;
+        }
+    }
+
     level_debugger::input();
     if (level_debugger::is_pausing())
     {
@@ -3042,6 +3115,7 @@ void gameinput(void)
         game.mapmenuchange(MAPMODE, true);
         game.gamesaved = false;
         game.gamesavefailed = false;
+        game.in_item_menu = false;
         game.menupage = 30; // Pause screen
     }
 
@@ -3066,6 +3140,8 @@ void mapinput(void)
     game.press_action = false;
     game.press_map = false;
     game.press_interact = false;
+    game.press_up = false;
+    game.press_down = false;
 
     if (version2_2 && graphics.fademode == FADE_FULLY_BLACK && graphics.menuoffset == 0)
     {
@@ -3156,13 +3232,35 @@ void mapinput(void)
             controller_down |= key.controllerWantsLeft(false);
         }
 
-        if (key.isDown(left) || key.isDown(KEYBOARD_UP) || key.isDown(a) ||  key.isDown(KEYBOARD_w)|| controller_up)
+        if (game.in_item_menu)
         {
-            game.press_left = true;
+            if (key.isDown(left) || key.isDown(a) || key.controllerWantsLeft(false))
+            {
+                game.press_left = true;
+            }
+            if (key.isDown(right) || key.isDown(d) || key.controllerWantsRight(false))
+            {
+                game.press_right = true;
+            }
+            if (key.isDown(KEYBOARD_UP) || key.isDown(KEYBOARD_w) || key.controllerWantsUp())
+            {
+                game.press_up = true;
+            }
+            if (key.isDown(KEYBOARD_DOWN) || key.isDown(KEYBOARD_s) || key.controllerWantsDown())
+            {
+                game.press_down = true;
+            }
         }
-        if (key.isDown(right) || key.isDown(KEYBOARD_DOWN) || key.isDown(d) ||  key.isDown(KEYBOARD_s)|| controller_down)
+        else
         {
-            game.press_right = true;
+            if (key.isDown(left) || key.isDown(KEYBOARD_UP) || key.isDown(a) || key.isDown(KEYBOARD_w) || controller_up)
+            {
+                game.press_left = true;
+            }
+            if (key.isDown(right) || key.isDown(KEYBOARD_DOWN) || key.isDown(d) || key.isDown(KEYBOARD_s) || controller_down)
+            {
+                game.press_right = true;
+            }
         }
         if (key.isDown(KEYBOARD_z) || key.isDown(KEYBOARD_SPACE) || key.isDown(KEYBOARD_v) || key.isDown(game.controllerButton_flip))
         {
@@ -3176,7 +3274,11 @@ void mapinput(void)
             if (key.isDown(27) && !game.mapheld)
             {
                 game.mapheld = true;
-                if (game.menupage < 9
+                if (game.in_item_menu)
+                {
+                    game.in_item_menu = false;
+                }
+                else if (game.menupage < 9
                 || (game.menupage >= 20 && game.menupage <= 21))
                 {
                     game.menupage = 30;
@@ -3198,13 +3300,27 @@ void mapinput(void)
         }
 
         //In the menu system, all keypresses are single taps rather than holds. Therefore this test has to be done for all presses
-        if (!game.press_action && !game.press_left && !game.press_right)
+        if (game.in_item_menu)
         {
-            game.jumpheld = false;
+            if (!game.press_action && !game.press_left && !game.press_right && !game.press_up && !game.press_down)
+            {
+                game.jumpheld = false;
+            }
+            if (!game.press_map && !key.isDown(27))
+            {
+                game.mapheld = false;
+            }
         }
-        if (!game.press_map && !key.isDown(27))
+        else
         {
-            game.mapheld = false;
+            if (!game.press_action && !game.press_left && !game.press_right)
+            {
+                game.jumpheld = false;
+            }
+            if (!game.press_map && !key.isDown(27))
+            {
+                game.mapheld = false;
+            }
         }
     }
     else
@@ -3218,20 +3334,99 @@ void mapinput(void)
         if(game.press_map && game.menupage < 10)
         {
             //Normal map screen, do transition later
-            graphics.resumegamemode = true;
+            if (game.in_item_menu)
+            {
+                game.in_item_menu = false;
+                music.playef(Sound_VIRIDIAN);
+                game.mapheld = true;
+            }
+            else
+            {
+                graphics.resumegamemode = true;
+            }
         }
     }
 
     if (!game.jumpheld)
     {
-        if (game.press_action || game.press_left || game.press_right || game.press_map)
+        if (game.in_item_menu)
         {
-            game.jumpheld = true;
+            if (game.press_action || game.press_left || game.press_right || game.press_map || game.press_up || game.press_down)
+            {
+                game.jumpheld = true;
+            }
+        }
+        else
+        {
+            if (game.press_action || game.press_left || game.press_right || game.press_map)
+            {
+                game.jumpheld = true;
+            }
         }
 
         if (script.running && game.menupage == 3)
         {
             // Force the player to stay in the SAVE tab while in a cutscene
+        }
+        else if (game.in_item_menu)
+        {
+#define GET_INDEX(x, y) ((y) * 2 + (x))
+
+            int size = game.inventory.size();
+
+            if (game.press_left || game.press_right)
+            {
+                int new_x = (game.current_item_x == 0) ? 1 : 0;
+                int new_index = GET_INDEX(new_x, game.current_item_y);
+                if (new_index < size)
+                {
+                    game.current_item_x = new_x;
+                }
+            }
+            if (game.press_up)
+            {
+                int new_y = (game.current_item_y - 1 + (size + 1) / 2) % ((size + 1) / 2);
+                int new_index = GET_INDEX(game.current_item_x, new_y);
+                if (new_index < size)
+                {
+                    game.current_item_y = new_y;
+                }
+                else
+                {
+                    game.current_item_y = (size + 1) / 2 - 2;
+                }
+            }
+            if (game.press_down)
+            {
+                int new_y = (game.current_item_y + 1) % ((size + 1) / 2);
+                int new_index = GET_INDEX(game.current_item_x, new_y);
+                if (new_index < size)
+                {
+                    game.current_item_y = new_y;
+                }
+                else
+                {
+                    game.current_item_y = 0;
+                }
+            }
+            int rel_y = game.current_item_y - game.scroll_offset;
+            if (rel_y < 0)
+            {
+                game.scroll_offset = game.current_item_y;
+            }
+            else if (rel_y >= 3)
+            {
+                game.scroll_offset = game.current_item_y - 2;
+            }
+
+            if (game.press_action)
+            {
+                ItemStack* stack = &game.inventory[GET_INDEX(game.current_item_x, game.current_item_y)];
+                if (stack->canUse())
+                {
+                    stack->use();
+                }
+            }
         }
         else if (game.press_left)
         {
@@ -3266,7 +3461,22 @@ static void mapmenuactionpress(const bool version2_2)
     switch (game.menupage)
     {
     case 1:
-    if (obj.flags[67] && !game.inspecial() && !map.custommode)
+        if (game.fishing_revealed)
+        {
+            if (!game.in_item_menu)
+            {
+                game.in_item_menu = true;
+                game.current_item_x = 0;
+                game.current_item_y = 0;
+                game.scroll_offset = 0;
+                music.playef(Sound_VIRIDIAN);
+            }
+            else
+            {
+
+            }
+        }
+    else if (obj.flags[67] && !game.inspecial() && !map.custommode)
     {
         //Warp back to the ship
         graphics.resumegamemode = true;

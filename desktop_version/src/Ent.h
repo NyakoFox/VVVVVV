@@ -30,7 +30,8 @@ enum EntityType
     EntityType_WARP_LINE_TOP = 53,
     EntityType_WARP_LINE_BOTTOM = 54,
     EntityType_COLLECTABLE_CREWMATE = 55,
-    EntityType_TELEPORTER = 100
+    EntityType_TELEPORTER = 100,
+    EntityType_BOBBER = 200
 };
 
 class entclass
@@ -85,6 +86,9 @@ public:
 
     SDL_Color realcol;
     int lerpoldxp, lerpoldyp;
+
+    bool in_water;
+    int last_water;
 };
 
 #endif /* ENT_H */

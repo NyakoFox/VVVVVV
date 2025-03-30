@@ -8,6 +8,7 @@
 #include "Game.h"
 #include "GlitchrunnerMode.h"
 #include "Graphics.h"
+#include "ItemHelpers.h"
 #include "Localization.h"
 #include "MakeAndPlay.h"
 #include "Maths.h"
@@ -791,6 +792,17 @@ void mapclass::resetplayer(const bool player_died)
     }
 
     game.deathseq = -1;
+    game.fishing_state = FishingState_IDLE;
+    game.fishing_timer = 0;
+    game.fishing_anim_timer = 0;
+    for (int i = obj.entities.size() - 1; i >= 0; i--)
+    {
+        if (obj.entities[i].type == EntityType_BOBBER)
+        {
+            obj.disableentity(i);
+        }
+    }
+
     int i = obj.getplayer();
     if(INBOUNDS_VEC(i, obj.entities))
     {
@@ -888,6 +900,17 @@ void mapclass::gotoroom(int rx, int ry)
     game.activetele = false;
     game.readytotele = 0;
     game.oldreadytotele = 0;
+
+    game.fishing_state = FishingState_IDLE;
+    for (int i = obj.entities.size() - 1; i >= 0; i--)
+    {
+        if (obj.entities[i].type == EntityType_BOBBER)
+        {
+            obj.disableentity(i);
+        }
+    }
+    game.fishing_timer = 0;
+    game.fishing_anim_timer = 0;
 
     //Ok, let's save the position of all lines on the screen
     for (size_t i = 0; i < obj.entities.size(); i++)
@@ -1877,7 +1900,7 @@ void mapclass::loadlevel(int rx, int ry)
                 obj.createentity(ex, ey, 3);
                 break;
             case 8: // Coins
-                obj.createentity(ex, ey, 8, cl.findcoin(edi));
+                obj.createentity(ex, ey, 8, cl.findcoin(edi), ent.p1);
                 break;
             case 9: // Trinkets
                 obj.createentity(ex, ey, 9, cl.findtrinket(edi));
@@ -1975,6 +1998,8 @@ void mapclass::loadlevel(int rx, int ry)
             case 25: // Trigger
                 obj.createblock(TRIGGER, ex, ey, ent.p1 * 8, ent.p2 * 8, ent.p3);
                 break;
+            case 26: // Water
+                obj.createblock(WATER, ex, ey, ent.p1 * 8, ent.p2 * 8);
             case 50: // Warp Lines
                 obj.customwarpmode=true;
                 switch (ent.p1)
@@ -2223,6 +2248,7 @@ void mapclass::loadlevel(int rx, int ry)
             }
         }
     }
+    obj.mark_as_in_water();
 }
 
 void mapclass::twoframedelayfix(void)

@@ -50,6 +50,7 @@ editorclass::editorclass(void)
     register_tool(EditorTool_START_POINT, "Start Point", "P", SDLK_p, false);
     register_tool(EditorTool_COINS, "Coins", "^1", SDLK_1, true);
     register_tool(EditorTool_TELEPORTERS, "Teleporters", "^2", SDLK_2, true);
+    register_tool(EditorTool_WATER, "Water", "^3", SDLK_3, true);
 
     static const short basic[] = {
         121, 121, 121, 121, 121, 121, 121, 160, 121, 121, 121, 121, 121, 121, 121,
@@ -996,9 +997,34 @@ static void draw_entities(void)
                 graphics.draw_rect(x, y, 32, 8, graphics.getRGB(255, 255, 255));
                 break;
             case 8: // Coins
-                graphics.draw_grid_tile(graphics.grphx.im_tiles_white, 48, x, y, 8, 8, graphics.getcol(26));
-                graphics.draw_rect(x, y, 8, 8, graphics.getRGB(255, 164, 164));
+            {
+                const SDL_Color coin_col = graphics.getcol(26);
+                const SDL_Color rect_col = graphics.getRGB(255, 164, 164);
+                switch (entity->p1)
+                {
+                case 1: // 10 coin
+                    graphics.draw_sprite(x, y, 192, coin_col);
+                    graphics.draw_rect(x, y, 16, 16, rect_col);
+                    break;
+                case 2: // 20 coin
+                    graphics.draw_sprite(x, y, 193, coin_col);
+                    graphics.draw_rect(x, y, 16, 16, rect_col);
+                    break;
+                case 3: // 50 coin
+                    graphics.draw_sprite(x, y, 194, coin_col);
+                    graphics.draw_rect(x, y, 24, 24, rect_col);
+                    break;
+                case 4: // 100 coin
+                    graphics.draw_sprite(x, y, 195, coin_col);
+                    graphics.draw_rect(x, y, 24, 24, rect_col);
+                    break;
+                default: // Coin (normal)
+                    graphics.draw_grid_tile(graphics.grphx.im_tiles_white, 48, x, y, 8, 8, coin_col);
+                    graphics.draw_rect(x, y, 8, 8, rect_col);
+                    break;
+                }
                 break;
+            }
             case 9: // Shiny Trinkets
                 graphics.draw_sprite(x, y, 22, 196, 196, 196);
                 graphics.draw_rect(x, y, 16, 16, graphics.getRGB(255, 164, 164));
@@ -1183,6 +1209,12 @@ static void draw_entities(void)
 
                 font::print(PR_FONT_LEVEL | PR_BOR | PR_CJK_HIGH, arrow_x, arrow_y, help.String(entity->p3), 255, 255, 255);
 
+                break;
+            }
+            case 26: // Water
+            {
+                graphics.draw_rect(x, y, entity->p1 * 8, entity->p2 * 8, graphics.getRGB(164, 255, 255));
+                graphics.draw_rect(x, y, 8, 8, graphics.getRGB(255, 255, 255));
                 break;
             }
             case 50: // Warp Lines
@@ -1423,7 +1455,7 @@ static void draw_cursor(void)
     case EditorTool_GRAVITY_LINES:
     case EditorTool_ROOMTEXT:
     case EditorTool_SCRIPTS:
-    case EditorTool_COINS:
+    case EditorTool_WATER:
         // 1x1
         graphics.draw_rect(x, y, 8, 8, blue);
         break;
@@ -1460,6 +1492,14 @@ static void draw_cursor(void)
     case EditorTool_TELEPORTERS:
         // 12x12
         graphics.draw_rect(x, y, 96, 96, blue);
+        break;
+    case EditorTool_COINS:
+        // Variable...
+        if (ed.v_modifier) graphics.draw_rect(x, y, 24, 24, blue);
+        else if (ed.c_modifier) graphics.draw_rect(x, y, 24, 24, blue);
+        else if (ed.x_modifier) graphics.draw_rect(x, y, 16, 16, blue);
+        else if (ed.z_modifier) graphics.draw_rect(x, y, 16, 16, blue);
+        else graphics.draw_rect(x, y, 8, 8, blue);
         break;
     default:
         break;
@@ -1570,6 +1610,9 @@ static void draw_box_placer()
         case BoxType_PLATFORM:
             message = loc::gettext("PLATFORM BOUNDS: Click on the first corner");
             break;
+        case BoxType_WATER:
+            message = loc::gettext("WATER: Click on the first corner");
+            break;
         default:
             message = loc::gettext("Click on the first corner");
             break;
@@ -1587,6 +1630,9 @@ static void draw_box_placer()
             break;
         case BoxType_PLATFORM:
             message = loc::gettext("PLATFORM BOUNDS: Click on the last corner");
+            break;
+        case BoxType_WATER:
+            message = loc::gettext("WATER: Click on the last corner");
             break;
         default:
             message = loc::gettext("Click on the last corner");
@@ -1823,6 +1869,9 @@ void editorclass::draw_tool(EditorTools tool, int x, int y)
     case EditorTool_SCRIPTS:
         graphics.draw_rect(x + 4, y + 4, 8, 8, graphics.getRGB(96, 96, 96));
         break;
+    case EditorTool_WATER:
+        graphics.draw_rect(x + 4, y + 4, 8, 8, graphics.getRGB(0, 96, 96));
+        break;
     case EditorTool_WARP_TOKENS:
         graphics.draw_sprite(x, y, 18 + (entframe % 2), 196, 196, 196);
         break;
@@ -1872,11 +1921,13 @@ void editorrender(void)
         // Draw the background, if any, over the guidelines
         draw_background(room->warpdir);
 
-        graphics.drawmap();
+        graphics.drawmap(true);
         draw_edgeguides();
 
         draw_entities();
         draw_ghosts();
+
+        graphics.drawmap(false);
 
         draw_bounds();
 
@@ -2690,6 +2741,15 @@ void editorclass::tool_place()
 
         lclickdelay = 1;
         break;
+    case EditorTool_WATER:
+        substate = EditorSubState_DRAW_BOX;
+        box_corner = BoxCorner_LAST;
+        box_type = BoxType_WATER;
+        box_point.x = tilex * 8;
+        box_point.y = tiley * 8;
+
+        lclickdelay = 1;
+        break;
     case EditorTool_WARP_TOKENS:
         substate = EditorSubState_DRAW_WARPTOKEN;
         warp_token_entity = customentities.size();
@@ -2745,8 +2805,28 @@ void editorclass::tool_place()
         lclickdelay = 1;
         break;
     case EditorTool_COINS:
-        add_entity(levx, levy, tilex, tiley, 8);
+    {
+        int p1 = 0;
+        if (v_modifier)
+        {
+            p1 = 4;
+        }
+        else if (c_modifier)
+        {
+            p1 = 3;
+        }
+        else if (x_modifier)
+        {
+            p1 = 2;
+        }
+        else if (z_modifier)
+        {
+            p1 = 1;
+        }
+
+        add_entity(levx, levy, tilex, tiley, 8, p1);
         break;
+    }
     case EditorTool_TELEPORTERS:
     {
         lclickdelay = 1;
@@ -3552,6 +3632,9 @@ void editorinput(void)
                         cl.setroomplaty1(ed.levx, ed.levy, top);
                         cl.setroomplatx2(ed.levx, ed.levy, right);
                         cl.setroomplaty2(ed.levx, ed.levy, bottom);
+                        break;
+                    case BoxType_WATER:
+                        ed.add_entity(ed.levx, ed.levy, left / 8, top / 8, 26, (right - left) / 8, (bottom - top) / 8);
                         break;
                     case BoxType_COPY:
                         // Unused

@@ -8,6 +8,7 @@
 #include "Game.h"
 #include "GlitchrunnerMode.h"
 #include "Graphics.h"
+#include "ItemHelpers.h"
 #include "Localization.h"
 #include "Map.h"
 #include "Maths.h"
@@ -847,6 +848,20 @@ void entityclass::createblock( int t, int xp, int yp, int w, int h, int trig /*=
         block.hp = h;
         block.rectset(xp, yp, w, h);
         break;
+    case WATER:
+        block.type = WATER;
+
+        if (xp == 0) { xp -= 16; w += 16; }
+        if (yp == 0) { yp -= 16; h += 16; }
+        if ((xp + w) == 320) w += 16;
+        if ((yp + h) == 240) h += 16;
+
+        block.xp = xp;
+        block.yp = yp;
+        block.wp = w;
+        block.hp = h;
+        block.rectset(xp, yp, w, h);
+        break;
     case ACTIVITY: //Activity Zone
         block.type = ACTIVITY;
         block.wp = w;
@@ -1547,6 +1562,37 @@ void entityclass::createentity(int xp, int yp, int t, int meta1, int meta2, int 
         //Check if it's already been collected
         entity.para = meta1;
         if (coincollect.find(meta1) != coincollect.end()) return;
+
+        entity.behave = meta2;
+
+        switch (meta2)
+        {
+        case 1:
+            entity.size = 0;
+            entity.w = 16;
+            entity.h = 16;
+            entity.tile = 192;
+            break;
+        case 2:
+            entity.size = 0;
+            entity.w = 16;
+            entity.h = 16;
+            entity.tile = 193;
+            break;
+        case 3:
+            entity.size = 0;
+            entity.w = 24;
+            entity.h = 24;
+            entity.tile = 194;
+            break;
+        case 4:
+            entity.size = 0;
+            entity.w = 24;
+            entity.h = 24;
+            entity.tile = 195;
+            break;
+        }
+
         break;
     case 9: //Something Shiny
         entity.rule = 3;
@@ -2185,6 +2231,17 @@ void entityclass::createentity(int xp, int yp, int t, int meta1, int meta2, int 
     case 100: // Invalid enemy, but gets treated as a teleporter
         entity.type = EntityType_TELEPORTER;
         break;
+    case 200: // Fishing bobber
+        entity.size = 200;
+        entity.rule = 200;
+        entity.type = EntityType_BOBBER;
+        entity.vx = meta1;
+        entity.vy = meta2;
+        entity.cx = 2;
+        entity.cy = 0;
+        entity.w = 3;
+        entity.h = 3;
+        break;
     }
 
     entity.lerpoldxp = entity.xp;
@@ -2706,6 +2763,14 @@ bool entityclass::updateentities( int i )
             {
                 music.playef(Sound_COIN);
                 coincollect.insert(entities[i].para);
+                switch (entities[i].behave)
+                {
+                default: game.coins_collected++; break;
+                case 1: game.coins_collected += 10; break;
+                case 2: game.coins_collected += 20; break;
+                case 3: game.coins_collected += 50; break;
+                case 4: game.coins_collected += 100; break;
+                }
 
                 return disableentity(i);
             }
@@ -3450,6 +3515,79 @@ bool entityclass::updateentities( int i )
                 entities[i].state = 0;
             }
             break;
+        case EntityType_BOBBER:
+        {
+            float decel = 0.25;
+            float grav = 0.5;
+            float ycap = 6.0;
+            float water_buoyancy = 0.5;
+            float water_cap = 1;
+            float step = 0.5;
+
+            if (entities[i].vx > 0)
+            {
+                entities[i].vx = SDL_max(0, entities[i].vx - decel);
+            }
+            if (entities[i].vx < 0)
+            {
+                entities[i].vx = SDL_min(0, entities[i].vx + decel);
+            }
+
+            if (entities[i].in_water)
+            {
+                if (game.gravitycontrol == 0)
+                {
+                    entities[i].vy -= water_buoyancy;
+                    if (entities[i].vy < -water_cap) entities[i].vy = -water_cap;
+                    int kill = 0;
+                    while (!wouldbeinwater(i))
+                    {
+                        entities[i].vy += step;
+                        if (kill++ > 200) break;
+                    }
+                }
+                else
+                {
+                    entities[i].vy += water_buoyancy;
+                    if (entities[i].vy > water_cap) entities[i].vy = water_cap;
+                    int kill = 0;
+                    while (!wouldbeinwater(i))
+                    {
+                        entities[i].vy -= step;
+                        if (kill++ > 200) break;
+                    }
+                }
+            }
+            else
+            {
+                if (game.gravitycontrol == 0)
+                {
+                    entities[i].vy += grav;
+                    if (entities[i].vy > ycap) entities[i].vy = ycap;
+                }
+                else
+                {
+                    entities[i].vy -= grav;
+                    if (entities[i].vy < -ycap) entities[i].vy = -ycap;
+                }
+            }
+
+            bool remove = false;
+            if (entities[i].xp < 0) remove = true;
+            if (entities[i].yp < 0) remove = true;
+            if (entities[i].xp > 320) remove = true;
+            if (entities[i].yp > 240) remove = true;
+
+            if (remove)
+            {
+                game.fishing_state = FishingState_IDLE;
+                game.fishing_timer = 0;
+                game.fishing_anim_timer = 0;
+                return disableentity(i);
+            }
+
+            break;
+        }
         case EntityType_INVALID: // Invalid entity, do nothing!
             break;
         }
@@ -3479,54 +3617,85 @@ void entityclass::animateentities( int _i )
         switch(entities[_i].type)
         {
         case EntityType_PLAYER:
+        {
             entities[_i].framedelay--;
-            if(entities[_i].dir==1)
+            if (entities[_i].dir == 1)
             {
-                entities[_i].drawframe=entities[_i].tile;
+                entities[_i].drawframe = entities[_i].tile;
             }
             else
             {
-                entities[_i].drawframe=entities[_i].tile+3;
+                entities[_i].drawframe = entities[_i].tile + 3;
             }
 
-            if(entities[_i].visualonground>0 || entities[_i].visualonroof>0)
+            if (entities[_i].visualonground > 0 || entities[_i].visualonroof > 0)
             {
-                if(entities[_i].vx > 0.00f || entities[_i].vx < -0.00f)
+                if (entities[_i].vx > 0.00f || entities[_i].vx < -0.00f)
                 {
                     //Walking
-                    if(entities[_i].framedelay<=1)
+                    if (entities[_i].framedelay <= 1)
                     {
-                        entities[_i].framedelay=4;
+                        entities[_i].framedelay = 4;
                         entities[_i].walkingframe++;
                     }
-                    if (entities[_i].walkingframe >=2) entities[_i].walkingframe=0;
+                    if (entities[_i].walkingframe >= 2) entities[_i].walkingframe = 0;
                     entities[_i].drawframe += entities[_i].walkingframe + 1;
                 }
 
                 if (entities[_i].visualonroof > 0) entities[_i].drawframe += 6;
                 // Stuck in a wall? Then default to gravitycontrol
                 if (entities[_i].visualonground > 0 && entities[_i].visualonroof > 0
-                && game.gravitycontrol == 0)
+                    && game.gravitycontrol == 0)
                 {
                     entities[_i].drawframe -= 6;
                 }
             }
             else
             {
-                entities[_i].drawframe ++;
+                entities[_i].drawframe++;
                 if (game.gravitycontrol == 1)
                 {
                     entities[_i].drawframe += 6;
                 }
             }
 
+            bool weirddirectionbs = false;
+            if (game.fishing_state == FishingState_CHOOSING)
+            {
+                entities[_i].drawframe = 204 + (SDL_clamp((game.fishing_anim_timer / 3), 0, 3));
+                weirddirectionbs = true;
+            }
+            else if (game.fishing_state == FishingState_POSTCHOOSING)
+            {
+                entities[_i].drawframe = 208 + (SDL_clamp((game.fishing_anim_timer / 3), 0, 2));
+                weirddirectionbs = true;
+            }
+            else if (game.fishing_state == FishingState_CASTING || game.fishing_state == FishingState_WAITING)
+            {
+                entities[_i].drawframe = 210;
+                weirddirectionbs = true;
+            }
+
+            if (weirddirectionbs)
+            {
+                if (entities[_i].dir == 0)
+                {
+                    entities[_i].drawframe += 12;
+                }
+                if (game.gravitycontrol == 1)
+                {
+                    entities[_i].drawframe += 24;
+                }
+            }
+
             if (game.deathseq > -1)
             {
-                entities[_i].drawframe=13;
+                entities[_i].drawframe = 13;
                 if (entities[_i].dir == 1) entities[_i].drawframe = 12;
                 if (game.gravitycontrol == 1) entities[_i].drawframe += 2;
             }
             break;
+        }
         case EntityType_MOVING:
         case EntityType_GRAVITRON_ENEMY:
             //Variable animation
@@ -4584,14 +4753,22 @@ void entityclass::applyfriction( int t, float xrate, float yrate )
         return;
     }
 
+    float cap_mult = 1;
+    if (entities[t].in_water)
+    {
+        xrate /= 2;
+        yrate /= 2;
+        cap_mult = 0.5;
+    }
+
     if (entities[t].vx > 0.00f) entities[t].vx -= xrate;
     if (entities[t].vx < 0.00f) entities[t].vx += xrate;
     if (entities[t].vy > 0.00f) entities[t].vy -= yrate;
     if (entities[t].vy < 0.00f) entities[t].vy += yrate;
-    if (entities[t].vy > 10.00f) entities[t].vy = 10.0f;
-    if (entities[t].vy < -10.00f) entities[t].vy = -10.0f;
-    if (entities[t].vx > 6.00f) entities[t].vx = 6.0f;
-    if (entities[t].vx < -6.00f) entities[t].vx = -6.0f;
+    if (entities[t].vy > 10.00f * cap_mult) entities[t].vy = 10.0f * cap_mult;
+    if (entities[t].vy < -10.00f * cap_mult) entities[t].vy = -10.0f * cap_mult;
+    if (entities[t].vx > 6.00f * cap_mult) entities[t].vx = 6.0f * cap_mult;
+    if (entities[t].vx < -6.00f * cap_mult) entities[t].vx = -6.0f * cap_mult;
 
     if (SDL_fabsf(entities[t].vx) < xrate) entities[t].vx = 0.0f;
     if (SDL_fabsf(entities[t].vy) < yrate) entities[t].vy = 0.0f;
@@ -4608,8 +4785,17 @@ void entityclass::updateentitylogic( int t )
     entities[t].oldxp = entities[t].xp;
     entities[t].oldyp = entities[t].yp;
 
-    entities[t].vx = entities[t].vx + entities[t].ax;
-    entities[t].vy = entities[t].vy + entities[t].ay;
+    float ax = entities[t].ax;
+    float ay = entities[t].ay;
+
+    if (entities[t].in_water)
+    {
+        ax /= 2;
+        ay /= 2;
+    }
+
+    entities[t].vx = entities[t].vx + ax;
+    entities[t].vy = entities[t].vy + ay;
     entities[t].ax = 0;
 
     if (entities[t].gravity)
@@ -4636,8 +4822,17 @@ void entityclass::updateentitylogic( int t )
         applyfriction(t, game.inertia, 0.25f);
     }
 
-    entities[t].newxp = entities[t].xp + entities[t].vx;
-    entities[t].newyp = entities[t].yp + entities[t].vy;
+    float vx = entities[t].vx;
+    float vy = entities[t].vy;
+
+    if (entities[t].type == EntityType_MOVING && entities[t].in_water)
+    {
+        vx /= 2;
+        vy /= 2;
+    }
+
+    entities[t].newxp = entities[t].xp + vx;
+    entities[t].newyp = entities[t].yp + vy;
 }
 
 void entityclass::entitymapcollision( int t )
@@ -4737,6 +4932,127 @@ void entityclass::customwarplinecheck(int i) {
             }
         }
     }
+}
+
+void entityclass::mark_as_in_water(void)
+{
+    for (size_t i = 0; i < entities.size(); i++)
+    {
+        entities[i].in_water = false;
+        entities[i].last_water = -1;
+
+        SDL_Rect entrect;
+        entrect.x = entities[i].xp + entities[i].cx;
+        entrect.y = entities[i].yp + entities[i].cy;
+        entrect.w = entities[i].w;
+        entrect.h = entities[i].h;
+
+        for (size_t j = 0; j < blocks.size(); j++)
+        {
+            if (blocks[j].type != WATER) continue;
+
+            if (help.intersects(entrect, blocks[j].rect))
+            {
+                entities[i].in_water = true;
+                entities[i].last_water = j;
+            }
+        }
+    }
+}
+
+void entityclass::entityblockcheck(void)
+{
+    for (size_t i = 0; i < entities.size(); i++)
+    {
+        bool was_in_water = entities[i].in_water;
+        entities[i].in_water = false;
+
+        SDL_Rect entrect;
+        entrect.x = entities[i].xp + entities[i].cx;
+        entrect.y = entities[i].yp + entities[i].cy;
+        entrect.w = entities[i].w;
+        entrect.h = entities[i].h;
+
+        for (size_t j = 0; j < blocks.size(); j++)
+        {
+            if (blocks[j].type != WATER) continue;
+
+            if (help.intersects(entrect, blocks[j].rect))
+            {
+                entities[i].in_water = true;
+                entities[i].last_water = j;
+
+                if (!was_in_water)
+                {
+                    int ent_point = entrect.x + entrect.w / 2;
+                    int rel_point = ent_point - blocks[j].xp;
+
+                    int entity_middle = entrect.y + entrect.h / 2;
+                    int block_middle = blocks[j].yp + blocks[j].hp / 2;
+
+                    bool top = entity_middle < block_middle;
+
+                    int index = rel_point * SPRINGS_PER_PIXEL;
+                    if (top && (INBOUNDS_VEC(index, blocks[j].springs)))
+                    {
+                        blocks[j].springs[index].y += (entities[i].vy * ENTITY_LEAVE_SPRING_MULT);
+                    }
+                    else if (!top && (INBOUNDS_VEC(index + 1, blocks[j].bottom_springs)))
+                    {
+                        blocks[j].bottom_springs[index + 1].y -= (entities[i].vy * ENTITY_LEAVE_SPRING_MULT);
+                    }
+                }
+            }
+        }
+
+        if (entities[i].in_water != was_in_water)
+        {
+            game.play_splash = true;
+            if (was_in_water)
+            {
+                // So if we WERE in the water...
+                int b = entities[i].last_water;
+                if (b != -1)
+                {
+                    int ent_point = entrect.x + entrect.w / 2;
+                    int rel_point = ent_point - blocks[b].xp;
+                    int entity_middle = entrect.y + entrect.h / 2;
+                    int block_middle = blocks[b].yp + blocks[b].hp / 2;
+                    bool top = entity_middle < block_middle;
+                    int index = rel_point * SPRINGS_PER_PIXEL;
+                    if (top && (INBOUNDS_VEC(index, blocks[b].springs)))
+                    {
+                        blocks[b].springs[index].y += (entities[i].vy * ENTITY_LEAVE_SPRING_MULT);
+                    }
+                    else if (!top && (INBOUNDS_VEC(index + 1, blocks[b].bottom_springs)))
+                    {
+                        blocks[b].bottom_springs[index + 1].y -= (entities[i].vy * ENTITY_LEAVE_SPRING_MULT);
+                    }
+                }
+                entities[i].last_water = -1;
+            }
+        }
+    }
+}
+
+bool entityclass::wouldbeinwater(int i)
+{
+    SDL_Rect entrect;
+    entrect.x = entities[i].xp + entities[i].vx + entities[i].cx;
+    entrect.y = entities[i].yp + entities[i].vy + entities[i].cy;
+    entrect.w = entities[i].w;
+    entrect.h = entities[i].h;
+
+    for (size_t j = 0; j < blocks.size(); j++)
+    {
+        if (blocks[j].type != WATER) continue;
+
+        if (help.intersects(entrect, blocks[j].rect))
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 void entityclass::entitycollisioncheck(void)

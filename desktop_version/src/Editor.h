@@ -51,6 +51,7 @@ enum EditorTools
     EditorTool_START_POINT,
     EditorTool_COINS,
     EditorTool_TELEPORTERS,
+    EditorTool_WATER,
 
     NUM_EditorTools
 };
@@ -87,7 +88,8 @@ enum BoxTypes
     BoxType_SCRIPT,
     BoxType_ENEMY,
     BoxType_PLATFORM,
-    BoxType_COPY
+    BoxType_COPY,
+    BoxType_WATER
 };
 
 enum BoxCorner
