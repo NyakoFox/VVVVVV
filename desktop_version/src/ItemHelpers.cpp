@@ -5,6 +5,7 @@
 #include "Game.h"
 #include "ItemStack.h"
 #include "Item.h"
+#include "ItemDefinitions.h"
 #include "Music.h"
 
 namespace Items

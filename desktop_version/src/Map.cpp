@@ -2000,6 +2000,7 @@ void mapclass::loadlevel(int rx, int ry)
                 break;
             case 26: // Water
                 obj.createblock(WATER, ex, ey, ent.p1 * 8, ent.p2 * 8);
+                break;
             case 50: // Warp Lines
                 obj.customwarpmode=true;
                 switch (ent.p1)

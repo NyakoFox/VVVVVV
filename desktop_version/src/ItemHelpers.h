@@ -8,21 +8,6 @@
 #define FISHING_CHOOSE_MAX_TIME 40
 #define FISHING_LINE_SMOOTHNESS 100
 
-enum FishingState {
-    FishingState_IDLE,
-    FishingState_CHOOSING,
-    FishingState_POSTCHOOSING,
-    FishingState_CASTING,
-    FishingState_WAITING,
-    FishingState_HOOKED,
-    FishingState_REELING
-};
-
-struct ItemGetDisplay {
-    ItemStack stack;
-    int timer;
-};
-
 namespace Items
 {
     extern Item* FISHING_ROD;

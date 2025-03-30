@@ -8,10 +8,8 @@
 
 #include "Font.h"
 #include "ItemStack.h"
+#include "ItemDefinitions.h"
 #include "ScreenSettings.h"
-
-struct ItemGetDisplay;
-enum FishingState;
 
 /* FIXME: Can't forward declare this enum in C++, unfortunately.
  * In C, enum sizes are always the same, so you can forward declare them.

@@ -17,9 +17,6 @@ public:
     Item(ItemSettings settings);
     Item(void);
 
-    Item(const Item& other) = delete;
-    Item& operator=(const Item& other) = delete;
-
     void draw(int x, int y);
 
     virtual bool canUse(ItemStack* stack);

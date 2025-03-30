@@ -14,6 +14,7 @@
 #include "GraphicsUtil.h"
 #include "InterimVersion.h"
 #include "ItemHelpers.h"
+#include "ItemDefinitions.h"
 #include "KeyPoll.h"
 #include "LevelDebugger.h"
 #include "Localization.h"
