@@ -385,6 +385,9 @@ void registerItems(void)
     toPool("junk", Items::TIRE, 25);
     toPool("junk", Items::GOLDFISH, 1);
 
+    // TODO: saltwater small,
+    // saltwater large
+
     BESTIARY_ITEMS.push_back(Items::LARGEMOUTH_BASS);
     BESTIARY_ITEMS.push_back(Items::SMALLMOUTH_BASS);
     BESTIARY_ITEMS.push_back(Items::BULLHEAD);
