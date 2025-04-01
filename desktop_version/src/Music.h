@@ -72,7 +72,8 @@ enum
     Sound_GATE = 36,
     Sound_FILLBUCKET = 37,
     Sound_ERROR = 38,
-    Sound_CASH = 39
+    Sound_CASH = 39,
+    Sound_DRIPPLE = 40
 };
 
 class musicclass

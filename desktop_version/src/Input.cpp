@@ -449,14 +449,14 @@ static void menuactionpress(void)
 #if !defined(MAKEANDPLAY)
         OPTION_ID(0) /* play */
 #endif
-        OPTION_ID(1) /* levels */
-        OPTION_ID(2) /* options */
+        //OPTION_ID(1) /* levels */
+        OPTION_ID(1) /* options */
         if (loc::show_translator_menu)
         {
-            OPTION_ID(3) /* translator */
+            OPTION_ID(2) /* translator */
         }
-        OPTION_ID(4) /* credits */
-        OPTION_ID(5) /* quit */
+        OPTION_ID(3) /* credits */
+        OPTION_ID(4) /* quit */
 
 #undef OPTION_ID
 
@@ -504,32 +504,32 @@ static void menuactionpress(void)
             break;
         }
 #endif
-        case 1:
+        /*case 1:
             //Bring you to the normal playmenu
             music.playef(Sound_VIRIDIAN);
             game.editor_disabled = !BUTTONGLYPHS_keyboard_is_available();
             game.createmenu(Menu::playerworlds);
             map.nexttowercolour();
-            break;
-        case 2:
+            break;*/
+        case 1:
             //Options
             music.playef(Sound_VIRIDIAN);
             game.createmenu(Menu::options);
             map.nexttowercolour();
             break;
-        case 3:
+        case 2:
             //Translator
             music.playef(Sound_VIRIDIAN);
             game.createmenu(Menu::translator_main);
             map.nexttowercolour();
             break;
-        case 4:
+        case 3:
             //Credits
             music.playef(Sound_VIRIDIAN);
             game.createmenu(Menu::credits);
             map.nexttowercolour();
             break;
-        case 5:
+        case 4:
             music.playef(Sound_VIRIDIAN);
             game.createmenu(Menu::youwannaquit);
             map.nexttowercolour();
@@ -3483,7 +3483,24 @@ void shopinput(void)
                             {
                                 music.playef(Sound_CASH);
                                 game.coins_collected -= items[game.shopselect].getBuyPrice();
+                                int inv_size = items.size();
                                 giveItem(items[game.shopselect]);
+                                items = getShopItems();
+                                if (inv_size != items.size())
+                                {
+                                    game.shopsubmode = ShopSubMode_MAIN;
+                                    game.shopselect = SDL_clamp(game.shopselect - 1, 0, (int)items.size() - 1);
+
+                                    if (game.shopselect - game.shopscroll < 0)
+                                    {
+                                        game.shopscroll = game.shopselect;
+                                    }
+
+                                    if (game.shopselect - game.shopscroll >= 3)
+                                    {
+                                        game.shopscroll = game.shopselect - 2;
+                                    }
+                                }
                             }
                         }
                         else
@@ -3516,7 +3533,24 @@ void shopinput(void)
                     case 2:
                         if (game.shopmode == ShopMode_BUY)
                         {
-                            if ((items[game.shopselect].getBuyPrice() * 5) > game.coins())
+                            bool cant_buy = false;
+                            if (items[game.shopselect].item == Items::GREEN_BOBBER) cant_buy = true;
+                            if (items[game.shopselect].item == Items::BLUE_BOBBER) cant_buy = true;
+                            if (items[game.shopselect].item == Items::GREEN_BOBBER) cant_buy = true;
+                            if (items[game.shopselect].item == Items::BLUE_BOBBER) cant_buy = true;
+                            if (items[game.shopselect].item == Items::PURPLE_BOBBER) cant_buy = true;
+                            if (items[game.shopselect].item == Items::BIG_BOBBER) cant_buy = true;
+                            if (items[game.shopselect].item == Items::FISH_SPINNER) cant_buy = true;
+                            if (items[game.shopselect].item == Items::FEATHER_SPINNER) cant_buy = true;
+                            if (items[game.shopselect].item == Items::COIN_SPINNER) cant_buy = true;
+                            if (items[game.shopselect].item == Items::TRINKET_SPINNER) cant_buy = true;
+                            if (items[game.shopselect].item == Items::VIRIDIAN_SPINNER) cant_buy = true;
+                            if (items[game.shopselect].item == Items::GIANT_BOBBER) cant_buy = true;
+                            if (items[game.shopselect].item == Items::BLUE_KEY) cant_buy = true;
+                            if (items[game.shopselect].item == Items::PURPLE_KEY) cant_buy = true;
+                            if (items[game.shopselect].item == Items::RED_KEY) cant_buy = true;
+
+                            if (cant_buy || (items[game.shopselect].getBuyPrice() * 5) > game.coins())
                             {
                                 game.shopcoinflash = 15;
                                 music.playef(Sound_ERROR);
@@ -3525,9 +3559,27 @@ void shopinput(void)
                             {
                                 music.playef(Sound_CASH);
                                 game.coins_collected -= items[game.shopselect].getBuyPrice() * 5;
+                                int inv_size = items.size();
                                 for (int i = 0; i < 5; i++)
                                 {
                                     giveItem(items[game.shopselect]);
+                                }
+
+                                items = getShopItems();
+                                if (inv_size != items.size())
+                                {
+                                    game.shopsubmode = ShopSubMode_MAIN;
+                                    game.shopselect = SDL_clamp(game.shopselect - 1, 0, (int)items.size() - 1);
+
+                                    if (game.shopselect - game.shopscroll < 0)
+                                    {
+                                        game.shopscroll = game.shopselect;
+                                    }
+
+                                    if (game.shopselect - game.shopscroll >= 3)
+                                    {
+                                        game.shopscroll = game.shopselect - 2;
+                                    }
                                 }
                             }
                         }

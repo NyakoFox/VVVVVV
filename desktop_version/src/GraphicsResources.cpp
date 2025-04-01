@@ -483,6 +483,18 @@ void GraphicsResources::init(void)
     FILESYSTEM_freeEnumerate(&handle_items);
 
     im_bobber = LoadImage("graphics/bobber.png");
+
+    im_bobber_big = LoadImage("graphics/bobber_big.png");
+    im_bobber_blue = LoadImage("graphics/bobber_blue.png");
+    im_bobber_coin = LoadImage("graphics/bobber_coin.png");
+    im_bobber_feather = LoadImage("graphics/bobber_feather.png");
+    im_bobber_fish = LoadImage("graphics/bobber_fish.png");
+    im_bobber_giant = LoadImage("graphics/bobber_giant.png");
+    im_bobber_green = LoadImage("graphics/bobber_green.png");
+    im_bobber_purple = LoadImage("graphics/bobber_purple.png");
+    im_bobber_trinket = LoadImage("graphics/bobber_trinket.png");
+    im_bobber_viridian = LoadImage("graphics/bobber_viridian.png");
+
     im_fishingrod_anim = LoadImage("graphics/fishingrod_anim.png");
     im_fishingrod_line_anim = LoadImage("graphics/fishingrod_line_anim.png");
 
@@ -495,6 +507,20 @@ void GraphicsResources::init(void)
 
     im_logo = LoadImage("graphics/logo.png", TEX_WHITE);
     im_question = LoadImage("graphics/question.png");
+
+    im_light_point = LoadImage("graphics/lights/point.png");
+    im_light_teleporter = LoadImage("graphics/lights/teleporter.png");
+
+    im_dripplelamps = LoadImage("graphics/dripplelamps.png");
+
+    mode_revsub_alpha = SDL_ComposeCustomBlendMode(
+        SDL_BLENDFACTOR_SRC_COLOR,
+        SDL_BLENDFACTOR_DST_COLOR,
+        SDL_BLENDOPERATION_ADD,
+        SDL_BLENDFACTOR_SRC_ALPHA,
+        SDL_BLENDFACTOR_DST_ALPHA,
+        SDL_BLENDOPERATION_REV_SUBTRACT
+    );
 }
 
 
@@ -541,6 +567,18 @@ void GraphicsResources::destroy(void)
     }
 
     CLEAR(im_bobber);
+
+    CLEAR(im_bobber_big);
+    CLEAR(im_bobber_blue);
+    CLEAR(im_bobber_coin);
+    CLEAR(im_bobber_feather);
+    CLEAR(im_bobber_fish);
+    CLEAR(im_bobber_giant);
+    CLEAR(im_bobber_green);
+    CLEAR(im_bobber_purple);
+    CLEAR(im_bobber_trinket);
+    CLEAR(im_bobber_viridian);
+
     CLEAR(im_fishingrod_anim);
     CLEAR(im_fishingrod_line_anim);
 

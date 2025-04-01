@@ -78,6 +78,9 @@ void entclass::clear(void)
     item = NULL;
 
     bobbergrav = 0;
+
+    light_strength = 255;
+    light_radius = 64;
 }
 
 bool entclass::outside(void)

@@ -2047,6 +2047,9 @@ void mapclass::loadlevel(int rx, int ry)
                     obj.createentity(ex, ey, 206);
                 }
                 break;
+            case 207: // Dripple lamps
+                obj.createentity(ex + 6 - 4, ey + 5 - 4, 207);
+                break;
             }
         }
 

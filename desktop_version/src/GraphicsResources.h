@@ -50,6 +50,18 @@ public:
     SDL_Texture* im_flipsprites_translated;
 
     SDL_Texture* im_bobber;
+
+    SDL_Texture* im_bobber_big;
+    SDL_Texture* im_bobber_blue;
+    SDL_Texture* im_bobber_coin;
+    SDL_Texture* im_bobber_feather;
+    SDL_Texture* im_bobber_fish;
+    SDL_Texture* im_bobber_giant;
+    SDL_Texture* im_bobber_green;
+    SDL_Texture* im_bobber_purple;
+    SDL_Texture* im_bobber_trinket;
+    SDL_Texture* im_bobber_viridian;
+
     SDL_Texture* im_fishingrod_anim;
     SDL_Texture* im_fishingrod_line_anim;
 
@@ -62,6 +74,13 @@ public:
 
     SDL_Texture* im_logo;
     SDL_Texture* im_question;
+
+    SDL_Texture* im_light_point;
+    SDL_Texture* im_light_teleporter;
+
+    SDL_Texture* im_dripplelamps;
+
+    SDL_BlendMode mode_revsub_alpha;
 };
 
 SDL_Surface* LoadImageSurface(const char* filename);

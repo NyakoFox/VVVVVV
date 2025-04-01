@@ -63,6 +63,14 @@ namespace Items
     extern Item* FISHTRONAUT;
     extern Item* NAVAL_MINE;
 
+    extern Item* OLD_BOOT;
+    extern Item* SODA_CAN;
+    extern Item* TIN_CAN;
+    extern Item* CAR_BATTERY;
+    extern Item* GAME_CARTRIDGE;
+    extern Item* DRIFTWOOD;
+    extern Item* SEA_GLASS;
+
     extern Item* THIRTY_SEVEN_FISH;
     extern Item* SQUISHFISH;
 
@@ -83,6 +91,17 @@ namespace Items
     extern Item* ENHANCED_BAIT;
     extern Item* DELUXE_BAIT;
     extern Item* ULTRA_BAIT;
+
+    extern Item* GREEN_BOBBER;
+    extern Item* BLUE_BOBBER;
+    extern Item* PURPLE_BOBBER;
+    extern Item* BIG_BOBBER;
+    extern Item* FISH_SPINNER;
+    extern Item* FEATHER_SPINNER;
+    extern Item* COIN_SPINNER;
+    extern Item* TRINKET_SPINNER;
+    extern Item* VIRIDIAN_SPINNER;
+    extern Item* GIANT_BOBBER;
 }
 
 bool hasItem(Item* item);
@@ -111,6 +130,7 @@ void decrementItem(ItemStack stack, int amount);
 void updateFishCaughtInfo(void);
 
 int getTrinketFinCount(void);
+int getCaughtFishAmount(void);
 ItemStack* getEquippedRod(void);
 
 SDL_Color getWaterColorsForPool(std::string pool);
@@ -124,6 +144,8 @@ static std::vector<Item*> BESTIARY_ITEMS;
 std::vector<Item*> getBestiaryItems(void);
 bool hasDiscovered(Item* item);
 FishCatchInfo getFishCatchInfo(Item* item);
+
+SDL_Texture* getBobberTexture(void);
 
 float easeOutCubic(float x);
 float easeInCubic(float x);

@@ -210,6 +210,12 @@ public:
     void drawimagecol(int t, int xp, int yp, SDL_Color ct, bool cent= false);
 
     void draw_texture(SDL_Texture* image, int x, int y);
+    void draw_texture(SDL_Texture* image, int x, int y, const float scalex, const float scaley);
+
+    void draw_light(SDL_Texture* image, const int x, const int y, const float scalex, const float scaley, const int alpha);
+    void draw_light(SDL_Texture* image, const int x, const int y);
+
+    void draw_point_light(const int x, const int y, const int radius, const int alpha);
 
     void draw_texture_part(SDL_Texture* image, int x, int y, int x2, int y2, int w, int h, int scalex, int scaley);
 
@@ -414,6 +420,9 @@ public:
     SDL_Texture* waterLineTexture;
     SDL_Texture* waterLineUnderneathTexture;
     SDL_Texture* waterTexture;
+
+    SDL_Texture* shadowTexture;
+    SDL_Texture* darknessTexture;
 
     SDL_Surface* tempScreenshot;
     SDL_Surface* tempScreenshot2x;

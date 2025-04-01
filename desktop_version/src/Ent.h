@@ -36,7 +36,8 @@ enum EntityType
     EntityType_BOBBER = 200,
     EntityType_GATE = 201,
     EntityType_SPECIAL_TERMINAL = 205,
-    EntityType_ITEM = 206
+    EntityType_ITEM = 206,
+    EntityType_DRIPPLE_LAMP = 207
 };
 
 class entclass
@@ -100,6 +101,9 @@ public:
 
     Item* item;
     int bobbergrav;
+
+    int light_strength;
+    int light_radius;
 };
 
 #endif /* ENT_H */

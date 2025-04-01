@@ -14,6 +14,7 @@
 #include "BucketItem.h"
 #include "FilledBucketItem.h"
 #include "TrinketFinFishItem.h"
+#include "BobberItem.h"
 
 namespace Items
 {
@@ -65,6 +66,13 @@ namespace Items
     Item* FISHTRONAUT;
     
     Item* NAVAL_MINE;
+    Item* OLD_BOOT;
+    Item* SODA_CAN;
+    Item* TIN_CAN;
+    Item* CAR_BATTERY;
+    Item* GAME_CARTRIDGE;
+    Item* DRIFTWOOD;
+    Item* SEA_GLASS;
 
     Item* THIRTY_SEVEN_FISH;
     Item* SQUISHFISH;
@@ -86,6 +94,17 @@ namespace Items
     Item* ENHANCED_BAIT;
     Item* DELUXE_BAIT;
     Item* ULTRA_BAIT;
+
+    Item* GREEN_BOBBER;
+    Item* BLUE_BOBBER;
+    Item* PURPLE_BOBBER;
+    Item* BIG_BOBBER;
+    Item* FISH_SPINNER;
+    Item* FEATHER_SPINNER;
+    Item* COIN_SPINNER;
+    Item* TRINKET_SPINNER;
+    Item* VIRIDIAN_SPINNER;
+    Item* GIANT_BOBBER;
 }
 
 bool hasItem(Item* item)
@@ -190,10 +209,15 @@ std::string getItemID(Item* item)
 
 void updateFishCaughtInfo(void)
 {
+    Item* item = game.fishing_item.item;
+
+    if (item == Items::KOI_B) item = Items::KOI_A;
+    if (item == Items::KOI_C) item = Items::KOI_A;
+
     for (int i = 0; i < game.fish_catch_info.size(); i++)
     {
         FishCatchInfo& info = game.fish_catch_info[i];
-        if (info.item == game.fishing_item.item)
+        if (info.item == item)
         {
             info.smallest = SDL_min(info.smallest, game.fishing_item.fish_size);
             info.largest = SDL_max(info.largest, game.fishing_item.fish_size);
@@ -203,7 +227,7 @@ void updateFishCaughtInfo(void)
     }
 
     FishCatchInfo info;
-    info.item = game.fishing_item.item;
+    info.item = item;
     info.smallest = game.fishing_item.fish_size;
     info.largest = game.fishing_item.fish_size;
     info.amount = game.fishing_item.count;
@@ -384,7 +408,6 @@ void registerItems(void)
     Items::VIRIDIFIN = registerItem("viridifin", new FishItem(ItemSettings().withName("Viridifin").withHabitat(Habitat_FRESHWATER).withSell(222).withDescription("It has an uncanny resemblance to you, to say the least...").withRarity(Rarity_LEGENDARY).withLayer("viridifin", 0), 40, 60, 100));
     Items::EDGEFISH = registerItem("edgefish", new FishItem(ItemSettings().withName("Edgefish").withHabitat(Habitat_FRESHWATER).withSell(190).withDescription("This fish subsists on pellets. No trademark infringement intended.").withRarity(Rarity_LEGENDARY).withLayer("edgefish", 8), 15, 30, 60));
     Items::TERMINNOW = registerItem("terminnow", new FishItem(ItemSettings().withName("Terminnow").withHabitat(Habitat_FRESHWATER).withSell(200).withDescription("      -= PERSONAL LOG =-      \nI can't believe this fish even has Wi-Fi.").withRarity(Rarity_LEGENDARY).withLayer("terminnow", 4), 10, 15, 20));
-    Items::TIRE = registerItem("tire", new Item(ItemSettings().withName("Tire").withSell(0).withDescription("This tire could be from the 3099 Space Derby Grand Prix.").withRarity(Rarity_JUNK).withLayer("tire", 19)));
     Items::SPIKE_FISH = registerItem("spike_fish", new FishItem(ItemSettings().withName("Spike Fish").withHabitat(Habitat_ANYWHERE).withSell(15).withDescription("They leave behind spiky corpses when they die. An invasive species found everywhere.").withLayer("spike_fish", -1), 40, 40, 40));
     Items::TRINKETFIN = registerItem("trinketfin", new TrinketFinFishItem(ItemSettings().withName("Trinketfin").withHabitat(Habitat_ANYWHERE).withDescription("Congratulations! You have found a shiny trinketfin!").withRarity(Rarity_RARE).withLayer("trinketfin", 3)));
 
@@ -407,17 +430,17 @@ void registerItems(void)
     Items::STAR_FISH = registerItem("star_fish", new FishItem(ItemSettings().withName("Star Fish").withSell(100).withHabitat(Habitat_SALTWATER).withDescription("This is a star fish, not a starfish.").withRarity(Rarity_ELUSIVE).withLayer("star_fish", 276), 80, 100, 120));
     Items::FISHTRONAUT = registerItem("fishtronaut", new FishItem(ItemSettings().withName("Fishtronaut").withSell(269).withHabitat(Habitat_SALTWATER).withDescription("One small step for fish, one giant leap for fishkind!").withRarity(Rarity_LEGENDARY).withLayer("fishtronaut_layer_1", 277).withLayer("fishtronaut_layer_2", 278).withLayer("fishtronaut_layer_3", 279).withLayer("fishtronaut_layer_4", 280).withLayer("fishtronaut_layer_5", 281).withLayer("fishtronaut_layer_6", 282).withLayer("fishtronaut_layer_7", 283), 25, 30, 70));
 
-    Items::NAVAL_MINE = registerItem("naval_mine", new Item(ItemSettings().withName("Naval Mine").withSell(25).withDescription("Uh oh.").withRarity(Rarity_JUNK).withLayer("naval_mine_layer_1", 284).withLayer("naval_mine_layer_2", 285)));
-
     Items::THIRTY_SEVEN_FISH = registerItem("thirty_seven_fish", new FishItem(ItemSettings().withName("37 Fish").withHabitat(Habitat_SALTWATER).withSell(237).withDescription("Do you remember how many fish you've caught?").withRarity(Rarity_LEGENDARY).withLayer("37_fish", 1), 15, 20, 35));
     Items::SQUISHFISH = registerItem("squishfish", new FishItem(ItemSettings().withName("Squishfish").withHabitat(Habitat_SALTWATER).withSell(203).withDescription("Rumor has it that eating this fish grants special power to those who believe.").withRarity(Rarity_LEGENDARY).withLayer("squishfish_layer_1", 286).withLayer("squishfish_layer_2", 287).withLayer("squishfish_layer_3", 288), 80, 140, 180));
 
+    // keys
     Items::YELLOW_KEY_FAKE = registerItem("yellow_key_fake", new Item(ItemSettings().withName("Metallic Object").withDescription("A mysterious metal object. It has a tag which says \"key\" on it.").withLayer("key", 26)));
     Items::YELLOW_KEY = registerItem("yellow_key", new Item(ItemSettings().withName("Yellow Key").withDescription("A \"key\" which opens yellow gates.").withLayer("key", 26)));
     Items::BLUE_KEY = registerItem("blue_key", new Item(ItemSettings().withName("Blue Key").withBuy(1000).withDescription("A \"key\" which opens blue gates.").withLayer("key", 300)));
     Items::PURPLE_KEY = registerItem("purple_key", new Item(ItemSettings().withName("Purple Key").withBuy(1500).withDescription("A \"key\" which opens purple gates.").withLayer("key", 301)));
     Items::RED_KEY = registerItem("red_key", new Item(ItemSettings().withName("Red Key").withBuy(1000).withDescription("A \"key\" which opens red gates.").withLayer("key", 302)));
 
+    // buckets
     Items::BUCKET = registerItem("bucket", new BucketItem(ItemSettings().withName("Bucket (Empty)").withDescription("It's a bucket. You cannot wear it on your head.").withLayer("bucket", 303)));
     Items::FRESHWATER_BUCKET = registerItem("freshwater_bucket", new FilledBucketItem(ItemSettings().withName("Bucket (Filled)").withDescription("It's a bucket filled with fresh water.").withLayer("bucket", 303).withLayer("bucket_fill",304)));
     Items::SALTWATER_BUCKET = registerItem("saltwater_bucket", new FilledBucketItem(ItemSettings().withName("Bucket (Filled)").withDescription("It's a bucket filled with salt water.").withLayer("bucket", 303).withLayer("bucket_fill",305)));
@@ -426,87 +449,136 @@ void registerItems(void)
     Items::BLUEWATER_BUCKET = registerItem("bluewater_bucket", new FilledBucketItem(ItemSettings().withName("Bucket (Filled)").withDescription("It's a bucket filled with blue chemicals.").withLayer("bucket", 303).withLayer("bucket_fill",308)));
     Items::PURPLEWATER_BUCKET = registerItem("purplewater_bucket", new FilledBucketItem(ItemSettings().withName("Bucket (Filled)").withDescription("It's a bucket filled with purple chemicals.").withLayer("bucket", 303).withLayer("bucket_fill",309)));
 
+    // bait
     Items::ENHANCED_BAIT = registerItem("enhanced_bait", new Item(ItemSettings().withName("Enhanced Bait").withDescription("Upgraded by Vitellary using the power of science. Still not a fish.").withLayer("worm_layer_1", 310).withLayer("worm_layer_2", 311)));
     Items::DELUXE_BAIT = registerItem("deluxe_bait", new Item(ItemSettings().withName("Deluxe Bait").withDescription("Upgraded even further. Has science gone too far? Not a fish.").withLayer("worm_layer_1", 312).withLayer("worm_layer_2", 313)));
     Items::ULTRA_BAIT = registerItem("ultra_bait", new Item(ItemSettings().withName("Ultra Bait").withDescription("It's a good thing this wasn't called something else.").withLayer("worm_layer_1", 314).withLayer("worm_layer_2", 315)));
 
-    toPool("freshwater_small", Items::LARGEMOUTH_BASS, 27);
-    toPool("freshwater_small", Items::SMALLMOUTH_BASS, 21);
-    toPool("freshwater_small", Items::BULLHEAD, 33);
-    toPool("freshwater_small", Items::CHUB, 21);
-    toPool("freshwater_small", Items::CARP, 42);
-    toPool("freshwater_small", Items::PERCH, 24);
-    toPool("freshwater_small", Items::MINNOW, 21);
-    toPool("freshwater_small", Items::SPIKE_FISH, 21);
-    toPool("freshwater_small", Items::TIRE, 15);
-    toPool("freshwater_small", Items::GOLDFISH, 6);
-    toPool("freshwater_small", Items::KOI_A, 1);
-    toPool("freshwater_small", Items::KOI_B, 1);
-    toPool("freshwater_small", Items::KOI_C, 1);
+    // bobbers
+    Items::GREEN_BOBBER = registerItem("green_bobber", new BobberItem(ItemSettings().withName("Green Bobber").withDescription("Equip this to change your bobber to a green one.").withBuy(250).withLayer("bobber_green", -1)));
+    Items::BLUE_BOBBER = registerItem("blue_bobber", new BobberItem(ItemSettings().withName("Blue Bobber").withDescription("Equip this to change your bobber to a blue one.").withBuy(250).withLayer("bobber_blue", -1)));
+    Items::PURPLE_BOBBER = registerItem("purple_bobber", new BobberItem(ItemSettings().withName("Purple Bobber").withDescription("Equip this to change your bobber to a purple one.").withBuy(250).withLayer("bobber_purple", -1)));
+    Items::BIG_BOBBER = registerItem("big_bobber", new BobberItem(ItemSettings().withName("Big Bobber").withDescription("Equip this to change your bobber to a big one.").withBuy(300).withLayer("bobber_big", -1)));
+    Items::FISH_SPINNER = registerItem("fish_spinner", new BobberItem(ItemSettings().withName("Fish Spinner").withDescription("Equip this to change your bobber to a fish-shaped one.").withBuy(500).withLayer("bobber_fish", -1)));
+    Items::FEATHER_SPINNER = registerItem("feather_spinner", new BobberItem(ItemSettings().withName("Feather Spinner").withDescription("Equip this to change your bobber to a fly fishing lure.").withBuy(500).withLayer("bobber_feather", -1)));
+    Items::COIN_SPINNER = registerItem("coin_spinner", new BobberItem(ItemSettings().withName("Coin Spinner").withDescription("Equip this to change your bobber to a coin-shaped one.").withBuy(750).withLayer("bobber_coin", -1)));
+    Items::TRINKET_SPINNER = registerItem("trinket_spinner", new BobberItem(ItemSettings().withName("Trinket Spinner").withDescription("Equip this to change your bobber to a trinket-shaped one.").withBuy(750).withLayer("bobber_trinket", -1)));
+    Items::VIRIDIAN_SPINNER = registerItem("viridian_spinner", new BobberItem(ItemSettings().withName("Viridian Spinner").withDescription("Equip this to change your bobber to one shaped like you.").withBuy(750).withLayer("bobber_viridian", -1)));
+    Items::GIANT_BOBBER = registerItem("giant_bobber", new BobberItem(ItemSettings().withName("Giant Bobber").withDescription("Equip this to change your bobber to a REALLY big one.").withBuy(1000).withLayer("bobber_giant", -1)));
 
-    toPool("freshwater_large", Items::LARGEMOUTH_BASS, 10);
-    toPool("freshwater_large", Items::SMALLMOUTH_BASS, 7);
-    toPool("freshwater_large", Items::BULLHEAD, 10);
-    toPool("freshwater_large", Items::CHUB, 7);
-    toPool("freshwater_large", Items::PIKE, 4);
-    toPool("freshwater_large", Items::WALLEYE, 3);
-    toPool("freshwater_large", Items::CARP, 10);
-    toPool("freshwater_large", Items::PERCH, 8);
-    toPool("freshwater_large", Items::CATFISH, 4);
-    toPool("freshwater_large", Items::MINNOW, 7);
-    toPool("freshwater_large", Items::KOI_A, 1);
-    toPool("freshwater_large", Items::KOI_B, 1);
-    toPool("freshwater_large", Items::KOI_C, 1);
-    toPool("freshwater_large", Items::RAINBOW_TROUT, 4);
-    toPool("freshwater_large", Items::GOLDEN_TROUT, 2);
-    toPool("freshwater_large", Items::GOLDFISH, 4);
-    toPool("freshwater_large", Items::GOLD_GOLDFISH, 1);
-    toPool("freshwater_large", Items::PRISMATIC_TROUT, 1);
-    toPool("freshwater_large", Items::SPIKE_FISH, 7);
-    toPool("freshwater_large", Items::TRINKETFIN, 1);
-    toPool("freshwater_large", Items::YESFIN, 2);
-    toPool("freshwater_large", Items::VIRIDIFIN, 1);
+    // junk
+    Items::TIRE = registerItem("tire", new Item(ItemSettings().withName("Tire").withSell(5).withDescription("This tire could be from the 3099 Space Derby Grand Prix.").withRarity(Rarity_JUNK).withLayer("tire", 19)));
+    Items::NAVAL_MINE = registerItem("naval_mine", new Item(ItemSettings().withName("Naval Mine").withSell(25).withDescription("Uh oh.").withRarity(Rarity_JUNK).withLayer("naval_mine_layer_1", 284).withLayer("naval_mine_layer_2", 285)));
+    Items::OLD_BOOT = registerItem("old_boot", new Item(ItemSettings().withName("Old Boot").withSell(5).withDescription("This boot is soaked ALL the way through.").withRarity(Rarity_JUNK).withLayer("boot", -1)));
+    Items::SODA_CAN = registerItem("soda_can", new Item(ItemSettings().withName("Soda Can").withSell(5).withDescription("Probably not the best idea to drink the water in this...").withRarity(Rarity_JUNK).withLayer("soda_can", -1)));
+    Items::TIN_CAN = registerItem("tin_can", new Item(ItemSettings().withName("Tin Can").withSell(5).withDescription("In surprisingly decent shape. It says, \"MINMO CAT FOODS\".").withRarity(Rarity_JUNK).withLayer("tin_can", -1)));
+    Items::CAR_BATTERY = registerItem("car_battery", new Item(ItemSettings().withName("Car Battery").withSell(15).withDescription("This may have been tossed in the ocean in a misguided attempt to \"recharge eels\".").withRarity(Rarity_JUNK).withLayer("car_battery", -1)));
+    Items::GAME_CARTRIDGE = registerItem("game_cartridge", new Item(ItemSettings().withName("Game Cartridge").withSell(5).withDescription("A cartridge for a retro game console. No way this still works.").withRarity(Rarity_JUNK).withLayer("cartridge", -1)));
+    Items::DRIFTWOOD = registerItem("driftwood", new Item(ItemSettings().withName("Driftwood").withSell(10).withDescription("This branch has been bleached by months at sea.").withRarity(Rarity_JUNK).withLayer("driftwood", -1)));
+    Items::SEA_GLASS = registerItem("sea_glass", new Item(ItemSettings().withName("Sea Glass").withSell(10).withDescription("These pieces of glass have been smoothed by years in the sea.").withRarity(Rarity_JUNK).withLayer("sea_glass", -1)));
+
+    toPool("freshwater_small", Items::LARGEMOUTH_BASS, 37);
+    toPool("freshwater_small", Items::SMALLMOUTH_BASS, 31);
+    toPool("freshwater_small", Items::BULLHEAD, 43);
+    toPool("freshwater_small", Items::CHUB, 31);
+    toPool("freshwater_small", Items::CARP, 52);
+    toPool("freshwater_small", Items::PERCH, 34);
+    toPool("freshwater_small", Items::MINNOW, 31);
+    toPool("freshwater_small", Items::SPIKE_FISH, 31);
+    toPool("freshwater_small", Items::TIRE, 15);
+    toPool("freshwater_small", Items::GOLDFISH, 16);
+    toPool("freshwater_small", Items::KOI_A, 4);
+    toPool("freshwater_small", Items::KOI_B, 4);
+    toPool("freshwater_small", Items::KOI_C, 4);
+    toPool("freshwater_small", Items::OLD_BOOT, 15);
+    toPool("freshwater_small", Items::TIN_CAN, 15);
+    toPool("freshwater_small", Items::SODA_CAN, 15);
+    toPool("freshwater_small", Items::GAME_CARTRIDGE, 5);
+
+    toPool("freshwater_large", Items::LARGEMOUTH_BASS, 18);
+    toPool("freshwater_large", Items::SMALLMOUTH_BASS, 15);
+    toPool("freshwater_large", Items::BULLHEAD, 18);
+    toPool("freshwater_large", Items::CHUB, 15);
+    toPool("freshwater_large", Items::PIKE, 12);
+    toPool("freshwater_large", Items::WALLEYE, 11);
+    toPool("freshwater_large", Items::CARP, 18);
+    toPool("freshwater_large", Items::PERCH, 16);
+    toPool("freshwater_large", Items::CATFISH, 12);
+    toPool("freshwater_large", Items::MINNOW, 15);
+    toPool("freshwater_large", Items::KOI_A, 4);
+    toPool("freshwater_large", Items::KOI_B, 4);
+    toPool("freshwater_large", Items::KOI_C, 4);
+    toPool("freshwater_large", Items::RAINBOW_TROUT, 12);
+    toPool("freshwater_large", Items::GOLDEN_TROUT, 10);
+    toPool("freshwater_large", Items::GOLDFISH, 12);
+    toPool("freshwater_large", Items::GOLD_GOLDFISH, 9);
+    toPool("freshwater_large", Items::PRISMATIC_TROUT, 9);
+    toPool("freshwater_large", Items::SPIKE_FISH, 15);
+    toPool("freshwater_large", Items::TRINKETFIN, 9);
+    toPool("freshwater_large", Items::YESFIN, 10);
+    toPool("freshwater_large", Items::VIRIDIFIN, 9);
     toPool("freshwater_large", Items::TIRE, 4);
     toPool("freshwater_large", Items::EDGEFISH, 1);
     toPool("freshwater_large", Items::TERMINNOW, 1);
+    toPool("freshwater_large", Items::OLD_BOOT,4);
+    toPool("freshwater_large", Items::TIN_CAN,4);
+    toPool("freshwater_large", Items::SODA_CAN,4);
+    toPool("freshwater_large", Items::GAME_CARTRIDGE,2);
 
     toPool("junk", Items::CARP, 10);
-    toPool("junk", Items::TIRE, 25);
     toPool("junk", Items::GOLDFISH, 1);
+    toPool("junk", Items::TIRE, 25);
+    toPool("junk", Items::OLD_BOOT, 25);
+    toPool("junk", Items::TIN_CAN, 25);
+    toPool("junk", Items::SODA_CAN, 25);
+    toPool("junk", Items::GAME_CARTRIDGE, 15);
 
-    toPool("saltwater_small", Items::RED_SNAPPER, 9);
-    toPool("saltwater_small", Items::AMBERJACK, 9);
-    toPool("saltwater_small", Items::COALFISH, 9);
-    toPool("saltwater_small", Items::ANCHOVY, 14);
-    toPool("saltwater_small", Items::SARDINE, 14);
-    toPool("saltwater_small", Items::SPIKE_FISH, 7);
+    toPool("saltwater_small", Items::RED_SNAPPER, 19);
+    toPool("saltwater_small", Items::AMBERJACK, 19);
+    toPool("saltwater_small", Items::COALFISH, 19);
+    toPool("saltwater_small", Items::ANCHOVY, 24);
+    toPool("saltwater_small", Items::SARDINE, 24);
+    toPool("saltwater_small", Items::SPIKE_FISH, 17);
     toPool("saltwater_small", Items::TIRE, 5);
     toPool("saltwater_small", Items::NAVAL_MINE, 1);
-    toPool("saltwater_small", Items::TRINKETFIN, 1);
+    toPool("saltwater_small", Items::TRINKETFIN, 5);
+    toPool("saltwater_small", Items::OLD_BOOT, 5);
+    toPool("saltwater_small", Items::TIN_CAN, 5);
+    toPool("saltwater_small", Items::SODA_CAN, 5);
+    toPool("saltwater_small", Items::CAR_BATTERY, 1);
+    toPool("saltwater_small", Items::DRIFTWOOD, 5);
+    toPool("saltwater_small", Items::SEA_GLASS, 5);
 
-    toPool("saltwater_large", Items::RED_SNAPPER, 10);
-    toPool("saltwater_large", Items::TUNA, 6);
-    toPool("saltwater_large", Items::BLUE_MARLIN, 4);
-    toPool("saltwater_large", Items::AMBERJACK, 10);
-    toPool("saltwater_large", Items::COALFISH, 10);
-    toPool("saltwater_large", Items::WAHOO, 6);
-    toPool("saltwater_large", Items::ANCHOVY, 12);
-    toPool("saltwater_large", Items::SARDINE, 12);
-    toPool("saltwater_large", Items::POMPANO, 7);
-    toPool("saltwater_large", Items::PUFFERFISH, 2);
-    toPool("saltwater_large", Items::MAHIMAHI, 4);
-    toPool("saltwater_large", Items::MORAY_EEL, 5);
-    toPool("saltwater_large", Items::RIBBON_EEL, 4);
-    toPool("saltwater_large", Items::SQUID, 3);
-    toPool("saltwater_large", Items::OCTOPUS, 2);
-    toPool("saltwater_large", Items::STAR_FISH, 8);
-    toPool("saltwater_large", Items::TRINKETFIN, 1);
-    toPool("saltwater_large", Items::STAR_FISH, 2);
-    toPool("saltwater_large", Items::FISHTRONAUT, 1);
+    toPool("saltwater_large", Items::RED_SNAPPER, 15);
+    toPool("saltwater_large", Items::TUNA, 11);
+    toPool("saltwater_large", Items::BLUE_MARLIN, 9);
+    toPool("saltwater_large", Items::AMBERJACK, 15);
+    toPool("saltwater_large", Items::COALFISH, 15);
+    toPool("saltwater_large", Items::WAHOO, 11);
+    toPool("saltwater_large", Items::ANCHOVY, 17);
+    toPool("saltwater_large", Items::SARDINE, 17);
+    toPool("saltwater_large", Items::POMPANO, 13);
+    toPool("saltwater_large", Items::PUFFERFISH, 7);
+    toPool("saltwater_large", Items::MAHIMAHI, 8);
+    toPool("saltwater_large", Items::MORAY_EEL, 10);
+    toPool("saltwater_large", Items::RIBBON_EEL, 9);
+    toPool("saltwater_large", Items::SQUID, 8);
+    toPool("saltwater_large", Items::OCTOPUS, 7);
+    toPool("saltwater_large", Items::STAR_FISH, 13);
+    toPool("saltwater_large", Items::TRINKETFIN, 6);
+    toPool("saltwater_large", Items::STAR_FISH, 7);
+    toPool("saltwater_large", Items::FISHTRONAUT, 6);
     toPool("saltwater_large", Items::NAVAL_MINE, 1);
     toPool("saltwater_large", Items::TIRE, 2);
     toPool("saltwater_large", Items::THIRTY_SEVEN_FISH, 1);
     toPool("saltwater_large", Items::SQUISHFISH, 1);
+    toPool("saltwater_large", Items::OLD_BOOT, 2);
+    toPool("saltwater_large", Items::TIN_CAN, 2);
+    toPool("saltwater_large", Items::SODA_CAN, 2);
+    toPool("saltwater_large", Items::CAR_BATTERY, 1);
+    toPool("saltwater_large", Items::DRIFTWOOD, 2);
+    toPool("saltwater_large", Items::SEA_GLASS, 2);
+
 
     BESTIARY_ITEMS.push_back(Items::LARGEMOUTH_BASS);
     BESTIARY_ITEMS.push_back(Items::SMALLMOUTH_BASS);
@@ -559,7 +631,6 @@ std::vector<Item*> getBestiaryItems(void)
 
 bool hasDiscovered(Item* item)
 {
-    return true; // debug
     for (auto& info : game.fish_catch_info)
     {
         if (info.item == item)
@@ -598,6 +669,16 @@ int getTrinketFinCount(void)
         {
             amount += stack.count;
         }
+    }
+    return amount;
+}
+
+int getCaughtFishAmount(void)
+{
+    int amount = 0;
+    for (auto& info : game.fish_catch_info)
+    {
+        amount += info.amount;
     }
     return amount;
 }
@@ -711,6 +792,17 @@ std::vector<ItemStack> getShopItems(void)
 
             if (!stack.canBuy()) continue;
 
+            if (item.second == Items::GREEN_BOBBER && (hasItem(Items::GREEN_BOBBER))) continue;
+            if (item.second == Items::BLUE_BOBBER && (hasItem(Items::BLUE_BOBBER))) continue;
+            if (item.second == Items::PURPLE_BOBBER && (hasItem(Items::PURPLE_BOBBER))) continue;
+            if (item.second == Items::BIG_BOBBER && (hasItem(Items::BIG_BOBBER))) continue;
+            if (item.second == Items::FISH_SPINNER && (hasItem(Items::FISH_SPINNER))) continue;
+            if (item.second == Items::FEATHER_SPINNER && (hasItem(Items::FEATHER_SPINNER))) continue;
+            if (item.second == Items::COIN_SPINNER && (hasItem(Items::COIN_SPINNER))) continue;
+            if (item.second == Items::TRINKET_SPINNER && (hasItem(Items::TRINKET_SPINNER))) continue;
+            if (item.second == Items::VIRIDIAN_SPINNER && (hasItem(Items::VIRIDIAN_SPINNER))) continue;
+            if (item.second == Items::GIANT_BOBBER && (hasItem(Items::GIANT_BOBBER))) continue;
+
             if (item.second == Items::BLUE_KEY && (hasItem(Items::BLUE_KEY))) continue;
             if (item.second == Items::PURPLE_KEY && (hasItem(Items::PURPLE_KEY))) continue;
             if (item.second == Items::RED_KEY && (hasItem(Items::RED_KEY))) continue;
@@ -724,6 +816,28 @@ std::vector<ItemStack> getShopItems(void)
     }
     return items;
 }
+
+SDL_Texture* getBobberTexture(void)
+{
+    for (auto& inv_stack : game.inventory)
+    {
+        if (inv_stack.isEquipped())
+        {
+            if (inv_stack.item == Items::GREEN_BOBBER) return graphics.grphx.im_bobber_green;
+            if (inv_stack.item == Items::BLUE_BOBBER) return graphics.grphx.im_bobber_blue;
+            if (inv_stack.item == Items::PURPLE_BOBBER) return graphics.grphx.im_bobber_purple;
+            if (inv_stack.item == Items::BIG_BOBBER) return graphics.grphx.im_bobber_big;
+            if (inv_stack.item == Items::FISH_SPINNER) return graphics.grphx.im_bobber_fish;
+            if (inv_stack.item == Items::FEATHER_SPINNER) return graphics.grphx.im_bobber_feather;
+            if (inv_stack.item == Items::COIN_SPINNER) return graphics.grphx.im_bobber_coin;
+            if (inv_stack.item == Items::TRINKET_SPINNER) return graphics.grphx.im_bobber_trinket;
+            if (inv_stack.item == Items::VIRIDIAN_SPINNER) return graphics.grphx.im_bobber_viridian;
+            if (inv_stack.item == Items::GIANT_BOBBER) return graphics.grphx.im_bobber_giant;
+        }
+    }
+    return graphics.grphx.im_bobber;
+}
+
 
 float easeOutCubic(float x)
 {

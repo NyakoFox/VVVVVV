@@ -808,6 +808,7 @@ void musicclass::init(void)
     soundTracks.push_back(SoundTrack( "sounds/fillbucket.wav" ));
     soundTracks.push_back(SoundTrack( "sounds/error.wav" ));
     soundTracks.push_back(SoundTrack( "sounds/cash.wav" ));
+    soundTracks.push_back(SoundTrack( "sounds/dripple.wav" ));
 
 #ifdef VVV_COMPILEMUSIC
     binaryBlob musicWriteBlob;

@@ -210,12 +210,12 @@ static void menurender(void)
 #if defined(MAKEANDPLAY)
 //        font::print(PR_RIGHT, 264, temp+35, loc::gettext("MAKE AND PLAY EDITION"), tr, tg, tb);
 #endif
-#ifdef INTERIM_VERSION_EXISTS
-        font::print(PR_RIGHT | PR_FONT_8X8, 310, 200, COMMIT_DATE, tr/2, tg/2, tb/2);
-        font::print(PR_RIGHT | PR_FONT_8X8, 310, 210, INTERIM_COMMIT, tr/2, tg/2, tb/2);
-        font::print(PR_RIGHT | PR_FONT_8X8, 310, 220, BRANCH_NAME, tr/2, tg/2, tb/2);
-#endif
-        font::print(PR_RIGHT, 310, 230, RELEASE_VERSION, tr/2, tg/2, tb/2);
+//#ifdef INTERIM_VERSION_EXISTS
+//        font::print(PR_RIGHT | PR_FONT_8X8, 310, 200, COMMIT_DATE, tr/2, tg/2, tb/2);
+//        font::print(PR_RIGHT | PR_FONT_8X8, 310, 210, INTERIM_COMMIT, tr/2, tg/2, tb/2);
+//        font::print(PR_RIGHT | PR_FONT_8X8, 310, 220, BRANCH_NAME, tr/2, tg/2, tb/2);
+//#endif
+        font::print(PR_RIGHT, 310, 230, "the depths v1.0", tr / 2, tg / 2, tb / 2);
 
         const char* left_msg = NULL;
 
@@ -2390,6 +2390,12 @@ static void mode_indicator_text(const int alpha)
 
 void gamerender(void)
 {
+    graphics.set_render_target(graphics.shadowTexture);
+    graphics.clear(0, 0, 0, 0);
+
+    graphics.set_render_target(graphics.darknessTexture);
+    graphics.clear();
+
     graphics.set_render_target(graphics.gameplayTexture);
     graphics.set_color(0, 0, 0, 255);
 
@@ -2438,6 +2444,38 @@ void gamerender(void)
             graphics.drawtowerspikes();
         }
         graphics.drawmap(false);
+    }
+
+    bool use_lighting = false;
+    if (game.roomx == 103 && game.roomy == 110) use_lighting = true;
+    if (game.roomx == 104 && game.roomy == 110) use_lighting = true;
+    if (game.roomx == 105 && game.roomy == 110) use_lighting = true;
+    if (game.roomx == 106 && game.roomy == 110) use_lighting = true;
+
+    if (game.roomx == 103 && game.roomy == 111) use_lighting = true;
+    if (game.roomx == 104 && game.roomy == 111) use_lighting = true;
+    if (game.roomx == 105 && game.roomy == 111) use_lighting = true;
+
+    if (game.roomx == 103 && game.roomy == 112) use_lighting = true;
+    if (game.roomx == 104 && game.roomy == 112) use_lighting = true;
+    if (game.roomx == 105 && game.roomy == 112) use_lighting = true;
+
+    if (use_lighting)
+    {
+        // Lighting
+        SDL_Texture* target = SDL_GetRenderTarget(gameScreen.m_renderer);
+        graphics.set_render_target(graphics.darknessTexture);
+        SDL_SetTextureBlendMode(graphics.shadowTexture, graphics.grphx.mode_revsub_alpha);
+        graphics.draw_texture(graphics.shadowTexture, 0, 0);
+
+        graphics.set_render_target(target);
+
+        SDL_SetTextureBlendMode(graphics.darknessTexture, SDL_BLENDMODE_BLEND);
+        graphics.set_texture_alpha_mod(graphics.darknessTexture, 192);
+        graphics.draw_texture(graphics.darknessTexture, 0, 0);
+        graphics.set_texture_alpha_mod(graphics.darknessTexture, 255);
+
+        // End lighting
     }
 
     int return_editor_alpha = 0;
@@ -3006,7 +3044,7 @@ static void draw_roomname_menu(void)
 
 static void rendermap(void)
 {
-    if (map.custommode && map.customshowmm)
+    if (false && (map.custommode && map.customshowmm))
     {
         const MapRenderData data = map.get_render_data();
 
@@ -3025,7 +3063,7 @@ static void rendermap(void)
             graphics.drawpartimage(IMAGE_CUSTOMMINIMAP, 40 + data.xoff, 21 + data.yoff, data.pixelsx, data.pixelsy);
         }
         return;
-     }
+    }
 
     graphics.drawpixeltextbox(35, 16, 250, 190, 65, 185, 207);
     graphics.drawimage(IMAGE_MINIMAP, 40, 21, false);
@@ -3362,7 +3400,7 @@ void shoprender(void)
             scissor.x = 0;
             scissor.y = 48;
             scissor.w = 320;
-            scissor.h = 240 - scissor.y;
+            scissor.h = 240 - scissor.y - 16;
             SDL_RenderSetClipRect(gameScreen.m_renderer, &scissor);
 
             int box_width = 32;
@@ -3460,11 +3498,20 @@ void shoprender(void)
                     case Rarity_LEGENDARY: rarity = "Legendary"; break;
                 }
 
-                font::print_wrap(PR_LEFT, 16, desc_y + 16 + 8 * 5, ("Amount caught: " + help.String(info.amount)).c_str(), 196, 196, 196);
-                font::print_wrap(PR_LEFT, 16, desc_y + 16 + 8 * 6, ("Largest spotted: " + help.String(info.largest) + "cm").c_str(), 196, 196, 196);
-                font::print_wrap(PR_LEFT, 16, desc_y + 16 + 8 * 7, ("Smallest spotted: " + help.String(info.smallest) + "cm").c_str(), 196, 196, 196);
-                font::print_wrap(PR_LEFT, 16, desc_y + 16 + 8 * 8, ("Habitat: " + habitat).c_str(), 196, 196, 196);
-                font::print_wrap(PR_LEFT, 16, desc_y + 16 + 8 * 9, ("Rarity: " + rarity).c_str(), 196, 196, 196);
+                if (item == Items::TRINKETFIN)
+                {
+                    font::print_wrap(PR_LEFT, 16, desc_y + 16 + 8 * 6, ("Amount caught: " + help.String(info.amount) + " / 5").c_str(), 196, 196, 196);
+                    font::print_wrap(PR_LEFT, 16, desc_y + 16 + 8 * 7, ("Habitat: " + habitat).c_str(), 196, 196, 196);
+                    font::print_wrap(PR_LEFT, 16, desc_y + 16 + 8 * 8, ("Rarity: " + rarity).c_str(), 196, 196, 196);
+                }
+                else
+                {
+                    font::print_wrap(PR_LEFT, 16, desc_y + 16 + 8 * 5, ("Amount caught: " + help.String(info.amount)).c_str(), 196, 196, 196);
+                    font::print_wrap(PR_LEFT, 16, desc_y + 16 + 8 * 6, ("Largest spotted: " + help.String(info.largest) + "cm").c_str(), 196, 196, 196);
+                    font::print_wrap(PR_LEFT, 16, desc_y + 16 + 8 * 7, ("Smallest spotted: " + help.String(info.smallest) + "cm").c_str(), 196, 196, 196);
+                    font::print_wrap(PR_LEFT, 16, desc_y + 16 + 8 * 8, ("Habitat: " + habitat).c_str(), 196, 196, 196);
+                    font::print_wrap(PR_LEFT, 16, desc_y + 16 + 8 * 9, ("Rarity: " + rarity).c_str(), 196, 196, 196);
+                }
             }
         }
     }
@@ -3884,12 +3931,12 @@ void maprender(void)
         }
 
         /* Stats. */
-
-        // Always show trinkets if you're in the main game, otherwise only show them if any exist in the level
-        bool show_trinkets = map.custommode ? (cl.numtrinkets() > 0) : true;
-        int deaths_pos = show_trinkets ? 102 : 72;
-        int time_pos = show_trinkets ? 152 : 132;
-        if (show_trinkets)
+        if (game.fishing_revealed)
+        {
+            font::print(PR_CEN | FLIP_PR_CJK_HIGH, -1, FLIP(52, 8), loc::gettext("[Fish caught]"), 196, 196, 255 - help.glow);
+            font::print(PR_CEN | FLIP_PR_CJK_LOW, -1, FLIP(64, 8), help.String(getCaughtFishAmount()), 96, 96, 96);
+        }
+        else
         {
             font::print(PR_CEN | FLIP_PR_CJK_HIGH, -1, FLIP(52, 8), loc::gettext("[Trinkets found]"), 196, 196, 255 - help.glow);
             char buffer[SCREEN_WIDTH_CHARS + 1];
@@ -3901,6 +3948,9 @@ void maprender(void)
             );
             font::print(PR_CEN | FLIP_PR_CJK_LOW, -1, FLIP(64, 8), buffer, 96, 96, 96);
         }
+
+        int deaths_pos = 102;
+        int time_pos = 152;
 
         font::print(PR_CEN | FLIP_PR_CJK_HIGH, -1, FLIP(deaths_pos, 8), loc::gettext("[Number of Deaths]"), 196, 196, 255 - help.glow);
         font::print(PR_CEN | FLIP_PR_CJK_LOW, -1, FLIP(deaths_pos + 12, 8), help.String(game.deathcounts), 96, 96, 96);

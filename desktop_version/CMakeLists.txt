@@ -124,6 +124,7 @@ set(VVV_CXX_SRC
     src/BucketItem.cpp
     src/FilledBucketItem.cpp
     src/TrinketFinFishItem.cpp
+    src/BobberItem.cpp
 )
 set(VVV_C_SRC
     src/DeferCallbacks.c
