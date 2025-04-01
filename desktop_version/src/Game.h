@@ -187,6 +187,7 @@ enum ShopSubMode
 {
     ShopSubMode_MAIN,
     ShopSubMode_CONFIRM,
+    ShopSubMode_FISH,
 };
 
 struct MenuStackFrame
@@ -648,6 +649,7 @@ public:
     int fishing_total;
     float fishing_strength;
     ItemStack fishing_item;
+    int trinketfin_flag;
 
     bool play_splash;
     bool play_splash2;
@@ -658,6 +660,8 @@ public:
     int shopcoinflash;
     ShopSubMode shopsubmode;
     int shopsubselect;
+    int shopsel_x;
+    int shopsel_y;
 
     Item* last_item;
 };

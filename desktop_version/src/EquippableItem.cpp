@@ -22,6 +22,10 @@ EquippableItem::EquippableItem(void)
 
 std::string EquippableItem::getName(ItemStack* stack)
 {
+    if (stack == NULL)
+    {
+        return this->settings.name;
+    }
     if (stack->isEquipped())
     {
         return "\u2605 " + this->settings.name;
@@ -31,6 +35,10 @@ std::string EquippableItem::getName(ItemStack* stack)
 
 std::string EquippableItem::getLongName(ItemStack* stack)
 {
+    if (stack == NULL)
+    {
+        return this->settings.name;
+    }
     if (stack->isEquipped())
     {
         return "\u2605 " + this->settings.name + " (Equipped)";
@@ -41,6 +49,10 @@ std::string EquippableItem::getLongName(ItemStack* stack)
 
 SDL_Color EquippableItem::getNameColor(ItemStack* stack)
 {
+    if (stack == NULL)
+    {
+        return Item::getNameColor(stack);
+    }
     if (stack->isEquipped())
     {
         return graphics.getRGB(255 - help.glow, 255 - help.glow, 196);

@@ -2734,7 +2734,8 @@ void gameinput(void)
                                 game.fishing_total = 40 + (fRandom() * 30);
                                 break;
                             }
-                            game.fishing_item = getItemForPool(obj.blocks[obj.entities[ie].last_water].script);
+                            game.trinketfin_flag = obj.blocks[obj.entities[ie].last_water].trigger;
+                            game.fishing_item = getItemForPool(obj.blocks[obj.entities[ie].last_water].script, game.trinketfin_flag);
                             game.fishing_item.item->getDefaultComponents(&game.fishing_item);
                             game.fishing_state = FishingState_WAITING;
                             game.fishing_timer = 0;
@@ -2908,6 +2909,12 @@ void gameinput(void)
                         game.fishing_total = 0;
                         music.stopef(Sound_REEL);
                         obj.disableentity(i);
+
+                        if (game.fishing_item.item == Items::TRINKETFIN)
+                        {
+                            obj.flags[game.trinketfin_flag] = true;
+                        }
+                        game.trinketfin_flag = 0;
 
                         useBait();
                         updateFishCaughtInfo();
@@ -3134,6 +3141,8 @@ void gameinput(void)
                                 game.shopselect = 0;
                                 game.shopsubmode = ShopSubMode_MAIN;
                                 game.shopsubselect = 0;
+                                game.shopsel_x = 0;
+                                game.shopsel_y = 0;
                                 graphics.resumegamemode = false;
                                 gameScreen.recacheTextures();
                                 graphics.menuoffset = 240;
@@ -3425,9 +3434,17 @@ void shopinput(void)
         }
         else
         {
-            music.playef(Sound_MENUCLOSE);
-            graphics.resumegamemode = true;
-            graphics.showcutscenebars_fast = false;
+            if (game.shopsubmode == ShopSubMode_FISH)
+            {
+                game.shopsubmode = ShopSubMode_MAIN;
+                music.playef(Sound_VIRIDIAN);
+            }
+            else
+            {
+                music.playef(Sound_MENUCLOSE);
+                graphics.resumegamemode = true;
+                graphics.showcutscenebars_fast = false;
+            }
         }
     }
 
@@ -3582,6 +3599,55 @@ void shopinput(void)
                         music.playef(Sound_VIRIDIAN);
                         game.shopsubmode = ShopSubMode_CONFIRM;
                         game.shopsubselect = 0;
+                    }
+                }
+            }
+        }
+        else
+        {
+            // enchiridion logic go
+            if (game.shopsubmode == ShopSubMode_MAIN)
+            {
+                std::vector<Item*> items = getBestiaryItems();
+
+                int old_shopsel_x = game.shopsel_x;
+                int old_shopsel_y = game.shopsel_y;
+
+                if (game.press_left) game.shopsel_x = SDL_clamp(game.shopsel_x - 1, 0, 7);
+                if (game.press_right) game.shopsel_x = SDL_clamp(game.shopsel_x + 1, 0, 7);
+                if (game.press_up) game.shopsel_y--;
+                if (game.press_down) game.shopsel_y++;
+
+                int index = game.shopsel_x + game.shopsel_y * 8;
+                if (!INBOUNDS_VEC(index, items))
+                {
+                    game.shopsel_x = old_shopsel_x;
+                    game.shopsel_y = old_shopsel_y;
+                }
+
+                if (game.shopsel_y - game.shopscroll < 0)
+                {
+                    game.shopscroll = game.shopsel_y;
+                }
+                if (game.shopsel_y - game.shopscroll >= 4)
+                {
+                    game.shopscroll = game.shopsel_y - 3;
+                }
+
+                if (game.press_action)
+                {
+                    if (INBOUNDS_VEC(index, items))
+                    {
+                        if (hasDiscovered(items[index]))
+                        {
+                            game.shopsubmode = ShopSubMode_FISH;
+                            game.shopsubselect = 0;
+                            music.playef(Sound_VIRIDIAN);
+                        }
+                        else
+                        {
+                            music.playef(Sound_ERROR);
+                        }
                     }
                 }
             }

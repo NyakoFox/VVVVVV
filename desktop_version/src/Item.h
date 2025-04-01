@@ -32,6 +32,7 @@ public:
     virtual int getSellPrice(ItemStack* stack);
     virtual bool canBuy(ItemStack* stack);
     virtual bool canSell(ItemStack* stack);
+    virtual Habitat getHabitat(ItemStack* stack);
 protected:
     ItemSettings settings;
 };

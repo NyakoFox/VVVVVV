@@ -14,6 +14,14 @@ enum ItemRarity
     Rarity_LEGENDARY
 };
 
+enum Habitat
+{
+    Habitat_NONE,
+    Habitat_FRESHWATER,
+    Habitat_SALTWATER,
+    Habitat_ANYWHERE
+};
+
 struct SpriteLayer
 {
     std::string texture_id;
@@ -32,6 +40,7 @@ public:
     std::vector<SpriteLayer> sprite_layers;
     int name_color;
     ItemRarity rarity;
+    Habitat habitat;
 
     int buy_price;
     int sell_price;
@@ -46,6 +55,7 @@ public:
     ItemSettings withRarity(ItemRarity rarity);
     ItemSettings withSell(int price);
     ItemSettings withBuy(int price);
+    ItemSettings withHabitat(Habitat habitat);
 };
 
 #endif /* ITEMSETTINGS_H */

@@ -395,11 +395,14 @@ void Game::init(void)
     shopscroll = 0;
     shopsubmode = ShopSubMode_MAIN;
     shopsubselect = 0;
+    shopsel_x = 0;
+    shopsel_y = 0;
     fishing_state = FishingState_IDLE;
     fishing_item = ItemStack();
     fishing_timer = 0;
     fishing_total = 0;
     fishing_anim_timer = 0;
+    trinketfin_flag = 0;
     last_item = NULL;
 
     fishing_revealed = false;

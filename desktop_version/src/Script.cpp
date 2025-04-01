@@ -1633,12 +1633,15 @@ void scriptclass::run(void)
                 game.shopscroll = 0;
                 game.shopsubmode = ShopSubMode_MAIN;
                 game.shopsubselect = 0;
+                game.shopsel_x = 0;
+                game.shopsel_y = 0;
                 game.fishing_state = FishingState_IDLE;
                 game.fishing_item = ItemStack();
                 game.last_item = NULL;
                 game.fishing_timer = 0;
                 game.fishing_total = 0;
                 game.fishing_anim_timer = 0;
+                game.trinketfin_flag = 0;
                 game.shopmode = ShopMode_BUY;
                 game.shopcoinflash = 0;
                 game.in_item_menu = false;
@@ -3634,6 +3637,7 @@ void scriptclass::hardreset(void)
     game.fishing_timer = 0;
     game.fishing_total = 0;
     game.fishing_anim_timer = 0;
+    game.trinketfin_flag = 0;
     game.inventory.clear();
     game.play_item_get = false;
     game.play_splash = false;
@@ -3642,6 +3646,8 @@ void scriptclass::hardreset(void)
     game.shopcoinflash = 0;
     game.shopselect = 0;
     game.shopscroll = 0;
+    game.shopsel_x = 0;
+    game.shopsel_y = 0;
     game.shopsubmode = ShopSubMode_MAIN;
     game.shopsubselect = 0;
     game.item_get_displays.clear();

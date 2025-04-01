@@ -494,6 +494,7 @@ void GraphicsResources::init(void)
     im_special_terminals = LoadImage("graphics/special_terminals.png", TEX_WHITE);
 
     im_logo = LoadImage("graphics/logo.png", TEX_WHITE);
+    im_question = LoadImage("graphics/question.png");
 }
 
 
@@ -550,6 +551,7 @@ void GraphicsResources::destroy(void)
 
     CLEAR(im_special_terminals);
     CLEAR(im_logo);
+    CLEAR(im_question);
 
 #undef CLEAR
 

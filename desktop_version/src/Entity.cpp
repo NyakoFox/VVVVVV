@@ -863,6 +863,7 @@ void entityclass::createblock( int t, int xp, int yp, int w, int h, int trig /*=
         block.rectset(xp, yp, w, h);
 
         block.script = script;
+        block.trigger = trig;
         break;
     case ACTIVITY: //Activity Zone
         block.type = ACTIVITY;

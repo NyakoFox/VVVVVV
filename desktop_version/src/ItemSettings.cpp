@@ -15,6 +15,7 @@ ItemSettings::ItemSettings(void)
     can_sell = false;
     buy_price = 0;
     sell_price = 0;
+    habitat = Habitat_NONE;
 }
 
 ItemSettings::ItemSettings(const ItemSettings& other)
@@ -28,6 +29,7 @@ ItemSettings::ItemSettings(const ItemSettings& other)
     can_sell = other.can_sell;
     buy_price = other.buy_price;
     sell_price = other.sell_price;
+    habitat = other.habitat;
 }
 
 ItemSettings ItemSettings::withName(std::string name)
@@ -80,5 +82,11 @@ ItemSettings ItemSettings::withSell(int price)
 {
     this->can_sell = true;
     this->sell_price = price;
+    return *this;
+}
+
+ItemSettings ItemSettings::withHabitat(Habitat habitat)
+{
+    this->habitat = habitat;
     return *this;
 }

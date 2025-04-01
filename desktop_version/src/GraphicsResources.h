@@ -61,6 +61,7 @@ public:
     SDL_Texture* im_special_terminals;
 
     SDL_Texture* im_logo;
+    SDL_Texture* im_question;
 };
 
 SDL_Surface* LoadImageSurface(const char* filename);

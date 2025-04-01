@@ -61,8 +61,6 @@ namespace Items
     Item* ENHANCED_BAIT;
     Item* DELUXE_BAIT;
     Item* ULTRA_BAIT;
-
-    Item* TEST;
 }
 
 bool hasItem(Item* item)
@@ -324,7 +322,6 @@ void registerItems(void)
     Items::TIRE = registerItem("tire", new Item(ItemSettings().withName("Tire").withSell(0).withDescription("This tire could be from the 3099 Space Derby Grand Prix.").withRarity(Rarity_JUNK).withLayer("tire", 19)));
     Items::SPIKE_FISH = registerItem("spike_fish", new FishItem(ItemSettings().withName("Spike Fish").withSell(15).withDescription("They leave behind spiky corpses when they die. An invasive species found everywhere.").withLayer("spike_fish", -1), 40, 40, 40));
     Items::TRINKETFIN = registerItem("trinketfin", new Item(ItemSettings().withName("Trinketfin").withDescription("Congratulations! You have found a shiny trinketfin!").withRarity(Rarity_RARE).withLayer("trinketfin", 3)));
-    //Items::A = registerItem("", new FishItem(ItemSettings().withName("").withDescription("").withLayer("", 208).withLayer("", 209), 18, 23, 60));
 
     Items::YELLOW_KEY_FAKE = registerItem("yellow_key_fake", new Item(ItemSettings().withName("Metallic Object").withDescription("A mysterious metal object. It has a tag which says \"key\" on it.").withLayer("key", 26)));
     Items::YELLOW_KEY = registerItem("yellow_key", new Item(ItemSettings().withName("Yellow Key").withDescription("A \"key\" which opens yellow gates.").withLayer("key", 26)));
@@ -343,8 +340,6 @@ void registerItems(void)
     Items::ENHANCED_BAIT = registerItem("enhanced_bait", new Item(ItemSettings().withName("Enhanced Bait").withDescription("Upgraded by Vitellary using the power of science. Still not a fish.").withLayer("worm_layer_1", 310).withLayer("worm_layer_2", 311)));
     Items::DELUXE_BAIT = registerItem("deluxe_bait", new Item(ItemSettings().withName("Deluxe Bait").withDescription("Upgraded even further. Has science gone too far? Not a fish.").withLayer("worm_layer_1", 312).withLayer("worm_layer_2", 313)));
     Items::ULTRA_BAIT = registerItem("ultra_bait", new Item(ItemSettings().withName("Ultra Bait").withDescription("It's a good thing this wasn't called something else.").withLayer("worm_layer_1", 314).withLayer("worm_layer_2", 315)));
-
-    Items::TEST = registerItem("test", new Item(ItemSettings().withName("Test").withDescription("These whiskered fish use pheremones to communicate. They have a social hierarchy.")));
 
     toPool("freshwater_small", Items::LARGEMOUTH_BASS, 27);
     toPool("freshwater_small", Items::SMALLMOUTH_BASS, 21);
@@ -389,6 +384,65 @@ void registerItems(void)
     toPool("junk", Items::CARP, 10);
     toPool("junk", Items::TIRE, 25);
     toPool("junk", Items::GOLDFISH, 1);
+
+    BESTIARY_ITEMS.push_back(Items::LARGEMOUTH_BASS);
+    BESTIARY_ITEMS.push_back(Items::SMALLMOUTH_BASS);
+    BESTIARY_ITEMS.push_back(Items::BULLHEAD);
+    BESTIARY_ITEMS.push_back(Items::CHUB);
+    BESTIARY_ITEMS.push_back(Items::PIKE);
+    BESTIARY_ITEMS.push_back(Items::WALLEYE);
+    BESTIARY_ITEMS.push_back(Items::CARP);
+    BESTIARY_ITEMS.push_back(Items::PERCH);
+    BESTIARY_ITEMS.push_back(Items::CATFISH);
+    BESTIARY_ITEMS.push_back(Items::MINNOW);
+    BESTIARY_ITEMS.push_back(Items::KOI_A); // hardcoded: this shows all 3 variants
+    BESTIARY_ITEMS.push_back(Items::RAINBOW_TROUT);
+    BESTIARY_ITEMS.push_back(Items::GOLDEN_TROUT);
+    BESTIARY_ITEMS.push_back(Items::GOLDFISH);
+    BESTIARY_ITEMS.push_back(Items::GOLD_GOLDFISH);
+    BESTIARY_ITEMS.push_back(Items::PRISMATIC_TROUT);
+    BESTIARY_ITEMS.push_back(Items::SPIKE_FISH);
+    BESTIARY_ITEMS.push_back(Items::TRINKETFIN);
+    BESTIARY_ITEMS.push_back(Items::YESFIN);
+    BESTIARY_ITEMS.push_back(Items::VIRIDIFIN);
+    BESTIARY_ITEMS.push_back(Items::EDGEFISH);
+    BESTIARY_ITEMS.push_back(Items::TERMINNOW);
+}
+
+std::vector<Item*> getBestiaryItems(void)
+{
+    return BESTIARY_ITEMS;
+}
+
+bool hasDiscovered(Item* item)
+{
+    for (auto& info : game.fish_catch_info)
+    {
+        if (info.item == item)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+FishCatchInfo getFishCatchInfo(Item* item)
+{
+    for (auto& info : game.fish_catch_info)
+    {
+        if (info.item == item)
+        {
+            return info;
+        }
+    }
+
+    FishCatchInfo info;
+    info.item = item;
+    info.smallest = 0;
+    info.largest = 0;
+    info.amount = 0;
+    return info;
 }
 
 ItemStack* getEquippedRod(void)
@@ -416,7 +470,7 @@ SDL_Color getWaterColorsForPool(std::string pool)
     return graphics.getRGB(127, 192, 255);
 }
 
-ItemStack getItemForPool(std::string pool)
+ItemStack getItemForPool(std::string pool, int flag)
 {
     if (pool == "")
     {
@@ -435,6 +489,8 @@ ItemStack getItemForPool(std::string pool)
         chooseFrom.clear();
         for (auto& data : POOLS[pool])
         {
+            if (flag >= 50 && flag <= 54 && obj.flags[flag] && data.item == Items::TRINKETFIN) continue; // if trinketfin flag is set, don't add trinketfin to the pool
+
             ItemStack stack = ItemStack(data.item, 1);
             int weight = data.weight * 10;
 

@@ -2005,7 +2005,7 @@ void mapclass::loadlevel(int rx, int ry)
                 obj.createblock(TRIGGER, ex, ey, ent.p1 * 8, ent.p2 * 8, ent.p3);
                 break;
             case 26: // Water
-                obj.createblock(WATER, ex, ey, ent.p1 * 8, ent.p2 * 8, 0, ent.scriptname, true);
+                obj.createblock(WATER, ex, ey, ent.p1 * 8, ent.p2 * 8, ent.p3, ent.scriptname, true);
                 break;
             case 50: // Warp Lines
                 obj.customwarpmode=true;

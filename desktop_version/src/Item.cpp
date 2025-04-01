@@ -117,3 +117,8 @@ bool Item::canBuy(ItemStack* stack)
 {
     return settings.can_buy;
 }
+
+Habitat Item::getHabitat(ItemStack* stack)
+{
+    return settings.habitat;
+}

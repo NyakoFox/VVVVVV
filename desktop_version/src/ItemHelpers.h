@@ -60,8 +60,6 @@ namespace Items
     extern Item* ENHANCED_BAIT;
     extern Item* DELUXE_BAIT;
     extern Item* ULTRA_BAIT;
-
-    extern Item* TEST;
 }
 
 bool hasItem(Item* item);
@@ -91,10 +89,16 @@ void updateFishCaughtInfo(void);
 ItemStack* getEquippedRod(void);
 
 SDL_Color getWaterColorsForPool(std::string pool);
-ItemStack getItemForPool(std::string pool);
+ItemStack getItemForPool(std::string pool, int flag);
 std::vector<ItemStack> getShopItems(void);
 
 static std::map<std::string, std::vector<PoolData>> POOLS;
+
+static std::vector<Item*> BESTIARY_ITEMS;
+
+std::vector<Item*> getBestiaryItems(void);
+bool hasDiscovered(Item* item);
+FishCatchInfo getFishCatchInfo(Item* item);
 
 float easeOutCubic(float x);
 float easeInCubic(float x);

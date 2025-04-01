@@ -3349,6 +3349,125 @@ void shoprender(void)
             }
         }
     }
+    else
+    {
+        // Enchiridion here...
+
+        std::vector<Item*> items = getBestiaryItems();
+
+        if (game.shopsubmode == ShopSubMode_MAIN)
+        {
+
+            SDL_Rect scissor;
+            scissor.x = 0;
+            scissor.y = 48;
+            scissor.w = 320;
+            scissor.h = 240 - scissor.y;
+            SDL_RenderSetClipRect(gameScreen.m_renderer, &scissor);
+
+            int box_width = 32;
+            int box_height = 32;
+            int box_padding = 7; // screw it!!!!!!!!! i gotta get this done!!!!!!!!!!!!
+            int boxes_per_row = 8;
+
+            int selected_index = game.shopsel_x + (game.shopsel_y * boxes_per_row);
+            for (int i = 0; i < items.size(); i++)
+            {
+                int x = box_padding + (i % boxes_per_row) * (box_width + box_padding);
+                int y = 48 + box_padding + ((i / boxes_per_row) - game.shopscroll) * (box_height + box_padding);
+
+                if (i == selected_index)
+                {
+                    graphics.drawpixeltextbox(x, y, box_width, box_height, 255, 255, 255);
+                }
+                else
+                {
+                    graphics.drawpixeltextbox(x, y, box_width, box_height, 65, 185, 207);
+                }
+
+                if (hasDiscovered(items[i]))
+                {
+                    items[i]->draw(x + 8, y + 8);
+                }
+                else
+                {
+                    graphics.set_color(128, 128, 128);
+                    graphics.draw_texture(graphics.grphx.im_question, x + 8, y + 8);
+                    graphics.set_color(255, 255, 255);
+                }
+            }
+
+            SDL_RenderSetClipRect(gameScreen.m_renderer, NULL);
+        }
+        else if (game.shopsubmode == ShopSubMode_FISH)
+        {
+            int ind = game.shopsel_x + game.shopsel_y * 8;
+
+            if (INBOUNDS_VEC(ind, items))
+            {
+                Item* item = items[ind];
+                FishCatchInfo info = getFishCatchInfo(item);
+
+                // first: draw the fish
+                if (item == Items::KOI_A)
+                {
+                    graphics.drawpixeltextbox(160 - 8 - 8 - 16 - 8, 64 - 8 - 4, 16 + 16 + 16 + 8 + 8+16, 16 + 16, 65, 185, 207);
+                    Items::KOI_A->draw(160 - 8 - 16 - 8, 64 - 4);
+                    Items::KOI_B->draw(160 - 8, 64 - 4);
+                    Items::KOI_C->draw(160 - 8 + 16 + 8, 64 - 4);
+                }
+                else
+                {
+                    graphics.drawpixeltextbox(160 - 8 - 8, 64 - 8 - 4, 16 + 16, 16 + 16, 65, 185, 207);
+                    item->draw(160 - 8, 64 - 4);
+                }
+
+                int name_len = font::len(PR_CEN, item->getName(NULL).c_str());
+                graphics.drawpixeltextbox(160 - (name_len + 24) / 2, 64 + 16 + 8, name_len + 24, font::height(PR_CEN) + 16, 65, 185, 207);
+
+                SDL_Color col = item->getNameColor(NULL);
+                font::print(PR_CEN, 160, 64 + 16 + 16, item->getName(NULL).c_str(), col.r, col.g, col.b);
+
+                int desc_y = 64 + 16 + 16 + font::height(PR_CEN) + 4 + 8;
+                graphics.drawpixeltextbox(0, desc_y, 320, 240 - 16 - desc_y, 65, 185, 207);
+
+                uint32_t flags = PR_LEFT;
+                int text_x = 16;
+                if (item == Items::TERMINNOW)
+                {
+                    // center the terminnow's desc... its funnier that way.
+                    flags = PR_CEN;
+                    text_x = -1;
+                }
+                font::print_wrap(flags, text_x, desc_y + 16, item->getDescription(NULL).c_str(), 196, 196, 196, 8, 320 - 32);
+
+                std::string habitat = "???";
+                switch (item->getHabitat(NULL))
+                {
+                    case Habitat_ANYWHERE: habitat = "Anywhere"; break;
+                    case Habitat_FRESHWATER: habitat = "Freshwater"; break;
+                    case Habitat_SALTWATER: habitat = "Saltwater"; break;
+                    case Habitat_NONE: habitat = "N/A"; break;
+                }
+                std::string rarity = "???";
+                switch (item->getRarity(NULL))
+                {
+                    case Rarity_JUNK: rarity = "Junk"; break;
+                    case Rarity_COMMON: rarity = "Common"; break;
+                    case Rarity_UNCOMMON: rarity = "Uncommon"; break;
+                    case Rarity_RARE: rarity = "Rare"; break;
+                    case Rarity_ELUSIVE: rarity = "Elusive"; break;
+                    case Rarity_LEGENDARY: rarity = "Legendary"; break;
+                }
+
+                font::print_wrap(PR_LEFT, 16, desc_y + 16 + 8 * 5, ("Amount caught: " + help.String(info.amount)).c_str(), 196, 196, 196);
+                font::print_wrap(PR_LEFT, 16, desc_y + 16 + 8 * 6, ("Largest spotted: " + help.String(info.largest) + "cm").c_str(), 196, 196, 196);
+                font::print_wrap(PR_LEFT, 16, desc_y + 16 + 8 * 7, ("Smallest spotted: " + help.String(info.smallest) + "cm").c_str(), 196, 196, 196);
+                font::print_wrap(PR_LEFT, 16, desc_y + 16 + 8 * 8, ("Habitat: " + habitat).c_str(), 196, 196, 196);
+                font::print_wrap(PR_LEFT, 16, desc_y + 16 + 8 * 9, ("Rarity: " + rarity).c_str(), 196, 196, 196);
+            }
+        }
+    }
 
     graphics.drawgui();
 

@@ -43,18 +43,33 @@ void FishItem::getDefaultComponents(ItemStack* stack)
 
 std::string FishItem::getLongName(ItemStack* stack)
 {
+    if (stack == NULL)
+    {
+        return this->settings.name;
+    }
+
     int size = stack->fish_size;
     return this->settings.name + " - " + help.String(size) + "cm";
 };
 
 std::string FishItem::getCatchText(ItemStack* stack)
 {
+    if (stack == NULL)
+    {
+        return this->settings.name;
+    }
+
     int size = stack->fish_size;
     return this->settings.name + "\n\n" + help.String(size) + "cm";
 }
 
 int FishItem::getSellPrice(ItemStack* stack)
 {
+    if (stack == NULL)
+    {
+        return this->settings.sell_price;
+    }
+
     const double low_mult = 0.8;
     const double high_mult = 1.5;
 
