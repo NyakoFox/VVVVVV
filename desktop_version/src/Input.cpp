@@ -3420,6 +3420,7 @@ void shopinput(void)
         {
             if (game.shopsubmode == ShopSubMode_CONFIRM)
             {
+                game.shopsubselect = 0;
                 game.shopsubmode = ShopSubMode_MAIN;
                 music.playef(Sound_VIRIDIAN);
             }
@@ -3434,6 +3435,7 @@ void shopinput(void)
         {
             if (game.shopsubmode == ShopSubMode_FISH)
             {
+                game.shopsubselect = 0;
                 game.shopsubmode = ShopSubMode_MAIN;
                 music.playef(Sound_VIRIDIAN);
             }
