@@ -518,8 +518,8 @@ void registerItems(void)
     toPool("freshwater_large", Items::YESFIN, 10);
     toPool("freshwater_large", Items::VIRIDIFIN, 9);
     toPool("freshwater_large", Items::TIRE, 4);
-    toPool("freshwater_large", Items::EDGEFISH, 1);
-    toPool("freshwater_large", Items::TERMINNOW, 1);
+    toPool("freshwater_large", Items::EDGEFISH, 9);
+    toPool("freshwater_large", Items::TERMINNOW, 9);
     toPool("freshwater_large", Items::OLD_BOOT,4);
     toPool("freshwater_large", Items::TIN_CAN,4);
     toPool("freshwater_large", Items::SODA_CAN,4);
@@ -570,8 +570,8 @@ void registerItems(void)
     toPool("saltwater_large", Items::FISHTRONAUT, 6);
     toPool("saltwater_large", Items::NAVAL_MINE, 1);
     toPool("saltwater_large", Items::TIRE, 2);
-    toPool("saltwater_large", Items::THIRTY_SEVEN_FISH, 1);
-    toPool("saltwater_large", Items::SQUISHFISH, 1);
+    toPool("saltwater_large", Items::THIRTY_SEVEN_FISH, 6);
+    toPool("saltwater_large", Items::SQUISHFISH, 6);
     toPool("saltwater_large", Items::OLD_BOOT, 2);
     toPool("saltwater_large", Items::TIN_CAN, 2);
     toPool("saltwater_large", Items::SODA_CAN, 2);
