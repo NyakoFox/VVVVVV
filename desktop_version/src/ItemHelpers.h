@@ -43,6 +43,29 @@ namespace Items
     extern Item* TERMINNOW;
     extern Item* TIRE;
 
+    extern Item* RED_SNAPPER;
+    extern Item* TUNA;
+    extern Item* BLUE_MARLIN;
+    extern Item* AMBERJACK;
+    extern Item* COALFISH;
+    extern Item* WAHOO;
+    extern Item* ANCHOVY;
+    extern Item* SARDINE;
+    extern Item* POMPANO;
+    extern Item* PUFFERFISH;
+    extern Item* MAHIMAHI;
+    extern Item* MORAY_EEL;
+    extern Item* RIBBON_EEL;
+    extern Item* SQUID;
+    extern Item* OCTOPUS;
+
+    extern Item* STAR_FISH;
+    extern Item* FISHTRONAUT;
+    extern Item* NAVAL_MINE;
+
+    extern Item* THIRTY_SEVEN_FISH;
+    extern Item* SQUISHFISH;
+
     extern Item* YELLOW_KEY_FAKE;
     extern Item* YELLOW_KEY;
     extern Item* BLUE_KEY;
@@ -65,6 +88,7 @@ namespace Items
 bool hasItem(Item* item);
 
 void giveItem(ItemStack stack);
+void giveItem(ItemStack stack, bool display);
 
 static std::map<std::string, Item*> ITEM_REGISTRY;
 void registerItems(void);
@@ -86,6 +110,7 @@ void decrementItem(ItemStack stack, int amount);
 
 void updateFishCaughtInfo(void);
 
+int getTrinketFinCount(void);
 ItemStack* getEquippedRod(void);
 
 SDL_Color getWaterColorsForPool(std::string pool);

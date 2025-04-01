@@ -4672,27 +4672,34 @@ void Game::updatestate(void)
             {
                 music.haltdasmusik();
             }
-            music.playef(Sound_FISHCAUGHT);
+            if (fishing_item.item == Items::TRINKETFIN)
+            {
+                music.playef(Sound_TRINKET);
+            }
+            else
+            {
+                music.playef(Sound_FISHCAUGHT);
+            }
             graphics.showcutscenebars_fast = true;
             hascontrol = false;
             completestop = true;
             advancetext = true;
             incstate();
 
-            graphics.createtextboxflipme("", 50, 85 - 24, TEXT_COLOUR("gray"));
+            graphics.createtextboxflipme("", 50, 60, TEXT_COLOUR("gray"));
             graphics.textboxprintflags(PR_FONT_INTERFACE);
             graphics.textboxcenterx();
             graphics.textboxtranslate(TEXTTRANSLATE_FUNCTION, caughtfish_textbox1);
             graphics.textboxapplyposition();
 
-            graphics.createtextboxflipme("", 50, 95 - 24, TEXT_COLOUR("gray"));
+            graphics.createtextboxflipme("", 50, 70, TEXT_COLOUR("gray"));
             graphics.textboxprintflags(PR_FONT_INTERFACE);
             graphics.textboxcenterx();
             graphics.textboxindex(graphics.textboxes.size() - 2);
             graphics.textboxtranslate(TEXTTRANSLATE_FUNCTION, caughtfish_textbox2);
             graphics.textboxapplyposition();
 
-            graphics.createtextboxflipme("", 50, 105 - 24, TEXT_COLOUR("gray"));
+            graphics.createtextboxflipme("", 50, 80, TEXT_COLOUR("gray"));
             graphics.textboxprintflags(PR_FONT_INTERFACE);
             graphics.textboxcenterx();
             graphics.textboxindex(graphics.textboxes.size() - 2);

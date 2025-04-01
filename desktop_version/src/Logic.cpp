@@ -1437,6 +1437,16 @@ void gamelogic(void)
         map.setbgobjlerp(graphics.towerbg);
     }
 
+    if (game.fishing_state != FishingState_IDLE)
+    {
+        if ((game.deathseq > 0) || script.running)
+        {
+            game.fishing_state = FishingState_IDLE;
+            game.fishing_timer = 0;
+            game.fishing_anim_timer = 0;
+        }
+    }
+
     //Update colour cycling for final level
     if (map.finalmode && map.final_colormode)
     {

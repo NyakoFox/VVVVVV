@@ -2750,7 +2750,6 @@ void gameinput(void)
                     game.jumpheld = true;
                     game.jumppressed = -1;
                     game.fishing_state = FishingState_IDLE;
-                    game.fishing_item = ItemStack();
                     game.fishing_timer = 0;
                     game.fishing_anim_timer = 0;
                     game.fishing_total = 0;
@@ -2776,7 +2775,6 @@ void gameinput(void)
                 game.jumpheld = true;
                 game.jumppressed = -1;
                 game.fishing_state = FishingState_IDLE;
-                game.fishing_item = ItemStack();
                 game.fishing_timer = 0;
                 game.fishing_anim_timer = 0;
                 game.fishing_total = 0;

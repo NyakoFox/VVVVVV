@@ -2912,7 +2912,7 @@ void gamerender(void)
                 int bobber_y = obj.entities[i].yp;
 
                 int off = 16;
-                if (game.gravitycontrol == 1)
+                if (obj.entities[i].bobbergrav == 1)
                 {
                     off = -16;
                 }

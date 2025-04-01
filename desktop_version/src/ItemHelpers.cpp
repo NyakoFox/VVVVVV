@@ -13,6 +13,7 @@
 #include "UtilityClass.h"
 #include "BucketItem.h"
 #include "FilledBucketItem.h"
+#include "TrinketFinFishItem.h"
 
 namespace Items
 {
@@ -43,6 +44,30 @@ namespace Items
     Item* EDGEFISH;
     Item* TERMINNOW;
     Item* TIRE;
+
+    Item* RED_SNAPPER;
+    Item* TUNA;
+    Item* BLUE_MARLIN;
+    Item* AMBERJACK;
+    Item* COALFISH;
+    Item* WAHOO;
+    Item* ANCHOVY;
+    Item* SARDINE;
+    Item* POMPANO;
+    Item* PUFFERFISH;
+    Item* MAHIMAHI;
+    Item* MORAY_EEL;
+    Item* RIBBON_EEL;
+    Item* SQUID;
+    Item* OCTOPUS;
+
+    Item* STAR_FISH;
+    Item* FISHTRONAUT;
+    
+    Item* NAVAL_MINE;
+
+    Item* THIRTY_SEVEN_FISH;
+    Item* SQUISHFISH;
 
     Item* YELLOW_KEY_FAKE;
     Item* YELLOW_KEY;
@@ -77,12 +102,26 @@ bool hasItem(Item* item)
 
 void giveItem(ItemStack stack)
 {
-    game.play_item_get = true;
+    giveItem(stack, true);
+}
 
-    ItemGetDisplay display;
-    display.stack = stack;
-    display.timer = 0;
-    game.item_get_displays.push_back(display);
+void giveItem(ItemStack stack, bool display)
+{
+    if (stack.item == NULL) {
+        // dont give null stacks...
+        return;
+    }
+
+    if (display)
+    {
+        game.play_item_get = true;
+
+        ItemGetDisplay display;
+        display.stack = stack;
+        display.timer = 0;
+        game.item_get_displays.push_back(display);
+    }
+
     // okay first... i guess let's just check if we have any matching stacks.
     for (auto& inv_stack : game.inventory)
     {
@@ -105,6 +144,16 @@ void giveItem(ItemStack stack)
 
 static Item* registerItem(std::string id, Item* item)
 {
+    if (item == NULL)
+    {
+        SDL_assert(false && "Attempt to register null item");
+        return NULL;
+    }
+    if (ITEM_REGISTRY.count(id) > 0)
+    {
+        SDL_assert(false && "Item ID already registered");
+        return NULL;
+    }
     ITEM_REGISTRY[id] = item;
     return item;
 }
@@ -120,6 +169,10 @@ void cleanItems(void)
 
 Item* getItem(std::string id)
 {
+    if (ITEM_REGISTRY.count(id) == 0)
+    {
+        return NULL;
+    }
     return ITEM_REGISTRY[id];
 }
 
@@ -192,6 +245,14 @@ void upgradeBait(void)
         {
             inv_item.item = Items::ULTRA_BAIT;
         }
+    }
+
+    // ok now we have to forcibly stack the bait
+    std::vector<ItemStack> old_inv = game.inventory;
+    game.inventory.clear();
+    for (int i = 0; i < old_inv.size(); i++)
+    {
+        giveItem(old_inv[i], false);
     }
 }
 
@@ -283,6 +344,10 @@ int getBaitTier(void)
 
 static void toPool(std::string pool, Item* item, int weight)
 {
+    if (item == NULL)
+    {
+        SDL_assert(false && "Attempt to add null item to pool");
+    }
     if (!POOLS.count(pool))
     {
         POOLS[pool] = std::vector<PoolData>();
@@ -297,31 +362,55 @@ void registerItems(void)
 {
     Items::FISHING_ROD = registerItem("fishing_rod", new FishingRodItem(ItemSettings().withName("Fishing Rod").withDescription("A basic fishing rod.").withLayer("fishing_rod_basic", 200).withLayer("fishing_line", 201)));
     Items::WORMS = registerItem("worms", new Item(ItemSettings().withName("Worms").withBuy(5).withDescription("A perfect bait for beginners. Notably not a fish.").withLayer("worm_layer_1", 204).withLayer("worm_layer_2", 205)));
-    Items::LARGEMOUTH_BASS = registerItem("largemouth_bass", new FishItem(ItemSettings().withName("Largemouth Bass").withSell(22).withDescription("A carnivorous, freshwater member of the sunfish family.").withLayer("largemouth_bass_layer_1", 202).withLayer("largemouth_bass_layer_2", 203), 30, 40, 75));
-    Items::SMALLMOUTH_BASS = registerItem("smallmouth_bass", new FishItem(ItemSettings().withName("Smallmouth Bass").withSell(30).withDescription("An adaptive freshwater fish known to be feistier than other bass.").withRarity(Rarity_UNCOMMON).withLayer("smallmouth_bass_layer_1", 206).withLayer("smallmouth_bass_layer_2", 207), 22, 27, 65));
-    Items::BULLHEAD = registerItem("bullhead", new FishItem(ItemSettings().withName("Bullhead").withSell(20).withDescription("This bottom dwelling scavenger will eat almost anything.").withLayer("bullhead_layer_1", 208).withLayer("bullhead_layer_2", 209), 18, 23, 60));
-    Items::CHUB = registerItem("chub", new FishItem(ItemSettings().withName("Chub").withSell(32).withDescription("A voracious eater, it will even eat fruit off trees above the water.").withRarity(Rarity_UNCOMMON).withLayer("chub_layer_1", 210).withLayer("chub_layer_2", 211), 15, 30, 60));
-    Items::PIKE = registerItem("pike", new FishItem(ItemSettings().withName("Pike").withSell(70).withDescription("This large species is aggressive and quick when chasing prey.").withRarity(Rarity_RARE).withLayer("pike_layer_1", 212).withLayer("pike_layer_2", 213), 40, 55, 150));
-    Items::WALLEYE = registerItem("walleye", new FishItem(ItemSettings().withName("Walleye").withSell(65).withDescription("Its unique pearlescent eyes give this fish powerful night vision.").withRarity(Rarity_RARE).withLayer("walleye_layer_1", 214).withLayer("walleye_layer_2", 215), 36, 54, 107));
-    Items::CARP = registerItem("carp", new FishItem(ItemSettings().withName("Carp").withSell(18).withDescription("This common freshwater fish is highly tolerant of turbid waters.").withLayer("carp_layer_1", 216).withLayer("carp_layer_2", 217), 25, 31, 120));
-    Items::PERCH = registerItem("perch", new FishItem(ItemSettings().withName("Perch").withSell(35).withDescription("This yellow fish is a critical food source for bass and walleye.").withRarity(Rarity_UNCOMMON).withLayer("perch_layer_1", 218).withLayer("perch_layer_2", 219), 10, 19, 50));
-    Items::CATFISH = registerItem("catfish", new FishItem(ItemSettings().withName("Catfish").withSell(65).withDescription("These whiskered fish use pheremones to communicate. They have a social hierarchy.").withRarity(Rarity_RARE).withLayer("catfish_layer_1", 220).withLayer("catfish_layer_2", 221), 43, 57, 132));
-    Items::MINNOW = registerItem("minnow", new FishItem(ItemSettings().withName("Minnow").withSell(30).withDescription("These little fish travel in large shoals to avoid predators.").withRarity(Rarity_UNCOMMON).withLayer("minnow_layer_1", 222).withLayer("minnow_layer_2", 223), 5, 7, 14));
-    Items::KOI_A = registerItem("koi_a", new FishItem(ItemSettings().withName("Koi").withSell(60).withDescription("A domesticated variety of carp with beautiful colored scales.").withRarity(Rarity_RARE).withLayer("koi_1_layer_1", 224).withLayer("koi_1_layer_2", 225), 25, 31, 60));
-    Items::KOI_B = registerItem("koi_b", new FishItem(ItemSettings().withName("Koi").withSell(60).withDescription("A domesticated variety of carp with beautiful colored scales.").withRarity(Rarity_RARE).withLayer("koi_2_layer_1", 224).withLayer("koi_2_layer_2", 225), 25, 31, 60));
-    Items::KOI_C = registerItem("koi_c", new FishItem(ItemSettings().withName("Koi").withSell(60).withDescription("A domesticated variety of carp with beautiful colored scales.").withRarity(Rarity_RARE).withLayer("koi_3_layer_1", 224).withLayer("koi_3_layer_2", 225), 25, 31, 60));
-    Items::RAINBOW_TROUT = registerItem("rainbow_trout", new FishItem(ItemSettings().withName("Rainbow Trout").withSell(75).withDescription("This multicolored fish is known for leaping out of the water.").withRarity(Rarity_RARE).withLayer("rainbow_trout_layer_1", 226).withLayer("rainbow_trout_layer_2", 227).withLayer("rainbow_trout_layer_3", 228).withLayer("rainbow_trout_layer_4", 229), 30, 60, 122));
-    Items::GOLDEN_TROUT = registerItem("golden_trout", new FishItem(ItemSettings().withName("Golden Trout").withSell(100).withDescription("This beautiful golden trout is out-competed by other species.").withRarity(Rarity_ELUSIVE).withLayer("golden_trout_layer_1", 230).withLayer("golden_trout_layer_2", 231).withLayer("golden_trout_layer_3", 232), 15, 30, 71));
-    Items::GOLDFISH = registerItem("goldfish", new FishItem(ItemSettings().withName("Goldfish").withSell(50).withDescription("Commonly kept as a pet. It gets bored easily without accessories.").withRarity(Rarity_RARE).withLayer("goldfish_layer_1", 233).withLayer("goldfish_layer_2", 234), 11, 15, 41));
-    Items::GOLD_GOLDFISH = registerItem("gold_goldfish", new FishItem(ItemSettings().withName("Gold Goldfish").withSell(200).withDescription("Its scales are made of gold leaf. It is sensitive to temperature.").withRarity(Rarity_LEGENDARY).withLayer("gold_goldfish_layer_1", 235).withLayer("gold_goldfish_layer_2", 236).withLayer("gold_goldfish_layer_3", 237).withLayer("gold_goldfish_layer_4", 238).withLayer("gold_goldfish_layer_5", 239).withLayer("gold_goldfish_layer_6", 240), 11, 15, 41));
-    Items::PRISMATIC_TROUT = registerItem("prismatic_trout", new FishItem(ItemSettings().withName("Prismatic Trout").withSell(200).withDescription("The mesmerizing scales of this fish can match any colour.").withRarity(Rarity_LEGENDARY).withNameColor(241).withLayer("prismatic_trout", 241), 30, 60, 100));
-    Items::YESFIN = registerItem("yesfin", new FishItem(ItemSettings().withName("Yesfin").withSell(100).withDescription("With a natural briefcase, this fish is perfect for the workplace.").withRarity(Rarity_ELUSIVE).withLayer("yesfin", 9), 20, 30, 70));
-    Items::VIRIDIFIN = registerItem("viridifin", new FishItem(ItemSettings().withName("Viridifin").withSell(222).withDescription("It has an uncanny resemblance to you, to say the least...").withRarity(Rarity_LEGENDARY).withLayer("viridifin", 0), 40, 60, 100));
-    Items::EDGEFISH = registerItem("edgefish", new FishItem(ItemSettings().withName("Edgefish").withSell(190).withDescription("This fish subsists on pellets. No trademark infringement intended.").withRarity(Rarity_LEGENDARY).withLayer("edgefish", 8), 15, 30, 60));
-    Items::TERMINNOW = registerItem("terminnow", new FishItem(ItemSettings().withName("Terminnow").withSell(200).withDescription("      -= PERSONAL LOG =-      \nI can't believe this fish even has Wi-Fi.").withRarity(Rarity_LEGENDARY).withLayer("terminnow", 4), 10, 15, 20));
+    Items::LARGEMOUTH_BASS = registerItem("largemouth_bass", new FishItem(ItemSettings().withName("Largemouth Bass").withHabitat(Habitat_FRESHWATER).withSell(22).withDescription("A carnivorous, freshwater member of the sunfish family.").withLayer("largemouth_bass_layer_1", 202).withLayer("largemouth_bass_layer_2", 203), 30, 40, 75));
+    Items::SMALLMOUTH_BASS = registerItem("smallmouth_bass", new FishItem(ItemSettings().withName("Smallmouth Bass").withHabitat(Habitat_FRESHWATER).withSell(30).withDescription("An adaptive freshwater fish known to be feistier than other bass.").withRarity(Rarity_UNCOMMON).withLayer("smallmouth_bass_layer_1", 206).withLayer("smallmouth_bass_layer_2", 207), 22, 27, 65));
+    Items::BULLHEAD = registerItem("bullhead", new FishItem(ItemSettings().withName("Bullhead").withHabitat(Habitat_FRESHWATER).withSell(20).withDescription("This bottom dwelling scavenger will eat almost anything.").withLayer("bullhead_layer_1", 208).withLayer("bullhead_layer_2", 209), 18, 23, 60));
+    Items::CHUB = registerItem("chub", new FishItem(ItemSettings().withName("Chub").withHabitat(Habitat_FRESHWATER).withSell(32).withDescription("A voracious eater, it will even eat fruit off trees above the water.").withRarity(Rarity_UNCOMMON).withLayer("chub_layer_1", 210).withLayer("chub_layer_2", 211), 15, 30, 60));
+    Items::PIKE = registerItem("pike", new FishItem(ItemSettings().withName("Pike").withHabitat(Habitat_FRESHWATER).withSell(70).withDescription("This large species is aggressive and quick when chasing prey.").withRarity(Rarity_RARE).withLayer("pike_layer_1", 212).withLayer("pike_layer_2", 213), 40, 55, 150));
+    Items::WALLEYE = registerItem("walleye", new FishItem(ItemSettings().withName("Walleye").withHabitat(Habitat_FRESHWATER).withSell(65).withDescription("Its unique pearlescent eyes give this fish powerful night vision.").withRarity(Rarity_RARE).withLayer("walleye_layer_1", 214).withLayer("walleye_layer_2", 215), 36, 54, 107));
+    Items::CARP = registerItem("carp", new FishItem(ItemSettings().withName("Carp").withHabitat(Habitat_FRESHWATER).withSell(18).withDescription("This common freshwater fish is highly tolerant of turbid waters.").withLayer("carp_layer_1", 216).withLayer("carp_layer_2", 217), 25, 31, 120));
+    Items::PERCH = registerItem("perch", new FishItem(ItemSettings().withName("Perch").withHabitat(Habitat_FRESHWATER).withSell(35).withDescription("This yellow fish is a critical food source for bass and walleye.").withRarity(Rarity_UNCOMMON).withLayer("perch_layer_1", 218).withLayer("perch_layer_2", 219), 10, 19, 50));
+    Items::CATFISH = registerItem("catfish", new FishItem(ItemSettings().withName("Catfish").withHabitat(Habitat_FRESHWATER).withSell(65).withDescription("These whiskered fish use pheremones to communicate. They have a social hierarchy.").withRarity(Rarity_RARE).withLayer("catfish_layer_1", 220).withLayer("catfish_layer_2", 221), 43, 57, 132));
+    Items::MINNOW = registerItem("minnow", new FishItem(ItemSettings().withName("Minnow").withHabitat(Habitat_FRESHWATER).withSell(30).withDescription("These little fish travel in large shoals to avoid predators.").withRarity(Rarity_UNCOMMON).withLayer("minnow_layer_1", 222).withLayer("minnow_layer_2", 223), 5, 7, 14));
+    Items::KOI_A = registerItem("koi_a", new FishItem(ItemSettings().withName("Koi").withHabitat(Habitat_FRESHWATER).withSell(60).withDescription("A domesticated variety of carp with beautiful colored scales.").withRarity(Rarity_RARE).withLayer("koi_1_layer_1", 224).withLayer("koi_1_layer_2", 225), 25, 31, 60));
+    Items::KOI_B = registerItem("koi_b", new FishItem(ItemSettings().withName("Koi").withHabitat(Habitat_FRESHWATER).withSell(60).withDescription("A domesticated variety of carp with beautiful colored scales.").withRarity(Rarity_RARE).withLayer("koi_2_layer_1", 224).withLayer("koi_2_layer_2", 225), 25, 31, 60));
+    Items::KOI_C = registerItem("koi_c", new FishItem(ItemSettings().withName("Koi").withHabitat(Habitat_FRESHWATER).withSell(60).withDescription("A domesticated variety of carp with beautiful colored scales.").withRarity(Rarity_RARE).withLayer("koi_3_layer_1", 224).withLayer("koi_3_layer_2", 225), 25, 31, 60));
+    Items::RAINBOW_TROUT = registerItem("rainbow_trout", new FishItem(ItemSettings().withName("Rainbow Trout").withHabitat(Habitat_FRESHWATER).withSell(75).withDescription("This multicolored fish is known for leaping out of the water.").withRarity(Rarity_RARE).withLayer("rainbow_trout_layer_1", 226).withLayer("rainbow_trout_layer_2", 227).withLayer("rainbow_trout_layer_3", 228).withLayer("rainbow_trout_layer_4", 229), 30, 60, 122));
+    Items::GOLDEN_TROUT = registerItem("golden_trout", new FishItem(ItemSettings().withName("Golden Trout").withHabitat(Habitat_FRESHWATER).withSell(100).withDescription("This beautiful golden trout is out-competed by other species.").withRarity(Rarity_ELUSIVE).withLayer("golden_trout_layer_1", 230).withLayer("golden_trout_layer_2", 231).withLayer("golden_trout_layer_3", 232), 15, 30, 71));
+    Items::GOLDFISH = registerItem("goldfish", new FishItem(ItemSettings().withName("Goldfish").withHabitat(Habitat_FRESHWATER).withSell(50).withDescription("Commonly kept as a pet. It gets bored easily without accessories.").withRarity(Rarity_RARE).withLayer("goldfish_layer_1", 233).withLayer("goldfish_layer_2", 234), 11, 15, 41));
+    Items::GOLD_GOLDFISH = registerItem("gold_goldfish", new FishItem(ItemSettings().withName("Gold Goldfish").withHabitat(Habitat_FRESHWATER).withSell(200).withDescription("Its scales are made of gold leaf. It is sensitive to temperature.").withRarity(Rarity_LEGENDARY).withLayer("gold_goldfish_layer_1", 235).withLayer("gold_goldfish_layer_2", 236).withLayer("gold_goldfish_layer_3", 237).withLayer("gold_goldfish_layer_4", 238).withLayer("gold_goldfish_layer_5", 239).withLayer("gold_goldfish_layer_6", 240), 11, 15, 41));
+    Items::PRISMATIC_TROUT = registerItem("prismatic_trout", new FishItem(ItemSettings().withName("Prismatic Trout").withHabitat(Habitat_FRESHWATER).withSell(200).withDescription("The mesmerizing scales of this fish can match any colour.").withRarity(Rarity_LEGENDARY).withNameColor(241).withLayer("prismatic_trout", 241), 30, 60, 100));
+    Items::YESFIN = registerItem("yesfin", new FishItem(ItemSettings().withName("Yesfin").withHabitat(Habitat_FRESHWATER).withSell(100).withDescription("With a natural briefcase, this fish is perfect for the workplace.").withRarity(Rarity_ELUSIVE).withLayer("yesfin", 9), 20, 30, 70));
+    Items::VIRIDIFIN = registerItem("viridifin", new FishItem(ItemSettings().withName("Viridifin").withHabitat(Habitat_FRESHWATER).withSell(222).withDescription("It has an uncanny resemblance to you, to say the least...").withRarity(Rarity_LEGENDARY).withLayer("viridifin", 0), 40, 60, 100));
+    Items::EDGEFISH = registerItem("edgefish", new FishItem(ItemSettings().withName("Edgefish").withHabitat(Habitat_FRESHWATER).withSell(190).withDescription("This fish subsists on pellets. No trademark infringement intended.").withRarity(Rarity_LEGENDARY).withLayer("edgefish", 8), 15, 30, 60));
+    Items::TERMINNOW = registerItem("terminnow", new FishItem(ItemSettings().withName("Terminnow").withHabitat(Habitat_FRESHWATER).withSell(200).withDescription("      -= PERSONAL LOG =-      \nI can't believe this fish even has Wi-Fi.").withRarity(Rarity_LEGENDARY).withLayer("terminnow", 4), 10, 15, 20));
     Items::TIRE = registerItem("tire", new Item(ItemSettings().withName("Tire").withSell(0).withDescription("This tire could be from the 3099 Space Derby Grand Prix.").withRarity(Rarity_JUNK).withLayer("tire", 19)));
-    Items::SPIKE_FISH = registerItem("spike_fish", new FishItem(ItemSettings().withName("Spike Fish").withSell(15).withDescription("They leave behind spiky corpses when they die. An invasive species found everywhere.").withLayer("spike_fish", -1), 40, 40, 40));
-    Items::TRINKETFIN = registerItem("trinketfin", new Item(ItemSettings().withName("Trinketfin").withDescription("Congratulations! You have found a shiny trinketfin!").withRarity(Rarity_RARE).withLayer("trinketfin", 3)));
+    Items::SPIKE_FISH = registerItem("spike_fish", new FishItem(ItemSettings().withName("Spike Fish").withHabitat(Habitat_ANYWHERE).withSell(15).withDescription("They leave behind spiky corpses when they die. An invasive species found everywhere.").withLayer("spike_fish", -1), 40, 40, 40));
+    Items::TRINKETFIN = registerItem("trinketfin", new TrinketFinFishItem(ItemSettings().withName("Trinketfin").withHabitat(Habitat_ANYWHERE).withDescription("Congratulations! You have found a shiny trinketfin!").withRarity(Rarity_RARE).withLayer("trinketfin", 3)));
+
+    Items::RED_SNAPPER = registerItem("red_snapper", new FishItem(ItemSettings().withName("Red Snapper").withSell(20).withHabitat(Habitat_SALTWATER).withDescription("A sociable fish, it will even school with other species.").withLayer("red_snapper_layer_1", 242).withLayer("red_snapper_layer_2", 243), 39, 60, 100));
+    Items::TUNA = registerItem("tuna", new FishItem(ItemSettings().withName("Tuna").withSell(40).withHabitat(Habitat_SALTWATER).withDescription("This extremely popular fish can grow to huge sizes.").withRarity(Rarity_UNCOMMON).withLayer("tuna_layer_1", 244).withLayer("tuna_layer_2", 245).withLayer("tuna_layer_3", 246), 97, 200, 458));
+    Items::BLUE_MARLIN = registerItem("blue_marlin", new FishItem(ItemSettings().withName("Blue Marlin").withSell(80).withHabitat(Habitat_SALTWATER).withDescription("A highly prized catch with a long bill. Large ones are called \"granders\".").withRarity(Rarity_RARE).withLayer("blue_marlin_layer_1", 247).withLayer("blue_marlin_layer_2", 248), 101, 290, 500));
+    Items::AMBERJACK = registerItem("amberjack", new FishItem(ItemSettings().withName("Amberjack").withSell(20).withHabitat(Habitat_SALTWATER).withDescription("A sea predator that likes to live in kelp forests and shipwrecks.").withLayer("amberjack_layer_1", 249).withLayer("amberjack_layer_2", 250).withLayer("amberjack_layer_3", 251), 88, 100, 190));
+    Items::COALFISH = registerItem("coalfish", new FishItem(ItemSettings().withName("Coalfish").withSell(20).withHabitat(Habitat_SALTWATER).withDescription("Also known as a coley, pollock, or saithe. It has a lot of names.").withLayer("coalfish_layer_1", 252).withLayer("coalfish_layer_2", 253), 39, 60, 130));
+    Items::WAHOO = registerItem("wahoo", new FishItem(ItemSettings().withName("Wahoo").withSell(35).withHabitat(Habitat_SALTWATER).withDescription("This active fish feeds on smaller fish and squid. Wahoo!").withRarity(Rarity_UNCOMMON).withLayer("wahoo_layer_1", 254).withLayer("wahoo_layer_2", 255), 99, 170, 250));
+    Items::ANCHOVY = registerItem("anchovy", new FishItem(ItemSettings().withName("Anchovy").withSell(15).withHabitat(Habitat_SALTWATER).withDescription("A small, highly abundant species. They move in gigantic schools.").withLayer("anchovy_layer_1", 256).withLayer("anchovy_layer_2", 257), 9, 13, 20));
+    Items::SARDINE = registerItem("sardine", new FishItem(ItemSettings().withName("Sardine").withSell(15).withHabitat(Habitat_SALTWATER).withDescription("A popular commercial catch. It feeds on surface plankton at night.").withLayer("sardine_layer_1", 258).withLayer("sardine_layer_2", 259), 13, 17, 28));
+    Items::POMPANO = registerItem("pompano", new FishItem(ItemSettings().withName("Pompano").withSell(35).withHabitat(Habitat_SALTWATER).withDescription("These fast swimmers enjoy shallow waters and surf flats.").withRarity(Rarity_UNCOMMON).withLayer("pompano_layer_1", 260).withLayer("pompano_layer_2", 261).withLayer("pompano_layer_3", 262), 25, 40, 64));
+    Items::PUFFERFISH = registerItem("pufferfish", new FishItem(ItemSettings().withName("Pufferfish").withSell(115).withHabitat(Habitat_SALTWATER).withDescription("This fish puffs up when threatened! Its spines protect it from predators.").withRarity(Rarity_ELUSIVE).withLayer("pufferfish_layer_1", 263).withLayer("pufferfish_layer_2", 264), 15, 30, 50));
+    Items::MAHIMAHI = registerItem("mahimahi", new FishItem(ItemSettings().withName("Mahi-Mahi").withSell(65).withHabitat(Habitat_SALTWATER).withDescription("Highly prized for its bright colours and size. It has a distinctive square 'forehead'.").withRarity(Rarity_RARE).withLayer("mahi-mahi_layer_1", 265).withLayer("mahi-mahi_layer_2", 266).withLayer("mahi-mahi_layer_3", 267), 65, 100, 210));
+    Items::MORAY_EEL = registerItem("moray_eel", new FishItem(ItemSettings().withName("Moray Eel").withSell(70).withHabitat(Habitat_SALTWATER).withDescription("If it swims in a reef and has sharp pointy teeth, that's a moray!").withRarity(Rarity_RARE).withLayer("moray_eel_layer_1", 268).withLayer("moray_eel_layer_2", 269), 69, 80, 150));
+    Items::RIBBON_EEL = registerItem("ribbon_eel", new FishItem(ItemSettings().withName("Ribbon Eel").withSell(70).withHabitat(Habitat_SALTWATER).withDescription("This eel is known for its long, thin body and vibrant colours.").withRarity(Rarity_RARE).withLayer("ribbon_eel_layer_1", 270).withLayer("ribbon_eel_layer_2", 271), 95, 100, 130));
+    Items::SQUID = registerItem("squid", new FishItem(ItemSettings().withName("Squid").withSell(95).withHabitat(Habitat_SALTWATER).withDescription("This little mollusk can change its colour in order to camouflage.").withRarity(Rarity_ELUSIVE).withLayer("squid_layer_1", 272).withLayer("squid_layer_2", 273), 13, 17, 28));
+    Items::OCTOPUS = registerItem("octopus", new FishItem(ItemSettings().withName("Octopus").withSell(120).withHabitat(Habitat_SALTWATER).withDescription("A highly intelligent mollusk. They're known to keep 'gardens' of marine plants!").withRarity(Rarity_ELUSIVE).withLayer("octopus_layer_1", 274).withLayer("octopus_layer_2", 275), 90, 110, 150));
+
+    Items::STAR_FISH = registerItem("star_fish", new FishItem(ItemSettings().withName("Star Fish").withSell(100).withHabitat(Habitat_SALTWATER).withDescription("This is a star fish, not a starfish.").withRarity(Rarity_ELUSIVE).withLayer("star_fish", 276), 80, 100, 120));
+    Items::FISHTRONAUT = registerItem("fishtronaut", new FishItem(ItemSettings().withName("Fishtronaut").withSell(269).withHabitat(Habitat_SALTWATER).withDescription("One small step for fish, one giant leap for fishkind!").withRarity(Rarity_LEGENDARY).withLayer("fishtronaut_layer_1", 277).withLayer("fishtronaut_layer_2", 278).withLayer("fishtronaut_layer_3", 279).withLayer("fishtronaut_layer_4", 280).withLayer("fishtronaut_layer_5", 281).withLayer("fishtronaut_layer_6", 282).withLayer("fishtronaut_layer_7", 283), 25, 30, 70));
+
+    Items::NAVAL_MINE = registerItem("naval_mine", new Item(ItemSettings().withName("Naval Mine").withSell(25).withDescription("Uh oh.").withRarity(Rarity_JUNK).withLayer("naval_mine_layer_1", 284).withLayer("naval_mine_layer_2", 285)));
+
+    Items::THIRTY_SEVEN_FISH = registerItem("thirty_seven_fish", new FishItem(ItemSettings().withName("37 Fish").withHabitat(Habitat_SALTWATER).withSell(237).withDescription("Do you remember how many fish you've caught?").withRarity(Rarity_LEGENDARY).withLayer("37_fish", 1), 15, 20, 35));
+    Items::SQUISHFISH = registerItem("squishfish", new FishItem(ItemSettings().withName("Squishfish").withHabitat(Habitat_SALTWATER).withSell(203).withDescription("Rumor has it that eating this fish grants special power to those who believe.").withRarity(Rarity_LEGENDARY).withLayer("squishfish_layer_1", 286).withLayer("squishfish_layer_2", 287).withLayer("squishfish_layer_3", 288), 80, 140, 180));
 
     Items::YELLOW_KEY_FAKE = registerItem("yellow_key_fake", new Item(ItemSettings().withName("Metallic Object").withDescription("A mysterious metal object. It has a tag which says \"key\" on it.").withLayer("key", 26)));
     Items::YELLOW_KEY = registerItem("yellow_key", new Item(ItemSettings().withName("Yellow Key").withDescription("A \"key\" which opens yellow gates.").withLayer("key", 26)));
@@ -385,8 +474,39 @@ void registerItems(void)
     toPool("junk", Items::TIRE, 25);
     toPool("junk", Items::GOLDFISH, 1);
 
-    // TODO: saltwater small,
-    // saltwater large
+    toPool("saltwater_small", Items::RED_SNAPPER, 9);
+    toPool("saltwater_small", Items::AMBERJACK, 9);
+    toPool("saltwater_small", Items::COALFISH, 9);
+    toPool("saltwater_small", Items::ANCHOVY, 14);
+    toPool("saltwater_small", Items::SARDINE, 14);
+    toPool("saltwater_small", Items::SPIKE_FISH, 7);
+    toPool("saltwater_small", Items::TIRE, 5);
+    toPool("saltwater_small", Items::NAVAL_MINE, 1);
+    toPool("saltwater_small", Items::TRINKETFIN, 1);
+
+    toPool("saltwater_large", Items::RED_SNAPPER, 10);
+    toPool("saltwater_large", Items::TUNA, 6);
+    toPool("saltwater_large", Items::BLUE_MARLIN, 4);
+    toPool("saltwater_large", Items::AMBERJACK, 10);
+    toPool("saltwater_large", Items::COALFISH, 10);
+    toPool("saltwater_large", Items::WAHOO, 6);
+    toPool("saltwater_large", Items::ANCHOVY, 12);
+    toPool("saltwater_large", Items::SARDINE, 12);
+    toPool("saltwater_large", Items::POMPANO, 7);
+    toPool("saltwater_large", Items::PUFFERFISH, 2);
+    toPool("saltwater_large", Items::MAHIMAHI, 4);
+    toPool("saltwater_large", Items::MORAY_EEL, 5);
+    toPool("saltwater_large", Items::RIBBON_EEL, 4);
+    toPool("saltwater_large", Items::SQUID, 3);
+    toPool("saltwater_large", Items::OCTOPUS, 2);
+    toPool("saltwater_large", Items::STAR_FISH, 8);
+    toPool("saltwater_large", Items::TRINKETFIN, 1);
+    toPool("saltwater_large", Items::STAR_FISH, 2);
+    toPool("saltwater_large", Items::FISHTRONAUT, 1);
+    toPool("saltwater_large", Items::NAVAL_MINE, 1);
+    toPool("saltwater_large", Items::TIRE, 2);
+    toPool("saltwater_large", Items::THIRTY_SEVEN_FISH, 1);
+    toPool("saltwater_large", Items::SQUISHFISH, 1);
 
     BESTIARY_ITEMS.push_back(Items::LARGEMOUTH_BASS);
     BESTIARY_ITEMS.push_back(Items::SMALLMOUTH_BASS);
@@ -410,6 +530,26 @@ void registerItems(void)
     BESTIARY_ITEMS.push_back(Items::VIRIDIFIN);
     BESTIARY_ITEMS.push_back(Items::EDGEFISH);
     BESTIARY_ITEMS.push_back(Items::TERMINNOW);
+
+    BESTIARY_ITEMS.push_back(Items::RED_SNAPPER);
+    BESTIARY_ITEMS.push_back(Items::TUNA);
+    BESTIARY_ITEMS.push_back(Items::BLUE_MARLIN);
+    BESTIARY_ITEMS.push_back(Items::AMBERJACK);
+    BESTIARY_ITEMS.push_back(Items::COALFISH);
+    BESTIARY_ITEMS.push_back(Items::WAHOO);
+    BESTIARY_ITEMS.push_back(Items::ANCHOVY);
+    BESTIARY_ITEMS.push_back(Items::SARDINE);
+    BESTIARY_ITEMS.push_back(Items::POMPANO);
+    BESTIARY_ITEMS.push_back(Items::PUFFERFISH);
+    BESTIARY_ITEMS.push_back(Items::MAHIMAHI);
+    BESTIARY_ITEMS.push_back(Items::MORAY_EEL);
+    BESTIARY_ITEMS.push_back(Items::RIBBON_EEL);
+    BESTIARY_ITEMS.push_back(Items::SQUID);
+    BESTIARY_ITEMS.push_back(Items::OCTOPUS);
+    BESTIARY_ITEMS.push_back(Items::STAR_FISH);
+    BESTIARY_ITEMS.push_back(Items::FISHTRONAUT);
+    BESTIARY_ITEMS.push_back(Items::THIRTY_SEVEN_FISH);
+    BESTIARY_ITEMS.push_back(Items::SQUISHFISH);
 }
 
 std::vector<Item*> getBestiaryItems(void)
@@ -419,6 +559,7 @@ std::vector<Item*> getBestiaryItems(void)
 
 bool hasDiscovered(Item* item)
 {
+    return true; // debug
     for (auto& info : game.fish_catch_info)
     {
         if (info.item == item)
@@ -446,6 +587,19 @@ FishCatchInfo getFishCatchInfo(Item* item)
     info.largest = 0;
     info.amount = 0;
     return info;
+}
+
+int getTrinketFinCount(void)
+{
+    int amount = 0;
+    for (auto& stack : game.inventory)
+    {
+        if (stack.item == Items::TRINKETFIN)
+        {
+            amount += stack.count;
+        }
+    }
+    return amount;
 }
 
 ItemStack* getEquippedRod(void)

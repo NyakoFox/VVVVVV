@@ -2265,6 +2265,7 @@ void entityclass::createentity(int xp, int yp, int t, int meta1, int meta2, int 
         entity.cy = 0;
         entity.w = 3;
         entity.h = 3;
+        entity.bobbergrav = game.gravitycontrol;
         break;
     case 201: // Gate (yellow)
     case 202: // Gate (blue)
@@ -3617,7 +3618,7 @@ bool entityclass::updateentities( int i )
 
             if (entities[i].in_water)
             {
-                if (game.gravitycontrol == 0)
+                if (entities[i].bobbergrav == 0)
                 {
                     entities[i].vy -= water_buoyancy;
                     if (entities[i].vy < -water_cap) entities[i].vy = -water_cap;
@@ -3642,7 +3643,7 @@ bool entityclass::updateentities( int i )
             }
             else
             {
-                if (game.gravitycontrol == 0)
+                if (entities[i].bobbergrav == 0)
                 {
                     entities[i].vy += grav;
                     if (entities[i].vy > ycap) entities[i].vy = ycap;
@@ -5137,6 +5138,8 @@ void entityclass::entityblockcheck(void)
                     {
                         blocks[j].bottom_springs[index + 1].y -= (entities[i].vy * ENTITY_LEAVE_SPRING_MULT);
                     }
+
+                    entities[i].bobbergrav = top ? 0 : 1;
                 }
             }
         }

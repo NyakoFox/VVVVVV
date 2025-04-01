@@ -2275,9 +2275,9 @@ void Graphics::drawentity(const int i, const int yoff)
                     SDL_Point bobberPoint;
                     bobberPoint.x = obj.entities[j].xp + obj.entities[j].off_x + obj.entities[j].cx + (obj.entities[j].w / 2);
                     bobberPoint.y = obj.entities[j].yp + obj.entities[j].off_y + obj.entities[j].cy - 1;
-                    if (game.gravitycontrol == 1)
+                    if (obj.entities[j].bobbergrav == 1)
                     {
-                        bobberPoint.y += 3;
+                        bobberPoint.y += 4;
                     }
 
                     SDL_Point playerPoint = obj.getRodPointPosition();
@@ -2576,9 +2576,9 @@ void Graphics::drawentity(const int i, const int yoff)
             return;
         }
 
-        bool flipped = (game.gravitycontrol == 1);
+        bool flipped = (obj.entities[i].bobbergrav == 1);
 
-        const SDL_Rect dstrect = { xp + obj.entities[i].off_x, yp + obj.entities[i].off_y + (flipped ? -4 : 0), w, h};
+        const SDL_Rect dstrect = { xp + obj.entities[i].off_x, yp + obj.entities[i].off_y + (flipped ? -12 : 0), w, h};
 
         copy_texture(grphx.im_bobber, NULL, &dstrect, 0, NULL, flipped ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE);
         break;
@@ -3544,6 +3544,11 @@ void Graphics::updatetowerbackground(TowerBG& bg_obj)
     set_render_target(target);
 }
 
+static SDL_Color makeDarker(SDL_Color color)
+{
+    return { (Uint8)(color.r * 0.5), (Uint8)(color.g * 0.5), (Uint8)(color.b * 0.5), color.a };
+}
+
 #define GETCOL_RANDOM (game.noflashingmode ? 0.5 : fRandom())
 SDL_Color Graphics::getcol( int t )
 {
@@ -3870,6 +3875,101 @@ SDL_Color Graphics::getcol( int t )
             sinf(0.05 * game.framecounter + 2 * M_PI / 3) * 127 + 128,
             sinf(0.05 * game.framecounter + 4 * M_PI / 3) * 127 + 128
         );
+    case 242: // Red snapper, layer 1
+        return getRGB(221 - help.glow / 2, 81 - help.glow / 2, 70 - help.glow / 2);
+    case 243: // Red snapper, layer 2
+        return getRGB(234 - help.glow / 2, 146 - help.glow / 2, 143 - help.glow / 2);
+    case 244: // Tuna, layer 1
+        return getRGB(167 - help.glow / 2, 210 - help.glow / 2, 211 - help.glow / 2);
+    case 245: // Tuna, layer 2
+        return getRGB(SDL_max(23 - help.glow / 2, 0), 110 - help.glow / 2, 168 - help.glow / 2);
+    case 246: // Tuna, layer 3
+        return getRGB(237 - help.glow / 2, 224 - help.glow / 2, 151 - help.glow / 2);
+
+    case 247: // blue marlin layer 1
+        return getRGB(195 - help.glow / 2, 209 - help.glow / 2, 224 - help.glow / 2);
+    case 248: // blue marlin layer 2
+        return getRGB(75 - help.glow / 2, 96 - help.glow / 2, 216 - help.glow / 2);
+    case 249: // amberjack layer 1
+        return getRGB(192 - help.glow / 2, 196 - help.glow / 2, 173 - help.glow / 2);
+    case 250: // amberjack layer 2
+        return getRGB(211 - help.glow / 2, 151 - help.glow / 2, 81 - help.glow / 2);
+    case 251: // amberjack layer 3
+        return getRGB(124 - help.glow / 2, 138 - help.glow / 2, 139 - help.glow / 2);
+    case 252: // coalfish layer 1
+        return getRGB(114 - help.glow / 2, 137 - help.glow / 2, 145 - help.glow / 2);
+    case 253: // coalfish layer 2
+        return getRGB(61 - help.glow / 2, 81 - help.glow / 2, 81 - help.glow / 2);
+    case 254: // wahoo layer 1
+        return getRGB(70 - help.glow / 2, 109 - help.glow / 2, 127 - help.glow / 2);
+    case 255: // wahoo layer 2
+        return getRGB(159 - help.glow / 2, 186 - help.glow / 2, 198 - help.glow / 2);
+    case 256: // anchovy layer 1
+        return getRGB(188 - help.glow / 2, 219 - help.glow / 2, 221 - help.glow / 2);
+    case 257: // anchovy layer 2
+        return getRGB(105 - help.glow / 2, 159 - help.glow / 2, 188 - help.glow / 2);
+    case 258: // sardine layer 1
+        return getRGB(226 - help.glow / 2, 220 - help.glow / 2, 206 - help.glow / 2);
+    case 259: // sardine layer 2
+        return getRGB(117 - help.glow / 2, 117 - help.glow / 2, 130 - help.glow / 2);
+    case 260: // pompano layer 1
+        return getRGB(207 - help.glow / 2, 218 - help.glow / 2, 214 - help.glow / 2);
+    case 261: // pompano layer 2
+        return getRGB(120 - help.glow / 2, 165 - help.glow / 2, 138 - help.glow / 2);
+    case 262: // pompano layer 3
+        return getRGB(252 - help.glow / 2, 215 - help.glow / 2, 95 - help.glow / 2);
+    case 263: // pufferfish layer 1
+        return getRGB(201 - help.glow / 2, 159 - help.glow / 2, 100 - help.glow / 2);
+    case 264: // pufferfish layer 2
+        return getRGB(243 - help.glow / 2, 231 - help.glow / 2, 205 - help.glow / 2);
+    case 265: // mahi-mahi layer 1
+        return getRGB(209 - help.glow / 2, 216 - help.glow / 2, 82 - help.glow / 2);
+    case 266: // mahi-mahi layer 2
+        return getRGB(72 - help.glow / 2, 175 - help.glow / 2, 80 - help.glow / 2);
+    case 267: // mahi-mahi layer 3
+        return getRGB(76 - help.glow / 2, 109 - help.glow / 2, 165 - help.glow / 2);
+    case 268: // moray eel layer 1
+        return getRGB(225 - help.glow / 2, 226 - help.glow / 2, 127 - help.glow / 2);
+    case 269: // moray eel layer 2
+        return getRGB(160 - help.glow / 2, 178 - help.glow / 2, 105 - help.glow / 2);
+    case 270: // ribbon eel layer 1
+        return getRGB(234 - help.glow / 2, 211 - help.glow / 2, 60 - help.glow / 2);
+    case 271: // ribbon eel layer 2
+        return getRGB(77 - help.glow / 2, 139 - help.glow / 2, 226 - help.glow / 2);
+    case 272: // squid layer 1
+        return getRGB(229 - help.glow / 2, 214 - help.glow / 2, 208 - help.glow / 2);
+    case 273: // squid layer 2
+        return getRGB(193 - help.glow / 2, 150 - help.glow / 2, 143 - help.glow / 2);
+    case 274: // octopus layer 1
+        return getRGB(158 - help.glow / 2, 63 - help.glow / 2, 93 - help.glow / 2);
+    case 275: // octopus layer 2
+        return getRGB(135 - help.glow / 2, 35 - help.glow / 2, 66 - help.glow / 2);
+    case 276: // star fish
+        return getRGB(247 - help.glow / 2, 228 - help.glow / 2, 121 - help.glow / 2);
+    case 277: // fishtronaut layer 1
+        return getRGB(137 - help.glow / 2, 111 - help.glow / 2, 88 - help.glow / 2);
+    case 278: // fishtronaut layer 2
+        return getRGB(173 - help.glow / 2, 172 - help.glow / 2, 138 - help.glow / 2);
+    case 279: // fishtronaut layer 3
+        return getRGB(255 - help.glow / 2, 255 - help.glow / 2, 255 - help.glow / 2);
+    case 280: // fishtronaut layer 4
+        return getRGB(201 - help.glow / 2, 206 - help.glow / 2, 206 - help.glow / 2);
+    case 281: // fishtronaut layer 5
+        return getRGB(154 - help.glow / 2, 165 - help.glow / 2, 165 - help.glow / 2);
+    case 282: // fishtronaut layer 6
+        return getRGB(74 - help.glow / 2, 96 - help.glow / 2, 135 - help.glow / 2);
+    case 283: // fishtronaut layer 7
+        return getRGB(165 - help.glow / 2, 131 - help.glow / 2, 46 - help.glow / 2);
+    case 284: // naval mine layer 1
+        return getRGB(61 - help.glow / 2, 58 - help.glow / 2, 60 - help.glow / 2);
+    case 285: // naval mine layer 2
+        return getRGB(86 - help.glow / 2, 83 - help.glow / 2, 85 - help.glow / 2);
+    case 286: // squishfish layer 1
+        return getRGB(117 - help.glow / 2, 209 - help.glow / 2, 248 - help.glow / 2);
+    case 287: // squishfish layer 2
+        return getRGB(158 - help.glow / 2, 255 - help.glow / 2, 227 - help.glow / 2);
+    case 288: // squishfish layer 3
+        return getRGB(117 - help.glow / 2, 139 - help.glow / 2, 248 - help.glow / 2);
 
     case 300: // Blue key
         if (game.noflashingmode)
@@ -3892,12 +3992,12 @@ SDL_Color Graphics::getcol( int t )
 
     case 303: // Bucket
         return getRGB(128 - help.glow / 2, 128 - help.glow / 2, 128 - help.glow / 2);
-    case 304: return getWaterColorsForPool("freshwater_small"); // Freshwater
-    case 305: return getWaterColorsForPool("saltwater_small"); // Saltwater
-    case 306: return getWaterColorsForPool("junk"); // Junk pool
-    case 307: return getWaterColorsForPool("special_green"); // Green water
-    case 308: return getWaterColorsForPool("special_blue"); // Blue water
-    case 309: return getWaterColorsForPool("special_purple"); // Purple water
+    case 304: return makeDarker(getWaterColorsForPool("freshwater_small")); // Freshwater
+    case 305: return makeDarker(getWaterColorsForPool("saltwater_small")); // Saltwater
+    case 306: return makeDarker(getWaterColorsForPool("junk")); // Junk pool
+    case 307: return makeDarker(getWaterColorsForPool("special_green")); // Green water
+    case 308: return makeDarker(getWaterColorsForPool("special_blue")); // Blue water
+    case 309: return makeDarker(getWaterColorsForPool("special_purple")); // Purple water
 
     case 310: // Enhanced Bait layer 1
         return getRGB(0, 255 - help.glow / 2, 180 - help.glow / 2);

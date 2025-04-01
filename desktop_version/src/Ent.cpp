@@ -76,6 +76,8 @@ void entclass::clear(void)
     off_y = 0;
 
     item = NULL;
+
+    bobbergrav = 0;
 }
 
 bool entclass::outside(void)

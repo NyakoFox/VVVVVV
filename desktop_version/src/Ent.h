@@ -99,6 +99,7 @@ public:
     int off_y;
 
     Item* item;
+    int bobbergrav;
 };
 
 #endif /* ENT_H */
