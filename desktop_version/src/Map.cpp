@@ -2040,6 +2040,13 @@ void mapclass::loadlevel(int rx, int ry)
             case 205: // Special terminal
                 obj.createentity(ex, ey, 205, ent.p1);
                 break;
+            case 206: // Item display
+                game.last_item = getItem(ent.scriptname);
+                if ((ent.p1 == -1) || (INBOUNDS_ARR(ent.p1, obj.flags) && !obj.flags[ent.p1]))
+                {
+                    obj.createentity(ex, ey, 206);
+                }
+                break;
             }
         }
 

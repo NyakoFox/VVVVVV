@@ -400,6 +400,7 @@ void Game::init(void)
     fishing_timer = 0;
     fishing_total = 0;
     fishing_anim_timer = 0;
+    last_item = NULL;
 
     fishing_revealed = false;
 

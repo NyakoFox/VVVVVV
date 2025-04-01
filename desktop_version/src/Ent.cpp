@@ -74,6 +74,8 @@ void entclass::clear(void)
 
     off_x = 0;
     off_y = 0;
+
+    item = NULL;
 }
 
 bool entclass::outside(void)

@@ -1635,6 +1635,7 @@ void scriptclass::run(void)
                 game.shopsubselect = 0;
                 game.fishing_state = FishingState_IDLE;
                 game.fishing_item = ItemStack();
+                game.last_item = NULL;
                 game.fishing_timer = 0;
                 game.fishing_total = 0;
                 game.fishing_anim_timer = 0;
@@ -2839,6 +2840,19 @@ void scriptclass::run(void)
             {
                 upgradeBait();
             }
+            else if (words[0] == "destroyitemdisplay")
+            {
+                for (int i = 0; i < obj.entities.size(); i++)
+                {
+                    if (obj.entities[i].type == EntityType_ITEM)
+                    {
+                        if (getItemID(obj.entities[i].item) == words[1])
+                        {
+                            obj.disableentity(i);
+                        }
+                    }
+                }
+            }
 
             position++;
         }
@@ -3616,6 +3630,7 @@ void scriptclass::hardreset(void)
 
     game.fishing_state = FishingState_IDLE;
     game.fishing_item = ItemStack();
+    game.last_item = NULL;
     game.fishing_timer = 0;
     game.fishing_total = 0;
     game.fishing_anim_timer = 0;

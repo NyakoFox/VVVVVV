@@ -13,6 +13,7 @@
 #include "Game.h"
 #include "Graphics.h"
 #include "GraphicsUtil.h"
+#include "ItemHelpers.h"
 #include "KeyPoll.h"
 #include "Localization.h"
 #include "Map.h"
@@ -1251,6 +1252,15 @@ static void draw_entities(void)
                 graphics.draw_grid_tile(graphics.grphx.im_special_terminals, entity->p1, x, y, 32, 40, graphics.getcol(4));
                 graphics.draw_rect(x, y, 32, 40, graphics.getRGB(164, 164, 164));
                 break;
+            }
+            case 206: // Item display
+            {
+                Item* item = getItem(entity->scriptname);
+                if (item != NULL)
+                {
+                    item->draw(x, y);
+                }
+                graphics.draw_rect(x, y, 16, 16, graphics.getRGB(164, 255, 255));
             }
             case 50: // Warp Lines
                 if (entity->p1 >= 2) // Horizontal

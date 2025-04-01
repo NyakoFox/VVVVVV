@@ -5,6 +5,8 @@
 
 #define        rn( rx,  ry) ((rx) + ((ry) * 100))
 
+#include "Item.h"
+
 enum EntityType
 {
     EntityType_INVALID = -1,
@@ -33,7 +35,8 @@ enum EntityType
     EntityType_TELEPORTER = 100,
     EntityType_BOBBER = 200,
     EntityType_GATE = 201,
-    EntityType_SPECIAL_TERMINAL = 205
+    EntityType_SPECIAL_TERMINAL = 205,
+    EntityType_ITEM = 206
 };
 
 class entclass
@@ -94,6 +97,8 @@ public:
 
     int off_x;
     int off_y;
+
+    Item* item;
 };
 
 #endif /* ENT_H */

@@ -2301,6 +2301,14 @@ void entityclass::createentity(int xp, int yp, int t, int meta1, int meta2, int 
         createblock(ACTIVITY, entity.xp, entity.yp, entity.w, entity.h, 36 + meta1, "special", true);
 
         break;
+    case 206: // Item display
+        entity.size = 206;
+        entity.rule = 206;
+        entity.type = EntityType_ITEM;
+        entity.w = 16;
+        entity.h = 16;
+        entity.item = game.last_item;
+        break;
     }
 
     entity.lerpoldxp = entity.xp;

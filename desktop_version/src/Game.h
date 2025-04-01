@@ -658,6 +658,8 @@ public:
     int shopcoinflash;
     ShopSubMode shopsubmode;
     int shopsubselect;
+
+    Item* last_item;
 };
 
 #ifndef GAME_DEFINITION

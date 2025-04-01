@@ -2649,6 +2649,12 @@ void Graphics::drawentity(const int i, const int yoff)
     case 205: // Special terminal
         draw_grid_tile(grphx.im_special_terminals, obj.entities[i].drawframe, xp, yp - yoff, 32, 40, obj.entities[i].realcol);
         break;
+    case 206: // Item display
+        if (obj.entities[i].item != NULL)
+        {
+            obj.entities[i].item->draw(xp, yp - yoff);
+        }
+        break;
     }
 }
 
