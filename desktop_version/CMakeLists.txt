@@ -121,6 +121,8 @@ set(VVV_CXX_SRC
     src/FishItem.cpp
     src/EquippableItem.cpp
     src/FishingRodItem.cpp
+    src/BucketItem.cpp
+    src/FilledBucketItem.cpp
 )
 set(VVV_C_SRC
     src/DeferCallbacks.c

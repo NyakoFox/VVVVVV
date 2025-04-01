@@ -3,6 +3,8 @@
 
 void titlelogic(void);
 
+void shoplogic(void);
+
 void maplogic(void);
 
 void gamecompletelogic(void);

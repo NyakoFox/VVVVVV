@@ -43,7 +43,30 @@ void FishItem::getDefaultComponents(ItemStack* stack)
 
 std::string FishItem::getLongName(ItemStack* stack)
 {
-    // find the fish_size component
     int size = stack->fish_size;
     return this->settings.name + " - " + help.String(size) + "cm";
 };
+
+std::string FishItem::getCatchText(ItemStack* stack)
+{
+    int size = stack->fish_size;
+    return this->settings.name + "\n\n" + help.String(size) + "cm";
+}
+
+int FishItem::getSellPrice(ItemStack* stack)
+{
+    const double low_mult = 0.8;
+    const double high_mult = 1.5;
+
+    double scale = (stack->fish_size > this->common_size) ? (high_mult - 1.0) : (low_mult - 1.0);
+    int bound = (stack->fish_size > this->common_size) ? this->max_size : this->min_size;
+
+    if (stack->fish_size == this->common_size)
+    {
+        return settings.sell_price;
+    }
+    else
+    {
+        return settings.sell_price * ((((stack->fish_size - this->common_size) / (double)(bound - this->common_size)) * scale) + 1.0);
+    }
+}

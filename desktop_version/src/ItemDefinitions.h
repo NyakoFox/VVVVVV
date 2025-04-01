@@ -16,4 +16,12 @@ struct ItemGetDisplay {
     int timer;
 };
 
+struct FishCatchInfo
+{
+    Item* item;
+    int smallest;
+    int largest;
+    int amount;
+};
+
 #endif /* ITEMDEFINITIONS_H */

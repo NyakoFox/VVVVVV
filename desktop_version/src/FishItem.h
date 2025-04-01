@@ -16,6 +16,8 @@ public:
     FishItem(void);
     virtual void getDefaultComponents(ItemStack* stack) override;
     virtual std::string getLongName(ItemStack* stack) override;
+    virtual std::string getCatchText(ItemStack* stack) override;
+    virtual int getSellPrice(ItemStack* stack) override;
     int min_size;
     int common_size;
     int max_size;

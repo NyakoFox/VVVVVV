@@ -44,6 +44,12 @@ void titlelogic(void)
     }
 }
 
+void shoplogic(void)
+{
+    //Misc
+    help.updateglow();
+}
+
 void maplogic(void)
 {
     //Misc
@@ -75,6 +81,8 @@ void gamecompletelogic(void)
         //Fix some graphical things
         graphics.showcutscenebars = false;
         graphics.setbars(0);
+        graphics.oldcutscenebarspos_fast = 0;
+        graphics.cutscenebarspos = 0;
         graphics.titlebg.scrolldir = 0;
         graphics.titlebg.bypos = 0;
         //Return to game
@@ -109,6 +117,8 @@ void gamecompletelogic2(void)
         //Fix some graphical things
         graphics.showcutscenebars = false;
         graphics.setbars(0);
+        graphics.oldcutscenebarspos_fast = 0;
+        graphics.cutscenebarspos = 0;
         //Fix the save thingy
         game.deletequick();
         int tmp=music.currentsong;
@@ -1515,6 +1525,11 @@ void gamelogic(void)
     {
         music.playef(Sound_SPLASH);
         game.play_splash = false;
+    }
+    if (game.play_splash2)
+    {
+        music.playef(Sound_SPLASH2);
+        game.play_splash2 = false;
     }
 
     level_debugger::logic();

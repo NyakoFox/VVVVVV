@@ -25,6 +25,7 @@ public:
 
     void increment(int amount);
     void increment(void);
+    bool decrement(int amount);
     bool decrement(void);
 
     bool isEmpty(void);
@@ -34,7 +35,13 @@ public:
     std::string getName(void);
     std::string getLongName(void);
     std::string getDescription(void);
+    std::string getCatchText(void);
     SDL_Color getNameColor(void);
+    ItemRarity getRarity(void);
+    int getBuyPrice(void);
+    bool canBuy(void);
+    int getSellPrice(void);
+    bool canSell(void);
 
     tinyxml2::XMLElement* serialize(tinyxml2::XMLDocument* doc);
 

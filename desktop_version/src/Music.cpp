@@ -191,7 +191,13 @@ end:
 
         for (int i = 0; i < VVV_MAX_CHANNELS; i++)
         {
-            FAudioSourceVoice_Stop(voices[i], 0, FAUDIO_COMMIT_NOW);
+            FAudioVoiceState voicestate;
+            FAudioSourceVoice_GetState(voices[i], &voicestate, 0);
+            if (voicestate.pCurrentBufferContext == ((void*)this))
+            {
+                FAudioSourceVoice_Stop(voices[i], 0, FAUDIO_COMMIT_NOW);
+                FAudioSourceVoice_FlushSourceBuffers(voices[i]);
+            }
         }
     }
 
@@ -230,7 +236,7 @@ end:
                     0, /* LoopBegin */
                     0, /* LoopLength */
                     (loop ? FAUDIO_LOOP_INFINITE : 0), /* LoopCount */
-                    NULL
+                    this /* pContext */
                 };
                 if (vorbis != NULL)
                 {
@@ -796,6 +802,12 @@ void musicclass::init(void)
     soundTracks.push_back(SoundTrack( "sounds/itemget.wav" ));
     soundTracks.push_back(SoundTrack( "sounds/reel.wav" ));
     soundTracks.push_back(SoundTrack( "sounds/splash2.wav" ));
+    soundTracks.push_back(SoundTrack( "sounds/fishalert.wav" ));
+    soundTracks.push_back(SoundTrack( "sounds/fishcaught.wav" ));
+    soundTracks.push_back(SoundTrack( "sounds/gate.wav" ));
+    soundTracks.push_back(SoundTrack( "sounds/fillbucket.wav" ));
+    soundTracks.push_back(SoundTrack( "sounds/error.wav" ));
+    soundTracks.push_back(SoundTrack( "sounds/cash.wav" ));
 
 #ifdef VVV_COMPILEMUSIC
     binaryBlob musicWriteBlob;

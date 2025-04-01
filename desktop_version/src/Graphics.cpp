@@ -41,7 +41,10 @@ void Graphics::init(void)
     trinketcolset = false;
 
     showcutscenebars = false;
+    showcutscenebars_fast = false;
     setbars(0);
+    oldcutscenebarspos_fast = 0;
+    cutscenebarspos = 0;
     notextoutline = false;
 
     flipmode = false;
@@ -832,6 +835,8 @@ bool Graphics::isbg(int t)
     // ok, so the tile is nonsolid. some should still show up in front of entities though, like the grass! so let's add a special case for those:
     if (map.tileset == 1)
     {
+        if (t >= 6 && t <= 9) return false; // spikes
+        if (t >= 49 && t <= 74) return false; // all spikes
         // GRASS:
 
         if (t == 941 || t == 942 || t == 981 || t == 982) return false; // grass-to-wall tiles
@@ -839,7 +844,6 @@ bool Graphics::isbg(int t)
         if (t >= 984 && t <= 989) return false; // grass (bottom)
         if (t >= 1024 && t <= 1033) return false; // literally every other decal (row 1)
         if (t >= 1064 && t <= 1073) return false; // literally every other decal (row 2)
-        if (t == 51 || t == 52 || t == 63 || t == 64) return false; // special spikes
 
         // SAND:
         if (t == 888 || t == 889) return false; // corner tiles for rocks (row 1)
@@ -1401,6 +1405,21 @@ void Graphics::cutscenebars(void)
         fill_rect(0, 0, usethispos, 16, 0, 0, 0);
         fill_rect(360 - usethispos, 224, usethispos, 16, 0, 0, 0);
     }
+
+    const float usethispos2 = lerp(oldcutscenebarspos_fast, cutscenebarspos_fast);
+    if (showcutscenebars_fast)
+    {
+        const int off = easeOutCubic(usethispos2) * 16;
+
+        fill_rect(0, -16 + off, 320, 16, 0, 0, 0);
+        fill_rect(0, 240 - off, 320, 16, 0, 0, 0);
+    }
+    else if (cutscenebarspos_fast > 0) //disappearing
+    {
+        const int off = easeInCubic(usethispos2) * 16;
+        fill_rect(0, -16 + off, 320, 16, 0, 0, 0);
+        fill_rect(0, 240 - off, 320, 16, 0, 0, 0);
+    }
 }
 
 void Graphics::cutscenebarstimer(void)
@@ -1416,6 +1435,19 @@ void Graphics::cutscenebarstimer(void)
         //disappearing
         cutscenebarspos -= 25;
         cutscenebarspos = SDL_max(cutscenebarspos, 0);
+    }
+
+    oldcutscenebarspos_fast = cutscenebarspos_fast;
+    if (showcutscenebars_fast)
+    {
+        cutscenebarspos_fast += 0.15;
+        cutscenebarspos_fast = SDL_min(cutscenebarspos_fast, 1);
+    }
+    else if (cutscenebarspos_fast > 0)
+    {
+        //disappearing
+        cutscenebarspos_fast -= 0.15;
+        cutscenebarspos_fast = SDL_max(cutscenebarspos_fast, 0);
     }
 }
 
@@ -2241,54 +2273,46 @@ void Graphics::drawentity(const int i, const int yoff)
                 {
                     // draw a line from the player to the bobber
                     SDL_Point bobberPoint;
-                    bobberPoint.x = obj.entities[j].xp + obj.entities[j].cx + (obj.entities[j].w / 2);
-                    bobberPoint.y = obj.entities[j].yp + obj.entities[j].cy;
+                    bobberPoint.x = obj.entities[j].xp + obj.entities[j].off_x + obj.entities[j].cx + (obj.entities[j].w / 2);
+                    bobberPoint.y = obj.entities[j].yp + obj.entities[j].off_y + obj.entities[j].cy - 1;
                     if (game.gravitycontrol == 1)
                     {
                         bobberPoint.y += 3;
                     }
 
-                    SDL_Point playerPoint;
-                    playerPoint.x = tpoint.x + 16 + 14;
-                    playerPoint.y = tpoint.y + 16 - 13;
-
-                    if (obj.entities[i].dir == 0)
-                    {
-                        playerPoint.x -= 37;
-                    }
-                    if (game.gravitycontrol == 1)
-                    {
-                        playerPoint.y += 21;
-                    }
-
-                    // TODO: maybe some actual physics for the midpoint...
-                    SDL_Point midPoint;
-                    midPoint.x = lerpReal(playerPoint.x, bobberPoint.x, 0.1);
-                    midPoint.y = lerpReal(playerPoint.y, bobberPoint.y, 0.9);
+                    SDL_Point playerPoint = obj.getRodPointPosition();
 
                     set_color(255, 255, 255);
 
-                    SDL_Point points[FISHING_LINE_SMOOTHNESS + 1];
-                    for (int k = 0; k <= FISHING_LINE_SMOOTHNESS; k++)
+                    if (obj.entities[j].behave == 1)
                     {
-                        float progress = (float)k / FISHING_LINE_SMOOTHNESS;
-                        float left_line_x = lerpReal(playerPoint.x, midPoint.x, progress);
-                        float left_line_y = lerpReal(playerPoint.y, midPoint.y, progress);
-                        float right_line_x = lerpReal(midPoint.x, bobberPoint.x, progress);
-                        float right_line_y = lerpReal(midPoint.y, bobberPoint.y, progress);
-
-                        SDL_Point coords;
-                        coords.x = lerpReal(left_line_x, right_line_x, progress);
-                        coords.y = lerpReal(left_line_y, right_line_y, progress);
-
-                        points[k] = coords;
+                        draw_line(playerPoint.x, playerPoint.y, bobberPoint.x, bobberPoint.y);
                     }
+                    else
+                    {
+                        // TODO: maybe some actual physics for the midpoint...
+                        SDL_Point midPoint;
+                        midPoint.x = lerpReal(playerPoint.x, bobberPoint.x, 0.1);
+                        midPoint.y = lerpReal(playerPoint.y, bobberPoint.y, 0.9);
 
-                    draw_lines(points, SDL_arraysize(points));
+                        SDL_Point points[FISHING_LINE_SMOOTHNESS + 1];
+                        for (int k = 0; k <= FISHING_LINE_SMOOTHNESS; k++)
+                        {
+                            float progress = (float)k / FISHING_LINE_SMOOTHNESS;
+                            float left_line_x = lerpReal(playerPoint.x, midPoint.x, progress);
+                            float left_line_y = lerpReal(playerPoint.y, midPoint.y, progress);
+                            float right_line_x = lerpReal(midPoint.x, bobberPoint.x, progress);
+                            float right_line_y = lerpReal(midPoint.y, bobberPoint.y, progress);
 
-                    //draw_rect(playerPoint.x - 2, playerPoint.y - 2, 4, 4, 255, 0, 0);
-                    //draw_rect(midPoint.x - 2, midPoint.y - 2, 4, 4, 255, 0, 0);
-                    //draw_rect(bobberPoint.x - 2, bobberPoint.y - 2, 4, 4, 255, 0, 0);
+                            SDL_Point coords;
+                            coords.x = lerpReal(left_line_x, right_line_x, progress);
+                            coords.y = lerpReal(left_line_y, right_line_y, progress);
+
+                            points[k] = coords;
+                        }
+
+                        draw_lines(points, SDL_arraysize(points));
+                    }
                 }
             }
         }
@@ -2543,7 +2567,7 @@ void Graphics::drawentity(const int i, const int yoff)
         draw_grid_tile(grphx.im_sprites, obj.entities[i].drawframe, xp, yp - yoff, sprites_rect.w, sprites_rect.h, obj.entities[i].realcol, 6, 6);
         break;
     }
-    case 200:
+    case 200: // Bobber
     {
         int w, h;
 
@@ -2554,11 +2578,77 @@ void Graphics::drawentity(const int i, const int yoff)
 
         bool flipped = (game.gravitycontrol == 1);
 
-        const SDL_Rect dstrect = { xp, yp + (flipped ? -4 : 0), w, h};
+        const SDL_Rect dstrect = { xp + obj.entities[i].off_x, yp + obj.entities[i].off_y + (flipped ? -4 : 0), w, h};
 
         copy_texture(grphx.im_bobber, NULL, &dstrect, 0, NULL, flipped ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE);
         break;
     }
+
+    case 201: // Gate
+    {
+        SDL_Texture* texture = NULL;
+        switch (obj.entities[i].behave)
+        {
+        case 0: texture = grphx.im_gate_yellow; break;
+        case 1: texture = grphx.im_gate_blue; break;
+        case 2: texture = grphx.im_gate_purple; break;
+        case 3: texture = grphx.im_gate_red; break;
+        }
+
+        int x = xp;
+        int y = yp - yoff;
+        int w = obj.entities[i].w;
+        int h = obj.entities[i].h;
+
+        if (texture == NULL)
+        {
+            draw_rect(x, y, w, h, getRGB(255, 255, 255));
+            return;
+        }
+
+        for (int cx = x + 4; cx < x + w - 4; cx += 4)
+        {
+            // top edge
+            draw_grid_tile(texture, 3, cx, y, 4, 4);
+            // bottom edge
+            draw_grid_tile(texture, 13, cx, y + (h - 4), 4, 4);
+        }
+        for (int cy = y + 4; cy < y + h - 4; cy += 4)
+        {
+            // left edge
+            draw_grid_tile(texture, 7, x, cy, 4, 4);
+            // right edge
+            draw_grid_tile(texture, 9, x + (w - 4), cy, 4, 4);
+        }
+
+        for (int cy = y + 4; cy < y + h - 4; cy += 4)
+        {
+            for (int cx = x + 4; cx < x + w - 4; cx += 4)
+            {
+                draw_grid_tile(texture, 8, cx, cy, 4, 4);
+            }
+        }
+
+        // top left corner
+        draw_grid_tile(texture, 2, x, y, 4, 4);
+        // top right corner
+        draw_grid_tile(texture, 4, x + (w - 4), y, 4, 4);
+        // bottom left corner
+        draw_grid_tile(texture, 12, x, y + (h - 4), 4, 4);
+        // bottom right corner
+        draw_grid_tile(texture, 14, x + (w - 4), y + (h - 4), 4, 4);
+
+        // keyhole
+        draw_grid_tile(texture, 0, x + (w / 2) - 4, y + (h / 2) - 4, 4, 4);
+        draw_grid_tile(texture, 1, x + (w / 2), y + (h / 2) - 4, 4, 4);
+        draw_grid_tile(texture, 5, x + (w / 2) - 4, y + (h / 2), 4, 4);
+        draw_grid_tile(texture, 6, x + (w / 2), y + (h / 2), 4, 4);
+
+        break;
+    }
+    case 205: // Special terminal
+        draw_grid_tile(grphx.im_special_terminals, obj.entities[i].drawframe, xp, yp - yoff, 32, 40, obj.entities[i].realcol);
+        break;
     }
 }
 
@@ -3107,6 +3197,7 @@ void Graphics::drawwater(void)
 
         if (block.type == WATER)
         {
+            SDL_Color water_col = getWaterColorsForPool(block.script);
             std::vector<SDL_FPoint> current_points;
             std::vector<SDL_FPoint> current_bottom_points;
 
@@ -3195,14 +3286,14 @@ void Graphics::drawwater(void)
                 set_render_target(waterTexture);
 
                 // Draw the line
-                set_color(127, 192, 255);
+                set_color(water_col);
                 SDL_RenderDrawLineF(gameScreen.m_renderer, block.xp + x, block.yp + top_y, block.xp + x, block.yp + bottom_y);
             }
 
             set_render_target(waterLineUnderneathTexture);
 
             // Draw the springs as connected lines.
-            set_color(192, 255, 255);
+            set_color(SDL_clamp(water_col.r + 64, 0, 255), SDL_clamp(water_col.g + 64, 0, 255), SDL_clamp(water_col.b + 64, 0, 255));
             SDL_RenderDrawLines(gameScreen.m_renderer, points.data(), points.size());
             SDL_RenderDrawLines(gameScreen.m_renderer, bottom_points.data(), bottom_points.size());
             set_color(255, 255, 255);
@@ -3773,6 +3864,47 @@ SDL_Color Graphics::getcol( int t )
             sinf(0.05 * game.framecounter + 2 * M_PI / 3) * 127 + 128,
             sinf(0.05 * game.framecounter + 4 * M_PI / 3) * 127 + 128
         );
+
+    case 300: // Blue key
+        if (game.noflashingmode)
+        {
+            return getRGB(32, 32, 234);
+        }
+        return getRGB(32, 32, 250 - (int)(GETCOL_RANDOM * 32));
+    case 301: // Purple key
+        if (game.noflashingmode)
+        {
+            return getRGB(234, 10, 234);
+        }
+        return getRGB(250 - (int)(GETCOL_RANDOM * 32), 10, 250 - (int)(GETCOL_RANDOM * 32));
+    case 302: // Red key
+        if (game.noflashingmode)
+        {
+            return getRGB(234, 10, 10);
+        }
+        return getRGB(250 - (int)(GETCOL_RANDOM * 32), 10, 10);
+
+    case 303: // Bucket
+        return getRGB(128 - help.glow / 2, 128 - help.glow / 2, 128 - help.glow / 2);
+    case 304: return getWaterColorsForPool("freshwater_small"); // Freshwater
+    case 305: return getWaterColorsForPool("saltwater_small"); // Saltwater
+    case 306: return getWaterColorsForPool("junk"); // Junk pool
+    case 307: return getWaterColorsForPool("special_green"); // Green water
+    case 308: return getWaterColorsForPool("special_blue"); // Blue water
+    case 309: return getWaterColorsForPool("special_purple"); // Purple water
+
+    case 310: // Enhanced Bait layer 1
+        return getRGB(0, 255 - help.glow / 2, 180 - help.glow / 2);
+    case 311: // Enhanced Bait layer 2
+        return getRGB(0, 200 - help.glow / 2, 140 - help.glow / 2);
+    case 312: // Deluxe Bait layer 1
+        return getRGB(64, 64, 255 - help.glow / 2);
+    case 313: // Deluxe Bait layer 2
+        return getRGB(0, 0, 255 - help.glow / 2);
+    case 314: // Ultra Bait layer 1
+        return getRGB(240 - help.glow / 2, 0, 255 - help.glow / 2);
+    case 315: // Ultra Bait layer 2
+        return getRGB(220-20 - help.glow / 2, 0, 230 - 20 - help.glow / 2);
     }
 
     return getRGB(255, 255, 255);
@@ -3786,8 +3918,13 @@ void Graphics::menuoffrender(void)
         return;
     }
 
+    if (game.gamestate == SHOPMODE)
+    {
+        cutscenebars();
+    }
+
     const int offset = (int) lerp(oldmenuoffset, menuoffset);
-    const SDL_Rect offsetRect = {0, offset, SCREEN_WIDTH_PIXELS, SCREEN_HEIGHT_PIXELS};
+    const SDL_Rect offsetRect = {0, SDL_max(offset, 0), SCREEN_WIDTH_PIXELS, SCREEN_HEIGHT_PIXELS};
 
     if (copy_texture(menuTexture, NULL, &offsetRect) != 0)
     {

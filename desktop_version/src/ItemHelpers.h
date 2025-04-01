@@ -8,6 +8,11 @@
 #define FISHING_CHOOSE_MAX_TIME 40
 #define FISHING_LINE_SMOOTHNESS 100
 
+struct PoolData {
+    Item* item;
+    int weight;
+};
+
 namespace Items
 {
     extern Item* FISHING_ROD;
@@ -36,9 +41,30 @@ namespace Items
     extern Item* VIRIDIFIN;
     extern Item* EDGEFISH;
     extern Item* TERMINNOW;
+    extern Item* TIRE;
+
+    extern Item* YELLOW_KEY_FAKE;
+    extern Item* YELLOW_KEY;
+    extern Item* BLUE_KEY;
+    extern Item* PURPLE_KEY;
+    extern Item* RED_KEY;
+
+    extern Item* BUCKET;
+    extern Item* FRESHWATER_BUCKET;
+    extern Item* SALTWATER_BUCKET;
+    extern Item* JUNKWATER_BUCKET;
+    extern Item* GREENWATER_BUCKET;
+    extern Item* BLUEWATER_BUCKET;
+    extern Item* PURPLEWATER_BUCKET;
+
+    extern Item* ENHANCED_BAIT;
+    extern Item* DELUXE_BAIT;
+    extern Item* ULTRA_BAIT;
 
     extern Item* TEST;
 }
+
+bool hasItem(Item* item);
 
 void giveItem(ItemStack stack);
 
@@ -49,7 +75,26 @@ void cleanItems(void);
 Item* getItem(std::string id);
 std::string getItemID(Item* item);
 
+bool canUpgradeBait(void);
+void upgradeBait(void);
+
+void removeEmptyInventorySlots(void);
+
+bool hasBait(void);
+void useBait(void);
+int getBaitTier(void);
+
+void decrementItem(ItemStack stack, int amount);
+
+void updateFishCaughtInfo(void);
+
 ItemStack* getEquippedRod(void);
+
+SDL_Color getWaterColorsForPool(std::string pool);
+ItemStack getItemForPool(std::string pool);
+std::vector<ItemStack> getShopItems(void);
+
+static std::map<std::string, std::vector<PoolData>> POOLS;
 
 float easeOutCubic(float x);
 float easeInCubic(float x);

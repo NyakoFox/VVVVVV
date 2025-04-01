@@ -176,6 +176,19 @@ enum
     TimeTrial_FINALLEVEL = 5
 };
 
+enum ShopMode
+{
+    ShopMode_BUY,
+    ShopMode_SELL,
+    ShopMode_FISH
+};
+
+enum ShopSubMode
+{
+    ShopSubMode_MAIN,
+    ShopSubMode_CONFIRM,
+};
+
 struct MenuStackFrame
 {
     int option;
@@ -626,14 +639,25 @@ public:
     int scroll_offset;
 
     std::vector<ItemGetDisplay> item_get_displays;
+    std::vector<FishCatchInfo> fish_catch_info;
     bool play_item_get;
 
     FishingState fishing_state;
     int fishing_timer;
     int fishing_anim_timer;
+    int fishing_total;
     float fishing_strength;
+    ItemStack fishing_item;
 
     bool play_splash;
+    bool play_splash2;
+
+    ShopMode shopmode;
+    int shopselect;
+    int shopscroll;
+    int shopcoinflash;
+    ShopSubMode shopsubmode;
+    int shopsubselect;
 };
 
 #ifndef GAME_DEFINITION

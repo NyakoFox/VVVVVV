@@ -2629,6 +2629,8 @@ void gameinput(void)
 
     if (game.fishing_state != FishingState_IDLE)
     {
+        bool pressed_action = game.press_action;
+
         game.press_left = false;
         game.press_right = false;
         game.press_action = false;
@@ -2669,7 +2671,7 @@ void gameinput(void)
                 if (INBOUNDS_VEC(player_idx, obj.entities))
                 {
                     entclass player = obj.entities[player_idx];
-                    int xvel = 8;
+                    int xvel = 10;
                     int yvel = -4;
 
                     xvel *= easeOutCirc(game.fishing_strength);
@@ -2705,13 +2707,223 @@ void gameinput(void)
         {
             game.fishing_timer++;
             game.fishing_anim_timer++;
+
+            if (game.fishing_timer >= 15)
+            {
+                for (size_t ie = 0; ie < obj.entities.size(); ++ie)
+                {
+                    if (obj.entities[ie].type == EntityType_BOBBER)
+                    {
+                        if (obj.entities[ie].in_water && (INBOUNDS_VEC(obj.entities[ie].last_water, obj.blocks)))
+                        {
+                            switch (getBaitTier())
+                            {
+                            case -1:
+                                game.fishing_total = 999999999;
+                                break;
+                            case 0: default:
+                                game.fishing_total = 120 + (fRandom() * 40);
+                                break;
+                            case 1:
+                                game.fishing_total = 80 + (fRandom() * 30);
+                                break;
+                            case 2:
+                                game.fishing_total = 60 + (fRandom() * 30);
+                                break;
+                            case 3:
+                                game.fishing_total = 40 + (fRandom() * 30);
+                                break;
+                            }
+                            game.fishing_item = getItemForPool(obj.blocks[obj.entities[ie].last_water].script);
+                            game.fishing_item.item->getDefaultComponents(&game.fishing_item);
+                            game.fishing_state = FishingState_WAITING;
+                            game.fishing_timer = 0;
+                            game.fishing_anim_timer = 0;
+                            break;
+                        }
+                    }
+                }
+                if (pressed_action || key.isDown(KEYBOARD_x))
+                {
+                    game.press_action = pressed_action;
+                    game.jumpheld = true;
+                    game.jumppressed = -1;
+                    game.fishing_state = FishingState_IDLE;
+                    game.fishing_item = ItemStack();
+                    game.fishing_timer = 0;
+                    game.fishing_anim_timer = 0;
+                    game.fishing_total = 0;
+                    for (int i = obj.entities.size() - 1; i >= 0; i--)
+                    {
+                        if (obj.entities[i].type == EntityType_BOBBER)
+                        {
+                            obj.disableentity(i);
+                        }
+                    }
+                }
+            }
+            break;
+        }
+        case FishingState_WAITING:
+        {
+            game.fishing_timer++;
+            game.fishing_anim_timer++;
+
+            if (pressed_action || key.isDown(KEYBOARD_x))
+            {
+                game.press_action = pressed_action;
+                game.jumpheld = true;
+                game.jumppressed = -1;
+                game.fishing_state = FishingState_IDLE;
+                game.fishing_item = ItemStack();
+                game.fishing_timer = 0;
+                game.fishing_anim_timer = 0;
+                game.fishing_total = 0;
+                for (int i = obj.entities.size() - 1; i >= 0; i--)
+                {
+                    if (obj.entities[i].type == EntityType_BOBBER)
+                    {
+                        obj.disableentity(i);
+                    }
+                }
+                break;
+            }
+
+            for (int i = obj.entities.size() - 1; i >= 0; i--)
+            {
+                if (obj.entities[i].type == EntityType_BOBBER)
+                {
+                    if (obj.entities[i].oldxp != obj.entities[i].xp || obj.entities[i].oldyp != obj.entities[i].yp)
+                    {
+                        game.fishing_timer = 0;
+                        break;
+                    }
+                }
+            }
+
+            if (!hasBait())
+            {
+                game.fishing_timer = 0;
+                break;
+            }
+
+            if (game.fishing_timer > game.fishing_total)
+            {
+                game.fishing_state = FishingState_HOOKED;
+                game.fishing_timer = 0;
+                game.fishing_anim_timer = 0;
+                game.fishing_total = 0;
+                music.loopef(Sound_FISHALERT);
+            }
+
+            break;
+        }
+        case FishingState_HOOKED:
+        {
+            game.fishing_timer++;
+            game.fishing_anim_timer++;
+
+            for (int i = obj.entities.size() - 1; i >= 0; i--)
+            {
+                if (obj.entities[i].type == EntityType_BOBBER)
+                {
+                    obj.entities[i].off_x = SDL_round((fRandom() * 2) - 1);
+                    obj.entities[i].off_y = SDL_round((fRandom() * 2) - 1);
+                }
+            }
+
+            if (game.fishing_timer > 45)
+            {
+                for (int i = obj.entities.size() - 1; i >= 0; i--)
+                {
+                    if (obj.entities[i].type == EntityType_BOBBER)
+                    {
+                        obj.entities[i].off_x = 0;
+                        obj.entities[i].off_y = 0;
+                    }
+                }
+                game.fishing_state = FishingState_CASTING;
+                game.fishing_timer = 15;
+                game.fishing_anim_timer = 15;
+                music.stopef(Sound_FISHALERT);
+            }
+            else
+            {
+                if (pressed_action || key.isDown(KEYBOARD_x))
+                {
+                    game.fishing_state = FishingState_REELING;
+                    music.stopef(Sound_FISHALERT);
+                    music.playef(Sound_REEL);
+                    game.fishing_timer = 0;
+                    game.fishing_anim_timer = 0;
+                    game.fishing_total = 0;
+                    for (int i = obj.entities.size() - 1; i >= 0; i--)
+                    {
+                        if (obj.entities[i].type == EntityType_BOBBER)
+                        {
+                            obj.entities[i].off_x = 0;
+                            obj.entities[i].off_y = 0;
+                            obj.entities[i].vx = 0;
+                            obj.entities[i].vy = 0;
+                            obj.entities[i].behave = 1;
+                        }
+                    }
+                }
+            }
+            break;
+        }
+        case FishingState_REELING:
+        {
+            game.fishing_timer++;
+            game.fishing_anim_timer++;
+            for (int i = obj.entities.size() - 1; i >= 0; i--)
+            {
+                if (obj.entities[i].type == EntityType_BOBBER)
+                {
+                    obj.entities[i].off_x = 0;
+                    obj.entities[i].off_y = 0;
+                    int reel_speed = 8;
+                    // calculate angle between target pos and current pos (bobber)
+                    SDL_Point target = obj.getRodPointPosition();
+                    target.x -= obj.entities[i].cx;
+                    target.y -= obj.entities[i].cy;
+                    SDL_Point current;
+                    current.x = obj.entities[i].xp;
+                    current.y = obj.entities[i].yp;
+
+                    float angle = atan2(target.y - current.y, target.x - current.x);
+                    float xmult = cos(angle);
+                    float ymult = sin(angle);
+
+                    obj.entities[i].vx = xmult * reel_speed;
+                    obj.entities[i].vy = ymult * reel_speed;
+
+                    // also calculate distance:
+                    float distance = sqrt((target.x - current.x) * (target.x - current.x) + (target.y - current.y) * (target.y - current.y));
+                    if (distance < (reel_speed * 1.5))
+                    {
+                        game.fishing_state = FishingState_IDLE;
+                        game.fishing_timer = 0;
+                        game.fishing_anim_timer = 0;
+                        game.fishing_total = 0;
+                        music.stopef(Sound_REEL);
+                        obj.disableentity(i);
+
+                        useBait();
+                        updateFishCaughtInfo();
+
+                        game.state = 5000;
+                        game.statedelay = 0;
+                    }
+                }
+            }
             break;
         }
         }
     }
     else
     {
-        if (key.isDown(KEYBOARD_x) && (getEquippedRod() != NULL))
+        if (key.isDown(KEYBOARD_x) && (getEquippedRod() != NULL) && !script.running && !game.advancetext && !game.completestop && (game.deathseq <= 0))
         {
             game.fishing_state = FishingState_CHOOSING;
         }
@@ -2904,9 +3116,35 @@ void gameinput(void)
                         enter_already_processed = true;
                         if((int(SDL_fabsf(obj.entities[ie].vx))<=1) && (int(obj.entities[ie].vy) == 0) )
                         {
-                            script.load(obj.blocks[game.activeactivity].script);
-                            obj.disableblock(game.activeactivity);
-                            game.activeactivity = -1;
+                            std::string scriptname = obj.blocks[game.activeactivity].script;
+                            if (scriptname == "SPECIAL_buy" || scriptname == "SPECIAL_sell" || scriptname == "SPECIAL_fish")
+                            {
+                                graphics.showcutscenebars_fast = true;
+                                graphics.cutscenebarspos_fast = 0;
+                                graphics.oldcutscenebarspos_fast = 0;
+
+                                game.prevgamestate = GAMEMODE;
+                                game.gamestate = SHOPMODE;
+                                music.playef(Sound_MENUOPEN);
+                                if (scriptname == "SPECIAL_buy") game.shopmode = ShopMode_BUY;
+                                if (scriptname == "SPECIAL_sell") game.shopmode = ShopMode_SELL;
+                                if (scriptname == "SPECIAL_fish") game.shopmode = ShopMode_FISH;
+                                game.shopcoinflash = 0;
+                                game.shopscroll = 0;
+                                game.shopselect = 0;
+                                game.shopsubmode = ShopSubMode_MAIN;
+                                game.shopsubselect = 0;
+                                graphics.resumegamemode = false;
+                                gameScreen.recacheTextures();
+                                graphics.menuoffset = 240;
+                                graphics.oldmenuoffset = graphics.menuoffset;
+                            }
+                            else
+                            {
+                                script.load(scriptname);
+                                obj.disableblock(game.activeactivity);
+                                game.activeactivity = -1;
+                            }
                         }
                     }
                 }
@@ -3126,6 +3364,230 @@ void gameinput(void)
 }
 
 static void mapmenuactionpress(bool version2_2);
+
+void shopinput(void)
+{
+    game.press_left = false;
+    game.press_right = false;
+    game.press_action = false;
+    game.press_map = false;
+    game.press_interact = false;
+    game.press_up = false;
+    game.press_down = false;
+
+    if (key.isDown(KEYBOARD_LEFT) || key.isDown(KEYBOARD_a) || key.controllerWantsLeft(false))
+    {
+        game.press_left = true;
+    }
+    if (key.isDown(KEYBOARD_RIGHT) || key.isDown(KEYBOARD_d) || key.controllerWantsRight(false))
+    {
+        game.press_right = true;
+    }
+    if (key.isDown(KEYBOARD_UP) || key.isDown(KEYBOARD_w) || key.controllerWantsUp())
+    {
+        game.press_up = true;
+    }
+    if (key.isDown(KEYBOARD_DOWN) || key.isDown(KEYBOARD_s) || key.controllerWantsDown())
+    {
+        game.press_down = true;
+    }
+    if (key.isDown(KEYBOARD_z) || key.isDown(KEYBOARD_SPACE) || key.isDown(KEYBOARD_v) || key.isDown(game.controllerButton_flip))
+    {
+        game.press_action = true;
+    }
+
+    if (!game.press_action && !game.press_left && !game.press_right && !game.press_up && !game.press_down)
+    {
+        game.jumpheld = false;
+    }
+    if (!game.press_map && !key.isDown(27))
+    {
+        game.mapheld = false;
+    }
+
+    if (key.isDown(27) && !game.mapheld)
+    {
+        game.mapheld = true;
+
+        if (game.shopmode == ShopMode_BUY || game.shopmode == ShopMode_SELL)
+        {
+            if (game.shopsubmode == ShopSubMode_CONFIRM)
+            {
+                game.shopsubmode = ShopSubMode_MAIN;
+                music.playef(Sound_VIRIDIAN);
+            }
+            else
+            {
+                music.playef(Sound_MENUCLOSE);
+                graphics.resumegamemode = true;
+                graphics.showcutscenebars_fast = false;
+            }
+        }
+        else
+        {
+            music.playef(Sound_MENUCLOSE);
+            graphics.resumegamemode = true;
+            graphics.showcutscenebars_fast = false;
+        }
+    }
+
+    if (!game.jumpheld)
+    {
+        if (game.press_action || game.press_left || game.press_right || game.press_map || game.press_up || game.press_down)
+        {
+            game.jumpheld = true;
+        }
+
+        if (game.shopmode == ShopMode_BUY || game.shopmode == ShopMode_SELL)
+        {
+            std::vector<ItemStack> items = getShopItems();
+
+            if (game.shopsubmode == ShopSubMode_CONFIRM)
+            {
+                if (game.press_left) game.shopsubselect--;
+                if (game.press_right) game.shopsubselect++;
+                game.shopsubselect = POS_MOD(game.shopsubselect, 3);
+
+                if (game.press_action)
+                {
+                    switch (game.shopsubselect)
+                    {
+                    case 0:
+                        music.playef(Sound_VIRIDIAN);
+                        game.shopsubmode = ShopSubMode_MAIN;
+                        break;
+                    case 1:
+                        if (game.shopmode == ShopMode_BUY)
+                        {
+                            if ((items[game.shopselect].getBuyPrice()) > game.coins())
+                            {
+                                game.shopcoinflash = 15;
+                                music.playef(Sound_ERROR);
+                            }
+                            else
+                            {
+                                music.playef(Sound_CASH);
+                                game.coins_collected -= items[game.shopselect].getBuyPrice();
+                                giveItem(items[game.shopselect]);
+                            }
+                        }
+                        else
+                        {
+                            // sell 1
+                            music.playef(Sound_CASH);
+                            int sellprice = items[game.shopselect].getSellPrice();
+                            game.coins_collected += sellprice;
+                            decrementItem(items[game.shopselect], 1);
+                            int inv_size = items.size();
+                            removeEmptyInventorySlots();
+                            items = getShopItems();
+                            if (inv_size != items.size())
+                            {
+                                game.shopsubmode = ShopSubMode_MAIN;
+                                game.shopselect = SDL_clamp(game.shopselect - 1, 0, (int)items.size() - 1);
+
+                                if (game.shopselect - game.shopscroll < 0)
+                                {
+                                    game.shopscroll = game.shopselect;
+                                }
+
+                                if (game.shopselect - game.shopscroll >= 3)
+                                {
+                                    game.shopscroll = game.shopselect - 2;
+                                }
+                            }
+                        }
+                        break;
+                    case 2:
+                        if (game.shopmode == ShopMode_BUY)
+                        {
+                            if ((items[game.shopselect].getBuyPrice() * 5) > game.coins())
+                            {
+                                game.shopcoinflash = 15;
+                                music.playef(Sound_ERROR);
+                            }
+                            else
+                            {
+                                music.playef(Sound_CASH);
+                                game.coins_collected -= items[game.shopselect].getBuyPrice() * 5;
+                                for (int i = 0; i < 5; i++)
+                                {
+                                    giveItem(items[game.shopselect]);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            // sell all...
+                            music.playef(Sound_CASH);
+                            int sellprice = items[game.shopselect].getSellPrice() * items[game.shopselect].count;
+                            game.coins_collected += sellprice;
+                            decrementItem(items[game.shopselect], items[game.shopselect].count);
+                            removeEmptyInventorySlots();
+                            items = getShopItems();
+                            game.shopsubmode = ShopSubMode_MAIN;
+                            game.shopselect = SDL_clamp(game.shopselect - 1, 0, (int)items.size() - 1);
+
+                            if (game.shopselect - game.shopscroll < 0)
+                            {
+                                game.shopscroll = game.shopselect;
+                            }
+
+                            if (game.shopselect - game.shopscroll >= 3)
+                            {
+                                game.shopscroll = game.shopselect - 2;
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+            else if (game.shopsubmode == ShopSubMode_MAIN)
+            {
+                int size = items.size();
+
+                if (size <= 0)
+                {
+                    return;
+                }
+
+                if (game.press_up)
+                {
+                    game.shopselect = POS_MOD(game.shopselect - 1, size);
+                }
+                if (game.press_down)
+                {
+                    game.shopselect = POS_MOD(game.shopselect + 1, size);
+                }
+
+                if (game.shopselect - game.shopscroll < 0)
+                {
+                    game.shopscroll = game.shopselect;
+                }
+
+                if (game.shopselect - game.shopscroll >= 3)
+                {
+                    game.shopscroll = game.shopselect - 2;
+                }
+
+                if (game.press_action)
+                {
+                    if ((game.shopmode == ShopMode_BUY) && items[game.shopselect].getBuyPrice() > game.coins())
+                    {
+                        game.shopcoinflash = 15;
+                        music.playef(Sound_ERROR);
+                    }
+                    else
+                    {
+                        music.playef(Sound_VIRIDIAN);
+                        game.shopsubmode = ShopSubMode_CONFIRM;
+                        game.shopsubselect = 0;
+                    }
+                }
+            }
+        }
+    }
+}
 
 void mapinput(void)
 {

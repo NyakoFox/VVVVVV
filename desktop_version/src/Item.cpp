@@ -54,14 +54,14 @@ SDL_Color Item::getNameColor(ItemStack* stack)
     {
         return graphics.getcol(this->settings.name_color);
     }
-    switch (this->settings.rarity)
+    switch (getRarity(stack))
     {
-    case Rarity_JUNK: return graphics.getRGB(160, 160, 160);
+    case Rarity_JUNK: return graphics.getRGB(140, 140, 140);
     case Rarity_COMMON: return graphics.getRGB(196, 196, 255 - help.glow);
-    case Rarity_UNCOMMON: return graphics.getRGB(164, 255 - help.glow, 164);
-    case Rarity_RARE: return graphics.getRGB(255 - help.glow, 196, 196);
-    case Rarity_ELUSIVE: return graphics.getRGB(255 - help.glow, 164, 255 - help.glow);
-    case Rarity_LEGENDARY: return graphics.getRGB(255 - help.glow, 255 - help.glow, 164);
+    case Rarity_UNCOMMON: return graphics.getRGB(135, 135, 255 - help.glow);
+    case Rarity_RARE: return graphics.getRGB(128, 255 - help.glow, 128);
+    case Rarity_ELUSIVE: return graphics.getRGB(240 - help.glow, 255 - help.glow, 120);
+    case Rarity_LEGENDARY: return graphics.getRGB(255 - help.glow, 192 - help.glow, 0);
     }
 
     return graphics.getRGB(196, 196, 255 - help.glow);
@@ -86,4 +86,34 @@ void Item::draw(int x, int y)
         graphics.set_texture_color_mod(texture, 255, 255, 255);
         graphics.set_texture_alpha_mod(texture, 255);
     }
+}
+
+std::string Item::getCatchText(ItemStack* stack)
+{
+    return "\n" + getName(stack) + "\n\n";
+}
+
+ItemRarity Item::getRarity(ItemStack* stack)
+{
+    return settings.rarity;
+}
+
+int Item::getSellPrice(ItemStack* stack)
+{
+    return settings.sell_price;
+}
+
+bool Item::canSell(ItemStack* stack)
+{
+    return settings.can_sell;
+}
+
+int Item::getBuyPrice(ItemStack* stack)
+{
+    return settings.buy_price;
+}
+
+bool Item::canBuy(ItemStack* stack)
+{
+    return settings.can_buy;
 }

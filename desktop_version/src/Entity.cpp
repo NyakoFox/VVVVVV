@@ -861,6 +861,8 @@ void entityclass::createblock( int t, int xp, int yp, int w, int h, int trig /*=
         block.wp = w;
         block.hp = h;
         block.rectset(xp, yp, w, h);
+
+        block.script = script;
         break;
     case ACTIVITY: //Activity Zone
         block.type = ACTIVITY;
@@ -1095,6 +1097,27 @@ void entityclass::createblock( int t, int xp, int yp, int w, int h, int trig /*=
             block.script = "custom_"+customscript;
             block.setblockcolour("orange");
             trig=0;
+            break;
+        case 36:
+            // HARDCODED: Buy terminal
+            block.prompt = "Press {button} to access buy terminal";
+            block.setblockcolour("orange");
+            block.script = "SPECIAL_buy";
+            trig = 0;
+            break;
+        case 37:
+            // HARDCODED: Sell terminal
+            block.prompt = "Press {button} to access sell terminal";
+            block.setblockcolour("orange");
+            block.script = "SPECIAL_sell";
+            trig = 0;
+            break;
+        case 38:
+            // HARDCODED: Fish enchiridion
+            block.prompt = "Press {button} to read enchiridion";
+            block.setblockcolour("orange");
+            block.script = "SPECIAL_fish";
+            trig = 0;
             break;
         }
         break;
@@ -2237,10 +2260,46 @@ void entityclass::createentity(int xp, int yp, int t, int meta1, int meta2, int 
         entity.type = EntityType_BOBBER;
         entity.vx = meta1;
         entity.vy = meta2;
-        entity.cx = 2;
+        entity.cx = 6;
         entity.cy = 0;
         entity.w = 3;
         entity.h = 3;
+        break;
+    case 201: // Gate (yellow)
+    case 202: // Gate (blue)
+    case 203: // Gate (purple)
+    case 204: // Gate (red)
+        entity.size = 201;
+        entity.rule = 201;
+        entity.type = EntityType_GATE;
+        entity.cx = 0;
+        entity.cy = 0;
+        entity.w = meta1;
+        entity.h = meta2;
+        entity.behave = t - 201;
+        entity.para = p1;
+
+        if (opened_gates.find(p1) != opened_gates.end()) return;
+
+        createblock(BLOCK, xp, yp, meta1, meta2);
+
+        break;
+    case 205: // Special terminal
+        entity.size = 205;
+        entity.rule = 3;
+        entity.type = EntityType_SPECIAL_TERMINAL;
+        entity.cx = 0;
+        entity.cy = 0;
+        entity.w = 32;
+        entity.h = 40;
+        entity.colour = 4;
+        entity.onentity = 1;
+        //entity.animate = 100;
+        entity.para = meta1;
+        entity.tile = meta1;
+
+        createblock(ACTIVITY, entity.xp, entity.yp, entity.w, entity.h, 36 + meta1, "special", true);
+
         break;
     }
 
@@ -3265,6 +3324,16 @@ bool entityclass::updateentities( int i )
                 entities[i].state = 0;
             }
             break;
+        case EntityType_SPECIAL_TERMINAL:
+            if (entities[i].state == 1)
+            {
+                entities[i].colour = 5;
+                entities[i].onentity = 0;
+                music.playef(Sound_TERMINALTOUCH);
+
+                entities[i].state = 0;
+            }
+            break;
         case EntityType_SUPERCREWMATE: //Super Crew member
             //Actually needs less complex AI than the scripting crewmember
             if (entities[i].state == 0)
@@ -3517,6 +3586,10 @@ bool entityclass::updateentities( int i )
             break;
         case EntityType_BOBBER:
         {
+            if (entities[i].behave == 1)
+            {
+                break;
+            }
             float decel = 0.25;
             float grav = 0.5;
             float ycap = 6.0;
@@ -3581,11 +3654,47 @@ bool entityclass::updateentities( int i )
             if (remove)
             {
                 game.fishing_state = FishingState_IDLE;
+                game.fishing_item = ItemStack();
                 game.fishing_timer = 0;
+                game.fishing_total = 0;
                 game.fishing_anim_timer = 0;
                 return disableentity(i);
             }
 
+            break;
+        }
+        case EntityType_GATE:
+        {
+            if (entities[i].behave == 0 && !hasItem(Items::YELLOW_KEY)) break;
+            if (entities[i].behave == 1 && !hasItem(Items::BLUE_KEY)) break;
+            if (entities[i].behave == 2 && !hasItem(Items::PURPLE_KEY)) break;
+            if (entities[i].behave == 3 && !hasItem(Items::RED_KEY)) break;
+
+            // is the player near it:
+            int j = getplayer();
+            if (INBOUNDS_VEC(j, entities))
+            {
+                SDL_Rect temprect;
+                temprect.x = entities[i].xp - 4;
+                temprect.y = entities[i].yp - 4;
+                temprect.w = entities[i].w + 8;
+                temprect.h = entities[i].h + 8;
+
+                SDL_Rect playerrect;
+                playerrect.x = entities[j].xp + entities[j].cx;
+                playerrect.y = entities[j].yp + entities[j].cy;
+                playerrect.w = entities[j].w;
+                playerrect.h = entities[j].h;
+
+                if (help.intersects(temprect, playerrect))
+                {
+                    opened_gates.insert(entities[i].para);
+                    music.playef(Sound_GATE);
+                    disableblockat(entities[i].xp, entities[i].yp);
+                    game.screenshake = 1;
+                    return disableentity(i);
+                }
+            }
             break;
         }
         case EntityType_INVALID: // Invalid entity, do nothing!
@@ -3670,9 +3779,18 @@ void entityclass::animateentities( int _i )
                 entities[_i].drawframe = 208 + (SDL_clamp((game.fishing_anim_timer / 3), 0, 2));
                 weirddirectionbs = true;
             }
-            else if (game.fishing_state == FishingState_CASTING || game.fishing_state == FishingState_WAITING)
+            else if (game.fishing_state == FishingState_CASTING || game.fishing_state == FishingState_WAITING || game.fishing_state == FishingState_HOOKED)
             {
                 entities[_i].drawframe = 210;
+                weirddirectionbs = true;
+            }
+            else if (game.fishing_state == FishingState_REELING)
+            {
+                entities[_i].drawframe = 212;
+                if (game.fishing_anim_timer > 7)
+                {
+                    entities[_i].drawframe = 211;
+                }
                 weirddirectionbs = true;
             }
 
@@ -4843,6 +4961,13 @@ void entityclass::entitymapcollision( int t )
         return;
     }
 
+    if (entities[t].type == EntityType_BOBBER && entities[t].behave == 1)
+    {
+        entities[t].xp = entities[t].newxp;
+        entities[t].yp = entities[t].newyp;
+        return;
+    }
+
     if (testwallsx(t, entities[t].newxp, entities[t].yp, false))
     {
         entities[t].xp = entities[t].newxp;
@@ -4938,6 +5063,7 @@ void entityclass::mark_as_in_water(void)
 {
     for (size_t i = 0; i < entities.size(); i++)
     {
+        if (entities[i].type == -1) continue;
         entities[i].in_water = false;
         entities[i].last_water = -1;
 
@@ -4964,6 +5090,7 @@ void entityclass::entityblockcheck(void)
 {
     for (size_t i = 0; i < entities.size(); i++)
     {
+        if (entities[i].type == -1) continue;
         bool was_in_water = entities[i].in_water;
         entities[i].in_water = false;
 
@@ -5007,7 +5134,17 @@ void entityclass::entityblockcheck(void)
 
         if (entities[i].in_water != was_in_water)
         {
-            game.play_splash = true;
+            int temp_mult = 1;
+            if (entities[i].type == EntityType_BOBBER && entities[i].behave == 1)
+            {
+                temp_mult = 2;
+                game.play_splash2 = true;
+            }
+            else
+            {
+                game.play_splash = true;
+            }
+
             if (was_in_water)
             {
                 // So if we WERE in the water...
@@ -5022,11 +5159,11 @@ void entityclass::entityblockcheck(void)
                     int index = rel_point * SPRINGS_PER_PIXEL;
                     if (top && (INBOUNDS_VEC(index, blocks[b].springs)))
                     {
-                        blocks[b].springs[index].y += (entities[i].vy * ENTITY_LEAVE_SPRING_MULT);
+                        blocks[b].springs[index].y += (entities[i].vy * ENTITY_LEAVE_SPRING_MULT * temp_mult);
                     }
                     else if (!top && (INBOUNDS_VEC(index + 1, blocks[b].bottom_springs)))
                     {
-                        blocks[b].bottom_springs[index + 1].y -= (entities[i].vy * ENTITY_LEAVE_SPRING_MULT);
+                        blocks[b].bottom_springs[index + 1].y -= (entities[i].vy * ENTITY_LEAVE_SPRING_MULT * temp_mult);
                     }
                 }
                 entities[i].last_water = -1;
@@ -5282,4 +5419,50 @@ void entityclass::stuckprevention(int t)
             entities[t].yp += 3;
         }
     }
+}
+
+SDL_Point entityclass::getRodPointPosition(void)
+{
+    int i = getplayer();
+    SDL_Point point;
+    if (!INBOUNDS_VEC(i, entities))
+    {
+        point.x = 0;
+        point.y = 0;
+        return point;
+    }
+    point.x = entities[i].xp + 16 + 14;
+    point.y = entities[i].yp + 16 - 13;
+
+    int offx = 0;
+    int offy = 0;
+    switch (entities[i].drawframe)
+    {
+    case 211: case 223: case 235: case 247:
+    case 212: case 224: case 236: case 248:
+        offx = 25;
+        offy = 9;
+        break;
+    }
+
+    if (entities[i].dir == 0)
+    {
+        point.x -= 37;
+        point.x += offx;
+    }
+    else
+    {
+        point.x -= offx;
+    }
+    if (game.gravitycontrol == 1)
+    {
+        point.y += 18;
+        point.y += offy;
+    }
+    else
+    {
+        point.y -= offy;
+    }
+
+    return point;
 }

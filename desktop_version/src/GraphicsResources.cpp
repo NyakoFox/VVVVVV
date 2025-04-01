@@ -485,6 +485,15 @@ void GraphicsResources::init(void)
     im_bobber = LoadImage("graphics/bobber.png");
     im_fishingrod_anim = LoadImage("graphics/fishingrod_anim.png");
     im_fishingrod_line_anim = LoadImage("graphics/fishingrod_line_anim.png");
+
+    im_gate_yellow = LoadImage("graphics/gate_yellow.png");
+    im_gate_blue = LoadImage("graphics/gate_blue.png");
+    im_gate_purple = LoadImage("graphics/gate_purple.png");
+    im_gate_red = LoadImage("graphics/gate_red.png");
+
+    im_special_terminals = LoadImage("graphics/special_terminals.png", TEX_WHITE);
+
+    im_logo = LoadImage("graphics/logo.png", TEX_WHITE);
 }
 
 
@@ -533,6 +542,14 @@ void GraphicsResources::destroy(void)
     CLEAR(im_bobber);
     CLEAR(im_fishingrod_anim);
     CLEAR(im_fishingrod_line_anim);
+
+    CLEAR(im_gate_yellow);
+    CLEAR(im_gate_blue);
+    CLEAR(im_gate_purple);
+    CLEAR(im_gate_red);
+
+    CLEAR(im_special_terminals);
+    CLEAR(im_logo);
 
 #undef CLEAR
 

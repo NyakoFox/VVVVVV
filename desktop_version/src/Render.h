@@ -5,6 +5,8 @@ void titlerender(void);
 
 void gamerender(void);
 
+void shoprender(void);
+
 void maprender(void);
 
 void teleporterrender(void);

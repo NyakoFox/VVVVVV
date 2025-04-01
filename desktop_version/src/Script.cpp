@@ -24,6 +24,7 @@
 #include "LocalizationStorage.h"
 #include "Map.h"
 #include "Music.h"
+#include "Screen.h"
 #include "Unreachable.h"
 #include "UtilityClass.h"
 #include "VFormat.h"
@@ -523,6 +524,14 @@ void scriptclass::run(void)
             if (words[0] == "endcutscene")
             {
                 graphics.showcutscenebars = false;
+            }
+            if (words[0] == "cutscenefast")
+            {
+                graphics.showcutscenebars_fast = true;
+            }
+            if (words[0] == "endcutscenefast")
+            {
+                graphics.showcutscenebars_fast = false;
             }
             if (words[0] == "setbars")
             {
@@ -1612,14 +1621,25 @@ void scriptclass::run(void)
                     obj.customcollect[i] = false;
                 }
                 obj.coincollect.clear();
+                obj.opened_gates.clear();
                 game.coins_collected = 0;
                 game.inventory.clear();
                 game.item_get_displays.clear();
+                game.fish_catch_info.clear();
                 game.play_item_get = false;
                 game.play_splash = false;
+                game.play_splash2 = false;
+                game.shopselect = 0;
+                game.shopscroll = 0;
+                game.shopsubmode = ShopSubMode_MAIN;
+                game.shopsubselect = 0;
                 game.fishing_state = FishingState_IDLE;
+                game.fishing_item = ItemStack();
                 game.fishing_timer = 0;
+                game.fishing_total = 0;
                 game.fishing_anim_timer = 0;
+                game.shopmode = ShopMode_BUY;
+                game.shopcoinflash = 0;
                 game.in_item_menu = false;
                 game.deathcounts = 0;
                 game.advancetext = false;
@@ -2741,6 +2761,17 @@ void scriptclass::run(void)
             {
                 giveItem(item);
             }
+            else if (words[0] == "replaceitem")
+            {
+                for (int i = 0; i < game.inventory.size(); i++)
+                {
+                    if (getItemID(game.inventory[i].item) == words[1])
+                    {
+                        game.inventory[i] = item;
+                        break;
+                    }
+                }
+            }
             else if (words[0] == "addcomponent")
             {
                 item.addComponent(words[1], words[2]);
@@ -2755,6 +2786,58 @@ void scriptclass::run(void)
                         break;
                     }
                 }
+            }
+            else if (words[0] == "ifitem")
+            {
+                if (hasItem(getItem(words[1])))
+                {
+                    loadalts("custom_" + words[2], "custom_" + raw_words[2]);
+                    position--;
+                }
+            }
+            else if (words[0] == "destroygate")
+            {
+                int x = ss_toi(words[1]);
+                int y = ss_toi(words[2]);
+                for (int i = 0; i < obj.entities.size(); i++)
+                {
+                    if (obj.entities[i].type == EntityType_GATE)
+                    {
+                        if (obj.entities[i].xp == x && obj.entities[i].yp == y)
+                        {
+                            obj.opened_gates.insert(obj.entities[i].para);
+                            music.playef(Sound_GATE);
+                            obj.disableblockat(obj.entities[i].xp, obj.entities[i].yp);
+                            obj.disableentity(i);
+                            game.screenshake = 1;
+                            break;
+                        }
+                    }
+                }
+            }
+            else if (words[0] == "ifcaught")
+            {
+                for (int i = 0; i < game.fish_catch_info.size(); i++)
+                {
+                    if (game.fish_catch_info[i].item == getItem(words[1]) && game.fish_catch_info[i].amount > 0)
+                    {
+                        loadalts("custom_" + words[2], "custom_" + raw_words[2]);
+                        position--;
+                        break;
+                    }
+                }
+            }
+            else if (words[0] == "ifbaitupgradeable")
+            {
+                if (canUpgradeBait())
+                {
+                    loadalts("custom_" + words[1], "custom_" + raw_words[1]);
+                    position--;
+                }
+            }
+            else if (words[0] == "upgradebait")
+            {
+                upgradeBait();
             }
 
             position++;
@@ -3470,7 +3553,10 @@ void scriptclass::hardreset(void)
     graphics.textboxes.clear();
     graphics.flipmode = false; //This will be reset if needs be elsewhere
     graphics.showcutscenebars = false;
+    graphics.showcutscenebars_fast = false;
     graphics.setbars(0);
+    graphics.oldcutscenebarspos_fast = 0;
+    graphics.cutscenebarspos = 0;
 
     //mapclass
     map.warpx = false;
@@ -3525,15 +3611,26 @@ void scriptclass::hardreset(void)
     i = 100; //previously a for-loop iterating over collect/customcollect set this to 100
 
     obj.coincollect.clear();
+    obj.opened_gates.clear();
     game.coins_collected = 0;
 
     game.fishing_state = FishingState_IDLE;
+    game.fishing_item = ItemStack();
     game.fishing_timer = 0;
+    game.fishing_total = 0;
     game.fishing_anim_timer = 0;
     game.inventory.clear();
     game.play_item_get = false;
     game.play_splash = false;
+    game.play_splash2 = false;
+    game.shopmode = ShopMode_BUY;
+    game.shopcoinflash = 0;
+    game.shopselect = 0;
+    game.shopscroll = 0;
+    game.shopsubmode = ShopSubMode_MAIN;
+    game.shopsubselect = 0;
     game.item_get_displays.clear();
+    game.fish_catch_info.clear();
     game.in_item_menu = false;
 
     game.fishing_revealed = false;
@@ -3745,6 +3842,18 @@ bool scriptclass::loadcustom(const std::string& t)
             add(lines[i]);
         }else if(words[0] == "ifwarp"){
             if(customtextmode==1){ add("endtext"); customtextmode=0;}
+            add(lines[i]);
+        }else if(words[0] == "ifitem"){
+            if(customtextmode==1){ add("endtext"); customtextmode=0;}
+            add(lines[i]);
+        }else if(words[0] == "ifcaught") {
+            if(customtextmode==1){ add("endtext"); customtextmode=0;}
+            add(lines[i]);
+        }else if (words[0] == "ifcoins") {
+            if (customtextmode == 1) { add("endtext"); customtextmode = 0; }
+            add(lines[i]);
+        }else if (words[0] == "ifbaitupgradeable") {
+            if (customtextmode == 1) { add("endtext"); customtextmode = 0; }
             add(lines[i]);
         }else if(words[0] == "iftrinkets"){
             if(customtextmode==1){ add("endtext"); customtextmode=0;}

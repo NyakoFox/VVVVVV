@@ -11,6 +11,10 @@ ItemSettings::ItemSettings(void)
     sprite_layers.clear();
     name_color = -1;
     rarity = Rarity_COMMON;
+    can_buy = false;
+    can_sell = false;
+    buy_price = 0;
+    sell_price = 0;
 }
 
 ItemSettings::ItemSettings(const ItemSettings& other)
@@ -20,6 +24,10 @@ ItemSettings::ItemSettings(const ItemSettings& other)
     sprite_layers = other.sprite_layers;
     name_color = other.name_color;
     rarity = other.rarity;
+    can_buy = other.can_buy;
+    can_sell = other.can_sell;
+    buy_price = other.buy_price;
+    sell_price = other.sell_price;
 }
 
 ItemSettings ItemSettings::withName(std::string name)
@@ -58,5 +66,19 @@ ItemSettings ItemSettings::withNameColor(int color)
 ItemSettings ItemSettings::withRarity(ItemRarity rarity)
 {
     this->rarity = rarity;
+    return *this;
+}
+
+ItemSettings ItemSettings::withBuy(int price)
+{
+    this->can_buy = true;
+    this->buy_price = price;
+    return *this;
+}
+
+ItemSettings ItemSettings::withSell(int price)
+{
+    this->can_sell = true;
+    this->sell_price = price;
     return *this;
 }

@@ -5,6 +5,8 @@ void titleinput(void);
 
 void gameinput(void);
 
+void shopinput(void);
+
 void mapinput(void);
 
 void teleporterinput(void);

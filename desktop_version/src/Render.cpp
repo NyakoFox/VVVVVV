@@ -204,8 +204,11 @@ static void menurender(void)
         graphics.draw_sprite((160 - 96) + 3 * 32, temp, 23, tr, tg, tb);
         graphics.draw_sprite((160 - 96) + 4 * 32, temp, 23, tr, tg, tb);
         graphics.draw_sprite((160 - 96) + 5 * 32, temp, 23, tr, tg, tb);
+        graphics.draw_grid_tile(graphics.grphx.im_logo, 0, 160 - 96, 84, 192, 24, graphics.getRGB(tr, tg, tb));
+        graphics.draw_grid_tile(graphics.grphx.im_logo, 1, 160 - 96, 84, 192, 24, graphics.getRGB(tr / 2, tg / 2, tb / 2));
+
 #if defined(MAKEANDPLAY)
-        font::print(PR_RIGHT, 264, temp+35, loc::gettext("MAKE AND PLAY EDITION"), tr, tg, tb);
+//        font::print(PR_RIGHT, 264, temp+35, loc::gettext("MAKE AND PLAY EDITION"), tr, tg, tb);
 #endif
 #ifdef INTERIM_VERSION_EXISTS
         font::print(PR_RIGHT | PR_FONT_8X8, 310, 200, COMMIT_DATE, tr/2, tg/2, tb/2);
@@ -1953,8 +1956,11 @@ void titlerender(void)
         graphics.draw_sprite((160 - 96) + 3 * 32, temp, 23, tr, tg, tb);
         graphics.draw_sprite((160 - 96) + 4 * 32, temp, 23, tr, tg, tb);
         graphics.draw_sprite((160 - 96) + 5 * 32, temp, 23, tr, tg, tb);
+
+        graphics.draw_grid_tile(graphics.grphx.im_logo, 0, 160 - 96, 84, 192, 24, graphics.getRGB(tr, tg, tb));
+        graphics.draw_grid_tile(graphics.grphx.im_logo, 1, 160 - 96, 84, 192, 24, graphics.getRGB(tr / 2, tg / 2, tb / 2));
 #if defined(MAKEANDPLAY)
-        font::print(PR_RIGHT, 264, temp+35, loc::gettext("MAKE AND PLAY EDITION"), tr, tg, tb);
+//        font::print(PR_RIGHT, 264, temp+35, loc::gettext("MAKE AND PLAY EDITION"), tr, tg, tb);
 #endif
 
         char buffer[SCREEN_WIDTH_CHARS*2 + 1];
@@ -2876,6 +2882,8 @@ void gamerender(void)
             line_x = player_x - line_width;
         }
 
+        line_x = SDL_clamp(line_x, 0, 320 - line_width);
+
         switch (game.fishing_state)
         {
         case FishingState_CHOOSING:
@@ -2891,6 +2899,30 @@ void gamerender(void)
             }
             graphics.draw_line(line_x + bar, line_y - 4, line_x + bar, line_y + 4);
             break;
+        }
+    }
+
+    if (game.fishing_state == FishingState_HOOKED)
+    {
+        for (int i = 0; i < obj.entities.size(); i++)
+        {
+            if (obj.entities[i].type == EntityType_BOBBER)
+            {
+                int bobber_x = obj.entities[i].xp;
+                int bobber_y = obj.entities[i].yp;
+
+                int off = 16;
+                if (game.gravitycontrol == 1)
+                {
+                    off = -16;
+                }
+
+                bobber_x += ((fRandom() * 2) - 1);
+                bobber_y += ((fRandom() * 2) - 1);
+
+                float rand = fRandom();
+                font::print(PR_BOR, bobber_x, bobber_y - off, "!", 255 - (rand * 60), 196 - (rand * 30), 196 - (rand * 30));
+            }
         }
     }
 
@@ -3106,6 +3138,244 @@ static void rendermapcursor(const bool flashing)
     }
 }
 
+void shoprender(void)
+{
+    graphics.set_render_target(graphics.menuTexture);
+    graphics.clear(0, 0, 0, 0);
+
+
+    // header
+
+    graphics.drawpixeltextbox(16, 16, 320 - 32, 32, 65, 185, 207);
+    switch (game.shopmode)
+    {
+    case ShopMode_BUY:
+        font::print(PR_1X | PR_CEN, -1, 16 + 8 + 4, loc::gettext("-= BUY =-"), 196, 196, 255 - help.glow);
+        break;
+    case ShopMode_SELL:
+        font::print(PR_1X | PR_CEN, -1, 16 + 8 + 4, loc::gettext("-= SELL =-"), 196, 196, 255 - help.glow);
+        break;
+    case ShopMode_FISH:
+        font::print(PR_1X | PR_CEN, -1, 16 + 8 + 4, loc::gettext("-= FISH ENCHIRIDION =-"), 196, 196, 255 - help.glow);
+        break;
+    }
+
+    // coins
+    if (game.shopmode != ShopMode_FISH)
+    {
+        SDL_Color color = graphics.getcol(26);
+
+        int y = 16 + 4;
+        std::string coins_str = help.String(game.coins());
+        int coins_width = font::len(PR_1X, coins_str.c_str());
+        int coins_height = font::height(PR_1X);
+
+        if (game.shopcoinflash > 0 && ((game.shopcoinflash / 2) % 2 == 1))
+        {
+            color = graphics.getRGB(255, 32, 32);
+        }
+
+        font::print(PR_1X | PR_RIGHT, 320 - 16 - 8, y + 8, coins_str.c_str(), color.r, color.g, color.b);
+
+        graphics.drawcoloredtile(320 - 16 - 8 - coins_width - 8 - 8, y + 8, 48, color.r, color.g, color.b);
+    }
+
+    if (game.shopmode != ShopMode_FISH)
+    {
+        // SHOP ITEMS
+        int box_width = 192 + 16;
+        int box_height = 32;
+
+        SDL_Rect scissor;
+        scissor.x = 0;
+        scissor.y = 48;
+        scissor.w = 320;
+        scissor.h = 240 - 48 - 64;
+        SDL_RenderSetClipRect(gameScreen.m_renderer, &scissor);
+
+        std::vector<ItemStack> items = getShopItems();
+
+        if (items.size() == 0)
+        {
+            font::print(PR_1X | PR_CEN | PR_BOR, -1, 120, loc::gettext("No items here!"), 196, 196, 255 - help.glow);
+        }
+
+        for (size_t i = 0; i < items.size(); i++)
+        {
+            int selected_index = game.shopselect;
+            bool current_selected = (i == selected_index);
+
+            int x = (320 - box_width) / 2;
+            int y = 48 + 8 + ((i - game.shopscroll) * (box_height + 8));
+
+            SDL_Color col = graphics.getRGB(65, 185, 207);
+            if (current_selected)
+            {
+                col = graphics.getRGB(255, 255, 255);
+            }
+
+            graphics.drawpixeltextbox(x, y, box_width, box_height, col.r, col.g, col.b);
+
+            ItemStack item = items[i];
+
+            item.item->draw(x + 8, y + 8);
+
+            SDL_Color name_col = item.getNameColor();
+
+            int name_y = y + 8;
+
+            if (game.shopmode == ShopMode_BUY)
+            {
+                short lines;
+                font::string_wordwrap(PR_LEFT, item.getName().c_str(), 84, &lines);
+                if (lines == 1)
+                {
+                    name_y += 4;
+                }
+            }
+
+            int len = font::len(PR_LEFT, item.getName().c_str());
+            font::print(PR_LEFT, x + 33, name_y, item.getName().c_str(), name_col.r, name_col.g, name_col.b);
+
+            if (game.shopmode == ShopMode_SELL)
+            {
+                if (item.count > 1)
+                {
+                    font::print(PR_RIGHT, x + box_width - 8, name_y, "x" + help.String(item.count), 255 - (help.glow / 2), 196, 196);
+                }
+
+                bool timesall = false;
+                if (game.shopsubselect == 2)
+                {
+                    timesall = true;
+                }
+
+                SDL_Color color = graphics.getcol(26);
+
+                std::string coins_str = help.String(item.getSellPrice() * (timesall ? item.count : 1));
+                int coins_width = font::len(PR_1X, coins_str.c_str());
+                int coins_height = font::height(PR_1X);
+
+                font::print(PR_1X | PR_RIGHT, x + box_width - 8, name_y + 8, coins_str.c_str(), color.r, color.g, color.b);
+
+                graphics.drawcoloredtile(x + box_width - 8 - coins_width - 8 - 8, name_y + 8, 48, color.r, color.g, color.b);
+            }
+
+            if (game.shopmode == ShopMode_BUY)
+            {
+                bool timesfive = false;
+                if (game.shopsubselect == 2)
+                {
+                    timesfive = true;
+                    font::print(PR_LEFT, x + 33 + len, name_y, " x5", 255 - (help.glow / 2), 196, 196);
+                }
+
+                SDL_Color color = graphics.getcol(26);
+
+                std::string coins_str = help.String(item.getBuyPrice() * (timesfive ? 5 : 1));
+                int coins_width = font::len(PR_1X, coins_str.c_str());
+                int coins_height = font::height(PR_1X);
+
+                font::print(PR_1X | PR_RIGHT, x + box_width - 8, name_y, coins_str.c_str(), color.r, color.g, color.b);
+
+                graphics.drawcoloredtile(x + box_width - 8 - coins_width - 8 - 8, name_y, 48, color.r, color.g, color.b);
+            }
+        }
+
+        SDL_RenderSetClipRect(gameScreen.m_renderer, NULL);
+
+        int desc_y = 160 + 16;
+
+        if (game.shopsubmode == ShopSubMode_CONFIRM)
+        {
+            if (game.shopsubselect == 0) {
+                graphics.drawpixeltextbox(16 + 8, desc_y + 8, 80, 32, 255, 255, 255);
+            }
+            else
+            {
+                graphics.drawpixeltextbox(16 + 8, desc_y + 8, 80, 32, 65, 185, 207);
+            }
+            if (game.shopsubselect == 1) {
+                graphics.drawpixeltextbox(16 + 8 + 96, desc_y + 8, 80, 32, 255, 255, 255);
+            }
+            else
+            {
+                graphics.drawpixeltextbox(16 + 8 + 96, desc_y + 8, 80, 32, 65, 185, 207);
+            }
+            if (game.shopsubselect == 2) {
+                graphics.drawpixeltextbox(16 + 8 + 96 + 96, desc_y + 8, 80, 32, 255, 255, 255);
+            }
+            else
+            {
+                graphics.drawpixeltextbox(16 + 8 + 96 + 96, desc_y + 8, 80, 32, 65, 185, 207);
+            }
+
+            font::print(PR_1X | PR_CEN, 16 + 8 + 40, desc_y + 20, "Return", 196, 196, 255 - help.glow);
+            font::print(PR_1X | PR_CEN, 16 + 8 + 96 + 40, desc_y + 20, (game.shopmode == ShopMode_BUY) ? "Buy 1" : "Sell 1", 196, 196, 255 - help.glow);
+            font::print(PR_1X | PR_CEN, 16 + 8 + 96 + 96 + 40, desc_y + 20, (game.shopmode == ShopMode_BUY) ? "Buy 5" : "Sell ALL", 196, 196, 255 - help.glow);
+        }
+        else if (game.shopsubmode == ShopSubMode_MAIN)
+        {
+            graphics.drawpixeltextbox(0, desc_y, 320, 48, 65, 185, 207);
+            if (INBOUNDS_VEC(game.shopselect, items))
+            {
+                ItemStack item = items[game.shopselect];
+                item.item->draw(16, desc_y + 16);
+                int x = 48;
+                int flags = PR_LEFT;
+                SDL_Color col = item.getNameColor();
+                font::print(flags, x, desc_y + 8, item.getLongName().c_str(), col.r, col.g, col.b);
+                x += font::len(flags, item.getLongName().c_str());
+                if (item.count > 1)
+                {
+                    char buffer[SCREEN_WIDTH_CHARS + 1];
+                    vformat_buf(
+                        buffer, sizeof(buffer),
+                        loc::gettext(" (x{count})"),
+                        "count:int",
+                        item.count
+                    );
+                    font::print(flags, x, desc_y + 8, buffer, 196, 196, 196);
+                }
+
+                short lines;
+                font::string_wordwrap(PR_LEFT, item.getDescription().c_str(), 264, &lines);
+                int y = desc_y + 24;
+                if (lines > 2)
+                {
+                    y -= 8;
+                }
+                font::print_wrap(PR_LEFT, 48, y, item.getDescription().c_str(), 196, 196, 196, 8, 264);
+            }
+        }
+    }
+
+    graphics.drawgui();
+
+    if (game.advancetext)
+    {
+        char buffer_adv[SCREEN_WIDTH_CHARS + 1];
+        vformat_buf(
+            buffer_adv, sizeof(buffer_adv),
+            loc::gettext("- Press {button} to advance text -"),
+            "button:but",
+            vformat_button(ActionSet_InGame, Action_InGame_ACTION)
+        );
+
+        font::print(PR_CEN | PR_BOR, -1, graphics.flipmode ? 228 : 5, buffer_adv, 220 - (help.glow), 220 - (help.glow), 255 - (help.glow / 2));
+    }
+
+    graphics.set_render_target(graphics.gameTexture);
+
+    graphics.set_blendmode(graphics.menuTexture, SDL_BLENDMODE_BLEND);
+
+    graphics.menuoffrender();
+
+    graphics.set_blendmode(graphics.menuTexture, SDL_BLENDMODE_NONE);
+
+    graphics.render();
+}
+
 void maprender(void)
 {
     graphics.set_render_target(graphics.menuTexture);
@@ -3214,9 +3484,9 @@ void maprender(void)
         {
             SDL_Rect rect;
             rect.x = 0;
-            rect.y = 10;
+            rect.y = 12;
             rect.w = 320;
-            rect.h = 240 - 10 - 80;
+            rect.h = 240 - 12 - 80;
 
             SDL_RenderSetClipRect(gameScreen.m_renderer, &rect);
             int box_width = 128;
@@ -3253,7 +3523,7 @@ void maprender(void)
                 {
                     name_y += 4;
                 }
-                font::print_wrap(PR_LEFT, x + 33, name_y, item.getName().c_str(), name_col.r, name_col.g, name_col.b, 8, 84);
+                font::print_wrap(PR_LEFT, x + 33, name_y, item.getName().c_str(), name_col.r, name_col.g, name_col.b, 8, box_width - 44);
 
                 if (item.count > 1)
                 {

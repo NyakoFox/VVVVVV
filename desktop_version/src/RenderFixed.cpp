@@ -200,6 +200,57 @@ void titlerenderfixed(void)
     }
 }
 
+void shoprenderfixed(void)
+{
+    if (game.shopcoinflash > 0)
+    {
+        game.shopcoinflash--;
+    }
+    graphics.trinketcolset = false;
+
+    graphics.cutscenebarstimer();
+    map.updateroomnames();
+
+    graphics.updatetextboxes();
+    graphics.updatetitlecolours();
+
+    graphics.oldmenuoffset = graphics.menuoffset;
+    if (graphics.resumegamemode)
+    {
+        if (game.prevgamestate == GAMEMODE
+            //Failsafe: if the script command gamemode(teleporter) got ran and the
+            //cutscene stopped without doing gamemode(game), then we need to go
+            //back to GAMEMODE, not game.prevgamestate (TELEPORTERMODE)
+            || !script.running)
+        {
+            graphics.menuoffset += 25;
+            int threshold = 240;
+            if (graphics.menuoffset >= threshold)
+            {
+                graphics.menuoffset = threshold;
+                //go back to gamemode!
+                game.mapheld = true;
+                game.gamestate = GAMEMODE;
+                graphics.resumegamemode = false;
+            }
+        }
+        else
+        {
+            game.mapheld = true;
+            game.gamestate = game.prevgamestate;
+            graphics.resumegamemode = false;
+        }
+    }
+    else if (graphics.menuoffset > 0)
+    {
+        graphics.menuoffset -= 25;
+        if (graphics.menuoffset < 0)
+        {
+            graphics.menuoffset = 0;
+        }
+    }
+}
+
 void maprenderfixed(void)
 {
     graphics.updatetextboxes();
@@ -260,6 +311,8 @@ void maprenderfixed(void)
     }else if (map.cursorstate == 2){
         map.cursordelay++;
     }
+
+    graphics.trinketcolset = false;
 
     map.updateroomnames();
 }

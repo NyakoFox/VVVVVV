@@ -5,6 +5,8 @@ void gamerenderfixed(void);
 
 void titlerenderfixed(void);
 
+void shoprenderfixed(void);
+
 void maprenderfixed(void);
 
 void teleporterrenderfixed(void);

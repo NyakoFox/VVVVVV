@@ -163,6 +163,8 @@ public:
 
     void stuckprevention(int t);
 
+    SDL_Point getRodPointPosition(void);
+
 
     std::vector<entclass> entities;
 
@@ -173,6 +175,7 @@ public:
     bool flags[100];
     bool collect[100];
     std::set<int> coincollect;
+    std::set<int> opened_gates;
     bool customcollect[100];
 
     int platformtile;

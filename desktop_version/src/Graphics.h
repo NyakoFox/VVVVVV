@@ -450,8 +450,13 @@ public:
     std::vector <textboxclass> textboxes;
 
     bool showcutscenebars;
+    bool showcutscenebars_fast;
+
     int cutscenebarspos;
     int oldcutscenebarspos;
+
+    float cutscenebarspos_fast;
+    float oldcutscenebarspos_fast;
 
     static const int numstars = 50;
     SDL_Rect stars[numstars];

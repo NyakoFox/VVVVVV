@@ -51,6 +51,11 @@ editorclass::editorclass(void)
     register_tool(EditorTool_COINS, "Coins", "^1", SDLK_1, true);
     register_tool(EditorTool_TELEPORTERS, "Teleporters", "^2", SDLK_2, true);
     register_tool(EditorTool_WATER, "Water", "^3", SDLK_3, true);
+    register_tool(EditorTool_GATE_YELLOW, "Gate (Yellow)", "^4", SDLK_4, true);
+    register_tool(EditorTool_GATE_BLUE, "Gate (Blue)", "^5", SDLK_5, true);
+    register_tool(EditorTool_GATE_PURPLE, "Gate (Purple)", "^6", SDLK_6, true);
+    register_tool(EditorTool_GATE_RED, "Gate (Red)", "^7", SDLK_7, true);
+    register_tool(EditorTool_SPECIAL_TERMINAL, "Special Terminal", "^8", SDLK_8, true);
 
     static const short basic[] = {
         121, 121, 121, 121, 121, 121, 121, 160, 121, 121, 121, 121, 121, 121, 121,
@@ -1217,6 +1222,36 @@ static void draw_entities(void)
                 graphics.draw_rect(x, y, 8, 8, graphics.getRGB(255, 255, 255));
                 break;
             }
+            case 201: // Gate (Yellow)
+            {
+                graphics.draw_rect(x, y, entity->p1 * 8, entity->p2 * 8, graphics.getRGB(255, 232, 117));
+                graphics.draw_rect(x, y, 8, 8, graphics.getRGB(255, 255, 255));
+                break;
+            }
+            case 202: // Gate (Blue)
+            {
+                graphics.draw_rect(x, y, entity->p1 * 8, entity->p2 * 8, graphics.getRGB(117, 168, 255));
+                graphics.draw_rect(x, y, 8, 8, graphics.getRGB(255, 255, 255));
+                break;
+            }
+            case 203: // Gate (Purple)
+            {
+                graphics.draw_rect(x, y, entity->p1 * 8, entity->p2 * 8, graphics.getRGB(197, 117, 255));
+                graphics.draw_rect(x, y, 8, 8, graphics.getRGB(255, 255, 255));
+                break;
+            }
+            case 204: // Gate (Red)
+            {
+                graphics.draw_rect(x, y, entity->p1 * 8, entity->p2 * 8, graphics.getRGB(255, 96, 114));
+                graphics.draw_rect(x, y, 8, 8, graphics.getRGB(255, 255, 255));
+                break;
+            }
+            case 205: // Special terminal
+            {
+                graphics.draw_grid_tile(graphics.grphx.im_special_terminals, entity->p1, x, y, 32, 40, graphics.getcol(4));
+                graphics.draw_rect(x, y, 32, 40, graphics.getRGB(164, 164, 164));
+                break;
+            }
             case 50: // Warp Lines
                 if (entity->p1 >= 2) // Horizontal
                 {
@@ -1456,6 +1491,10 @@ static void draw_cursor(void)
     case EditorTool_ROOMTEXT:
     case EditorTool_SCRIPTS:
     case EditorTool_WATER:
+    case EditorTool_GATE_YELLOW:
+    case EditorTool_GATE_BLUE:
+    case EditorTool_GATE_PURPLE:
+    case EditorTool_GATE_RED:
         // 1x1
         graphics.draw_rect(x, y, 8, 8, blue);
         break;
@@ -1500,6 +1539,10 @@ static void draw_cursor(void)
         else if (ed.x_modifier) graphics.draw_rect(x, y, 16, 16, blue);
         else if (ed.z_modifier) graphics.draw_rect(x, y, 16, 16, blue);
         else graphics.draw_rect(x, y, 8, 8, blue);
+        break;
+    case EditorTool_SPECIAL_TERMINAL:
+        // 4x5
+        graphics.draw_rect(x, y, 32, 40, blue);
         break;
     default:
         break;
@@ -1613,6 +1656,18 @@ static void draw_box_placer()
         case BoxType_WATER:
             message = loc::gettext("WATER: Click on the first corner");
             break;
+        case BoxType_GATE_YELLOW:
+            message = loc::gettext("YELLOW GATE: Click on the first corner");
+            break;
+        case BoxType_GATE_BLUE:
+            message = loc::gettext("BLUE GATE: Click on the first corner");
+            break;
+        case BoxType_GATE_PURPLE:
+            message = loc::gettext("PURPLE GATE: Click on the first corner");
+            break;
+        case BoxType_GATE_RED:
+            message = loc::gettext("RED GATE: Click on the first corner");
+            break;
         default:
             message = loc::gettext("Click on the first corner");
             break;
@@ -1633,6 +1688,18 @@ static void draw_box_placer()
             break;
         case BoxType_WATER:
             message = loc::gettext("WATER: Click on the last corner");
+            break;
+        case BoxType_GATE_YELLOW:
+            message = loc::gettext("YELLOW GATE: Click on the last corner");
+            break;
+        case BoxType_GATE_BLUE:
+            message = loc::gettext("BLUE GATE: Click on the last corner");
+            break;
+        case BoxType_GATE_PURPLE:
+            message = loc::gettext("PURPLE GATE: Click on the last corner");
+            break;
+        case BoxType_GATE_RED:
+            message = loc::gettext("RED GATE: Click on the last corner");
             break;
         default:
             message = loc::gettext("Click on the last corner");
@@ -1872,6 +1939,18 @@ void editorclass::draw_tool(EditorTools tool, int x, int y)
     case EditorTool_WATER:
         graphics.draw_rect(x + 4, y + 4, 8, 8, graphics.getRGB(0, 96, 96));
         break;
+    case EditorTool_GATE_YELLOW:
+        graphics.draw_rect(x + 4, y + 4, 8, 8, graphics.getRGB(255, 232, 117));
+        break;
+    case EditorTool_GATE_BLUE:
+        graphics.draw_rect(x + 4, y + 4, 8, 8, graphics.getRGB(117, 168, 255));
+        break;
+    case EditorTool_GATE_PURPLE:
+        graphics.draw_rect(x + 4, y + 4, 8, 8, graphics.getRGB(197, 117, 255));
+        break;
+    case EditorTool_GATE_RED:
+        graphics.draw_rect(x + 4, y + 4, 8, 8, graphics.getRGB(255, 96, 114));
+        break;
     case EditorTool_WARP_TOKENS:
         graphics.draw_sprite(x, y, 18 + (entframe % 2), 196, 196, 196);
         break;
@@ -1898,6 +1977,12 @@ void editorclass::draw_tool(EditorTools tool, int x, int y)
         graphics.draw_texture_part(graphics.grphx.im_teleporter, x, y, 136, 40, 16, 16, 1, 1);
         graphics.set_texture_color_mod(graphics.grphx.im_teleporter, 255, 255, 255);
         break;
+    }
+    case EditorTool_SPECIAL_TERMINAL:
+    {
+        graphics.set_color(196, 196, 196);
+        graphics.draw_texture_part(graphics.grphx.im_special_terminals, x, y, 0, 0, 16, 16, 1, 1);
+        graphics.set_color(255, 255, 255);
     }
     default:
         break;
@@ -2647,6 +2732,10 @@ void editorclass::entity_clicked(const int index)
         get_input_line(TEXT_SCRIPT, "Enter script name:", &entity->scriptname);
         text_entity = index;
         break;
+    case 205:
+        // Special terminals
+        entity->p1 = (entity->p1 + 1) % 3;
+        break;
     }
 }
 
@@ -2750,10 +2839,50 @@ void editorclass::tool_place()
 
         lclickdelay = 1;
         break;
+    case EditorTool_GATE_YELLOW:
+        substate = EditorSubState_DRAW_BOX;
+        box_corner = BoxCorner_LAST;
+        box_type = BoxType_GATE_YELLOW;
+        box_point.x = tilex * 8;
+        box_point.y = tiley * 8;
+
+        lclickdelay = 1;
+        break;
+    case EditorTool_GATE_BLUE:
+        substate = EditorSubState_DRAW_BOX;
+        box_corner = BoxCorner_LAST;
+        box_type = BoxType_GATE_BLUE;
+        box_point.x = tilex * 8;
+        box_point.y = tiley * 8;
+
+        lclickdelay = 1;
+        break;
+    case EditorTool_GATE_PURPLE:
+        substate = EditorSubState_DRAW_BOX;
+        box_corner = BoxCorner_LAST;
+        box_type = BoxType_GATE_PURPLE;
+        box_point.x = tilex * 8;
+        box_point.y = tiley * 8;
+
+        lclickdelay = 1;
+        break;
+    case EditorTool_GATE_RED:
+        substate = EditorSubState_DRAW_BOX;
+        box_corner = BoxCorner_LAST;
+        box_type = BoxType_GATE_RED;
+        box_point.x = tilex * 8;
+        box_point.y = tiley * 8;
+
+        lclickdelay = 1;
+        break;
     case EditorTool_WARP_TOKENS:
         substate = EditorSubState_DRAW_WARPTOKEN;
         warp_token_entity = customentities.size();
         add_entity(levx, levy, tilex, tiley, 13);
+        lclickdelay = 1;
+        break;
+    case EditorTool_SPECIAL_TERMINAL:
+        add_entity(levx, levy, tilex, tiley, 205, 0);
         lclickdelay = 1;
         break;
     case EditorTool_WARP_LINES:
@@ -3635,6 +3764,18 @@ void editorinput(void)
                         break;
                     case BoxType_WATER:
                         ed.add_entity(ed.levx, ed.levy, left / 8, top / 8, 26, (right - left) / 8, (bottom - top) / 8);
+                        break;
+                    case BoxType_GATE_YELLOW:
+                        ed.add_entity(ed.levx, ed.levy, left / 8, top / 8, 201, (right - left) / 8, (bottom - top) / 8);
+                        break;
+                    case BoxType_GATE_BLUE:
+                        ed.add_entity(ed.levx, ed.levy, left / 8, top / 8, 202, (right - left) / 8, (bottom - top) / 8);
+                        break;
+                    case BoxType_GATE_PURPLE:
+                        ed.add_entity(ed.levx, ed.levy, left / 8, top / 8, 203, (right - left) / 8, (bottom - top) / 8);
+                        break;
+                    case BoxType_GATE_RED:
+                        ed.add_entity(ed.levx, ed.levy, left / 8, top / 8, 204, (right - left) / 8, (bottom - top) / 8);
                         break;
                     case BoxType_COPY:
                         // Unused

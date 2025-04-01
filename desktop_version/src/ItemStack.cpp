@@ -44,6 +44,18 @@ void ItemStack::increment(void)
     this->count++;
 }
 
+bool ItemStack::decrement(int amount)
+{
+    while (amount > 0)
+    {
+        if (!this->decrement())
+        {
+            return false;
+        }
+        amount--;
+    }
+}
+
 bool ItemStack::decrement(void)
 {
     if (this->count == 0)
@@ -167,4 +179,58 @@ void ItemStack::addComponent(std::string key, std::string value)
         this->equipped = ss_toi(value) == 1;
         return;
     }
+}
+
+std::string ItemStack::getCatchText(void)
+{
+    if (this->item == nullptr)
+    {
+        return "null";
+    }
+    return this->item->getCatchText(this);
+}
+
+ItemRarity ItemStack::getRarity(void)
+{
+    if (this->item == nullptr)
+    {
+        return Rarity_JUNK;
+    }
+    return this->item->getRarity(this);
+}
+
+int ItemStack::getBuyPrice(void)
+{
+    if (this->item == nullptr)
+    {
+        return 0;
+    }
+    return this->item->getBuyPrice(this);
+}
+
+int ItemStack::getSellPrice(void)
+{
+    if (this->item == nullptr)
+    {
+        return 0;
+    }
+    return this->item->getSellPrice(this);
+}
+
+bool ItemStack::canBuy(void)
+{
+    if (this->item == nullptr)
+    {
+        return false;
+    }
+    return this->item->canBuy(this);
+}
+
+bool ItemStack::canSell(void)
+{
+    if (this->item == nullptr)
+    {
+        return false;
+    }
+    return this->item->canSell(this);
 }

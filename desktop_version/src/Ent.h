@@ -31,7 +31,9 @@ enum EntityType
     EntityType_WARP_LINE_BOTTOM = 54,
     EntityType_COLLECTABLE_CREWMATE = 55,
     EntityType_TELEPORTER = 100,
-    EntityType_BOBBER = 200
+    EntityType_BOBBER = 200,
+    EntityType_GATE = 201,
+    EntityType_SPECIAL_TERMINAL = 205
 };
 
 class entclass
@@ -89,6 +91,9 @@ public:
 
     bool in_water;
     int last_water;
+
+    int off_x;
+    int off_y;
 };
 
 #endif /* ENT_H */

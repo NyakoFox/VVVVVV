@@ -52,6 +52,11 @@ enum EditorTools
     EditorTool_COINS,
     EditorTool_TELEPORTERS,
     EditorTool_WATER,
+    EditorTool_GATE_YELLOW,
+    EditorTool_GATE_BLUE,
+    EditorTool_GATE_PURPLE,
+    EditorTool_GATE_RED,
+    EditorTool_SPECIAL_TERMINAL,
 
     NUM_EditorTools
 };
@@ -89,7 +94,11 @@ enum BoxTypes
     BoxType_ENEMY,
     BoxType_PLATFORM,
     BoxType_COPY,
-    BoxType_WATER
+    BoxType_WATER,
+    BoxType_GATE_YELLOW,
+    BoxType_GATE_BLUE,
+    BoxType_GATE_PURPLE,
+    BoxType_GATE_RED,
 };
 
 enum BoxCorner

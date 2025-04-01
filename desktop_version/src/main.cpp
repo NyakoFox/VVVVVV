@@ -148,6 +148,13 @@ static const inline struct ImplFunc* get_gamestate_funcs(
         {Func_fixed, titlelogic},
     FUNC_LIST_END
 
+    FUNC_LIST_BEGIN(SHOPMODE)
+        {Func_fixed, shoprenderfixed},
+        {Func_delta, shoprender},
+        {Func_input, shopinput},
+        {Func_fixed, shoplogic},
+    FUNC_LIST_END
+
     FUNC_LIST_BEGIN(MAPMODE)
         {Func_fixed, maprenderfixed},
         {Func_delta, maprender},

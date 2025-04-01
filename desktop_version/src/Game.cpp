@@ -385,10 +385,20 @@ void Game::init(void)
     coins_collected = 0;
     inventory.clear();
     item_get_displays.clear();
+    fish_catch_info.clear();
     play_item_get = false;
     play_splash = false;
+    play_splash2 = false;
+    shopmode = ShopMode_BUY;
+    shopcoinflash = 0;
+    shopselect = 0;
+    shopscroll = 0;
+    shopsubmode = ShopSubMode_MAIN;
+    shopsubselect = 0;
     fishing_state = FishingState_IDLE;
+    fishing_item = ItemStack();
     fishing_timer = 0;
+    fishing_total = 0;
     fishing_anim_timer = 0;
 
     fishing_revealed = false;
@@ -1243,6 +1253,59 @@ static void gamecomplete_textbox12(textboxclass* THIS)
             game.hardestroom.c_str(), game.hardestroom_specialname
         )
     );
+}
+
+static void caughtfish_textbox1(textboxclass* THIS)
+{
+    extern Game game;
+    THIS->lines.clear();
+
+    if (game.fishing_item.getRarity() == Rarity_JUNK)
+    {
+        THIS->lines.push_back(loc::gettext("You caught a..."));
+    }
+    else
+    {
+        THIS->lines.push_back(loc::gettext("You caught a fish!"));
+    }
+
+    THIS->wrap(2);
+    THIS->centertext();
+    THIS->pad(1, 1);
+}
+
+static void caughtfish_textbox2(textboxclass* THIS)
+{
+    extern Game game;
+    THIS->lines.clear();
+
+    THIS->additem(12, 12, getItemID(game.fishing_item.item));
+
+    THIS->lines.push_back(game.fishing_item.getCatchText());
+
+    if (INBOUNDS_VEC(THIS->other_textbox_index, graphics.textboxes)
+        && &graphics.textboxes[THIS->other_textbox_index] != THIS)
+    {
+        THIS->yp = graphics.textboxes[THIS->other_textbox_index].yp + 10 + graphics.textboxes[THIS->other_textbox_index].h;
+    }
+    THIS->wrap(2);
+    THIS->pad(4, 1);
+}
+
+static void caughtfish_textbox3(textboxclass* THIS)
+{
+    extern Game game;
+    THIS->lines.clear();
+
+    THIS->lines.push_back(game.fishing_item.getDescription());
+
+    if (INBOUNDS_VEC(THIS->other_textbox_index, graphics.textboxes)
+        && &graphics.textboxes[THIS->other_textbox_index] != THIS)
+    {
+        THIS->yp = graphics.textboxes[THIS->other_textbox_index].yp + 10 + graphics.textboxes[THIS->other_textbox_index].h;
+    }
+    THIS->wrap(2);
+    THIS->pad(1, 1);
 }
 
 void Game::setstate(const int gamestate)
@@ -4599,6 +4662,57 @@ void Game::updatestate(void)
             }
             setstate(0);
             break;
+        case 5000:
+            // Caught a fish!
+            if (music.currentsong > -1)
+            {
+                music.haltdasmusik();
+            }
+            music.playef(Sound_FISHCAUGHT);
+            graphics.showcutscenebars_fast = true;
+            hascontrol = false;
+            completestop = true;
+            advancetext = true;
+            incstate();
+
+            graphics.createtextboxflipme("", 50, 85 - 24, TEXT_COLOUR("gray"));
+            graphics.textboxprintflags(PR_FONT_INTERFACE);
+            graphics.textboxcenterx();
+            graphics.textboxtranslate(TEXTTRANSLATE_FUNCTION, caughtfish_textbox1);
+            graphics.textboxapplyposition();
+
+            graphics.createtextboxflipme("", 50, 95 - 24, TEXT_COLOUR("gray"));
+            graphics.textboxprintflags(PR_FONT_INTERFACE);
+            graphics.textboxcenterx();
+            graphics.textboxindex(graphics.textboxes.size() - 2);
+            graphics.textboxtranslate(TEXTTRANSLATE_FUNCTION, caughtfish_textbox2);
+            graphics.textboxapplyposition();
+
+            graphics.createtextboxflipme("", 50, 105 - 24, TEXT_COLOUR("gray"));
+            graphics.textboxprintflags(PR_FONT_INTERFACE);
+            graphics.textboxcenterx();
+            graphics.textboxindex(graphics.textboxes.size() - 2);
+            graphics.textboxtranslate(TEXTTRANSLATE_FUNCTION, caughtfish_textbox3);
+            graphics.textboxapplyposition();
+            break;
+        case 5001:
+            if (!advancetext)
+            {
+                // Prevent softlocks if we somehow don't have advancetext
+                incstate();
+            }
+            break;
+        case 5002:
+            graphics.textboxremove();
+            hascontrol = true;
+            advancetext = false;
+            completestop = false;
+            setstate(0);
+            graphics.showcutscenebars_fast = false;
+            giveItem(fishing_item);
+            fishing_item = ItemStack();
+            music.resumefade(1500);
+            break;
         }
     }
 }
@@ -5818,6 +5932,7 @@ void Game::customloadquick(const std::string& savfile)
         LOAD_ARRAY_RENAME(collect, obj.collect)
 
         LOAD_SET_RENAME(coincollect, obj.coincollect)
+        LOAD_SET_RENAME(opened_gates, obj.opened_gates)
 
         LOAD_ARRAY_RENAME(customcollect, obj.customcollect)
 
@@ -6079,6 +6194,31 @@ void Game::customloadquick(const std::string& savfile)
                 }
 
                 map.setregion(thisid, thisrx, thisry, thisrx2, thisry2);
+            }
+        }
+        else if (SDL_strcmp(pKey, "catchinfo") == 0)
+        {
+            tinyxml2::XMLElement* pElem2;
+            for (pElem2 = pElem->FirstChildElement(); pElem2 != NULL; pElem2 = pElem2->NextSiblingElement())
+            {
+                if (SDL_strcmp(pElem2->Value(), "info") == 0)
+                {
+                    std::string itemname = pElem2->Attribute("item") == NULL ? "null" : pElem2->Attribute("item");
+                    std::string amount = pElem2->Attribute("amount") == NULL ? "1" : pElem2->Attribute("amount");
+                    std::string smallest = pElem2->Attribute("smallest") == NULL ? "0" : pElem2->Attribute("smallest");
+                    std::string largest = pElem2->Attribute("largest") == NULL ? "0" : pElem2->Attribute("largest");
+
+                    Item* item = getItem(itemname);
+                    if (item == NULL) continue;
+
+                    FishCatchInfo info;
+                    info.item = item;
+                    info.amount = ss_toi(amount);
+                    info.largest = ss_toi(largest);
+                    info.smallest = ss_toi(smallest);
+
+                    fish_catch_info.push_back(info);
+                }
             }
         }
     }
@@ -6445,6 +6585,15 @@ bool Game::customsavequick(const std::string& savfile)
     }
     xml::update_tag(msgs, "coincollect", coincollect.c_str());
 
+    std::string opened_gates;
+    std::set<int>::iterator iterator2 = obj.opened_gates.begin();
+    while (iterator2 != obj.opened_gates.end())
+    {
+        opened_gates += help.String(*iterator2) + ",";
+        iterator2++;
+    }
+    xml::update_tag(msgs, "opened_gates", opened_gates.c_str());
+
     std::string customcollect;
     for(size_t i = 0; i < SDL_arraysize(obj.customcollect); i++ )
     {
@@ -6518,6 +6667,18 @@ bool Game::customsavequick(const std::string& savfile)
 
             msg->LinkEndChild(region_el);
         }
+    }
+
+    tinyxml2::XMLElement* catchinfo_msg = xml::update_element_delete_contents(msgs, "catchinfo");
+    for (size_t i = 0; i < fish_catch_info.size(); i++)
+    {
+        tinyxml2::XMLElement* info_el;
+        info_el = doc.NewElement("info");
+        info_el->SetAttribute("item", getItemID(fish_catch_info[i].item).c_str());
+        info_el->SetAttribute("amount", help.String(fish_catch_info[i].amount).c_str());
+        info_el->SetAttribute("smallest", help.String(fish_catch_info[i].smallest).c_str());
+        info_el->SetAttribute("largest", help.String(fish_catch_info[i].largest).c_str());
+        catchinfo_msg->LinkEndChild(info_el);
     }
 
     //Special stats

@@ -25,7 +25,13 @@ public:
     virtual std::string getName(ItemStack* stack);
     virtual std::string getLongName(ItemStack* stack);
     virtual std::string getDescription(ItemStack* stack);
+    virtual std::string getCatchText(ItemStack* stack);
     virtual SDL_Color getNameColor(ItemStack* stack);
+    virtual ItemRarity getRarity(ItemStack* stack);
+    virtual int getBuyPrice(ItemStack* stack);
+    virtual int getSellPrice(ItemStack* stack);
+    virtual bool canBuy(ItemStack* stack);
+    virtual bool canSell(ItemStack* stack);
 protected:
     ItemSettings settings;
 };

@@ -52,6 +52,15 @@ public:
     SDL_Texture* im_bobber;
     SDL_Texture* im_fishingrod_anim;
     SDL_Texture* im_fishingrod_line_anim;
+
+    SDL_Texture* im_gate_yellow;
+    SDL_Texture* im_gate_blue;
+    SDL_Texture* im_gate_purple;
+    SDL_Texture* im_gate_red;
+
+    SDL_Texture* im_special_terminals;
+
+    SDL_Texture* im_logo;
 };
 
 SDL_Surface* LoadImageSurface(const char* filename);

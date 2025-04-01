@@ -795,6 +795,7 @@ void mapclass::resetplayer(const bool player_died)
     game.fishing_state = FishingState_IDLE;
     game.fishing_timer = 0;
     game.fishing_anim_timer = 0;
+    game.fishing_total = 0;
     for (int i = obj.entities.size() - 1; i >= 0; i--)
     {
         if (obj.entities[i].type == EntityType_BOBBER)
@@ -911,6 +912,7 @@ void mapclass::gotoroom(int rx, int ry)
     }
     game.fishing_timer = 0;
     game.fishing_anim_timer = 0;
+    game.fishing_total = 0;
 
     //Ok, let's save the position of all lines on the screen
     for (size_t i = 0; i < obj.entities.size(); i++)
@@ -1845,6 +1847,10 @@ void mapclass::loadlevel(int rx, int ry)
             const int ex = ent.x * 8;
             const int ey = ent.y * 8;
 
+            const int global_x = rx * 40 + ent.x;
+            const int global_y = ry * 30 + ent.y;
+            const int id = global_x + (global_y * 20);
+
             // Platform and enemy bounding boxes
             int bx1 = 0, by1 = 0, bx2 = 0, by2 = 0;
 
@@ -1999,7 +2005,7 @@ void mapclass::loadlevel(int rx, int ry)
                 obj.createblock(TRIGGER, ex, ey, ent.p1 * 8, ent.p2 * 8, ent.p3);
                 break;
             case 26: // Water
-                obj.createblock(WATER, ex, ey, ent.p1 * 8, ent.p2 * 8);
+                obj.createblock(WATER, ex, ey, ent.p1 * 8, ent.p2 * 8, 0, ent.scriptname, true);
                 break;
             case 50: // Warp Lines
                 obj.customwarpmode=true;
@@ -2018,6 +2024,21 @@ void mapclass::loadlevel(int rx, int ry)
                     obj.createentity(ent.p2 * 8, ey, 54, ent.p3);
                     break;
                 }
+                break;
+            case 201: // Gate (yellow)
+                obj.createentity(ex, ey, 201, ent.p1 * 8, ent.p2 * 8, id);
+                break;
+            case 202: // Gate (blue)
+                obj.createentity(ex, ey, 202, ent.p1 * 8, ent.p2 * 8, id);
+                break;
+            case 203: // Gate (purple)
+                obj.createentity(ex, ey, 203, ent.p1 * 8, ent.p2 * 8, id);
+                break;
+            case 204: // Gate (red)
+                obj.createentity(ex, ey, 204, ent.p1 * 8, ent.p2 * 8, id);
+                break;
+            case 205: // Special terminal
+                obj.createentity(ex, ey, 205, ent.p1);
                 break;
             }
         }

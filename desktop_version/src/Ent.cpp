@@ -71,6 +71,9 @@ void entclass::clear(void)
 
     in_water = false;
     last_water = -1;
+
+    off_x = 0;
+    off_y = 0;
 }
 
 bool entclass::outside(void)
@@ -622,6 +625,7 @@ void entclass::updatecolour(void)
     case 9: // Really Big Sprite! (2x2)
     case 10: // 2x1 Sprite
     case 13: // Special for epilogue: huge hero!
+    case 205:
         realcol = graphics.getcol(colour);
         break;
     case 5: // Horizontal gravity line

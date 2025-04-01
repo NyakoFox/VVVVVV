@@ -66,7 +66,13 @@ enum
     Sound_MENUCLOSE = 30,
     Sound_ITEMGET = 31,
     Sound_REEL = 32,
-    Sound_SPLASH2 = 33
+    Sound_SPLASH2 = 33,
+    Sound_FISHALERT = 34,
+    Sound_FISHCAUGHT = 35,
+    Sound_GATE = 36,
+    Sound_FILLBUCKET = 37,
+    Sound_ERROR = 38,
+    Sound_CASH = 39
 };
 
 class musicclass
