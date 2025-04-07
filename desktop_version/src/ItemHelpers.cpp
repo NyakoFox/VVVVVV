@@ -494,6 +494,7 @@ void registerItems(void)
     toPool("freshwater_small", Items::TIN_CAN, 15);
     toPool("freshwater_small", Items::SODA_CAN, 15);
     toPool("freshwater_small", Items::GAME_CARTRIDGE, 5);
+    toPool("freshwater_small", Items::TRINKETFIN, 12);
 
     toPool("freshwater_large", Items::LARGEMOUTH_BASS, 18);
     toPool("freshwater_large", Items::SMALLMOUTH_BASS, 15);
