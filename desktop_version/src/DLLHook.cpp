@@ -63,6 +63,11 @@ void VVV_PushEvent(VVV_Event* event)
     events.push_back(*event);
 }
 
+extern "C" DECLSPEC int SDLCALL version(void)
+{
+    return 1;
+}
+
 extern "C" DECLSPEC int SDLCALL get_ghost_count(void)
 {
     return ed.ghosts.size();
@@ -342,4 +347,23 @@ extern "C" DECLSPEC void SDLCALL play_level(const char* level_data, const char* 
     }
 
     return;
+}
+
+DLL_blend_mode get_blend_mode(SDL_BlendMode mode)
+{
+    switch (mode)
+    {
+    case SDL_BLENDMODE_NONE:
+        return BLENDMODE_NONE;
+    case SDL_BLENDMODE_BLEND:
+        return BLENDMODE_BLEND;
+    case SDL_BLENDMODE_ADD:
+        return BLENDMODE_ADD;
+    case SDL_BLENDMODE_MOD:
+        return BLENDMODE_MOD;
+    case SDL_BLENDMODE_MUL:
+        return BLENDMODE_MUL;
+    default:
+        return BLENDMODE_INVALID;
+    }
 }

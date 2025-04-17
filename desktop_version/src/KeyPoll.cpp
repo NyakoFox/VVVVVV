@@ -278,13 +278,13 @@ void KeyPoll::Poll(void)
                 }
             }
 
-            if (evt.keysym.sym == SDLK_F6 && !evt.repeat)
-            {
-                const bool success = SaveScreenshot();
-                game.old_screenshot_border_timer = 255;
-                game.screenshot_border_timer = 255;
-                game.screenshot_saved_success = success;
-            }
+            //if (evt.keysym.sym == SDLK_F6 && !evt.repeat)
+            //{
+            //    const bool success = SaveScreenshot();
+            //    game.old_screenshot_border_timer = 255;
+            //    game.screenshot_border_timer = 255;
+            //    game.screenshot_saved_success = success;
+            //}
 
             BUTTONGLYPHS_keyboard_set_active(true);
 

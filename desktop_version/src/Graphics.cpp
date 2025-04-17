@@ -514,25 +514,23 @@ int Graphics::query_texture(SDL_Texture* texture, Uint32* format, int* access, i
 
 int Graphics::set_blendmode(const SDL_BlendMode blendmode)
 {
-    // TODO
-    //const int result = SDL_SetRenderDrawBlendMode(gameScreen.m_renderer, blendmode);
-    //if (result != 0)
-    //{
-    //    WHINE_ONCE_ARGS(("Could not set draw mode: %s", SDL_GetError()));
-    //}
-    //return result;
+    // TODO: This WORKS, but we shouldn't do it yet, as LOVE2D 11 doesn't support custom blend modes.
+
+    //draw_message message;
+    //message.type = DRAW_SET_BLENDMODE;
+    //message.blendmode = get_blend_mode(blendmode);
+    //push_draw_message(message);
     return 0;
 }
 
 int Graphics::set_blendmode(SDL_Texture* texture, const SDL_BlendMode blendmode)
 {
-    // TODO
-    //const int result = SDL_SetTextureBlendMode(texture, blendmode);
-    //if (result != 0)
-    //{
-    //    WHINE_ONCE_ARGS(("Could not set texture blend mode: %s", SDL_GetError()));
-    //}
-    //return result;
+    // TODO: This WORKS, but we shouldn't do it yet, as LOVE2D 11 doesn't support custom blend modes.
+
+    //draw_message message;
+    //message.type = DRAW_SET_TEXTURE_BLENDMODE;
+    //SDL_strlcpy(message.texture, get_texture_id(texture).c_str(), sizeof(message.texture));
+    //message.blendmode = get_blend_mode(blendmode);
     return 0;
 }
 
@@ -3571,7 +3569,9 @@ void Graphics::flashlight(void)
 {
     set_blendmode(SDL_BLENDMODE_NONE);
 
-    fill_rect(NULL, 0xBB, 0xBB, 0xBB, 0xBB);
+    // TODO: Because blendmodes aren't implemented yet, we have to draw this with an alpha of 255.
+    fill_rect(NULL, 0xBB, 0xBB, 0xBB, 0xFF);
+    //fill_rect(NULL, 0xBB, 0xBB, 0xBB, 0xBB);
 }
 
 void Graphics::screenshake(void)

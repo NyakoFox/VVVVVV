@@ -58,6 +58,9 @@ extern "C" DECLSPEC void SDLCALL set_invincibility(bool invincible);
 extern "C" DECLSPEC void SDLCALL set_roomname_bg(bool translucent);
 extern "C" DECLSPEC void SDLCALL set_volume(int volume);
 extern "C" DECLSPEC void SDLCALL set_sound_volume(int volume);
+
+extern "C" DECLSPEC int SDLCALL version(void);
+
 extern "C" DECLSPEC int SDLCALL get_ghost_count(void);
 extern "C" DECLSPEC GhostInfo SDLCALL get_ghost_info(int index);
 
@@ -89,8 +92,19 @@ typedef enum {
     DRAW_TEXTURE = 8,
     DRAW_TEXTURE_EXT = 9,
     DRAW_SET_TINT_COLOR = 10,
-    DRAW_SET_TINT_ALPHA = 11
+    DRAW_SET_TINT_ALPHA = 11,
+    DRAW_SET_BLENDMODE = 12,
+    DRAW_SET_TEXTURE_BLENDMODE = 13
 } DLL_draw_type;
+
+typedef enum {
+    BLENDMODE_INVALID = -1,
+    BLENDMODE_NONE = 0,
+    BLENDMODE_BLEND = 1,
+    BLENDMODE_ADD = 2,
+    BLENDMODE_MOD = 4,
+    BLENDMODE_MUL = 8
+} DLL_blend_mode;
 
 typedef struct {
     int x;
@@ -126,6 +140,7 @@ typedef struct {
     bool flip_y;
     bool src_whole;
     bool dest_whole;
+    DLL_blend_mode blendmode;
 } draw_message;
 
 static std::vector<draw_message> draw_messages;
@@ -135,5 +150,7 @@ static std::vector<VVV_Texture*> textures;
 extern "C" DECLSPEC draw_message SDLCALL pop_draw_messages(void);
 
 void push_draw_message(draw_message message);
+
+DLL_blend_mode get_blend_mode(SDL_BlendMode mode);
 
 #endif /* DLLHOOK_H */
