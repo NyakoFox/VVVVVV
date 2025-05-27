@@ -3267,7 +3267,7 @@ void scriptclass::startgamemode(const enum StartMode mode)
     }
 
     game.gravitycontrol = game.savegc;
-    graphics.flipmode = graphics.setflipmode;
+    graphics.flipmode = false; // graphics.setflipmode;
 
     if (!map.custommode && !graphics.setflipmode)
     {

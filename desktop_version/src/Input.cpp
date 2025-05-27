@@ -321,6 +321,14 @@ void recomputetextboxes(void)
 
 static void toggleflipmode(void)
 {
+    if (true)
+    {
+        graphics.setflipmode = false;
+        graphics.flipmode = false;
+        music.playef(Sound_CRY);
+        return;
+    }
+
     graphics.setflipmode = !graphics.setflipmode;
     game.savestatsandsettings_menu();
     if (graphics.setflipmode)
@@ -446,9 +454,7 @@ static void menuactionpress(void)
             option_id = id; \
         } \
         option_seq++;
-#if !defined(MAKEANDPLAY)
         OPTION_ID(0) /* play */
-#endif
         //OPTION_ID(1) /* levels */
         OPTION_ID(1) /* options */
         if (loc::show_translator_menu)
@@ -463,7 +469,6 @@ static void menuactionpress(void)
 
         switch (option_id)
         {
-#if !defined(MAKEANDPLAY)
         case 0:
         {
             //Play
@@ -503,7 +508,6 @@ static void menuactionpress(void)
 
             break;
         }
-#endif
         /*case 1:
             //Bring you to the normal playmenu
             music.playef(Sound_VIRIDIAN);
@@ -860,24 +864,18 @@ static void menuactionpress(void)
             game.savestatsandsettings_menu();
             break;
         case 2:
-            /* Interact button toggle */
-            music.playef(Sound_VIRIDIAN);
-            game.separate_interact = !game.separate_interact;
-            game.savestatsandsettings_menu();
-            break;
-        case 3:
             // toggle fake load screen
             game.skipfakeload = !game.skipfakeload;
             game.savestatsandsettings_menu();
             music.playef(Sound_VIRIDIAN);
             break;
-        case 4:
+        case 3:
             // toggle in game timer
             game.showingametimer = !game.showingametimer;
             game.savestatsandsettings_menu();
             music.playef(Sound_VIRIDIAN);
             break;
-        case 5:
+        case 4:
             // english sprites
             loc::english_sprites = !loc::english_sprites;
             if (!loc::english_sprites)
@@ -1030,6 +1028,12 @@ static void menuactionpress(void)
         {
             gameplayoptionsoffset = 1;
             if (game.currentmenuoption == 0) {
+                if (true)
+                {
+                    music.playef(Sound_CRY);
+                    break;
+                }
+
                 toggleflipmode();
                 // Fix wrong area music in Tower (Positive Force vs. ecroF evitisoP)
                 if (map.custommode)
@@ -1072,20 +1076,7 @@ static void menuactionpress(void)
             game.createmenu(Menu::advancedoptions);
             map.nexttowercolour();
         }
-        else if (game.currentmenuoption == gameplayoptionsoffset + 3)
-        {
-            //Clear Data
-            music.playef(Sound_VIRIDIAN);
-            game.createmenu(Menu::cleardatamenu);
-            map.nexttowercolour();
-        }
-        else if (game.currentmenuoption == gameplayoptionsoffset + 4)
-        {
-            music.playef(Sound_VIRIDIAN);
-            game.createmenu(Menu::clearcustomdatamenu);
-            map.nexttowercolour();
-        }
-        else if (game.currentmenuoption == gameplayoptionsoffset + 5) {
+        else if (game.currentmenuoption == gameplayoptionsoffset + 3) {
             //return to previous menu
             music.playef(Sound_VIRIDIAN);
             game.returnmenu();
@@ -2322,7 +2313,6 @@ void titleinput(void)
     game.press_right = false;
     game.press_action = false;
     game.press_map = false;
-    game.press_interact = false;
 
     bool lang_press_horizontal = false;
 
@@ -2401,7 +2391,6 @@ void titleinput(void)
         if (    game.currentmenuname == Menu::controller &&
                 game.currentmenuoption > 0 &&
                 game.currentmenuoption < 6 &&
-                (game.separate_interact || game.currentmenuoption < 5) &&
                 key.controllerButtonDown()      )
         {
             if (!controller_held)
@@ -2599,7 +2588,6 @@ void gameinput(void)
         game.press_left = false;
         game.press_right = false;
         game.press_action = false;
-        game.press_interact = false;
 
         if (key.isDown(KEYBOARD_LEFT) || key.isDown(KEYBOARD_a) || key.controllerWantsLeft(false))
         {
@@ -2613,11 +2601,6 @@ void gameinput(void)
                 || key.isDown(KEYBOARD_UP) || key.isDown(KEYBOARD_DOWN) || key.isDown(KEYBOARD_w) || key.isDown(KEYBOARD_s)|| key.isDown(game.controllerButton_flip))
         {
             game.press_action = true;
-        }
-
-        if (key.isDown(KEYBOARD_e) || key.isDown(game.controllerButton_interact))
-        {
-            game.press_interact = true;
         }
     }
 
@@ -2634,7 +2617,6 @@ void gameinput(void)
         game.press_left = false;
         game.press_right = false;
         game.press_action = false;
-        game.press_interact = false;
 
         switch (game.fishing_state)
         {
@@ -2653,7 +2635,7 @@ void gameinput(void)
                 game.fishing_timer -= FISHING_CHOOSE_MAX_TIME;
             }
 
-            if (!key.isDown(KEYBOARD_x))
+            if (!key.isDown(KEYBOARD_x) && !key.isDown(game.controllerButton_interact))
             {
                 game.fishing_state = FishingState_POSTCHOOSING;
                 game.fishing_timer = 0;
@@ -2744,7 +2726,7 @@ void gameinput(void)
                         }
                     }
                 }
-                if (pressed_action || key.isDown(KEYBOARD_x))
+                if (pressed_action || key.isDown(KEYBOARD_x) || key.isDown(game.controllerButton_interact))
                 {
                     game.press_action = pressed_action;
                     game.jumpheld = true;
@@ -2769,7 +2751,7 @@ void gameinput(void)
             game.fishing_timer++;
             game.fishing_anim_timer++;
 
-            if (pressed_action || key.isDown(KEYBOARD_x))
+            if (pressed_action || key.isDown(KEYBOARD_x) || key.isDown(game.controllerButton_interact))
             {
                 game.press_action = pressed_action;
                 game.jumpheld = true;
@@ -2848,7 +2830,7 @@ void gameinput(void)
             }
             else
             {
-                if (pressed_action || key.isDown(KEYBOARD_x))
+                if (pressed_action || key.isDown(KEYBOARD_x) || key.isDown(game.controllerButton_interact))
                 {
                     game.fishing_state = FishingState_REELING;
                     music.stopef(Sound_FISHALERT);
@@ -2928,7 +2910,7 @@ void gameinput(void)
     }
     else
     {
-        if (key.isDown(KEYBOARD_x) && (getEquippedRod() != NULL) && !script.running && !game.advancetext && !game.completestop && (game.deathseq <= 0))
+        if ((key.isDown(KEYBOARD_x) || key.isDown(game.controllerButton_interact)) && (getEquippedRod() != NULL) && !script.running && !game.advancetext && !game.completestop && (game.deathseq <= 0))
         {
             game.fishing_state = FishingState_CHOOSING;
         }
@@ -2984,11 +2966,6 @@ void gameinput(void)
         game.mapheld = false;
     }
 
-    if (!game.press_interact)
-    {
-        game.interactheld = false;
-    }
-
     if (game.intimetrial && graphics.fademode == FADE_FULLY_BLACK && game.quickrestartkludge && !game.translator_exploring)
     {
         //restart the time trial
@@ -3004,8 +2981,7 @@ void gameinput(void)
     {
         if ((game.press_map || key.isDown(27)) && !game.mapheld)
         {
-            if (!game.separate_interact
-            && game.press_map
+            if (game.press_map
             && (INBOUNDS_VEC(game.activeactivity, obj.blocks)
             || (game.activetele && game.readytotele > 20)))
             {
@@ -3023,15 +2999,8 @@ void gameinput(void)
     bool has_control = false;
     bool enter_pressed = game.press_map && !game.mapheld;
     bool enter_already_processed = false;
-    bool interact_pressed;
-    if (game.separate_interact)
-    {
-        interact_pressed = game.press_interact && !game.interactheld;
-    }
-    else
-    {
-        interact_pressed = enter_pressed;
-    }
+    bool interact_pressed = enter_pressed;
+
     for (size_t ie = 0; ie < obj.entities.size(); ++ie)
     {
         if (obj.entities[ie].rule == 0)
@@ -3041,11 +3010,7 @@ void gameinput(void)
                 has_control = true;
                 if (interact_pressed)
                 {
-                    game.interactheld = true;
-                    if (!game.separate_interact)
-                    {
-                        game.mapheld = true;
-                    }
+                    game.mapheld = true;
                 }
 
                 if (interact_pressed && !script.running)
@@ -3300,7 +3265,7 @@ void gameinput(void)
     /* The rest of the if-tree runs only if enter is pressed and it has not
      * already been processed with 'separate interact' off.
      */
-    if (!enter_pressed || (enter_already_processed && !game.separate_interact))
+    if (!enter_pressed || enter_already_processed)
     {
         // Do nothing
     }
@@ -3378,7 +3343,6 @@ void shopinput(void)
     game.press_right = false;
     game.press_action = false;
     game.press_map = false;
-    game.press_interact = false;
     game.press_up = false;
     game.press_down = false;
 
@@ -3719,7 +3683,6 @@ void mapinput(void)
     game.press_right = false;
     game.press_action = false;
     game.press_map = false;
-    game.press_interact = false;
     game.press_up = false;
     game.press_down = false;
 
@@ -4181,7 +4144,6 @@ void teleporterinput(void)
     game.press_right = false;
     game.press_action = false;
     game.press_map = false;
-    game.press_interact = false;
 
     if(graphics.menuoffset==0)
     {
@@ -4189,17 +4151,13 @@ void teleporterinput(void)
         if (key.isDown(KEYBOARD_RIGHT) || key.isDown(KEYBOARD_d)|| key.controllerWantsRight(false) ) game.press_right = true;
         if (key.isDown(KEYBOARD_z) || key.isDown(KEYBOARD_SPACE) || key.isDown(KEYBOARD_v)
                 || key.isDown(KEYBOARD_UP) || key.isDown(KEYBOARD_DOWN)||  key.isDown(KEYBOARD_w)||  key.isDown(KEYBOARD_s) || key.isDown(game.controllerButton_flip)) game.press_action = true;
-        if (!game.separate_interact && (key.isDown(KEYBOARD_ENTER) || key.isDown(game.controllerButton_map)))
+        if ((key.isDown(KEYBOARD_ENTER) || key.isDown(game.controllerButton_map)))
         {
             game.press_map = true;
         }
-        if (key.isDown(KEYBOARD_e) || key.isDown(game.controllerButton_interact))
-        {
-            game.press_interact = true;
-        }
 
         //In the menu system, all keypresses are single taps rather than holds. Therefore this test has to be done for all presses
-        if (!game.press_action && !game.press_left && !game.press_right && !game.press_interact) game.jumpheld = false;
+        if (!game.press_action && !game.press_left && !game.press_right) game.jumpheld = false;
         if (!game.press_map) game.mapheld = false;
 
         if (key.isDown(27))
@@ -4227,7 +4185,7 @@ void teleporterinput(void)
 
     if (!game.jumpheld)
     {
-        if (game.press_action || game.press_left || game.press_right || game.press_map || game.press_interact)
+        if (game.press_action || game.press_left || game.press_right || game.press_map)
         {
             game.jumpheld = true;
         }
@@ -4270,7 +4228,7 @@ void teleporterinput(void)
             while (!map.isexplored(tempx, tempy));
         }
 
-        if ((game.separate_interact && game.press_interact) || game.press_map)
+        if (game.press_map)
         {
             tempx = map.teleporters[game.teleport_to_teleporter].x;
             tempy = map.teleporters[game.teleport_to_teleporter].y;
@@ -4317,7 +4275,6 @@ void gamecompleteinput(void)
     game.press_right = false;
     game.press_action = false;
     game.press_map = false;
-    game.press_interact = false;
 
     //Do this before we update map.bypos
     if (!game.colourblindmode)
@@ -4372,7 +4329,6 @@ void gamecompleteinput2(void)
     game.press_right = false;
     game.press_action = false;
     game.press_map = false;
-    game.press_interact = false;
 
     //Do this here because input comes first
     game.oldcreditposx = game.creditposx;

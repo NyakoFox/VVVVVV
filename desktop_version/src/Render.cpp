@@ -306,15 +306,8 @@ static void menurender(void)
             gameplayoptionsoffset = 1;
             if (game.currentmenuoption == 0) {
                 font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Flip Mode"), tr, tg, tb);
-                int next_y = font::print_wrap(PR_CEN, -1, 65, loc::gettext("Flip the entire game vertically."), tr, tg, tb);
-                if (graphics.setflipmode)
-                {
-                    font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Currently ENABLED!"), tr, tg, tb);
-                }
-                else
-                {
-                    font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Currently Disabled."), tr/2, tg/2, tb/2);
-                }
+                int next_y = font::print_wrap(PR_CEN, -1, 65, loc::gettext("Unavailable for VVVVVV: The Depths."), tr, tg, tb);
+                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Forcibly Disabled."), tr/2, tg/2, tb/2);
             }
         }
 
@@ -322,16 +315,18 @@ static void menurender(void)
         {
             //Toggle FPS
             font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Toggle 30+ FPS"), tr, tg, tb);
-            int next_y = font::print_wrap(PR_CEN, -1, 65, loc::gettext("Change whether the game runs at 30 or over 30 FPS."), tr, tg, tb);
+            int next_y = 65;
+            int next_y2 = next_y;
 
             if (!game.over30mode)
             {
-                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Current mode: 30 FPS"), tr/2, tg/2, tb/2);
+                next_y2 = font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Current mode: 30 FPS"), tr/2, tg/2, tb/2);
             }
             else
             {
-                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Current mode: Over 30 FPS"), tr, tg, tb);
+                next_y2 = font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Current mode: Over 30 FPS"), tr, tg, tb);
             }
+            font::print_wrap(PR_CEN, -1, next_y2, loc::gettext("WARNING: Over 30 FPS is largely untested in VVVVVV: The Depths."), tr / 2, tg / 2, tb / 2);
             break;
         }
         else if (game.currentmenuoption == gameplayoptionsoffset + 1)
@@ -345,17 +340,6 @@ static void menurender(void)
             //Advanced options
             font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Advanced Options"), tr, tg, tb);
             font::print_wrap(PR_CEN, -1, 65, loc::gettext("All other gameplay settings."), tr, tg, tb);
-        }
-        else if (game.currentmenuoption == gameplayoptionsoffset + 3)
-        {
-            //Clear Data
-            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Clear Data"), tr, tg, tb);
-            font::print_wrap(PR_CEN, -1, 65, loc::gettext("Delete your main game save data and unlocked play modes."), tr, tg, tb);
-        }
-        else if (game.currentmenuoption == gameplayoptionsoffset + 4)
-        {
-            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Clear Data"), tr, tg, tb);
-            font::print_wrap(PR_CEN, -1, 65, loc::gettext("Delete your custom level save data and completion stars."), tr, tg, tb);
         }
 
         break;
@@ -731,15 +715,7 @@ static void menurender(void)
             }
             font::print(PR_2X | PR_CEN, -1, 30, title, tr, tg, tb);
 
-            if (game.currentmenuoption == 5 && !game.separate_interact)
-            {
-                font::print_wrap(
-                    PR_CEN, -1, 55,
-                    loc::gettext("Interact is currently Enter!|See speedrunner options."),
-                    tr, tg, tb
-                );
-            }
-            else if (!game.gpmenu_confirming)
+            if (!game.gpmenu_confirming)
             {
                 font::print_wrap(
                     PR_CEN | PR_BRIGHTNESS(255 - help.glow*2), -1, 55,
@@ -814,11 +790,7 @@ static void menurender(void)
                 );
 
                 int brightness = 255;
-                if (bind == 5 && !game.separate_interact)
-                {
-                    brightness = 128;
-                }
-                else if (game.gpmenu_confirming && game.currentmenuoption == bind)
+                if (game.gpmenu_confirming && game.currentmenuoption == bind)
                 {
                     brightness = 255 - help.glow*2;
                 }
@@ -1116,27 +1088,6 @@ static void menurender(void)
         }
         case 2:
         {
-            char buffer[SCREEN_WIDTH_CHARS + 1];
-            const char* button;
-
-            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Interact Button"), tr, tg, tb);
-            int next_y = font::print_wrap(PR_CEN, -1, 65, loc::gettext("Toggle whether you interact with prompts using ENTER or E."), tr, tg, tb);
-
-            if (game.separate_interact)
-            {
-                button = loc::gettext("E");
-            }
-            else
-            {
-                button = loc::gettext("ENTER");
-            }
-
-            vformat_buf(buffer, sizeof(buffer), loc::gettext("Interact button: {button}"), "button:str", button);
-            font::print_wrap(PR_CEN, -1, next_y, buffer, tr, tg, tb);
-            break;
-        }
-        case 3:
-        {
             font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Fake Load Screen"), tr, tg, tb);
             int next_y = font::print_wrap(PR_CEN, -1, 65, loc::gettext("Disable the fake loading screen which appears on game launch."), tr, tg, tb);
             if (game.skipfakeload)
@@ -1145,7 +1096,7 @@ static void menurender(void)
                 font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Fake loading screen is ON"), tr, tg, tb);
             break;
         }
-        case 4:
+        case 3:
         {
             font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("In-Game Timer"), tr, tg, tb);
             int next_y = font::print_wrap(PR_CEN, -1, 65, loc::gettext("Toggle the in-game timer outside of time trials."), tr, tg, tb);
@@ -1159,7 +1110,7 @@ static void menurender(void)
             }
             break;
         }
-        case 5:
+        case 4:
         {
             font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("English Sprites"), tr, tg, tb);
             int next_y = font::print_wrap(PR_CEN, -1, 65, loc::gettext("Show the original English word enemies regardless of your language setting."), tr, tg, tb);

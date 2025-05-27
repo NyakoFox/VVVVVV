@@ -575,10 +575,7 @@ int main(int argc, char *argv[])
     {
         /* Just print the version and exit. No vlogging. */
         puts(
-            "VVVVVV " RELEASE_VERSION
-#ifdef MAKEANDPLAY
-            " [M&P]"
-#endif
+            "VVVVVV " RELEASE_VERSION " THE DEPTHS v1.0.1"
         );
 #ifdef INTERIM_VERSION_EXISTS
         puts(COMMIT_DATE);
