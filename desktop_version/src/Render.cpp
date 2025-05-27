@@ -4036,7 +4036,17 @@ void maprender(void)
 
         if (map.custommode)
         {
-            font::print(PR_CEN | PR_FONT_LEVEL, -1, FLIP(90, 8), game.customleveltitle, 25, 255 - help.glow/2, 255 - help.glow/2);
+            font::print(PR_CEN | PR_FONT_LEVEL, -1, FLIP(80, 8), loc::gettext("VVVVVV: The Depths"), 25, 255 - help.glow / 2, 255 - help.glow / 2);
+
+            char buffer[SCREEN_WIDTH_CHARS + 1];
+            vformat_buf(
+                buffer, sizeof(buffer),
+                loc::gettext("Fish caught: {amount}"),
+                "amount:int",
+                getCaughtFishAmount()
+            );
+
+            font::print(PR_CEN | PR_FONT_LEVEL, -1, FLIP(105, 8), buffer, 255 - help.glow / 2, 255 - help.glow / 2, 255 - help.glow / 2);
         }
         else
         {

@@ -238,9 +238,9 @@ bool canUpgradeBait(void)
 {
     for (auto& inv_item : game.inventory)
     {
+        bool bait_upgrade_1 = obj.flags[7];
+        bool bait_upgrade_2 = obj.flags[8];
         bool bait_upgrade_3 = obj.flags[9];
-        bool bait_upgrade_2 = obj.flags[8] || bait_upgrade_3;
-        bool bait_upgrade_1 = obj.flags[7] || bait_upgrade_2 || bait_upgrade_3;
 
         if (inv_item.item == Items::WORMS && bait_upgrade_1) return true;
         if (inv_item.item == Items::ENHANCED_BAIT && bait_upgrade_2) return true;
@@ -253,9 +253,9 @@ void upgradeBait(void)
 {
     for (auto& inv_item : game.inventory)
     {
+        bool bait_upgrade_1 = obj.flags[7];
+        bool bait_upgrade_2 = obj.flags[8];
         bool bait_upgrade_3 = obj.flags[9];
-        bool bait_upgrade_2 = obj.flags[8] || bait_upgrade_3;
-        bool bait_upgrade_1 = obj.flags[7] || bait_upgrade_2 || bait_upgrade_3;
 
         if (inv_item.item == Items::WORMS && bait_upgrade_1)
         {
