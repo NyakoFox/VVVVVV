@@ -215,7 +215,7 @@ static void menurender(void)
 //        font::print(PR_RIGHT | PR_FONT_8X8, 310, 210, INTERIM_COMMIT, tr/2, tg/2, tb/2);
 //        font::print(PR_RIGHT | PR_FONT_8X8, 310, 220, BRANCH_NAME, tr/2, tg/2, tb/2);
 //#endif
-        font::print(PR_RIGHT, 310, 230, "the depths v1.0", tr / 2, tg / 2, tb / 2);
+        font::print(PR_RIGHT, 310, 230, "the depths v1.0.1", tr / 2, tg / 2, tb / 2);
 
         const char* left_msg = NULL;
 
