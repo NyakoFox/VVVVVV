@@ -3549,19 +3549,19 @@ int Graphics::crewcolour(const int t)
     switch (t)
     {
     case 0:
-        return CYAN;
+        return EntityColour_CREW_CYAN;
     case 1:
-        return PURPLE;
+        return EntityColour_CREW_PURPLE;
     case 2:
-        return YELLOW;
+        return EntityColour_CREW_YELLOW;
     case 3:
-        return RED;
+        return EntityColour_CREW_RED;
     case 4:
-        return GREEN;
+        return EntityColour_CREW_GREEN;
     case 5:
-        return BLUE;
+        return EntityColour_CREW_BLUE;
     default:
-        return 0;
+        return EntityColour_CREW_CYAN;
     }
 }
 
@@ -3664,12 +3664,15 @@ void Graphics::get_stretch_info(SDL_Rect* rect)
         break;
     default:
         SDL_assert(0 && "Invalid scaling mode!");
-        /* Width and height should be nonzero to avoid division by zero. */
         rect->x = 0;
         rect->y = 0;
         rect->w = width;
         rect->h = height;
     }
+
+    // In case anything accidentally set the width/height to 0, we'll clamp it to avoid crashing from a division by 0
+    rect->w = SDL_max(1, rect->w);
+    rect->h = SDL_max(1, rect->h);
 }
 
 void Graphics::render(void)

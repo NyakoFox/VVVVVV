@@ -1,18 +1,8 @@
 name: CI-loc
 
-# Only trigger workflow when code changes, or this file is changed.
-# Android has a different workflow and different rules.
-on:
-  push:
-    paths:
-      - "desktop_version/fonts/**.png"
-      - "desktop_version/lang/**"
-      - ".github/workflows/ci-loc.yml"
-  pull_request:
-    paths:
-      - "desktop_version/fonts/**.png"
-      - "desktop_version/lang/**"
-      - ".github/workflows/ci-loc.yml"
+# Trigger on every push and pull request.
+# Different from upstream as artifacts are created.
+on: [push, pull_request]
 
 env:
   SRC_DIR_PATH: desktop_version
