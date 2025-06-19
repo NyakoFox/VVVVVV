@@ -8183,3 +8183,25 @@ bool Game::isingamecompletescreen(void)
 {
     return (state >= 3501 && state <= 3518) || (state >= 3520 && state <= 3522);
 }
+
+void Game::cancel_fishing(bool destroy_bobbers)
+{
+    fishing_state = FishingState_IDLE;
+    fishing_timer = 0;
+    fishing_anim_timer = 0;
+    fishing_total = 0;
+
+    music.stopef(Sound_FISHALERT);
+    music.stopef(Sound_REEL);
+
+    if (destroy_bobbers)
+    {
+        for (int i = obj.entities.size() - 1; i >= 0; i--)
+        {
+            if (obj.entities[i].type == EntityType_BOBBER)
+            {
+                obj.disableentity(i);
+            }
+        }
+    }
+}

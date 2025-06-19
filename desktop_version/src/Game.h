@@ -664,6 +664,8 @@ public:
     Item* last_item;
 
     bool enable_editor;
+
+    void cancel_fishing(bool destroy_bobbers);
 };
 
 #ifndef GAME_DEFINITION

@@ -796,18 +796,8 @@ void mapclass::resetplayer(const bool player_died)
     }
 
     game.deathseq = -1;
-    game.fishing_state = FishingState_IDLE;
-    game.fishing_timer = 0;
-    game.fishing_anim_timer = 0;
-    game.fishing_total = 0;
-    music.stopef(Sound_FISHALERT);
-    for (int i = obj.entities.size() - 1; i >= 0; i--)
-    {
-        if (obj.entities[i].type == EntityType_BOBBER)
-        {
-            obj.disableentity(i);
-        }
-    }
+
+    game.cancel_fishing(true);
 
     int i = obj.getplayer();
     if(INBOUNDS_VEC(i, obj.entities))
@@ -907,18 +897,7 @@ void mapclass::gotoroom(int rx, int ry)
     game.readytotele = 0;
     game.oldreadytotele = 0;
 
-    game.fishing_state = FishingState_IDLE;
-    music.stopef(Sound_FISHALERT);
-    for (int i = obj.entities.size() - 1; i >= 0; i--)
-    {
-        if (obj.entities[i].type == EntityType_BOBBER)
-        {
-            obj.disableentity(i);
-        }
-    }
-    game.fishing_timer = 0;
-    game.fishing_anim_timer = 0;
-    game.fishing_total = 0;
+    game.cancel_fishing(true);
 
     //Ok, let's save the position of all lines on the screen
     for (size_t i = 0; i < obj.entities.size(); i++)

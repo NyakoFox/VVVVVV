@@ -3684,12 +3684,7 @@ bool entityclass::updateentities( int i )
 
             if (remove)
             {
-                music.stopef(Sound_FISHALERT);
-                game.fishing_state = FishingState_IDLE;
-                game.fishing_item = ItemStack();
-                game.fishing_timer = 0;
-                game.fishing_total = 0;
-                game.fishing_anim_timer = 0;
+                game.cancel_fishing(false);
                 return disableentity(i);
             }
 

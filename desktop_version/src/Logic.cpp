@@ -1441,17 +1441,7 @@ void gamelogic(void)
     {
         if ((game.deathseq > 0) || script.running)
         {
-            game.fishing_state = FishingState_IDLE;
-            game.fishing_timer = 0;
-            game.fishing_anim_timer = 0;
-            music.stopef(Sound_FISHALERT);
-            for (int i = obj.entities.size() - 1; i >= 0; i--)
-            {
-                if (obj.entities[i].type == EntityType_BOBBER)
-                {
-                    obj.disableentity(i);
-                }
-            }
+            game.cancel_fishing(true);
         }
     }
 

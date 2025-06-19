@@ -2748,18 +2748,8 @@ void gameinput(void)
                     game.press_action = pressed_action;
                     game.jumpheld = true;
                     game.jumppressed = -1;
-                    game.fishing_state = FishingState_IDLE;
-                    game.fishing_timer = 0;
-                    game.fishing_anim_timer = 0;
-                    game.fishing_total = 0;
-                    music.stopef(Sound_FISHALERT);
-                    for (int i = obj.entities.size() - 1; i >= 0; i--)
-                    {
-                        if (obj.entities[i].type == EntityType_BOBBER)
-                        {
-                            obj.disableentity(i);
-                        }
-                    }
+
+                    game.cancel_fishing(true);
                 }
             }
             break;
@@ -2774,18 +2764,8 @@ void gameinput(void)
                 game.press_action = pressed_action;
                 game.jumpheld = true;
                 game.jumppressed = -1;
-                game.fishing_state = FishingState_IDLE;
-                game.fishing_timer = 0;
-                game.fishing_anim_timer = 0;
-                game.fishing_total = 0;
-                music.stopef(Sound_FISHALERT);
-                for (int i = obj.entities.size() - 1; i >= 0; i--)
-                {
-                    if (obj.entities[i].type == EntityType_BOBBER)
-                    {
-                        obj.disableentity(i);
-                    }
-                }
+
+                game.cancel_fishing(true);
                 break;
             }
 
@@ -2902,12 +2882,7 @@ void gameinput(void)
                     float distance = sqrt((target.x - current.x) * (target.x - current.x) + (target.y - current.y) * (target.y - current.y));
                     if (distance < (reel_speed * 1.5))
                     {
-                        game.fishing_state = FishingState_IDLE;
-                        game.fishing_timer = 0;
-                        game.fishing_anim_timer = 0;
-                        game.fishing_total = 0;
-                        music.stopef(Sound_REEL);
-                        obj.disableentity(i);
+                        game.cancel_fishing(true);
 
                         if (game.fishing_item.item == Items::TRINKETFIN)
                         {

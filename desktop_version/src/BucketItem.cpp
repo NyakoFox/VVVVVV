@@ -54,5 +54,5 @@ void BucketItem::use(ItemStack* stack)
             return;
         }
     }
-    music.playef(Sound_ALARM);
+    music.playef(Sound_ERROR);
 }
