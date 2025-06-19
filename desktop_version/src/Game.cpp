@@ -404,7 +404,7 @@ void Game::init(void)
 
     fishing_revealed = false;
 
-#if defined(__ANDROID__) || defined(TARGET_OS_IPHONE)
+#if defined(__ANDROID__) || TARGET_OS_IPHONE
     checkpoint_saving = true;
 #else
     checkpoint_saving = false;
