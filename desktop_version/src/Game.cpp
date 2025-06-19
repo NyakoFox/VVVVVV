@@ -8205,3 +8205,51 @@ void Game::cancel_fishing(bool destroy_bobbers)
         }
     }
 }
+
+bool Game::can_cast(void)
+{
+    if (script.running || advancetext || completestop || deathseq > -1)
+    {
+        // The player shouldn't have input in these states anyway... (imagine if vanilla had a state machine...)
+        return false;
+    }
+
+    if (getEquippedRod() == NULL)
+    {
+        // No rod equipped, so...
+        return false;
+    }
+
+    // Submersion check
+    int i = obj.getplayer();
+    if (INBOUNDS_VEC(i, obj.entities))
+    {
+        // Player exists, check if they're in water
+        if (obj.entities[i].in_water && (INBOUNDS_VEC(obj.entities[i].last_water, obj.blocks)))
+        {
+            // We're in water, let's do a naive check and assume that they're only in a single box of water
+            blockclass& block = obj.blocks[obj.entities[i].last_water];
+
+            // Get our top/bottoms
+            int player_top = obj.entities[i].yp + obj.entities[i].cy;
+            int player_bottom = player_top + obj.entities[i].h;
+            int water_top = block.rect.y;
+            int water_bottom = water_top + block.rect.h;
+
+            // Calculate intersection points
+            int intersection_top = SDL_max(player_top, water_top);
+            int intersection_bottom = SDL_min(player_bottom, water_bottom);
+
+            // Find out how submerged the player is
+            int overlap_height = intersection_bottom - intersection_top;
+            float fraction = overlap_height / obj.entities[i].h;
+
+            if (fraction > 0.75) {
+                // Over 75% submerged!! Can't fish!
+                return false;
+            }
+        }
+    }
+
+    return true;
+}

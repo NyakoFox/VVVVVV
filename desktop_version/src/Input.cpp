@@ -2629,6 +2629,12 @@ void gameinput(void)
 
     if (game.fishing_state != FishingState_IDLE)
     {
+        if (!game.can_cast())
+        {
+            // Cancel!
+            game.cancel_fishing(true);
+        }
+
         bool pressed_action = game.press_action;
 
         game.press_left = false;
@@ -2904,7 +2910,7 @@ void gameinput(void)
     }
     else
     {
-        if ((key.isDown(KEYBOARD_x) || key.isDown(game.controllerButton_interact)) && (getEquippedRod() != NULL) && !script.running && !game.advancetext && !game.completestop && (game.deathseq <= 0))
+        if ((key.isDown(KEYBOARD_x) || key.isDown(game.controllerButton_interact)) && game.can_cast())
         {
             game.fishing_state = FishingState_CHOOSING;
         }

@@ -666,6 +666,7 @@ public:
     bool enable_editor;
 
     void cancel_fishing(bool destroy_bobbers);
+    bool can_cast(void);
 };
 
 #ifndef GAME_DEFINITION
