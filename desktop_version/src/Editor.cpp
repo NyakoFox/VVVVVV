@@ -1261,6 +1261,7 @@ static void draw_entities(void)
                     item->draw(x, y);
                 }
                 graphics.draw_rect(x, y, 16, 16, graphics.getRGB(164, 255, 255));
+                break;
             }
             case 50: // Warp Lines
                 if (entity->p1 >= 2) // Horizontal

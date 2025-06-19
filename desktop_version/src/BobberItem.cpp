@@ -24,8 +24,9 @@ BobberItem::BobberItem(void)
 void BobberItem::use(ItemStack* stack)
 {
     bool wasEquipped = stack->isEquipped();
-    for (auto& inv_stack : game.inventory)
+    for (int i = 0; i < game.inventory.size(); i++)
     {
+        ItemStack& inv_stack = game.inventory[i];
         if (inv_stack.item == Items::GREEN_BOBBER)
         {
             inv_stack.setEquipped(false);

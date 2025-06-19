@@ -2752,6 +2752,7 @@ void gameinput(void)
                     game.fishing_timer = 0;
                     game.fishing_anim_timer = 0;
                     game.fishing_total = 0;
+                    music.stopef(Sound_FISHALERT);
                     for (int i = obj.entities.size() - 1; i >= 0; i--)
                     {
                         if (obj.entities[i].type == EntityType_BOBBER)
@@ -2777,6 +2778,7 @@ void gameinput(void)
                 game.fishing_timer = 0;
                 game.fishing_anim_timer = 0;
                 game.fishing_total = 0;
+                music.stopef(Sound_FISHALERT);
                 for (int i = obj.entities.size() - 1; i >= 0; i--)
                 {
                     if (obj.entities[i].type == EntityType_BOBBER)

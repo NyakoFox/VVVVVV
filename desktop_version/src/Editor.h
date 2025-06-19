@@ -98,7 +98,7 @@ enum BoxTypes
     BoxType_GATE_YELLOW,
     BoxType_GATE_BLUE,
     BoxType_GATE_PURPLE,
-    BoxType_GATE_RED,
+    BoxType_GATE_RED
 };
 
 enum BoxCorner

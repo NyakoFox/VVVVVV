@@ -187,7 +187,7 @@ enum ShopSubMode
 {
     ShopSubMode_MAIN,
     ShopSubMode_CONFIRM,
-    ShopSubMode_FISH,
+    ShopSubMode_FISH
 };
 
 struct MenuStackFrame

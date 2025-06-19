@@ -109,9 +109,10 @@ namespace Items
 
 bool hasItem(Item* item)
 {
-    for (auto& inv_item : game.inventory)
+    for (int i = 0; i < game.inventory.size(); i++)
     {
-        if (inv_item.item == item)
+        ItemStack& inv_stack = game.inventory[i];
+        if (inv_stack.item == item)
         {
             return true;
         }
@@ -142,8 +143,9 @@ void giveItem(ItemStack stack, bool display)
     }
 
     // okay first... i guess let's just check if we have any matching stacks.
-    for (auto& inv_stack : game.inventory)
+    for (int i = 0; i < game.inventory.size(); i++)
     {
+        ItemStack& inv_stack = game.inventory[i];
         if (stack.item == inv_stack.item)
         {
             // they're the same item at least, so... check components? i guess?
@@ -179,10 +181,12 @@ static Item* registerItem(std::string id, Item* item)
 
 void cleanItems(void)
 {
-    for (auto& item : ITEM_REGISTRY)
+    std::map<std::string, Item*>::iterator it;
+    for (it = ITEM_REGISTRY.begin(); it != ITEM_REGISTRY.end(); it++)
     {
-        delete item.second;
+        delete it->second;
     }
+
     ITEM_REGISTRY.clear();
 }
 
@@ -197,13 +201,15 @@ Item* getItem(std::string id)
 
 std::string getItemID(Item* item)
 {
-    for (auto& entry : ITEM_REGISTRY)
+    std::map<std::string, Item*>::iterator it;
+    for (it = ITEM_REGISTRY.begin(); it != ITEM_REGISTRY.end(); it++)
     {
-        if (entry.second == item)
+        if (it->second == item)
         {
-            return entry.first;
+            return it->first;
         }
     }
+
     return "null";
 }
 
@@ -236,38 +242,42 @@ void updateFishCaughtInfo(void)
 
 bool canUpgradeBait(void)
 {
-    for (auto& inv_item : game.inventory)
+    for (int i = 0; i < game.inventory.size(); i++)
     {
+        ItemStack& inv_stack = game.inventory[i];
+
         bool bait_upgrade_1 = obj.flags[7];
         bool bait_upgrade_2 = obj.flags[8];
         bool bait_upgrade_3 = obj.flags[9];
 
-        if (inv_item.item == Items::WORMS && bait_upgrade_1) return true;
-        if (inv_item.item == Items::ENHANCED_BAIT && bait_upgrade_2) return true;
-        if (inv_item.item == Items::DELUXE_BAIT && bait_upgrade_3) return true;
+        if (inv_stack.item == Items::WORMS && bait_upgrade_1) return true;
+        if (inv_stack.item == Items::ENHANCED_BAIT && bait_upgrade_2) return true;
+        if (inv_stack.item == Items::DELUXE_BAIT && bait_upgrade_3) return true;
     }
     return false;
 }
 
 void upgradeBait(void)
 {
-    for (auto& inv_item : game.inventory)
+    for (int i = 0; i < game.inventory.size(); i++)
     {
+        ItemStack& inv_stack = game.inventory[i];
+
         bool bait_upgrade_1 = obj.flags[7];
         bool bait_upgrade_2 = obj.flags[8];
         bool bait_upgrade_3 = obj.flags[9];
 
-        if (inv_item.item == Items::WORMS && bait_upgrade_1)
+        if (inv_stack.item == Items::WORMS && bait_upgrade_1)
         {
-            inv_item.item = Items::ENHANCED_BAIT;
+            inv_stack.item = Items::ENHANCED_BAIT;
         }
-        if (inv_item.item == Items::ENHANCED_BAIT && bait_upgrade_2)
+        if (inv_stack.item == Items::ENHANCED_BAIT && bait_upgrade_2)
         {
-            inv_item.item = Items::DELUXE_BAIT;
+            inv_stack.item = Items::DELUXE_BAIT;
         }
-        if (inv_item.item == Items::DELUXE_BAIT && bait_upgrade_3)
+        if (inv_stack.item == Items::DELUXE_BAIT && bait_upgrade_3)
         {
-            inv_item.item = Items::ULTRA_BAIT;
+            inv_stack.item = Items::ULTRA_BAIT;
         }
     }
 
@@ -282,12 +292,13 @@ void upgradeBait(void)
 
 bool hasBait(void)
 {
-    for (auto& inv_item : game.inventory)
+    for (int i = 0; i < game.inventory.size(); i++)
     {
-        if (inv_item.item == Items::WORMS) return true;
-        if (inv_item.item == Items::ENHANCED_BAIT) return true;
-        if (inv_item.item == Items::DELUXE_BAIT) return true;
-        if (inv_item.item == Items::ULTRA_BAIT) return true;
+        ItemStack& inv_stack = game.inventory[i];
+        if (inv_stack.item == Items::WORMS) return true;
+        if (inv_stack.item == Items::ENHANCED_BAIT) return true;
+        if (inv_stack.item == Items::DELUXE_BAIT) return true;
+        if (inv_stack.item == Items::ULTRA_BAIT) return true;
     }
     return false;
 }
@@ -296,7 +307,7 @@ void removeEmptyInventorySlots(void)
 {
     for (int i = game.inventory.size() - 1; i >= 0; i--)
     {
-        if (game.inventory[i].count <= 0 || game.inventory[i].item == nullptr)
+        if (game.inventory[i].count <= 0 || game.inventory[i].item == NULL)
         {
             game.inventory.erase(game.inventory.begin() + i);
         }
@@ -306,38 +317,42 @@ void removeEmptyInventorySlots(void)
 void useBait(void)
 {
     // use the best bait. im crunching rn man just make it work
-    for (auto& inv_item : game.inventory)
+    for (int i = 0; i < game.inventory.size(); i++)
     {
-        if (inv_item.item == Items::ULTRA_BAIT)
+        ItemStack& inv_stack = game.inventory[i];
+        if (inv_stack.item == Items::ULTRA_BAIT)
         {
-            inv_item.decrement();
+            inv_stack.decrement();
             removeEmptyInventorySlots();
             return;
         }
     }
-    for (auto& inv_item : game.inventory)
+    for (int i = 0; i < game.inventory.size(); i++)
     {
-        if (inv_item.item == Items::DELUXE_BAIT)
+        ItemStack& inv_stack = game.inventory[i];
+        if (inv_stack.item == Items::DELUXE_BAIT)
         {
-            inv_item.decrement();
+            inv_stack.decrement();
             removeEmptyInventorySlots();
             return;
         }
     }
-    for (auto& inv_item : game.inventory)
+    for (int i = 0; i < game.inventory.size(); i++)
     {
-        if (inv_item.item == Items::ENHANCED_BAIT)
+        ItemStack& inv_stack = game.inventory[i];
+        if (inv_stack.item == Items::ENHANCED_BAIT)
         {
-            inv_item.decrement();
+            inv_stack.decrement();
             removeEmptyInventorySlots();
             return;
         }
     }
-    for (auto& inv_item : game.inventory)
+    for (int i = 0; i < game.inventory.size(); i++)
     {
-        if (inv_item.item == Items::WORMS)
+        ItemStack& inv_stack = game.inventory[i];
+        if (inv_stack.item == Items::WORMS)
         {
-            inv_item.decrement();
+            inv_stack.decrement();
             removeEmptyInventorySlots();
             return;
         }
@@ -347,21 +362,25 @@ void useBait(void)
 int getBaitTier(void)
 {
     // use the best bait. im crunching rn man just make it work
-    for (auto& inv_item : game.inventory)
+    for (int i = 0; i < game.inventory.size(); i++)
     {
-        if (inv_item.item == Items::ULTRA_BAIT) return 3;
+        ItemStack& inv_stack = game.inventory[i];
+        if (inv_stack.item == Items::ULTRA_BAIT) return 3;
     }
-    for (auto& inv_item : game.inventory)
+    for (int i = 0; i < game.inventory.size(); i++)
     {
-        if (inv_item.item == Items::DELUXE_BAIT) return 2;
+        ItemStack& inv_stack = game.inventory[i];
+        if (inv_stack.item == Items::DELUXE_BAIT) return 2;
     }
-    for (auto& inv_item : game.inventory)
+    for (int i = 0; i < game.inventory.size(); i++)
     {
-        if (inv_item.item == Items::ENHANCED_BAIT) return 1;
+        ItemStack& inv_stack = game.inventory[i];
+        if (inv_stack.item == Items::ENHANCED_BAIT) return 1;
     }
-    for (auto& inv_item : game.inventory)
+    for (int i = 0; i < game.inventory.size(); i++)
     {
-        if (inv_item.item == Items::WORMS) return 0;
+        ItemStack& inv_stack = game.inventory[i];
+        if (inv_stack.item == Items::WORMS) return 0;
     }
     return -1;
 }
@@ -632,8 +651,9 @@ std::vector<Item*> getBestiaryItems(void)
 
 bool hasDiscovered(Item* item)
 {
-    for (auto& info : game.fish_catch_info)
+    for (int i = 0; i < game.fish_catch_info.size(); i++)
     {
+        FishCatchInfo& info = game.fish_catch_info[i];
         if (info.item == item)
         {
             return true;
@@ -645,8 +665,9 @@ bool hasDiscovered(Item* item)
 
 FishCatchInfo getFishCatchInfo(Item* item)
 {
-    for (auto& info : game.fish_catch_info)
+    for (int i = 0; i < game.fish_catch_info.size(); i++)
     {
+        FishCatchInfo& info = game.fish_catch_info[i];
         if (info.item == item)
         {
             return info;
@@ -664,11 +685,12 @@ FishCatchInfo getFishCatchInfo(Item* item)
 int getTrinketFinCount(void)
 {
     int amount = 0;
-    for (auto& stack : game.inventory)
+    for (int i = 0; i < game.inventory.size(); i++)
     {
-        if (stack.item == Items::TRINKETFIN)
+        ItemStack& inv_stack = game.inventory[i];
+        if (inv_stack.item == Items::TRINKETFIN)
         {
-            amount += stack.count;
+            amount += inv_stack.count;
         }
     }
     return amount;
@@ -677,8 +699,9 @@ int getTrinketFinCount(void)
 int getCaughtFishAmount(void)
 {
     int amount = 0;
-    for (auto& info : game.fish_catch_info)
+    for (int i = 0; i < game.fish_catch_info.size(); i++)
     {
+        FishCatchInfo& info = game.fish_catch_info[i];
         amount += info.amount;
     }
     return amount;
@@ -686,11 +709,12 @@ int getCaughtFishAmount(void)
 
 ItemStack* getEquippedRod(void)
 {
-    for (auto& stack : game.inventory)
+    for (int i = 0; i < game.inventory.size(); i++)
     {
-        if (stack.item == Items::FISHING_ROD && stack.isEquipped())
+        ItemStack& inv_stack = game.inventory[i];
+        if (inv_stack.item == Items::FISHING_ROD && inv_stack.isEquipped())
         {
-            return &stack;
+            return &inv_stack;
         }
     }
     return NULL;
@@ -726,8 +750,11 @@ ItemStack getItemForPool(std::string pool, int flag)
 
         std::vector<ItemStack> chooseFrom;
         chooseFrom.clear();
-        for (auto& data : POOLS[pool])
+
+        for (int i = 0; i < POOLS[pool].size(); i++)
         {
+            PoolData& data = POOLS[pool][i];
+
             if (flag >= 50 && flag <= 54 && obj.flags[flag] && data.item == Items::TRINKETFIN) continue; // if trinketfin flag is set, don't add trinketfin to the pool
             if ((flag < 50 || flag > 54) && data.item == Items::TRINKETFIN) continue; // if trinketfin flag is NOT set, don't add trinketfin to the pool
 
@@ -755,8 +782,9 @@ ItemStack getItemForPool(std::string pool, int flag)
 void decrementItem(ItemStack stack, int amount)
 {
     // ok, we only have a stack. i guess let's compare it?
-    for (auto& inv_stack : game.inventory)
+    for (int i = 0; i < game.inventory.size(); i++)
     {
+        ItemStack& inv_stack = game.inventory[i];
         if (stack.item == inv_stack.item)
         {
             // same item at least. so check components
@@ -776,41 +804,44 @@ std::vector<ItemStack> getShopItems(void)
     std::vector<ItemStack> items;
     if (game.shopmode == ShopMode_SELL)
     {
-        for (auto& stack : game.inventory)
+        for (int i = 0; i < game.inventory.size(); i++)
         {
-            if (stack.canSell())
+            ItemStack& inv_stack = game.inventory[i];
+            if (inv_stack.canSell())
             {
-                items.push_back(stack);
+                items.push_back(inv_stack);
             }
         }
     }
     else if (game.shopmode == ShopMode_BUY)
     {
         // loop through the whole registry ?!
-        for (auto& item : ITEM_REGISTRY)
+
+        std::map<std::string, Item*>::iterator it;
+        for (it = ITEM_REGISTRY.begin(); it != ITEM_REGISTRY.end(); it++)
         {
-            ItemStack stack = ItemStack(item.second, 1);
+            ItemStack stack = ItemStack(it->second, 1);
             stack.item->getDefaultComponents(&stack);
 
             if (!stack.canBuy()) continue;
 
-            if (item.second == Items::GREEN_BOBBER && (hasItem(Items::GREEN_BOBBER))) continue;
-            if (item.second == Items::BLUE_BOBBER && (hasItem(Items::BLUE_BOBBER))) continue;
-            if (item.second == Items::PURPLE_BOBBER && (hasItem(Items::PURPLE_BOBBER))) continue;
-            if (item.second == Items::BIG_BOBBER && (hasItem(Items::BIG_BOBBER))) continue;
-            if (item.second == Items::FISH_SPINNER && (hasItem(Items::FISH_SPINNER))) continue;
-            if (item.second == Items::FEATHER_SPINNER && (hasItem(Items::FEATHER_SPINNER))) continue;
-            if (item.second == Items::COIN_SPINNER && (hasItem(Items::COIN_SPINNER))) continue;
-            if (item.second == Items::TRINKET_SPINNER && (hasItem(Items::TRINKET_SPINNER))) continue;
-            if (item.second == Items::VIRIDIAN_SPINNER && (hasItem(Items::VIRIDIAN_SPINNER))) continue;
-            if (item.second == Items::GIANT_BOBBER && (hasItem(Items::GIANT_BOBBER))) continue;
+            if (it->second == Items::GREEN_BOBBER && (hasItem(Items::GREEN_BOBBER))) continue;
+            if (it->second == Items::BLUE_BOBBER && (hasItem(Items::BLUE_BOBBER))) continue;
+            if (it->second == Items::PURPLE_BOBBER && (hasItem(Items::PURPLE_BOBBER))) continue;
+            if (it->second == Items::BIG_BOBBER && (hasItem(Items::BIG_BOBBER))) continue;
+            if (it->second == Items::FISH_SPINNER && (hasItem(Items::FISH_SPINNER))) continue;
+            if (it->second == Items::FEATHER_SPINNER && (hasItem(Items::FEATHER_SPINNER))) continue;
+            if (it->second == Items::COIN_SPINNER && (hasItem(Items::COIN_SPINNER))) continue;
+            if (it->second == Items::TRINKET_SPINNER && (hasItem(Items::TRINKET_SPINNER))) continue;
+            if (it->second == Items::VIRIDIAN_SPINNER && (hasItem(Items::VIRIDIAN_SPINNER))) continue;
+            if (it->second == Items::GIANT_BOBBER && (hasItem(Items::GIANT_BOBBER))) continue;
 
-            if (item.second == Items::BLUE_KEY && (hasItem(Items::BLUE_KEY))) continue;
-            if (item.second == Items::PURPLE_KEY && (hasItem(Items::PURPLE_KEY))) continue;
-            if (item.second == Items::RED_KEY && (hasItem(Items::RED_KEY))) continue;
-            if (item.second == Items::BLUE_KEY && !obj.flags[6]) continue;
-            if (item.second == Items::PURPLE_KEY && !obj.flags[3]) continue;
-            if (item.second == Items::RED_KEY && !hasItem(Items::PURPLE_KEY)) continue;
+            if (it->second == Items::BLUE_KEY && (hasItem(Items::BLUE_KEY))) continue;
+            if (it->second == Items::PURPLE_KEY && (hasItem(Items::PURPLE_KEY))) continue;
+            if (it->second == Items::RED_KEY && (hasItem(Items::RED_KEY))) continue;
+            if (it->second == Items::BLUE_KEY && !obj.flags[6]) continue;
+            if (it->second == Items::PURPLE_KEY && !obj.flags[3]) continue;
+            if (it->second == Items::RED_KEY && !hasItem(Items::PURPLE_KEY)) continue;
 
             items.push_back(stack);
         }
@@ -821,8 +852,9 @@ std::vector<ItemStack> getShopItems(void)
 
 SDL_Texture* getBobberTexture(void)
 {
-    for (auto& inv_stack : game.inventory)
+    for (int i = 0; i < game.inventory.size(); i++)
     {
+        ItemStack& inv_stack = game.inventory[i];
         if (inv_stack.isEquipped())
         {
             if (inv_stack.item == Items::GREEN_BOBBER) return graphics.grphx.im_bobber_green;

@@ -65,7 +65,7 @@ bool ItemStack::decrement(void)
     this->count--;
     if (this->count == 0)
     {
-        this->item = nullptr;
+        this->item = NULL;
         return false;
     }
     return true;
@@ -73,7 +73,7 @@ bool ItemStack::decrement(void)
 
 bool ItemStack::isEmpty(void)
 {
-    if (this->item == nullptr)
+    if (this->item == NULL)
     {
         return true;
     }
@@ -82,7 +82,7 @@ bool ItemStack::isEmpty(void)
 
 bool ItemStack::canUse(void)
 {
-    if (this->item == nullptr)
+    if (this->item == NULL)
     {
         return false;
     }
@@ -91,7 +91,7 @@ bool ItemStack::canUse(void)
 
 void ItemStack::use(void)
 {
-    if (this->item == nullptr)
+    if (this->item == NULL)
     {
         return;
     }
@@ -100,7 +100,7 @@ void ItemStack::use(void)
 
 std::string ItemStack::getName(void)
 {
-    if (this->item == nullptr)
+    if (this->item == NULL)
     {
         return "null";
     }
@@ -109,7 +109,7 @@ std::string ItemStack::getName(void)
 
 std::string ItemStack::getLongName(void)
 {
-    if (this->item == nullptr)
+    if (this->item == NULL)
     {
         return "null";
     }
@@ -118,7 +118,7 @@ std::string ItemStack::getLongName(void)
 
 std::string ItemStack::getDescription(void)
 {
-    if (this->item == nullptr)
+    if (this->item == NULL)
     {
         return "null";
     }
@@ -127,7 +127,7 @@ std::string ItemStack::getDescription(void)
 
 SDL_Color ItemStack::getNameColor(void)
 {
-    if (this->item == nullptr)
+    if (this->item == NULL)
     {
         return graphics.getRGB(255, 0, 0);
     }
@@ -161,8 +161,8 @@ tinyxml2::XMLElement* ItemStack::serialize(tinyxml2::XMLDocument* doc)
     item_element->SetAttribute("count", this->count);
     // Serialize components
 
-    serializeComponent(doc, item_element, "fish_size", std::to_string(this->fish_size));
-    serializeComponent(doc, item_element, "equipped", std::to_string(this->equipped ? 1 : 0));
+    serializeComponent(doc, item_element, "fish_size", help.String(this->fish_size));
+    serializeComponent(doc, item_element, "equipped", help.String(this->equipped ? 1 : 0));
 
     return item_element;
 }
@@ -183,7 +183,7 @@ void ItemStack::addComponent(std::string key, std::string value)
 
 std::string ItemStack::getCatchText(void)
 {
-    if (this->item == nullptr)
+    if (this->item == NULL)
     {
         return "null";
     }
@@ -192,7 +192,7 @@ std::string ItemStack::getCatchText(void)
 
 ItemRarity ItemStack::getRarity(void)
 {
-    if (this->item == nullptr)
+    if (this->item == NULL)
     {
         return Rarity_JUNK;
     }
@@ -201,7 +201,7 @@ ItemRarity ItemStack::getRarity(void)
 
 int ItemStack::getBuyPrice(void)
 {
-    if (this->item == nullptr)
+    if (this->item == NULL)
     {
         return 0;
     }
@@ -210,7 +210,7 @@ int ItemStack::getBuyPrice(void)
 
 int ItemStack::getSellPrice(void)
 {
-    if (this->item == nullptr)
+    if (this->item == NULL)
     {
         return 0;
     }
@@ -219,7 +219,7 @@ int ItemStack::getSellPrice(void)
 
 bool ItemStack::canBuy(void)
 {
-    if (this->item == nullptr)
+    if (this->item == NULL)
     {
         return false;
     }
@@ -228,7 +228,7 @@ bool ItemStack::canBuy(void)
 
 bool ItemStack::canSell(void)
 {
-    if (this->item == nullptr)
+    if (this->item == NULL)
     {
         return false;
     }

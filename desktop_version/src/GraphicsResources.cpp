@@ -561,10 +561,12 @@ void GraphicsResources::destroy(void)
         CLEAR(graphics.customminimaps[i]);
     }
 
-    for (auto& item : graphics.item_sprites)
+    std::map<std::string, SDL_Texture*>::iterator it;
+    for (it = graphics.item_sprites.begin(); it != graphics.item_sprites.end(); it++)
     {
-        CLEAR(item.second);
+        CLEAR(it->second);
     }
+    graphics.item_sprites.clear();
 
     CLEAR(im_bobber);
 

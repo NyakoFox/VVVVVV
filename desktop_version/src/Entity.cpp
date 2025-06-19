@@ -3684,6 +3684,7 @@ bool entityclass::updateentities( int i )
 
             if (remove)
             {
+                music.stopef(Sound_FISHALERT);
                 game.fishing_state = FishingState_IDLE;
                 game.fishing_item = ItemStack();
                 game.fishing_timer = 0;
@@ -3735,6 +3736,8 @@ bool entityclass::updateentities( int i )
                 entities[i].onentity = 2;
                 music.playef(Sound_DRIPPLE);
             }
+            break;
+        case EntityType_ITEM:
             break;
         case EntityType_INVALID: // Invalid entity, do nothing!
             break;

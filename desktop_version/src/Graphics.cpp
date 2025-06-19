@@ -3629,7 +3629,10 @@ void Graphics::updatetowerbackground(TowerBG& bg_obj)
 
 static SDL_Color makeDarker(SDL_Color color)
 {
-    return { (Uint8)(color.r * 0.5), (Uint8)(color.g * 0.5), (Uint8)(color.b * 0.5), color.a };
+    color.r *= 0.5;
+    color.g *= 0.5;
+    color.b *= 0.5;
+    return color;
 }
 
 #define GETCOL_RANDOM (game.noflashingmode ? 0.5 : fRandom())

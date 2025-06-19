@@ -137,7 +137,7 @@ SDL_Color getWaterColorsForPool(std::string pool);
 ItemStack getItemForPool(std::string pool, int flag);
 std::vector<ItemStack> getShopItems(void);
 
-static std::map<std::string, std::vector<PoolData>> POOLS;
+static std::map<std::string, std::vector<PoolData> > POOLS;
 
 static std::vector<Item*> BESTIARY_ITEMS;
 
