@@ -16,10 +16,11 @@ option(OFFICIAL_BUILD "Compile an official build of the game" OFF)
 
 option(MAKEANDPLAY "Compile a version of the game without the main campaign (provided for convenience; consider modifying MakeAndPlay.h instead" OFF)
 
-if(OFFICIAL_BUILD AND NOT MAKEANDPLAY)
-    set(STEAM ON)
-    set(GOG ON)
-endif()
+# We're a mod, we don't have Steam or GOG support
+#if(OFFICIAL_BUILD AND NOT MAKEANDPLAY)
+#    set(STEAM ON)
+#    set(GOG ON)
+#endif()
 
 option(REMOVE_ABSOLUTE_PATHS "If supported by the compiler, replace all absolute paths to source directories compiled into the binary (if any) with relative paths" ON)
 

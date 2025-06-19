@@ -70,29 +70,22 @@ jobs:
       # Using a more specific key including a reference to the container if possible
       # We need to define container_image_tag in the env or find a way to get it
 
-    - name: CMake configure (default version)
+    - name: CMake configure
       run: |
         mkdir -p ${SRC_DIR_PATH}/build && cd ${SRC_DIR_PATH}/build
         # If cache was hit and build dir exists, this cmake might just verify.
         # If build dir is empty, it will configure.
-        cmake -G Ninja ..
-    - name: Build (default version)
+        cmake -G Ninja -DOFFICIAL_BUILD=ON -DMAKEANDPLAY=ON ..
+    - name: Build
       run: ninja -C ${SRC_DIR_PATH}/build
-
-    - name: CMake configure (official)
+    - name: Fix dylib paths
       run: |
-        cd ${SRC_DIR_PATH}/build
-        cmake -DOFFICIAL_BUILD=ON ..
-    - name: Build (official)
-      run: |
-        ninja -C ${SRC_DIR_PATH}/build
-
-    - name: CMake configure (M&P)
-      run: |
-        cd ${SRC_DIR_PATH}/build
-        cmake -DOFFICIAL_BUILD=OFF -DMAKEANDPLAY=ON ..
-    - name: Build (M&P)
-      run: ninja -C ${SRC_DIR_PATH}/build
+        install_name_tool -change '/usr/local/opt/sdl2/lib/libSDL2-2.0.0.dylib' '@rpath/libSDL2-2.0.0.dylib' ${SRC_DIR_PATH}/build/VVVVVV
+    - name: Upload binary
+      uses: actions/upload-artifact@v4
+      with:
+        name: VVVVVV-The-Depths-macos-${{ github.sha }}
+        path: ${{ env.SRC_DIR_PATH }}/build/VVVVVV
 
   build-lin:
     name: Build (Steam Linux Runtime Sniper)
@@ -115,28 +108,19 @@ jobs:
         key: ${{ runner.os }}-${{ env.CONTAINER_IMAGE_TAG }}-cmake-build-${{ hashFiles(format('{0}/CMakeLists.txt', env.SRC_DIR_PATH)) }}
       # Using a more specific key including a reference to the container
 
-    - name: CMake configure (default version)
+    - name: CMake configure
       run: |
         mkdir -p ${SRC_DIR_PATH}/build && cd ${SRC_DIR_PATH}/build
         # If cache was hit and build dir exists, this cmake might just verify.
         # If build dir is empty, it will configure.
-        cmake -G Ninja ..
-    - name: Build (default version)
+        cmake -G Ninja -DOFFICIAL_BUILD=ON -DMAKEANDPLAY=ON ..
+    - name: Build
       run: ninja -C ${SRC_DIR_PATH}/build
-
-    - name: CMake configure (official)
-      run: |
-        cd ${SRC_DIR_PATH}/build
-        cmake -G Ninja -DOFFICIAL_BUILD=ON ..
-    - name: Build (official)
-      run: ninja -C ${SRC_DIR_PATH}/build
-
-    - name: CMake configure (M&P)
-      run: |
-        cd ${SRC_DIR_PATH}/build
-        cmake -G Ninja -DOFFICIAL_BUILD=OFF -DMAKEANDPLAY=ON ..
-    - name: Build (M&P)
-      run: ninja -C ${SRC_DIR_PATH}/build
+    - name: Upload binary
+      uses: actions/upload-artifact@v4
+      with:
+        name: VVVVVV-The-Depths-ubuntu-${{ github.sha }}
+        path: ${{ env.SRC_DIR_PATH }}/build/VVVVVV
 
   build-win:
     name: Build (windows-latest)
@@ -185,31 +169,18 @@ jobs:
         $env:LDFLAGS =  "/LIBPATH:C:\SDL2-$env:SDL_VERSION\lib\x86 "
         cmake -G "Visual Studio 17 2022" -A Win32 `
               -DSDL2_INCLUDE_DIRS="C:\SDL2-$env:SDL_VERSION\include" `
-              -DSDL2_LIBRARIES="SDL2;SDL2main" ..
+              -DSDL2_LIBRARIES="SDL2;SDL2main" -DCMAKE_BUILD_TYPE=Release ..
 
-    - name: CMake configure (default version)
+    - name: CMake configure
       run: |
         cd $env:SRC_DIR_PATH/build
-        cmake ..
-    - name: Build (default version)
+        cmake -DOFFICIAL_BUILD=ON -DMAKEANDPLAY=ON ..
+    - name: Build
       run: |
         cd $env:SRC_DIR_PATH/build
-        cmake --build .
-
-    - name: CMake configure (official)
-      run: |
-        cd $env:SRC_DIR_PATH/build
-        cmake -DOFFICIAL_BUILD=ON ..
-    - name: Build (official)
-      run: |
-        cd $env:SRC_DIR_PATH/build
-        cmake --build .
-
-    - name: CMake configure (M&P)
-      run: |
-        cd $env:SRC_DIR_PATH/build
-        cmake -DOFFICIAL_BUILD=OFF -DMAKEANDPLAY=ON ..
-    - name: Build (M&P)
-      run: |
-        cd $env:SRC_DIR_PATH/build
-        cmake --build .
+        cmake --build . --config Release
+    - name: Upload binary
+      uses: actions/upload-artifact@v4
+      with:
+        name: VVVVVV-The-Depths-windows-${{ github.sha }}
+        path: ${{ env.SRC_DIR_PATH }}/build/Release/VVVVVV.exe
