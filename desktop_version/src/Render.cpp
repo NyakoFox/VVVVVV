@@ -2247,7 +2247,7 @@ static const char* interact_prompt(
         buffer, buffer_size,
         raw,
         "button:but",
-        vformat_button(ActionSet_InGame, Action_InGame_Interact)
+        vformat_button(ActionSet_InGame, Action_InGame_Map)
     );
 
     return buffer;
