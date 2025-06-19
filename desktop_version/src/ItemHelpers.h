@@ -87,6 +87,7 @@ namespace Items
     extern Item* GREENWATER_BUCKET;
     extern Item* BLUEWATER_BUCKET;
     extern Item* PURPLEWATER_BUCKET;
+    extern Item* VITELLARYWATER_BUCKET;
 
     extern Item* ENHANCED_BAIT;
     extern Item* DELUXE_BAIT;

@@ -90,6 +90,7 @@ namespace Items
     Item* GREENWATER_BUCKET;
     Item* BLUEWATER_BUCKET;
     Item* PURPLEWATER_BUCKET;
+    Item* VITELLARYWATER_BUCKET;
 
     Item* ENHANCED_BAIT;
     Item* DELUXE_BAIT;
@@ -467,6 +468,7 @@ void registerItems(void)
     Items::GREENWATER_BUCKET = registerItem("greenwater_bucket", new FilledBucketItem(ItemSettings().withName("Bucket (Filled)").withDescription("It's a bucket filled with green chemicals.").withLayer("bucket", 303).withLayer("bucket_fill",307)));
     Items::BLUEWATER_BUCKET = registerItem("bluewater_bucket", new FilledBucketItem(ItemSettings().withName("Bucket (Filled)").withDescription("It's a bucket filled with blue chemicals.").withLayer("bucket", 303).withLayer("bucket_fill",308)));
     Items::PURPLEWATER_BUCKET = registerItem("purplewater_bucket", new FilledBucketItem(ItemSettings().withName("Bucket (Filled)").withDescription("It's a bucket filled with purple chemicals.").withLayer("bucket", 303).withLayer("bucket_fill",309)));
+    Items::VITELLARYWATER_BUCKET = registerItem("vitellarywater_bucket", new FilledBucketItem(ItemSettings().withName("Bucket (Filled)").withDescription("It's a bucket filled with fresh water.").withLayer("bucket", 303).withLayer("bucket_fill", 304)));
 
     // bait
     Items::ENHANCED_BAIT = registerItem("enhanced_bait", new Item(ItemSettings().withName("Enhanced Bait").withDescription("Upgraded by Vitellary using the power of science. Still not a fish.").withLayer("worm_layer_1", 310).withLayer("worm_layer_2", 311)));
@@ -743,6 +745,7 @@ ItemStack getItemForPool(std::string pool, int flag)
     if (pool == "special_green") pool = "junk";
     if (pool == "special_blue") pool = "junk";
     if (pool == "special_purple") pool = "junk";
+    if (pool == "special_vitellary") pool = "freshwater_small";
 
     if (POOLS.count(pool))
     {

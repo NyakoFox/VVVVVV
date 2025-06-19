@@ -44,6 +44,7 @@ void BucketItem::use(ItemStack* stack)
             else if (block.script == "special_green") stack->item = Items::GREENWATER_BUCKET;
             else if (block.script == "special_blue") stack->item = Items::BLUEWATER_BUCKET;
             else if (block.script == "special_purple") stack->item = Items::PURPLEWATER_BUCKET;
+            else if (block.script == "special_vitellary") stack->item = Items::VITELLARYWATER_BUCKET;
             else
             {
                 music.playef(Sound_ERROR);
