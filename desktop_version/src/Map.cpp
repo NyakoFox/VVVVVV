@@ -694,6 +694,10 @@ bool mapclass::collide(int x, int y, const bool invincible)
             if (tileset == 1)
             {
                 if (tile>= 49 && tile < 80) return true;
+                if (tile >= 27 && tile <= 39) return true;
+                if (tile >= 706 && tile <= 718) return true;
+                if (tile >= 1080 && tile <= 1087) return true;
+                if (tile >= 1124 && tile <= 1127) return true;
             }
         }
     }
@@ -2092,7 +2096,7 @@ void mapclass::loadlevel(int rx, int ry)
                 }
                 else if(tileset==1)
                 {
-                    if ((tile >= 63 && tile <= 74) ||
+                    if ((tile >= 63 && tile <= 78) ||
                             (tile >= 6 && tile <= 9))
                     {
                         //sticking up) {
@@ -2109,10 +2113,28 @@ void mapclass::loadlevel(int rx, int ry)
                         }
                         if (tile < 11) tile--;
                     }
-                    if (tile >= 49 && tile <= 62)
+                    if ((tile >= 49 && tile <= 62) ||
+                            (tile >= 27 && tile <= 39) ||
+                            (tile >= 1080 && tile <= 1087) ||
+                            (tile >= 1124 && tile <= 1127) ||
+                            tile == 79)
                     {
                         //left or right
                         obj.createblock(2, (i * 8), (j * 8)+3, 8, 2);
+                    }
+                    // extra fishing vertical ones
+                    if (tile >= 706 && tile <= 718)
+                    {
+                        //sticking up
+                        if (tile % 2 != 0 || tile == 718)
+                        {
+                            obj.createblock(2, (i * 8), (j * 8), 8, 4);
+                        }
+                        else
+                        {
+                            //Sticking down
+                            obj.createblock(2, (i * 8), (j * 8) + 4, 8, 4);
+                        }
                     }
                 }
                 else if(tileset==2)
