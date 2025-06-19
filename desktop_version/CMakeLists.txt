@@ -23,6 +23,12 @@ endif()
 
 option(REMOVE_ABSOLUTE_PATHS "If supported by the compiler, replace all absolute paths to source directories compiled into the binary (if any) with relative paths" ON)
 
+option(APP_BUNDLE "Produce an application bundle on Apple platforms" OFF)
+
+if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
+    set(APP_BUNDLE ON)
+endif()
+
 
 # Architecture Flags
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
@@ -54,8 +60,13 @@ if(NOT WIN32)
         set(BIN_LIBROOT "Frameworks")
         set(BIN_RPATH "@executable_path/Frameworks")
     elseif(APPLE)
-        set(BIN_LIBROOT "osx")
-        set(BIN_RPATH "@executable_path/osx")
+        if(DEFINED SDL2_FRAMEWORK)
+            set(BIN_LIBROOT "Frameworks")
+            set(BIN_RPATH "@executable_path/../Frameworks")
+        else()
+            set(BIN_LIBROOT "osx")
+            set(BIN_RPATH "@executable_path/osx")
+        endif()
     elseif(CMAKE_SIZEOF_VOID_P MATCHES "8")
         set(BIN_LIBROOT "lib64")
         set(BIN_RPATH "\$ORIGIN/lib64")
@@ -145,23 +156,40 @@ if(WIN32)
     add_executable(VVVVVV WIN32 ${VVV_SRC} icon.rc)
 elseif(ANDROID)
     add_library(VVVVVV SHARED ${VVV_SRC})
-elseif(CMAKE_SYSTEM_NAME STREQUAL "iOS")
+elseif(APP_BUNDLE)
     file(GLOB_RECURSE REPO_RESOURCES "fonts/*" "lang/*")
 
-    add_executable(VVVVVV MACOSX_BUNDLE ${VVV_SRC} ${DATA_ZIP} AppIcon.xcassets ${REPO_RESOURCES})
+    if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+        list(APPEND REPO_RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/icon.icns")
+    else()
+        list(APPEND REPO_RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/AppIcon.xcassets")
+    endif()
+
+    add_executable(VVVVVV MACOSX_BUNDLE ${VVV_SRC} ${DATA_ZIP} ${REPO_RESOURCES})
     set_target_properties(VVVVVV PROPERTIES
-        XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "com.distractionware.vvvvvvmobile"
         XCODE_ATTRIBUTE_PRODUCT_NAME "VVVVVV"
-        XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY "1,2" # iPhone, iPad
         XCODE_ATTRIBUTE_CURRENT_PROJECT_VERSION "2.5"
         XCODE_ATTRIBUTE_MARKETING_VERSION "2.5"
-        XCODE_ATTRIBUTE_ASSETCATALOG_COMPILER_APPICON_NAME AppIcon
-        XCODE_ATTRIBUTE_GENERATE_INFOPLIST_FILE YES
-        MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist"
-        XCODE_ATTRIBUTE_INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace YES
-        XCODE_ATTRIBUTE_INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents YES
-        RESOURCE "${DATA_ZIP};AppIcon.xcassets"
     )
+
+    if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
+        set_target_properties(VVVVVV PROPERTIES
+            XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "com.distractionware.vvvvvvmobile"
+            XCODE_ATTRIBUTE_ASSETCATALOG_COMPILER_APPICON_NAME AppIcon
+            XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY "1,2" # iPhone, iPad
+            XCODE_ATTRIBUTE_INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace YES
+            XCODE_ATTRIBUTE_INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents YES
+            MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/Info-ios.plist"
+            RESOURCE "${DATA_ZIP};AppIcon.xcassets"
+        )
+    else()
+        set_target_properties(VVVVVV PROPERTIES
+            XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "com.distractionware.vvvvvv"
+            XCODE_ATTRIBUTE_INFOPLIST_KEY_CFBundleIconFile icon.icns
+            MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/Info-mac.plist"
+            RESOURCE "${DATA_ZIP}"
+        )
+    endif()
 
     foreach(REPO_FILE ${REPO_RESOURCES})
         file(RELATIVE_PATH REPO_FILE_REL "${CMAKE_CURRENT_SOURCE_DIR}" ${REPO_FILE})
