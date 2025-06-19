@@ -844,7 +844,11 @@ bool Graphics::isbg(int t)
     if (map.tileset == 1)
     {
         if (t >= 6 && t <= 9) return false; // spikes
-        if (t >= 49 && t <= 74) return false; // all spikes
+        if (t >= 49 && t <= 80) return false; // all spikes
+        if (t >= 27 && t <= 39) return false; // extra beach spikes
+        if (t >= 706 && t <= 718) return false; // extra grass spikes
+        if (t >= 1080 && t <= 1087) return false; // extra grass spikes
+        if (t >= 1124 && t <= 1127) return false; // extra grass spikes
         // GRASS:
 
         if (t == 941 || t == 942 || t == 981 || t == 982) return false; // grass-to-wall tiles
