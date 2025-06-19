@@ -1,0 +1,72 @@
+name: CI (macOS bundle)
+
+on:
+  push:
+    paths:
+      - "desktop_version/CMakeLists.txt"
+      - "desktop_version/src/**.cpp"
+      - "desktop_version/src/**.c"
+      - "desktop_version/src/**.h"
+      - "third_party/**"
+      - ".github/workflows/mac.yml"
+
+jobs:
+  build-mac:
+    name: Build (Mac bundle)
+
+    runs-on: macos-latest
+
+    env:
+      SDL_VERSION: 2.32.8
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: true
+
+    - name: Cache data.zip
+      id: cache-data
+      uses: actions/cache@v4
+      with:
+        path: desktop_version/build/data-zip
+        key: data-zip-folder
+
+    - name: Download data.zip
+      run: |
+        mkdir -p desktop_version/build/data-zip
+        cd desktop_version/build/data-zip
+        curl -JLO https://thelettervsixtim.es/makeandplay/data.zip
+      if: steps.cache-data.outputs.cache-hit != 'true'
+
+    - name: Cache SDL
+      id: cache-sdl
+      uses: actions/cache@v4
+      env:
+        cache-name: cache-sdl-dmg
+      with:
+        path: SDL2-${{ env.SDL_VERSION }}.dmg
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ env.SDL_VERSION }}
+
+    - name: Download SDL
+      run: |
+        curl -JLO https://github.com/libsdl-org/SDL/releases/download/release-$SDL_VERSION/SDL2-$SDL_VERSION.dmg
+      if: steps.cache-sdl.outputs.cache-hit != 'true'
+
+    - name: CMake configure (M&P)
+      run: |
+        hdiutil attach -noverify SDL2-$SDL_VERSION.dmg
+        cd desktop_version/build
+        cmake -G Xcode .. -DOFFICIAL_BUILD=ON -DMAKEANDPLAY=ON -DAPP_BUNDLE=ON -DDATA_ZIP=$PWD/data-zip/data.zip -DSDL2_FRAMEWORK=/Volumes/SDL2/SDL2.framework -DCMAKE_OSX_ARCHITECTURES='arm64;x86_64'
+    - name: Build (M&P)
+      run: |
+        cmake --build desktop_version/build --config Release
+        shopt -s extglob
+        rm -rf desktop_version/build/Release/!(VVVVVV.app)
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: VVVVVV-macOS
+        path: desktop_version/build/Release/
+
+
