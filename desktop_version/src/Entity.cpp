@@ -3678,14 +3678,13 @@ bool entityclass::updateentities( int i )
 
             bool remove = false;
             if (entities[i].xp < 0) remove = true;
-            if (entities[i].yp < 0) remove = true;
+            if (entities[i].bobbergrav == 1 && entities[i].yp < 0) remove = true;
             if (entities[i].xp > 320) remove = true;
-            if (entities[i].yp > 240) remove = true;
+            if (entities[i].bobbergrav == 0 && entities[i].yp > 240) remove = true;
 
             if (remove)
             {
-                game.cancel_fishing(false);
-                return disableentity(i);
+                game.reel_nofish();
             }
 
             break;
@@ -3821,7 +3820,7 @@ void entityclass::animateentities( int _i )
                 entities[_i].drawframe = 210;
                 weirddirectionbs = true;
             }
-            else if (game.fishing_state == FishingState_REELING)
+            else if (game.fishing_state == FishingState_REELING || game.fishing_state == FishingState_REELING_NOFISH)
             {
                 entities[_i].drawframe = 212;
                 if (game.fishing_anim_timer > 7)

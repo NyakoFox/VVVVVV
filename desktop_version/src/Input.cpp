@@ -545,12 +545,18 @@ static void menuactionpress(void)
             map.nexttowercolour();
             break;
         case 4:
+            // Mod credits
+            music.playef(Sound_VIRIDIAN);
+            game.createmenu(Menu::depths_credits);
+            map.nexttowercolour();
+            break;
+        case 5:
             //Credits
             music.playef(Sound_VIRIDIAN);
             game.createmenu(Menu::credits);
             map.nexttowercolour();
             break;
-        case 5:
+        case 6:
             music.playef(Sound_VIRIDIAN);
             game.createmenu(Menu::youwannaquit);
             map.nexttowercolour();
@@ -1617,6 +1623,98 @@ static void menuactionpress(void)
             break;
         }
         break;
+    case Menu::depths_credits:
+        switch (game.currentmenuoption)
+        {
+        case 0:
+            // next
+            music.playef(Sound_VIRIDIAN);
+            game.createmenu(Menu::depths_credits2, true);
+            map.nexttowercolour();
+            break;
+        case 1:
+            // last
+            music.playef(Sound_VIRIDIAN);
+            game.createmenu(Menu::depths_credits4, true);
+            map.nexttowercolour();
+            break;
+        case 2:
+            // return
+            music.playef(Sound_VIRIDIAN);
+            game.returnmenu();
+            map.nexttowercolour();
+            break;
+        }
+        break;
+    case Menu::depths_credits2:
+        switch (game.currentmenuoption)
+        {
+        case 0:
+            // next
+            music.playef(Sound_VIRIDIAN);
+            game.createmenu(Menu::depths_credits3, true);
+            map.nexttowercolour();
+            break;
+        case 1:
+            // previous
+            music.playef(Sound_VIRIDIAN);
+            game.createmenu(Menu::depths_credits, true);
+            map.nexttowercolour();
+            break;
+        case 2:
+            // return
+            music.playef(Sound_VIRIDIAN);
+            game.returnmenu();
+            map.nexttowercolour();
+            break;
+        }
+        break;
+    case Menu::depths_credits3:
+        switch (game.currentmenuoption)
+        {
+        case 0:
+            // next
+            music.playef(Sound_VIRIDIAN);
+            game.createmenu(Menu::depths_credits4, true);
+            map.nexttowercolour();
+            break;
+        case 1:
+            // previous
+            music.playef(Sound_VIRIDIAN);
+            game.createmenu(Menu::depths_credits2, true);
+            map.nexttowercolour();
+            break;
+        case 2:
+            // return
+            music.playef(Sound_VIRIDIAN);
+            game.returnmenu();
+            map.nexttowercolour();
+            break;
+        }
+        break;
+    case Menu::depths_credits4:
+        switch (game.currentmenuoption)
+        {
+        case 0:
+            // first
+            music.playef(Sound_VIRIDIAN);
+            game.createmenu(Menu::depths_credits, true);
+            map.nexttowercolour();
+            break;
+        case 1:
+            // last
+            music.playef(Sound_VIRIDIAN);
+            game.createmenu(Menu::depths_credits3, true);
+            map.nexttowercolour();
+            break;
+        case 2:
+            // return
+            music.playef(Sound_VIRIDIAN);
+            game.returnmenu();
+            map.nexttowercolour();
+            break;
+        }
+        break;
     case Menu::credits:
         switch (game.currentmenuoption)
         {
@@ -2632,7 +2730,7 @@ void gameinput(void)
         if (!game.can_cast())
         {
             // Cancel!
-            game.cancel_fishing(true);
+            game.cancel_or_reel(true);
         }
 
         bool pressed_action = game.press_action;
@@ -2755,7 +2853,7 @@ void gameinput(void)
                     game.jumpheld = true;
                     game.jumppressed = -1;
 
-                    game.cancel_fishing(true);
+                    game.cancel_or_reel(true);
                 }
             }
             break;
@@ -2771,7 +2869,7 @@ void gameinput(void)
                 game.jumpheld = true;
                 game.jumppressed = -1;
 
-                game.cancel_fishing(true);
+                game.cancel_or_reel(true);
                 break;
             }
 
@@ -2859,6 +2957,7 @@ void gameinput(void)
             break;
         }
         case FishingState_REELING:
+        case FishingState_REELING_NOFISH:
         {
             game.fishing_timer++;
             game.fishing_anim_timer++;
@@ -2890,17 +2989,22 @@ void gameinput(void)
                     {
                         game.cancel_fishing(true);
 
-                        if (game.fishing_item.item == Items::TRINKETFIN)
+                        if (game.fishing_state == FishingState_REELING)
                         {
-                            obj.flags[game.trinketfin_flag] = true;
+                            // If we're actually catching something, well, catch it
+
+                            if (game.fishing_item.item == Items::TRINKETFIN)
+                            {
+                                obj.flags[game.trinketfin_flag] = true;
+                            }
+                            game.trinketfin_flag = 0;
+
+                            useBait();
+                            updateFishCaughtInfo();
+
+                            game.state = 5000;
+                            game.statedelay = 0;
                         }
-                        game.trinketfin_flag = 0;
-
-                        useBait();
-                        updateFishCaughtInfo();
-
-                        game.state = 5000;
-                        game.statedelay = 0;
                     }
                 }
             }

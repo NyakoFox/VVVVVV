@@ -1439,7 +1439,7 @@ void gamelogic(void)
 
     if (game.fishing_state != FishingState_IDLE)
     {
-        if ((game.deathseq > 0) || script.running)
+        if (game.deathseq > 0)
         {
             game.cancel_fishing(true);
         }

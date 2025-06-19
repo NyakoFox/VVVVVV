@@ -6973,7 +6973,8 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         {
             option(loc::gettext("translator"));
         }
-        option(loc::gettext("credits"));
+        option(loc::gettext("mod credits"));
+        option(loc::gettext("game credits"));
         option(loc::gettext("quit"));
         menuyoff = -10;
         maxspacing = 15;
@@ -7431,6 +7432,25 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         option(loc::gettext("unlock secret lab"), !unlock[Unlock_SECRETLAB]);
         option(loc::gettext("return"));
         menuyoff = -20;
+        break;
+    case Menu::depths_credits:
+        option(loc::gettext("next page"));
+        option(loc::gettext("last page"));
+        option(loc::gettext("return"));
+        menuyoff = 64;
+        break;
+    case Menu::depths_credits2:
+    case Menu::depths_credits3:
+        option(loc::gettext("next page"));
+        option(loc::gettext("previous page"));
+        option(loc::gettext("return"));
+        menuyoff = 64;
+        break;
+    case Menu::depths_credits4:
+        option(loc::gettext("first page"));
+        option(loc::gettext("previous page"));
+        option(loc::gettext("return"));
+        menuyoff = 64;
         break;
     case Menu::credits:
         option(loc::gettext("next page"));
@@ -8203,6 +8223,51 @@ void Game::cancel_fishing(bool destroy_bobbers)
                 obj.disableentity(i);
             }
         }
+    }
+}
+
+void Game::reel_nofish(void)
+{
+    fishing_state = FishingState_REELING_NOFISH;
+    fishing_timer = 0;
+    fishing_anim_timer = 0;
+    fishing_total = 0;
+
+    music.stopef(Sound_FISHALERT);
+    music.playef(Sound_REEL);
+
+    for (int i = obj.entities.size() - 1; i >= 0; i--)
+    {
+        if (obj.entities[i].type == EntityType_BOBBER)
+        {
+            obj.entities[i].behave = 1;
+        }
+    }
+}
+
+void Game::cancel_or_reel(bool destroy_bobbers)
+{
+    bool bobber_exists = false;
+
+    for (int i = obj.entities.size() - 1; i >= 0; i--)
+    {
+        if (obj.entities[i].type == EntityType_BOBBER)
+        {
+            bobber_exists = true;
+            break;
+        }
+    }
+
+    if (bobber_exists)
+    {
+        if (fishing_state != FishingState_REELING_NOFISH && fishing_state != FishingState_REELING)
+        {
+            reel_nofish();
+        }
+    }
+    else
+    {
+        cancel_fishing(destroy_bobbers);
     }
 }
 

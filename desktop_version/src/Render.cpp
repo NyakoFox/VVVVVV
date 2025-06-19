@@ -208,7 +208,7 @@ static void menurender(void)
         graphics.draw_grid_tile(graphics.grphx.im_logo, 1, 160 - 96, 84, 192, 24, graphics.getRGB(tr / 2, tg / 2, tb / 2));
 
 #if defined(MAKEANDPLAY)
-//        font::print(PR_RIGHT, 264, temp+35, loc::gettext("MAKE AND PLAY EDITION"), tr, tg, tb);
+        //        font::print(PR_RIGHT, 264, temp+35, loc::gettext("MAKE AND PLAY EDITION"), tr, tg, tb);
 #endif
 //#ifdef INTERIM_VERSION_EXISTS
 //        font::print(PR_RIGHT | PR_FONT_8X8, 310, 200, COMMIT_DATE, tr/2, tg/2, tb/2);
@@ -241,22 +241,22 @@ static void menurender(void)
 
         if (left_msg != NULL)
         {
-            font::print(0, 10, 230, left_msg, tr/2, tg/2, tb/2);
+            font::print(0, 10, 230, left_msg, tr / 2, tg / 2, tb / 2);
         }
         break;
     }
     case Menu::levellist:
     {
-        if (cl.ListOfMetaData.size()==0)
+        if (cl.ListOfMetaData.size() == 0)
         {
             font::print_wrap(PR_CEN, -1, 90, loc::gettext("ERROR: No levels found."), tr, tg, tb);
         }
-        int tmp=game.currentmenuoption+(game.levelpage*8);
+        int tmp = game.currentmenuoption + (game.levelpage * 8);
         if (INBOUNDS_VEC(tmp, cl.ListOfMetaData))
         {
             const bool nextlastoptions = cl.ListOfMetaData.size() > 8;
             //Don't show next/previous page or return to menu options here!
-            if (nextlastoptions && game.menuoptions.size() - game.currentmenuoption<=3)
+            if (nextlastoptions && game.menuoptions.size() - game.currentmenuoption <= 3)
             {
 
             }
@@ -282,12 +282,12 @@ static void menurender(void)
                 font::print(title_flags | PR_2X | PR_CEN, -1, 15, title, tr, tg, tb);
                 int sp = SDL_max(10, font::height(level_flags));
                 graphics.print_level_creator(creator_flags, 40, creator, tr, tg, tb);
-                font::print(level_flags | PR_CEN, -1, 40+sp, cl.ListOfMetaData[tmp].website, tr, tg, tb);
-                font::print(level_flags | PR_CEN, -1, 40+sp*3, cl.ListOfMetaData[tmp].Desc1, tr, tg, tb);
-                font::print(level_flags | PR_CEN, -1, 40+sp*4, cl.ListOfMetaData[tmp].Desc2, tr, tg, tb);
+                font::print(level_flags | PR_CEN, -1, 40 + sp, cl.ListOfMetaData[tmp].website, tr, tg, tb);
+                font::print(level_flags | PR_CEN, -1, 40 + sp * 3, cl.ListOfMetaData[tmp].Desc1, tr, tg, tb);
+                font::print(level_flags | PR_CEN, -1, 40 + sp * 4, cl.ListOfMetaData[tmp].Desc2, tr, tg, tb);
                 if (sp <= 10)
                 {
-                    font::print(level_flags | PR_CEN, -1, 40+sp*5, cl.ListOfMetaData[tmp].Desc3, tr, tg, tb);
+                    font::print(level_flags | PR_CEN, -1, 40 + sp * 5, cl.ListOfMetaData[tmp].Desc3, tr, tg, tb);
                 }
             }
         }
@@ -307,7 +307,7 @@ static void menurender(void)
             if (game.currentmenuoption == 0) {
                 font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Flip Mode"), tr, tg, tb);
                 int next_y = font::print_wrap(PR_CEN, -1, 65, loc::gettext("Unavailable for VVVVVV: The Depths."), tr, tg, tb);
-                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Forcibly Disabled."), tr/2, tg/2, tb/2);
+                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Forcibly Disabled."), tr / 2, tg / 2, tb / 2);
             }
         }
 
@@ -320,7 +320,7 @@ static void menurender(void)
 
             if (!game.over30mode)
             {
-                next_y2 = font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Current mode: 30 FPS"), tr/2, tg/2, tb/2);
+                next_y2 = font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Current mode: 30 FPS"), tr / 2, tg / 2, tb / 2);
             }
             else
             {
@@ -375,7 +375,7 @@ static void menurender(void)
             font::print_wrap(PR_CEN, -1, 65, loc::gettext("Disable screen effects, enable slowdown modes or invincibility."), tr, tg, tb);
             break;
         case 5:
-            font::print(PR_2X | PR_CEN,  -1, 30, loc::gettext("Language"), tr, tg, tb);
+            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Language"), tr, tg, tb);
             font::print_wrap(PR_CEN, -1, 65, loc::gettext("Change the language."), tr, tg, tb);
         }
         break;
@@ -384,7 +384,7 @@ static void menurender(void)
         int offset = 0;
         if (game.currentmenuoption == offset + 0 && !gameScreen.isForcedFullscreen())
         {
-            font::print(PR_2X | PR_CEN,  -1, 30, loc::gettext("Toggle Fullscreen"), tr, tg, tb);
+            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Toggle Fullscreen"), tr, tg, tb);
             int next_y = font::print_wrap(PR_CEN, -1, 65, loc::gettext("Change to fullscreen/windowed mode."), tr, tg, tb);
 
             if (gameScreen.isWindowed)
@@ -404,7 +404,7 @@ static void menurender(void)
 
         if (game.currentmenuoption == offset + 1)
         {
-            font::print(PR_2X | PR_CEN,  -1, 30, loc::gettext("Scaling Mode"), tr, tg, tb);
+            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Scaling Mode"), tr, tg, tb);
             int next_y = font::print_wrap(PR_CEN, -1, 65, loc::gettext("Choose letterbox/stretch/integer mode."), tr, tg, tb);
 
             switch (gameScreen.scalingMode)
@@ -436,7 +436,7 @@ static void menurender(void)
         }
         if (game.currentmenuoption == offset + 3)
         {
-            font::print(PR_2X | PR_CEN,  -1, 30, loc::gettext("Toggle Filter"), tr, tg, tb);
+            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Toggle Filter"), tr, tg, tb);
             int next_y = font::print_wrap(PR_CEN, -1, 65, loc::gettext("Change to nearest/linear filter."), tr, tg, tb);
 
             if (gameScreen.isFiltered)
@@ -451,7 +451,7 @@ static void menurender(void)
 
         if (game.currentmenuoption == offset + 4)
         {
-            font::print(PR_2X | PR_CEN,  -1, 30, loc::gettext("Analogue Mode"), tr, tg, tb);
+            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Analogue Mode"), tr, tg, tb);
             font::print_wrap(PR_CEN, -1, 65, loc::gettext("There is nothing wrong with your television set. Do not attempt to adjust the picture."), tr, tg, tb);
         }
         if (game.currentmenuoption == offset + 5)
@@ -461,7 +461,7 @@ static void menurender(void)
 
             if (!gameScreen.vsync)
             {
-                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Current mode: VSYNC OFF"), tr/2, tg/2, tb/2);
+                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Current mode: VSYNC OFF"), tr / 2, tg / 2, tb / 2);
             }
             else
             {
@@ -508,6 +508,39 @@ static void menurender(void)
 
         }
         break;
+    case Menu::depths_credits:
+    {
+        const int temp = 20;
+        graphics.draw_sprite((160 - 96) + 0 * 32, temp, 23, tr, tg, tb);
+        graphics.draw_sprite((160 - 96) + 1 * 32, temp, 23, tr, tg, tb);
+        graphics.draw_sprite((160 - 96) + 2 * 32, temp, 23, tr, tg, tb);
+        graphics.draw_sprite((160 - 96) + 3 * 32, temp, 23, tr, tg, tb);
+        graphics.draw_sprite((160 - 96) + 4 * 32, temp, 23, tr, tg, tb);
+        graphics.draw_sprite((160 - 96) + 5 * 32, temp, 23, tr, tg, tb);
+        graphics.draw_grid_tile(graphics.grphx.im_logo, 0, 160 - 96, temp + 34, 192, 24, graphics.getRGB(tr, tg, tb));
+        graphics.draw_grid_tile(graphics.grphx.im_logo, 1, 160 - 96, temp + 34, 192, 24, graphics.getRGB(tr / 2, tg / 2, tb / 2));
+
+        const int text_off = temp + 34 + 24 + 8 - 20;
+        font::print(PR_CEN, -1, text_off + 20, loc::gettext("...is a VVVVVV mod by"), tr, tg, tb);
+        font::print(PR_2X | PR_CEN | PR_FONT_8X8, -1, text_off + 55, "NyakoFox", tr, tg, tb);
+        font::print(PR_2X | PR_CEN | PR_FONT_8X8, -1, text_off + 85, "mothbeanie", tr, tg, tb);
+
+        break;
+    }
+    case Menu::depths_credits2:
+        font::print(PR_CEN, -1, 40, loc::gettext("With programming by"), tr, tg, tb);
+        font::print(PR_2X | PR_CEN | PR_FONT_8X8, -1, 55, "NyakoFox", tr, tg, tb);
+        font::print(PR_CEN, -1, 110, loc::gettext("and level creation by"), tr, tg, tb);
+        font::print(PR_2X | PR_CEN | PR_FONT_8X8, -1, 125, "mothbeanie", tr, tg, tb);
+        break;
+    case Menu::depths_credits3:
+        font::print(PR_CEN, -1, 40, loc::gettext("Art by"), tr, tg, tb);
+        font::print(PR_2X | PR_CEN | PR_FONT_8X8, -1, 55, "mothbeanie", tr, tg, tb);
+        font::print(PR_CEN, -1, 100, loc::gettext("Music by"), tr, tg, tb);
+        font::print(PR_2X | PR_CEN | PR_FONT_8X8, -1, 115, "Allison Fleischer", tr, tg, tb);
+        font::print(PR_2X | PR_CEN | PR_FONT_8X8, -1, 135, "NyakoFox", tr, tg, tb);
+        break;
+
     case Menu::credits:
         font::print(PR_CEN, -1, 50, loc::gettext("VVVVVV is a game by"), tr, tg, tb);
         font::print(PR_2X | PR_CEN | PR_FONT_8X8, -1, 65, "Terry Cavanagh", tr, tg, tb);

@@ -8,7 +8,8 @@ enum FishingState {
     FishingState_CASTING,
     FishingState_WAITING,
     FishingState_HOOKED,
-    FishingState_REELING
+    FishingState_REELING,
+    FishingState_REELING_NOFISH
 };
 
 struct ItemGetDisplay {

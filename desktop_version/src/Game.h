@@ -81,6 +81,10 @@ namespace Menu
         setinvincibility,
         setslowdown,
         unlockmenu,
+        depths_credits,
+        depths_credits2,
+        depths_credits3,
+        depths_credits4,
         credits,
         credits2,
         credits25,
@@ -666,6 +670,8 @@ public:
     bool enable_editor;
 
     void cancel_fishing(bool destroy_bobbers);
+    void reel_nofish(void);
+    void cancel_or_reel(bool destroy_bobbers);
     bool can_cast(void);
 };
 
