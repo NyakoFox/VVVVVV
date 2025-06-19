@@ -662,6 +662,8 @@ public:
     int shopsel_y;
 
     Item* last_item;
+
+    bool enable_editor;
 };
 
 #ifndef GAME_DEFINITION

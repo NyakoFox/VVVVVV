@@ -455,14 +455,17 @@ static void menuactionpress(void)
         } \
         option_seq++;
         OPTION_ID(0) /* play */
-        //OPTION_ID(1) /* levels */
-        OPTION_ID(1) /* options */
+        if (game.enable_editor)
+        {
+            OPTION_ID(1) /* levels */
+        }
+        OPTION_ID(2) /* options */
         if (loc::show_translator_menu)
         {
-            OPTION_ID(2) /* translator */
+            OPTION_ID(3) /* translator */
         }
-        OPTION_ID(3) /* credits */
-        OPTION_ID(4) /* quit */
+        OPTION_ID(4) /* credits */
+        OPTION_ID(5) /* quit */
 
 #undef OPTION_ID
 
@@ -508,32 +511,46 @@ static void menuactionpress(void)
 
             break;
         }
-        /*case 1:
-            //Bring you to the normal playmenu
-            music.playef(Sound_VIRIDIAN);
-            game.editor_disabled = !BUTTONGLYPHS_keyboard_is_available();
-            game.createmenu(Menu::playerworlds);
-            map.nexttowercolour();
-            break;*/
         case 1:
+            // We replaced the "levels" tab with "editor", so... directly launch into the editor
+
+            /*
+                music.playef(Sound_VIRIDIAN);
+                game.editor_disabled = !BUTTONGLYPHS_keyboard_is_available();
+                game.createmenu(Menu::playerworlds);
+                map.nexttowercolour();
+            */
+
+            if (game.editor_disabled)
+            {
+                music.playef(Sound_CRY);
+            }
+            else
+            {
+                music.playef(Sound_VIRIDIAN);
+                startmode(Start_EDITOR);
+                ed.filename = "";
+            }
+            break;
+        case 2:
             //Options
             music.playef(Sound_VIRIDIAN);
             game.createmenu(Menu::options);
             map.nexttowercolour();
             break;
-        case 2:
+        case 3:
             //Translator
             music.playef(Sound_VIRIDIAN);
             game.createmenu(Menu::translator_main);
             map.nexttowercolour();
             break;
-        case 3:
+        case 4:
             //Credits
             music.playef(Sound_VIRIDIAN);
             game.createmenu(Menu::credits);
             map.nexttowercolour();
             break;
-        case 4:
+        case 5:
             music.playef(Sound_VIRIDIAN);
             game.createmenu(Menu::youwannaquit);
             map.nexttowercolour();

@@ -410,6 +410,8 @@ void Game::init(void)
     checkpoint_saving = false;
 #endif
 
+    enable_editor = false;
+
     setdefaultcontrollerbuttons();
 }
 
@@ -6961,8 +6963,11 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         option(loc::gettext("play"));
 
         // Custom levels aren't really supported... we're doing some scary stuff!
+        if (enable_editor)
+        {
+            option(loc::gettext("editor"));
+        }
 
-        //option(loc::gettext("levels"));
         option(loc::gettext("options"));
         if (loc::show_translator_menu)
         {

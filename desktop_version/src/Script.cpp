@@ -3177,6 +3177,20 @@ void scriptclass::startgamemode(const enum StartMode mode)
         map.custommode = true;
         map.custommodeforreal = false;
         graphics.fademode = FADE_START_FADEIN;
+
+        // Forcibly load into fishing...
+        ed.filename = "fishing";
+        if (cl.load("fishing.vvvvvv"))
+        {
+            ed.show_note(loc::gettext("Loaded map: fishing.vvvvvv"));
+        }
+        else
+        {
+            ed.show_note(loc::gettext("ERROR: Could not load fishing.vvvvvv"));
+        }
+        graphics.foregrounddrawn = false;
+        graphics.backgrounddrawn = false;
+        ed.substate = EditorSubState_MAIN;
         break;
 
     case Start_EDITORPLAYTESTING:

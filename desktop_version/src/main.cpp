@@ -64,6 +64,8 @@ static std::string playassets;
 
 static std::string playtestname;
 
+static bool editor_enabled = false;
+
 static volatile Uint64 time_ = 0;
 static volatile Uint64 timePrev = 0;
 static volatile Uint32 accumulator = 0;
@@ -497,6 +499,10 @@ int main(int argc, char *argv[])
         {
             level_debugger::set_forced();
         }
+        else if (ARG("-force-editor"))
+        {
+            editor_enabled = true;
+        }
         else if (ARG("-nooutput"))
         {
             vlog_toggle_output(0);
@@ -671,6 +677,8 @@ int main(int argc, char *argv[])
     game.gamestate = PRELOADER;
 
     game.menustart = false;
+
+    game.enable_editor = editor_enabled;
 
     // Initialize title screen to cyan
     graphics.titlebg.colstate = 10;
