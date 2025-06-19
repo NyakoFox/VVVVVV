@@ -449,7 +449,7 @@ void registerItems(void)
     Items::STAR_FISH = registerItem("star_fish", new FishItem(ItemSettings().withName("Star Fish").withSell(100).withHabitat(Habitat_SALTWATER).withDescription("This is a star fish, not a starfish.").withRarity(Rarity_ELUSIVE).withLayer("star_fish", 276), 80, 100, 120));
     Items::FISHTRONAUT = registerItem("fishtronaut", new FishItem(ItemSettings().withName("Fishtronaut").withSell(269).withHabitat(Habitat_SALTWATER).withDescription("One small step for fish, one giant leap for fishkind!").withRarity(Rarity_LEGENDARY).withLayer("fishtronaut_layer_1", 277).withLayer("fishtronaut_layer_2", 278).withLayer("fishtronaut_layer_3", 279).withLayer("fishtronaut_layer_4", 280).withLayer("fishtronaut_layer_5", 281).withLayer("fishtronaut_layer_6", 282).withLayer("fishtronaut_layer_7", 283), 25, 30, 70));
 
-    Items::THIRTY_SEVEN_FISH = registerItem("thirty_seven_fish", new FishItem(ItemSettings().withName("37 Fish").withHabitat(Habitat_SALTWATER).withSell(237).withDescription("Do you remember how many fish you've caught?").withRarity(Rarity_LEGENDARY).withLayer("37_fish", 1), 15, 20, 35));
+    Items::THIRTY_SEVEN_FISH = registerItem("thirty_seven_fish", new FishItem(ItemSettings().withName("37 Fish").withHabitat(Habitat_SALTWATER).withSell(237).withDescription("Do you remember how many fish you've caught?").withRarity(Rarity_LEGENDARY).withLayer("37_fish", 1), 36, 37, 38));
     Items::SQUISHFISH = registerItem("squishfish", new FishItem(ItemSettings().withName("Squishfish").withHabitat(Habitat_SALTWATER).withSell(203).withDescription("Rumor has it that eating this fish grants special power to those who believe.").withRarity(Rarity_LEGENDARY).withLayer("squishfish_layer_1", 286).withLayer("squishfish_layer_2", 287).withLayer("squishfish_layer_3", 288), 80, 140, 180));
 
     // keys
@@ -531,19 +531,19 @@ void registerItems(void)
     toPool("freshwater_large", Items::RAINBOW_TROUT, 12);
     toPool("freshwater_large", Items::GOLDEN_TROUT, 10);
     toPool("freshwater_large", Items::GOLDFISH, 12);
-    toPool("freshwater_large", Items::GOLD_GOLDFISH, 9);
-    toPool("freshwater_large", Items::PRISMATIC_TROUT, 9);
+    toPool("freshwater_large", Items::GOLD_GOLDFISH, 8);
+    toPool("freshwater_large", Items::PRISMATIC_TROUT, 8);
     toPool("freshwater_large", Items::SPIKE_FISH, 15);
-    toPool("freshwater_large", Items::TRINKETFIN, 9);
+    toPool("freshwater_large", Items::TRINKETFIN, 8);
     toPool("freshwater_large", Items::YESFIN, 10);
-    toPool("freshwater_large", Items::VIRIDIFIN, 9);
+    toPool("freshwater_large", Items::VIRIDIFIN, 8);
     toPool("freshwater_large", Items::TIRE, 4);
-    toPool("freshwater_large", Items::EDGEFISH, 9);
-    toPool("freshwater_large", Items::TERMINNOW, 9);
-    toPool("freshwater_large", Items::OLD_BOOT,4);
-    toPool("freshwater_large", Items::TIN_CAN,4);
-    toPool("freshwater_large", Items::SODA_CAN,4);
-    toPool("freshwater_large", Items::GAME_CARTRIDGE,2);
+    toPool("freshwater_large", Items::EDGEFISH, 8);
+    toPool("freshwater_large", Items::TERMINNOW, 8);
+    toPool("freshwater_large", Items::OLD_BOOT, 4);
+    toPool("freshwater_large", Items::TIN_CAN, 4);
+    toPool("freshwater_large", Items::SODA_CAN, 4);
+    toPool("freshwater_large", Items::GAME_CARTRIDGE, 2);
 
     toPool("junk", Items::CARP, 10);
     toPool("junk", Items::GOLDFISH, 1);
@@ -588,15 +588,15 @@ void registerItems(void)
     toPool("saltwater_large", Items::TRINKETFIN, 6);
     toPool("saltwater_large", Items::STAR_FISH, 7);
     toPool("saltwater_large", Items::FISHTRONAUT, 6);
-    toPool("saltwater_large", Items::NAVAL_MINE, 1);
+    toPool("saltwater_large", Items::NAVAL_MINE, 3);
     toPool("saltwater_large", Items::TIRE, 2);
     toPool("saltwater_large", Items::THIRTY_SEVEN_FISH, 6);
     toPool("saltwater_large", Items::SQUISHFISH, 6);
     toPool("saltwater_large", Items::OLD_BOOT, 2);
     toPool("saltwater_large", Items::TIN_CAN, 2);
     toPool("saltwater_large", Items::SODA_CAN, 2);
-    toPool("saltwater_large", Items::CAR_BATTERY, 1);
-    toPool("saltwater_large", Items::DRIFTWOOD, 2);
+    toPool("saltwater_large", Items::CAR_BATTERY, 3);
+    toPool("saltwater_large", Items::DRIFTWOOD, 3);
     toPool("saltwater_large", Items::SEA_GLASS, 2);
 
 
