@@ -1298,7 +1298,11 @@ void Graphics::draw_texture(SDL_Texture * image, const int x, const int y, const
         return;
     }
 
-    const SDL_Rect dstrect = { x, y, w * scalex, h * scaley };
+    SDL_Rect dstrect;
+    dstrect.x = x;
+    dstrect.y = y;
+    dstrect.w = w * scalex;
+    dstrect.h = h * scaley;
 
     copy_texture(image, NULL, &dstrect);
 }

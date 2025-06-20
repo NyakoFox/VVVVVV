@@ -765,6 +765,7 @@ ItemStack getItemForPool(std::string pool, int flag)
                 case Rarity_RARE: weight += (5 * bait_tier); break;
                 case Rarity_ELUSIVE: weight += (3 * bait_tier); break;
                 case Rarity_LEGENDARY: weight += (1 * bait_tier); break;
+                default: break;
             }
 
             for (int i = 0; i < SDL_max(weight, 1); i++)
