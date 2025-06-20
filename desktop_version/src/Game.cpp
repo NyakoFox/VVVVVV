@@ -8210,6 +8210,7 @@ void Game::cancel_fishing(bool destroy_bobbers)
     fishing_timer = 0;
     fishing_anim_timer = 0;
     fishing_total = 0;
+    fishing_strength = 0;
 
     music.stopef(Sound_FISHALERT);
     music.stopef(Sound_REEL);

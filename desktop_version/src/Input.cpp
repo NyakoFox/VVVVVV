@@ -3018,6 +3018,7 @@ void gameinput(void)
     {
         if ((key.isDown(KEYBOARD_x) || key.isDown(game.controllerButton_interact)) && game.can_cast())
         {
+            game.cancel_fishing(true);
             game.fishing_state = FishingState_CHOOSING;
         }
     }
