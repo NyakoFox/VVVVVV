@@ -2988,9 +2988,10 @@ void gameinput(void)
                     float distance = sqrt((target.x - current.x) * (target.x - current.x) + (target.y - current.y) * (target.y - current.y));
                     if (distance < (reel_speed * 1.5))
                     {
+                        bool real_catch = game.fishing_state == FishingState_REELING;
                         game.cancel_fishing(true);
 
-                        if (game.fishing_state == FishingState_REELING)
+                        if (real_catch)
                         {
                             // If we're actually catching something, well, catch it
 

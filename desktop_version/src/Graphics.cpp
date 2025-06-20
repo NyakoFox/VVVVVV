@@ -2330,6 +2330,7 @@ void Graphics::drawentity(const int i, const int yoff)
                     SDL_Point bobberPoint;
                     bobberPoint.x = obj.entities[j].xp + obj.entities[j].off_x + obj.entities[j].cx + (obj.entities[j].w / 2);
                     bobberPoint.y = obj.entities[j].yp + obj.entities[j].off_y + obj.entities[j].cy - 1;
+
                     if (obj.entities[j].bobbergrav == 1)
                     {
                         bobberPoint.y += 4;
@@ -2665,6 +2666,15 @@ void Graphics::drawentity(const int i, const int yoff)
         bool flipped = (obj.entities[i].bobbergrav == 1);
 
         const SDL_Rect dstrect = { xp + obj.entities[i].off_x, yp + obj.entities[i].off_y + (flipped ? -12 : 0), w, h};
+
+        // Display the fish on the bobber... kind of weird so commented out for now
+
+        /*
+        if (game.fishing_state == FishingState_REELING && !game.fishing_item.isEmpty() && game.fishing_item.item != NULL)
+        {
+            game.fishing_item.item->draw(xp, yp - yoff);
+        }
+        */
 
         copy_texture(getBobberTexture(), NULL, &dstrect, 0, NULL, flipped ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE);
         break;
