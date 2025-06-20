@@ -453,7 +453,7 @@ void registerItems(void)
     Items::YELLOW_KEY_FAKE = registerItem("yellow_key_fake", new Item(ItemSettings().withName("Metallic Object").withDescription("A mysterious metal object. It has a tag which says \"key\" on it.").withLayer("key", 26)));
     Items::YELLOW_KEY = registerItem("yellow_key", new Item(ItemSettings().withName("Yellow Key").withDescription("A \"key\" which opens yellow gates.").withLayer("key", 26)));
     Items::BLUE_KEY = registerItem("blue_key", new Item(ItemSettings().withName("Blue Key").withBuy(1000).withDescription("A \"key\" which opens blue gates.").withLayer("key", 300)));
-    Items::PURPLE_KEY = registerItem("purple_key", new Item(ItemSettings().withName("Purple Key").withBuy(3000).withDescription("A \"key\" which opens purple gates.").withLayer("key", 301)));
+    Items::PURPLE_KEY = registerItem("purple_key", new Item(ItemSettings().withName("Purple Key").withBuy(2500).withDescription("A \"key\" which opens purple gates.").withLayer("key", 301)));
     Items::RED_KEY = registerItem("red_key", new Item(ItemSettings().withName("Red Key").withBuy(2000).withDescription("A \"key\" which opens red gates.").withLayer("key", 302)));
 
     // buckets
