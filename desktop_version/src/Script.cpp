@@ -2843,6 +2843,15 @@ void scriptclass::run(void)
             {
                 upgradeBait();
             }
+            else if (words[0] == "ifbaitlevel")
+            {
+                int upgrade_level = obj.flags[7] + obj.flags[8] + obj.flags[9];
+                if (upgrade_level >= ss_toi(words[1]))
+                {
+                    loadalts("custom_" + words[2], "custom_" + raw_words[2]);
+                    position--;
+                }
+            }
             else if (words[0] == "destroyitemdisplay")
             {
                 for (int i = 0; i < obj.entities.size(); i++)

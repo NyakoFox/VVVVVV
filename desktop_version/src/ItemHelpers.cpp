@@ -247,13 +247,11 @@ bool canUpgradeBait(void)
     {
         ItemStack& inv_stack = game.inventory[i];
 
-        bool bait_upgrade_1 = obj.flags[7];
-        bool bait_upgrade_2 = obj.flags[8];
-        bool bait_upgrade_3 = obj.flags[9];
+        int upgrade_level = obj.flags[7] + obj.flags[8] + obj.flags[9];
 
-        if (inv_stack.item == Items::WORMS && bait_upgrade_1) return true;
-        if (inv_stack.item == Items::ENHANCED_BAIT && bait_upgrade_2) return true;
-        if (inv_stack.item == Items::DELUXE_BAIT && bait_upgrade_3) return true;
+        if (inv_stack.item == Items::WORMS && (upgrade_level >= 1)) return true;
+        if (inv_stack.item == Items::ENHANCED_BAIT && (upgrade_level >= 2)) return true;
+        if (inv_stack.item == Items::DELUXE_BAIT && (upgrade_level >= 3)) return true;
     }
     return false;
 }
@@ -264,19 +262,17 @@ void upgradeBait(void)
     {
         ItemStack& inv_stack = game.inventory[i];
 
-        bool bait_upgrade_1 = obj.flags[7];
-        bool bait_upgrade_2 = obj.flags[8];
-        bool bait_upgrade_3 = obj.flags[9];
+        int upgrade_level = obj.flags[7] + obj.flags[8] + obj.flags[9];
 
-        if (inv_stack.item == Items::WORMS && bait_upgrade_1)
+        if (inv_stack.item == Items::WORMS && (upgrade_level >= 1))
         {
             inv_stack.item = Items::ENHANCED_BAIT;
         }
-        if (inv_stack.item == Items::ENHANCED_BAIT && bait_upgrade_2)
+        if (inv_stack.item == Items::ENHANCED_BAIT && (upgrade_level >= 2))
         {
             inv_stack.item = Items::DELUXE_BAIT;
         }
-        if (inv_stack.item == Items::DELUXE_BAIT && bait_upgrade_3)
+        if (inv_stack.item == Items::DELUXE_BAIT && (upgrade_level >= 3))
         {
             inv_stack.item = Items::ULTRA_BAIT;
         }
