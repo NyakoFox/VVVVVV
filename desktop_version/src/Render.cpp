@@ -3259,11 +3259,11 @@ void shoprender(void)
 
             int name_y = y + 8;
 
+            short name_lines = 1;
             if (game.shopmode == ShopMode_BUY)
             {
-                short lines;
-                font::string_wordwrap(PR_LEFT, item.getName().c_str(), 84, &lines);
-                if (lines == 1)
+                font::string_wordwrap(PR_LEFT, item.getName().c_str(), 84, &name_lines);
+                if (name_lines == 1)
                 {
                     name_y += 4;
                 }
@@ -3311,8 +3311,11 @@ void shoprender(void)
                 int coins_width = font::len(PR_1X, coins_str.c_str());
                 int coins_height = font::height(PR_1X);
 
+                if (name_lines > 1)
+                {
+                    name_y += 8;
+                }
                 font::print(PR_1X | PR_RIGHT, x + box_width - 8, name_y, coins_str.c_str(), color.r, color.g, color.b);
-
                 graphics.drawcoloredtile(x + box_width - 8 - coins_width - 8 - 8, name_y, 48, color.r, color.g, color.b);
             }
         }
