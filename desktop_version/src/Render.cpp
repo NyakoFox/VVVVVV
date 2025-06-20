@@ -521,9 +521,9 @@ static void menurender(void)
         graphics.draw_grid_tile(graphics.grphx.im_logo, 1, 160 - 96, temp + 34, 192, 24, graphics.getRGB(tr / 2, tg / 2, tb / 2));
 
         const int text_off = temp + 34 + 24 + 8 - 20;
-        font::print(PR_CEN, -1, text_off + 20, loc::gettext("...is a VVVVVV mod by"), tr, tg, tb);
-        font::print(PR_2X | PR_CEN | PR_FONT_8X8, -1, text_off + 55, "NyakoFox", tr, tg, tb);
-        font::print(PR_2X | PR_CEN | PR_FONT_8X8, -1, text_off + 85, "mothbeanie", tr, tg, tb);
+        font::print(PR_CEN, -1, text_off + 20 + 12, loc::gettext("...is a VVVVVV mod by"), tr, tg, tb);
+        font::print(PR_2X | PR_CEN | PR_FONT_8X8, -1, text_off + 55 + 10, "NyakoFox", tr, tg, tb);
+        font::print(PR_2X | PR_CEN | PR_FONT_8X8, -1, text_off + 85 + 10, "mothbeanie", tr, tg, tb);
 
         break;
     }
@@ -539,6 +539,16 @@ static void menurender(void)
         font::print(PR_CEN, -1, 100, loc::gettext("Music by"), tr, tg, tb);
         font::print(PR_2X | PR_CEN | PR_FONT_8X8, -1, 115, "Allison Fleischer", tr, tg, tb);
         font::print(PR_2X | PR_CEN | PR_FONT_8X8, -1, 135, "NyakoFox", tr, tg, tb);
+        break;
+    case Menu::depths_credits4:
+        font::print(PR_CEN, -1, 30, loc::gettext("Special thanks to"), tr, tg, tb);
+        font::print(PR_CEN | PR_FONT_8X8, -1, 55, "Dav999 (Code assistance, testing)", tr, tg, tb);
+        font::print(PR_CEN | PR_FONT_8X8, -1, 75, "Allison Fleischer (Music, playtesting)", tr, tg, tb);
+        font::print(PR_CEN | PR_FONT_8X8, -1, 95, "stupid cat (Playtesting)", tr, tg, tb);
+
+        font::print(PR_CEN, -1, 130, loc::gettext("and of course to"), tr, tg, tb);
+        font::print(PR_CEN | PR_FONT_8X8, -1, 150, "Terry Cavanagh", tr, tg, tb);
+        font::print(PR_CEN | PR_FONT_8X8, -1, 170, "for making this amazing game!", tr, tg, tb);
         break;
 
     case Menu::credits:
