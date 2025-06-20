@@ -3890,6 +3890,9 @@ bool scriptclass::loadcustom(const std::string& t)
         }else if(words[0] == "ifitem"){
             if(customtextmode==1){ add("endtext"); customtextmode=0;}
             add(lines[i]);
+        }else if(words[0] == "ifbaitlevel"){
+            if(customtextmode==1){ add("endtext"); customtextmode=0;}
+            add(lines[i]);
         }else if(words[0] == "ifcaught") {
             if(customtextmode==1){ add("endtext"); customtextmode=0;}
             add(lines[i]);
