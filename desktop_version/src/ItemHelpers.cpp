@@ -453,8 +453,8 @@ void registerItems(void)
     Items::YELLOW_KEY_FAKE = registerItem("yellow_key_fake", new Item(ItemSettings().withName("Metallic Object").withDescription("A mysterious metal object. It has a tag which says \"key\" on it.").withLayer("key", 26)));
     Items::YELLOW_KEY = registerItem("yellow_key", new Item(ItemSettings().withName("Yellow Key").withDescription("A \"key\" which opens yellow gates.").withLayer("key", 26)));
     Items::BLUE_KEY = registerItem("blue_key", new Item(ItemSettings().withName("Blue Key").withBuy(1000).withDescription("A \"key\" which opens blue gates.").withLayer("key", 300)));
-    Items::PURPLE_KEY = registerItem("purple_key", new Item(ItemSettings().withName("Purple Key").withBuy(1500).withDescription("A \"key\" which opens purple gates.").withLayer("key", 301)));
-    Items::RED_KEY = registerItem("red_key", new Item(ItemSettings().withName("Red Key").withBuy(1000).withDescription("A \"key\" which opens red gates.").withLayer("key", 302)));
+    Items::PURPLE_KEY = registerItem("purple_key", new Item(ItemSettings().withName("Purple Key").withBuy(3000).withDescription("A \"key\" which opens purple gates.").withLayer("key", 301)));
+    Items::RED_KEY = registerItem("red_key", new Item(ItemSettings().withName("Red Key").withBuy(2000).withDescription("A \"key\" which opens red gates.").withLayer("key", 302)));
 
     // buckets
     Items::BUCKET = registerItem("bucket", new BucketItem(ItemSettings().withName("Bucket (Empty)").withDescription("It's a bucket. You cannot wear it on your head.").withLayer("bucket", 303)));
@@ -472,16 +472,16 @@ void registerItems(void)
     Items::ULTRA_BAIT = registerItem("ultra_bait", new Item(ItemSettings().withName("Ultra Bait").withDescription("It's a good thing this wasn't called something else.").withLayer("worm_layer_1", 314).withLayer("worm_layer_2", 315)));
 
     // bobbers
-    Items::GREEN_BOBBER = registerItem("green_bobber", new BobberItem(ItemSettings().withName("Green Bobber").withDescription("Equip this to change your bobber to a green one.").withBuy(250).withLayer("bobber_green", -1)));
-    Items::BLUE_BOBBER = registerItem("blue_bobber", new BobberItem(ItemSettings().withName("Blue Bobber").withDescription("Equip this to change your bobber to a blue one.").withBuy(250).withLayer("bobber_blue", -1)));
-    Items::PURPLE_BOBBER = registerItem("purple_bobber", new BobberItem(ItemSettings().withName("Purple Bobber").withDescription("Equip this to change your bobber to a purple one.").withBuy(250).withLayer("bobber_purple", -1)));
-    Items::BIG_BOBBER = registerItem("big_bobber", new BobberItem(ItemSettings().withName("Big Bobber").withDescription("Equip this to change your bobber to a big one.").withBuy(300).withLayer("bobber_big", -1)));
-    Items::FISH_SPINNER = registerItem("fish_spinner", new BobberItem(ItemSettings().withName("Fish Spinner").withDescription("Equip this to change your bobber to a fish-shaped one.").withBuy(500).withLayer("bobber_fish", -1)));
-    Items::FEATHER_SPINNER = registerItem("feather_spinner", new BobberItem(ItemSettings().withName("Feather Spinner").withDescription("Equip this to change your bobber to a fly fishing lure.").withBuy(500).withLayer("bobber_feather", -1)));
-    Items::COIN_SPINNER = registerItem("coin_spinner", new BobberItem(ItemSettings().withName("Coin Spinner").withDescription("Equip this to change your bobber to a coin-shaped one.").withBuy(750).withLayer("bobber_coin", -1)));
-    Items::TRINKET_SPINNER = registerItem("trinket_spinner", new BobberItem(ItemSettings().withName("Trinket Spinner").withDescription("Equip this to change your bobber to a trinket-shaped one.").withBuy(750).withLayer("bobber_trinket", -1)));
-    Items::VIRIDIAN_SPINNER = registerItem("viridian_spinner", new BobberItem(ItemSettings().withName("Viridian Spinner").withDescription("Equip this to change your bobber to one shaped like you.").withBuy(750).withLayer("bobber_viridian", -1)));
-    Items::GIANT_BOBBER = registerItem("giant_bobber", new BobberItem(ItemSettings().withName("Giant Bobber").withDescription("Equip this to change your bobber to a REALLY big one.").withBuy(1000).withLayer("bobber_giant", -1)));
+    Items::GREEN_BOBBER = registerItem("green_bobber", new BobberItem(ItemSettings().withName("Green Bobber").withDescription("Equip this to change your bobber to a green one.").withBuy(500).withLayer("bobber_green", -1)));
+    Items::BLUE_BOBBER = registerItem("blue_bobber", new BobberItem(ItemSettings().withName("Blue Bobber").withDescription("Equip this to change your bobber to a blue one.").withBuy(500).withLayer("bobber_blue", -1)));
+    Items::PURPLE_BOBBER = registerItem("purple_bobber", new BobberItem(ItemSettings().withName("Purple Bobber").withDescription("Equip this to change your bobber to a purple one.").withBuy(500).withLayer("bobber_purple", -1)));
+    Items::BIG_BOBBER = registerItem("big_bobber", new BobberItem(ItemSettings().withName("Big Bobber").withDescription("Equip this to change your bobber to a big one.").withBuy(600).withLayer("bobber_big", -1)));
+    Items::FISH_SPINNER = registerItem("fish_spinner", new BobberItem(ItemSettings().withName("Fish Spinner").withDescription("Equip this to change your bobber to a fish-shaped one.").withBuy(800).withLayer("bobber_fish", -1)));
+    Items::FEATHER_SPINNER = registerItem("feather_spinner", new BobberItem(ItemSettings().withName("Feather Spinner").withDescription("Equip this to change your bobber to a fly fishing lure.").withBuy(800).withLayer("bobber_feather", -1)));
+    Items::COIN_SPINNER = registerItem("coin_spinner", new BobberItem(ItemSettings().withName("Coin Spinner").withDescription("Equip this to change your bobber to a coin-shaped one.").withBuy(1500).withLayer("bobber_coin", -1)));
+    Items::TRINKET_SPINNER = registerItem("trinket_spinner", new BobberItem(ItemSettings().withName("Trinket Spinner").withDescription("Equip this to change your bobber to a trinket-shaped one.").withBuy(1500).withLayer("bobber_trinket", -1)));
+    Items::VIRIDIAN_SPINNER = registerItem("viridian_spinner", new BobberItem(ItemSettings().withName("Viridian Spinner").withDescription("Equip this to change your bobber to one shaped like you.").withBuy(1500).withLayer("bobber_viridian", -1)));
+    Items::GIANT_BOBBER = registerItem("giant_bobber", new BobberItem(ItemSettings().withName("Giant Bobber").withDescription("Equip this to change your bobber to a REALLY big one.").withBuy(2000).withLayer("bobber_giant", -1)));
 
     // junk
     Items::TIRE = registerItem("tire", new Item(ItemSettings().withName("Tire").withSell(5).withDescription("This tire could be from the 3099 Space Derby Grand Prix.").withRarity(Rarity_JUNK).withLayer("tire", 19)));
