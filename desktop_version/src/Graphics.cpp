@@ -4115,6 +4115,57 @@ SDL_Color Graphics::getcol( int t )
         return getRGB(240 - help.glow / 2, 0, 255 - help.glow / 2);
     case 315: // Ultra Bait layer 2
         return getRGB(220-20 - help.glow / 2, 0, 230 - 20 - help.glow / 2);
+
+    case 316: // salmon (saltwater) layer 1
+        return getRGB(99 - help.glow / 2, 112 - help.glow / 2, 142 - help.glow / 2);
+    case 317: // salmon (saltwater) layer 2
+        return getRGB(203 - help.glow / 2, 201 - help.glow / 2, 216 - help.glow / 2);
+    case 318: // salmon (freshwater) layer 1
+        return getRGB(220 - help.glow / 2, 68 - help.glow / 2, 44 - help.glow / 2);
+    case 319: // salmon (freshwater) layer 2
+        return getRGB(196 - help.glow / 2, 111 - help.glow / 2, 47 - help.glow / 2);
+    case 320: // salmon (freshwater) layer 3
+        return getRGB(181 - help.glow / 2, 166 - help.glow / 2, 56 - help.glow / 2);
+    case 321: // salmon (freshwater) layer 4
+        return getRGB(203 - help.glow / 2, 201 - help.glow / 2, 216 - help.glow / 2);
+    case 322: // sturgeon layer 1
+        return getRGB(161 - help.glow / 2, 146 - help.glow / 2, 141 - help.glow / 2);
+    case 323: // sturgeon layer 2
+        return getRGB(104 - help.glow / 2, 87 - help.glow / 2, 83 - help.glow / 2);
+    case 324: // shortnose gar layer 1
+        return getRGB(216 - help.glow / 2, 206 - help.glow / 2, 171 - help.glow / 2);
+    case 325: // shortnose gar layer 2
+        return getRGB(130 - help.glow / 2, 121 - help.glow / 2, 88 - help.glow / 2);
+    case 326: // shortnose gar layer 3
+        return getRGB(86 - help.glow / 2, 78 - help.glow / 2, 48 - help.glow / 2);
+    case 327: // longnose gar layer 1
+        return getRGB(216 - help.glow / 2, 206 - help.glow / 2, 171 - help.glow / 2);
+    case 328: // longnose gar layer 2
+        return getRGB(134 - help.glow / 2, 143 - help.glow / 2, 126 - help.glow / 2);
+    case 329: // longnose gar layer 3
+        return getRGB(99 - help.glow / 2, 96 - help.glow / 2, 60 - help.glow / 2);
+    case 330: // grouper layer 1
+        return getRGB(206 - help.glow / 2, 193 - help.glow / 2, 163 - help.glow / 2);
+    case 331: // grouper layer 2
+        return getRGB(143 - help.glow / 2, 155 - help.glow / 2, 94 - help.glow / 2);
+    case 332: // grouper layer 3
+        return getRGB(76 - help.glow / 2, 104 - help.glow / 2, 42 - help.glow / 2);
+    case 333: // bluefish layer 1
+        return getRGB(208 - help.glow / 2, 213 - help.glow / 2, 219 - help.glow / 2);
+    case 334: // bluefish layer 2
+        return getRGB(148 - help.glow / 2, 188 - help.glow / 2, 211 - help.glow / 2);
+    case 335: // bluefish layer 3
+        return getRGB(71 - help.glow / 2, 116 - help.glow / 2, 142 - help.glow / 2);
+    case 336: // flounder layer 1
+        return getRGB(142 - help.glow / 2, 111 - help.glow / 2, 75 - help.glow / 2);
+    case 337: // flounder layer 2
+        return getRGB(216 - help.glow / 2, 192 - help.glow / 2, 144 - help.glow / 2);
+    case 338: // flounder layer 3
+        return getRGB(104 - help.glow / 2, 70 - help.glow / 2, 35 - help.glow / 2);
+    case 339: // fishbone layer 1
+        return getRGB(226 - help.glow / 2, 222 - help.glow / 2, 204 - help.glow / 2);
+    case 340: // fishbone layer 2
+        return getRGB(188 - help.glow / 2, 181 - help.glow / 2, 149 - help.glow / 2);
     }
 
     return getRGB(255, 255, 255);

@@ -19,7 +19,8 @@ enum Habitat
     Habitat_NONE,
     Habitat_FRESHWATER,
     Habitat_SALTWATER,
-    Habitat_ANYWHERE
+    Habitat_ANYWHERE,
+    Habitat_EXTREMOPHILE
 };
 
 struct SpriteLayer

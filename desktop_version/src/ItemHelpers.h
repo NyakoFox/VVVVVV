@@ -74,6 +74,20 @@ namespace Items
     extern Item* THIRTY_SEVEN_FISH;
     extern Item* SQUISHFISH;
 
+    extern Item* SALMON_1;
+    extern Item* SALMON_2;
+    extern Item* STURGEON;
+    extern Item* SHORTNOSE_GAR;
+    extern Item* LONGNOSE_GAR;
+    extern Item* GROUPER;
+    extern Item* BLUEFISH;
+    extern Item* FLOUNDER;
+    extern Item* FISHBONE;
+
+    extern Item* KELP;
+    extern Item* DULSE;
+    extern Item* WATER_SILK;
+
     extern Item* YELLOW_KEY_FAKE;
     extern Item* YELLOW_KEY;
     extern Item* BLUE_KEY;

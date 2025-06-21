@@ -77,6 +77,20 @@ namespace Items
     Item* THIRTY_SEVEN_FISH;
     Item* SQUISHFISH;
 
+    Item* SALMON_1;
+    Item* SALMON_2;
+    Item* STURGEON;
+    Item* SHORTNOSE_GAR;
+    Item* LONGNOSE_GAR;
+    Item* GROUPER;
+    Item* BLUEFISH;
+    Item* FLOUNDER;
+    Item* FISHBONE;
+
+    Item* KELP;
+    Item* DULSE;
+    Item* WATER_SILK;
+
     Item* YELLOW_KEY_FAKE;
     Item* YELLOW_KEY;
     Item* BLUE_KEY;
@@ -220,6 +234,7 @@ void updateFishCaughtInfo(void)
 
     if (item == Items::KOI_B) item = Items::KOI_A;
     if (item == Items::KOI_C) item = Items::KOI_A;
+    if (item == Items::SALMON_2) item = Items::SALMON_1;
 
     for (int i = 0; i < game.fish_catch_info.size(); i++)
     {
@@ -494,6 +509,22 @@ void registerItems(void)
     Items::DRIFTWOOD = registerItem("driftwood", new Item(ItemSettings().withName("Driftwood").withSell(10).withDescription("This branch has been bleached by months at sea.").withRarity(Rarity_JUNK).withLayer("driftwood", -1)));
     Items::SEA_GLASS = registerItem("sea_glass", new Item(ItemSettings().withName("Sea Glass").withSell(10).withDescription("These pieces of glass have been smoothed by years in the sea.").withRarity(Rarity_JUNK).withLayer("sea_glass", -1)));
 
+    // 1.1 new fish
+    Items::SALMON_1 = registerItem("salmon_1", new FishItem(ItemSettings().withName("Salmon").withSell(65).withHabitat(Habitat_ANYWHERE).withDescription("Their appearance changes drastically during migrations called 'salmon runs'.").withRarity(Rarity_RARE).withLayer("salmon_1_layer_1", 316).withLayer("salmon_1_layer_2", 317), 34, 55, 84));
+    Items::SALMON_2 = registerItem("salmon_2", new FishItem(ItemSettings().withName("Salmon").withSell(65).withHabitat(Habitat_ANYWHERE).withDescription("Their appearance changes drastically during migrations called 'salmon runs'.").withRarity(Rarity_RARE).withLayer("salmon_2_layer_1", 318).withLayer("salmon_2_layer_2", 319).withLayer("salmon_2_layer_3", 320).withLayer("salmon_2_layer_4", 321), 34, 55, 84));
+    Items::STURGEON = registerItem("sturgeon", new FishItem(ItemSettings().withName("Sturgeon").withSell(110).withHabitat(Habitat_FRESHWATER).withDescription("This venerable fish can live over 100 years. It is endangered due to overfishing.").withRarity(Rarity_ELUSIVE).withLayer("sturgeon_layer_1", 322).withLayer("sturgeon_layer_2", 323), 180, 250, 720));
+    Items::SHORTNOSE_GAR = registerItem("shortnose_gar", new FishItem(ItemSettings().withName("Shortnose Gar").withSell(40).withHabitat(Habitat_FRESHWATER).withDescription("An ambush predator. It feeds on terrestrial prey by entering floodplains.").withRarity(Rarity_UNCOMMON).withLayer("shortnose_gar_layer_1", 324).withLayer("shortnose_gar_layer_2", 325).withLayer("shortnose_gar_layer_3", 326), 45, 63, 88));
+    Items::LONGNOSE_GAR = registerItem("longnose_gar", new FishItem(ItemSettings().withName("Longnose Gar").withSell(70).withHabitat(Habitat_FRESHWATER).withDescription("A freshwater apex predator. Its snout is twice the length of its head!").withRarity(Rarity_RARE).withLayer("longnose_gar_layer_1", 327).withLayer("longnose_gar_layer_2", 328).withLayer("longnose_gar_layer_3", 329), 71, 122, 150));
+    Items::GROUPER = registerItem("grouper", new FishItem(ItemSettings().withName("Grouper").withSell(40).withHabitat(Habitat_SALTWATER).withDescription("It prefers brackish waters. Older fish change sex from female to male.").withRarity(Rarity_UNCOMMON).withLayer("grouper_layer_1", 330).withLayer("grouper_layer_2", 331).withLayer("grouper_layer_3", 332), 55, 90, 150));
+    Items::BLUEFISH = registerItem("bluefish", new FishItem(ItemSettings().withName("Bluefish").withSell(25).withHabitat(Habitat_SALTWATER).withDescription("Its behavior of chasing prey into shallow waters is known as a \"bluefish blitz\".").withLayer("bluefish_layer_1", 333).withLayer("bluefish_layer_2", 334).withLayer("bluefish_layer_3", 335), 20, 60, 120));
+    Items::FLOUNDER = registerItem("flounder", new FishItem(ItemSettings().withName("Flounder").withSell(25).withHabitat(Habitat_SALTWATER).withDescription("A common bottom-feeder. Both of eyes are on the top of its head.").withLayer("flounder_layer_1", 336).withLayer("flounder_layer_2", 337).withLayer("flounder_layer_3", 338), 38, 51, 94));
+    Items::FISHBONE = registerItem("fishbone", new FishItem(ItemSettings().withName("Fishbone").withSell(5).withHabitat(Habitat_EXTREMOPHILE).withDescription("Despite how it looks, this is its own species. It's only bones.").withLayer("fishbone_layer_1", 339).withLayer("fishbone_layer_2", 340), 15, 30, 60));
+
+    // 1.1 new junk
+    Items::KELP = registerItem("kelp", new Item(ItemSettings().withName("Kelp").withSell(15).withDescription("Also known as brown algae. Kelp forests are an important marine habitat.").withRarity(Rarity_JUNK).withLayer("kelp", -1)));
+    Items::DULSE = registerItem("dulse", new Item(ItemSettings().withName("Dulse").withSell(15).withDescription("This red seaweed is considered a health food when dried.").withRarity(Rarity_JUNK).withLayer("dulse", -1)));
+    Items::WATER_SILK = registerItem("water_silk", new Item(ItemSettings().withName("Water Silk").withSell(15).withDescription("A type of freshwater green algae. Each strand is a spiral under a microscope.").withRarity(Rarity_JUNK).withLayer("water_silk", -1)));
+
     toPool("freshwater_small", Items::LARGEMOUTH_BASS, 37);
     toPool("freshwater_small", Items::SMALLMOUTH_BASS, 31);
     toPool("freshwater_small", Items::BULLHEAD, 43);
@@ -512,6 +543,7 @@ void registerItems(void)
     toPool("freshwater_small", Items::SODA_CAN, 15);
     toPool("freshwater_small", Items::GAME_CARTRIDGE, 5);
     toPool("freshwater_small", Items::TRINKETFIN, 12);
+    toPool("freshwater_small", Items::WATER_SILK, 16);
 
     toPool("freshwater_large", Items::LARGEMOUTH_BASS, 18);
     toPool("freshwater_large", Items::SMALLMOUTH_BASS, 15);
@@ -542,6 +574,11 @@ void registerItems(void)
     toPool("freshwater_large", Items::TIN_CAN, 4);
     toPool("freshwater_large", Items::SODA_CAN, 4);
     toPool("freshwater_large", Items::GAME_CARTRIDGE, 2);
+    toPool("freshwater_large", Items::SALMON_2, 12);
+    toPool("freshwater_large", Items::STURGEON, 9);
+    toPool("freshwater_large", Items::SHORTNOSE_GAR, 16);
+    toPool("freshwater_large", Items::LONGNOSE_GAR, 12);
+    toPool("freshwater_large", Items::WATER_SILK, 5);
 
     toPool("junk", Items::CARP, 10);
     toPool("junk", Items::GOLDFISH, 1);
@@ -566,6 +603,9 @@ void registerItems(void)
     toPool("saltwater_small", Items::CAR_BATTERY, 1);
     toPool("saltwater_small", Items::DRIFTWOOD, 5);
     toPool("saltwater_small", Items::SEA_GLASS, 5);
+    toPool("saltwater_small", Items::FLOUNDER, 19);
+    toPool("saltwater_small", Items::KELP, 6);
+    toPool("saltwater_small", Items::DULSE, 6);
 
     toPool("saltwater_large", Items::RED_SNAPPER, 15);
     toPool("saltwater_large", Items::TUNA, 11);
@@ -596,6 +636,22 @@ void registerItems(void)
     toPool("saltwater_large", Items::CAR_BATTERY, 3);
     toPool("saltwater_large", Items::DRIFTWOOD, 3);
     toPool("saltwater_large", Items::SEA_GLASS, 2);
+    toPool("saltwater_large", Items::SALMON_1, 9);
+    toPool("saltwater_large", Items::GROUPER, 11);
+    toPool("saltwater_large", Items::BLUEFISH, 14);
+    toPool("saltwater_large", Items::FLOUNDER, 15);
+    toPool("saltwater_large", Items::KELP, 3);
+    toPool("saltwater_large", Items::DULSE, 3);
+
+    toPool("chemicals", Items::FISHBONE, 25);
+    toPool("chemicals", Items::CARP, 3);
+    toPool("chemicals", Items::TIRE, 25);
+    toPool("chemicals", Items::OLD_BOOT, 25);
+    toPool("chemicals", Items::TIN_CAN, 25);
+    toPool("chemicals", Items::SODA_CAN, 25);
+    toPool("chemicals", Items::GAME_CARTRIDGE, 15);
+
+    toPool("algae", Items::WATER_SILK, 10);
 
 
     BESTIARY_ITEMS.push_back(Items::LARGEMOUTH_BASS);
@@ -607,8 +663,12 @@ void registerItems(void)
     BESTIARY_ITEMS.push_back(Items::CARP);
     BESTIARY_ITEMS.push_back(Items::PERCH);
     BESTIARY_ITEMS.push_back(Items::CATFISH);
+    BESTIARY_ITEMS.push_back(Items::SHORTNOSE_GAR);
+    BESTIARY_ITEMS.push_back(Items::LONGNOSE_GAR);
     BESTIARY_ITEMS.push_back(Items::MINNOW);
     BESTIARY_ITEMS.push_back(Items::KOI_A); // hardcoded: this shows all 3 variants
+    BESTIARY_ITEMS.push_back(Items::SALMON_1); // hardcoded: this shows both variants
+    BESTIARY_ITEMS.push_back(Items::STURGEON);
     BESTIARY_ITEMS.push_back(Items::RAINBOW_TROUT);
     BESTIARY_ITEMS.push_back(Items::GOLDEN_TROUT);
     BESTIARY_ITEMS.push_back(Items::GOLDFISH);
@@ -625,7 +685,10 @@ void registerItems(void)
     BESTIARY_ITEMS.push_back(Items::TUNA);
     BESTIARY_ITEMS.push_back(Items::BLUE_MARLIN);
     BESTIARY_ITEMS.push_back(Items::AMBERJACK);
+    BESTIARY_ITEMS.push_back(Items::FLOUNDER);
+    BESTIARY_ITEMS.push_back(Items::BLUEFISH);
     BESTIARY_ITEMS.push_back(Items::COALFISH);
+    BESTIARY_ITEMS.push_back(Items::GROUPER);
     BESTIARY_ITEMS.push_back(Items::WAHOO);
     BESTIARY_ITEMS.push_back(Items::ANCHOVY);
     BESTIARY_ITEMS.push_back(Items::SARDINE);
@@ -640,6 +703,7 @@ void registerItems(void)
     BESTIARY_ITEMS.push_back(Items::FISHTRONAUT);
     BESTIARY_ITEMS.push_back(Items::THIRTY_SEVEN_FISH);
     BESTIARY_ITEMS.push_back(Items::SQUISHFISH);
+    BESTIARY_ITEMS.push_back(Items::FISHBONE);
 }
 
 std::vector<Item*> getBestiaryItems(void)
@@ -738,10 +802,10 @@ ItemStack getItemForPool(std::string pool, int flag)
         pool = "freshwater_small";
     }
 
-    if (pool == "special_green") pool = "junk";
-    if (pool == "special_blue") pool = "junk";
-    if (pool == "special_purple") pool = "junk";
-    if (pool == "special_vitellary") pool = "freshwater_small";
+    if (pool == "special_green") pool = "chemicals";
+    if (pool == "special_blue") pool = "chemicals";
+    if (pool == "special_purple") pool = "chemicals";
+    if (pool == "special_vitellary") pool = "algae";
 
     if (POOLS.count(pool))
     {

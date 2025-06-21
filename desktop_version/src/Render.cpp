@@ -3454,6 +3454,12 @@ void shoprender(void)
                     Items::KOI_B->draw(160 - 8, 64 - 4);
                     Items::KOI_C->draw(160 - 8 + 16 + 8, 64 - 4);
                 }
+                else if (item == Items::SALMON_1)
+                {
+                    graphics.drawpixeltextbox(160 - 8 - 8 - 12, 64 - 8 - 4, 16 + 24 + 8 + 8, 16 + 16, 65, 185, 207);
+                    Items::SALMON_1->draw(160 - 8 - 12, 64 - 4);
+                    Items::SALMON_2->draw(160 - 8 + 12, 64 - 4);
+                }
                 else
                 {
                     graphics.drawpixeltextbox(160 - 8 - 8, 64 - 8 - 4, 16 + 16, 16 + 16, 65, 185, 207);
@@ -3485,6 +3491,7 @@ void shoprender(void)
                     case Habitat_ANYWHERE: habitat = "Anywhere"; break;
                     case Habitat_FRESHWATER: habitat = "Freshwater"; break;
                     case Habitat_SALTWATER: habitat = "Saltwater"; break;
+                    case Habitat_EXTREMOPHILE: habitat = "Extremophile"; break;
                     case Habitat_NONE: habitat = "N/A"; break;
                 }
                 std::string rarity = "???";
