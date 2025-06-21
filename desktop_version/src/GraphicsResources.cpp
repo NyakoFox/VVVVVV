@@ -494,6 +494,7 @@ void GraphicsResources::init(void)
     im_bobber_purple = LoadImage("graphics/bobber_purple.png");
     im_bobber_trinket = LoadImage("graphics/bobber_trinket.png");
     im_bobber_viridian = LoadImage("graphics/bobber_viridian.png");
+    im_bobber_naval_mine = LoadImage("graphics/bobber_naval_mine.png");
 
     im_fishingrod_anim = LoadImage("graphics/fishingrod_anim.png");
     im_fishingrod_line_anim = LoadImage("graphics/fishingrod_line_anim.png");
@@ -580,6 +581,7 @@ void GraphicsResources::destroy(void)
     CLEAR(im_bobber_purple);
     CLEAR(im_bobber_trinket);
     CLEAR(im_bobber_viridian);
+    CLEAR(im_bobber_naval_mine);
 
     CLEAR(im_fishingrod_anim);
     CLEAR(im_fishingrod_line_anim);

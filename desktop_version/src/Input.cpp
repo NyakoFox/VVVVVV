@@ -2999,6 +2999,10 @@ void gameinput(void)
                             {
                                 obj.flags[game.trinketfin_flag] = true;
                             }
+                            if (game.fishing_item.item == Items::NAVAL_MINE)
+                            {
+                                obj.flags[15] = true;
+                            }
                             game.trinketfin_flag = 0;
 
                             useBait();
@@ -3620,6 +3624,7 @@ void shopinput(void)
                             if (items[game.shopselect].item == Items::TRINKET_SPINNER) cant_buy = true;
                             if (items[game.shopselect].item == Items::VIRIDIAN_SPINNER) cant_buy = true;
                             if (items[game.shopselect].item == Items::GIANT_BOBBER) cant_buy = true;
+                            if (items[game.shopselect].item == Items::NAVAL_MINE_BOBBER) cant_buy = true;
                             if (items[game.shopselect].item == Items::BLUE_KEY) cant_buy = true;
                             if (items[game.shopselect].item == Items::PURPLE_KEY) cant_buy = true;
                             if (items[game.shopselect].item == Items::RED_KEY) cant_buy = true;

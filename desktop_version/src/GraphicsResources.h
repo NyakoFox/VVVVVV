@@ -61,6 +61,7 @@ public:
     SDL_Texture* im_bobber_purple;
     SDL_Texture* im_bobber_trinket;
     SDL_Texture* im_bobber_viridian;
+    SDL_Texture* im_bobber_naval_mine;
 
     SDL_Texture* im_fishingrod_anim;
     SDL_Texture* im_fishingrod_line_anim;

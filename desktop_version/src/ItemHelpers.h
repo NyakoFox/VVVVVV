@@ -117,6 +117,7 @@ namespace Items
     extern Item* TRINKET_SPINNER;
     extern Item* VIRIDIAN_SPINNER;
     extern Item* GIANT_BOBBER;
+    extern Item* NAVAL_MINE_BOBBER;
 }
 
 bool hasItem(Item* item);

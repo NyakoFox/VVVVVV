@@ -67,6 +67,10 @@ void BobberItem::use(ItemStack* stack)
         {
             inv_stack.setEquipped(false);
         }
+        if (inv_stack.item == Items::NAVAL_MINE_BOBBER)
+        {
+            inv_stack.setEquipped(false);
+        }
     }
     stack->setEquipped(!wasEquipped);
     music.playef(Sound_VIRIDIAN);

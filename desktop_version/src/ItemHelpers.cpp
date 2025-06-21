@@ -120,6 +120,7 @@ namespace Items
     Item* TRINKET_SPINNER;
     Item* VIRIDIAN_SPINNER;
     Item* GIANT_BOBBER;
+    Item* NAVAL_MINE_BOBBER;
 }
 
 bool hasItem(Item* item)
@@ -497,6 +498,7 @@ void registerItems(void)
     Items::TRINKET_SPINNER = registerItem("trinket_spinner", new BobberItem(ItemSettings().withName("Trinket Spinner").withDescription("Equip this to change your bobber to a trinket-shaped one.").withBuy(1500).withLayer("bobber_trinket", -1)));
     Items::VIRIDIAN_SPINNER = registerItem("viridian_spinner", new BobberItem(ItemSettings().withName("Viridian Spinner").withDescription("Equip this to change your bobber to one shaped like you.").withBuy(1500).withLayer("bobber_viridian", -1)));
     Items::GIANT_BOBBER = registerItem("giant_bobber", new BobberItem(ItemSettings().withName("Giant Bobber").withDescription("Equip this to change your bobber to a REALLY big one.").withBuy(2000).withLayer("bobber_giant", -1)));
+    Items::NAVAL_MINE_BOBBER = registerItem("naval_mine_bobber", new BobberItem(ItemSettings().withName("Mine Bobber").withDescription("Equip this to change your bobber to a naval mine.\n...Is this a good idea?").withBuy(2000).withLayer("bobber_naval_mine", -1)));
 
     // junk
     Items::TIRE = registerItem("tire", new Item(ItemSettings().withName("Tire").withSell(5).withDescription("This tire could be from the 3099 Space Derby Grand Prix.").withRarity(Rarity_JUNK).withLayer("tire", 19)));
@@ -899,6 +901,8 @@ std::vector<ItemStack> getShopItems(void)
             if (it->second == Items::TRINKET_SPINNER && (hasItem(Items::TRINKET_SPINNER))) continue;
             if (it->second == Items::VIRIDIAN_SPINNER && (hasItem(Items::VIRIDIAN_SPINNER))) continue;
             if (it->second == Items::GIANT_BOBBER && (hasItem(Items::GIANT_BOBBER))) continue;
+            if (it->second == Items::NAVAL_MINE_BOBBER && !obj.flags[15]) continue;
+            if (it->second == Items::NAVAL_MINE_BOBBER && (hasItem(Items::NAVAL_MINE_BOBBER))) continue;
 
             if (it->second == Items::BLUE_KEY && (hasItem(Items::BLUE_KEY))) continue;
             if (it->second == Items::PURPLE_KEY && (hasItem(Items::PURPLE_KEY))) continue;
@@ -931,6 +935,7 @@ SDL_Texture* getBobberTexture(void)
             if (inv_stack.item == Items::TRINKET_SPINNER) return graphics.grphx.im_bobber_trinket;
             if (inv_stack.item == Items::VIRIDIAN_SPINNER) return graphics.grphx.im_bobber_viridian;
             if (inv_stack.item == Items::GIANT_BOBBER) return graphics.grphx.im_bobber_giant;
+            if (inv_stack.item == Items::NAVAL_MINE_BOBBER) return graphics.grphx.im_bobber_naval_mine;
         }
     }
     return graphics.grphx.im_bobber;
