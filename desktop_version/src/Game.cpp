@@ -1263,7 +1263,14 @@ static void caughtfish_textbox1(textboxclass* THIS)
     extern Game game;
     THIS->lines.clear();
 
-    if (game.fishing_item.getRarity() == Rarity_JUNK)
+    
+    if (game.fishing_item.item == Items::KELP
+        || game.fishing_item.item == Items::DULSE
+        || game.fishing_item.item == Items::WATER_SILK)
+    {
+        THIS->lines.push_back(loc::gettext("You caught some..."));
+    }
+    else if (game.fishing_item.getRarity() == Rarity_JUNK)
     {
         THIS->lines.push_back(loc::gettext("You caught a..."));
     }
