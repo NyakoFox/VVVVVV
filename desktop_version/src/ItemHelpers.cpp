@@ -518,12 +518,12 @@ void registerItems(void)
     Items::GROUPER = registerItem("grouper", new FishItem(ItemSettings().withName("Grouper").withSell(40).withHabitat(Habitat_SALTWATER).withDescription("It prefers brackish waters. Older fish change sex from female to male.").withRarity(Rarity_UNCOMMON).withLayer("grouper_layer_1", 330).withLayer("grouper_layer_2", 331).withLayer("grouper_layer_3", 332), 55, 90, 150));
     Items::BLUEFISH = registerItem("bluefish", new FishItem(ItemSettings().withName("Bluefish").withSell(25).withHabitat(Habitat_SALTWATER).withDescription("Its behavior of chasing prey into shallow waters is known as a \"bluefish blitz\".").withLayer("bluefish_layer_1", 333).withLayer("bluefish_layer_2", 334).withLayer("bluefish_layer_3", 335), 20, 60, 120));
     Items::FLOUNDER = registerItem("flounder", new FishItem(ItemSettings().withName("Flounder").withSell(25).withHabitat(Habitat_SALTWATER).withDescription("A common bottom-feeder. Both of eyes are on the top of its head.").withLayer("flounder_layer_1", 336).withLayer("flounder_layer_2", 337).withLayer("flounder_layer_3", 338), 38, 51, 94));
-    Items::FISHBONE = registerItem("fishbone", new FishItem(ItemSettings().withName("Fishbone").withSell(5).withHabitat(Habitat_EXTREMOPHILE).withDescription("Despite how it looks, this is its own species. It's only bones.").withLayer("fishbone_layer_1", 339).withLayer("fishbone_layer_2", 340), 15, 30, 60));
+    Items::FISHBONE = registerItem("fishbone", new FishItem(ItemSettings().withName("Fishbone").withSell(12).withHabitat(Habitat_EXTREMOPHILE).withDescription("Despite how it looks, this is its own species. It's only bones.").withLayer("fishbone_layer_1", 339).withLayer("fishbone_layer_2", 340), 15, 30, 60));
 
     // 1.1 new junk
-    Items::KELP = registerItem("kelp", new Item(ItemSettings().withName("Kelp").withSell(15).withDescription("Also known as brown algae. Kelp forests are an important marine habitat.").withRarity(Rarity_JUNK).withLayer("kelp", -1)));
-    Items::DULSE = registerItem("dulse", new Item(ItemSettings().withName("Dulse").withSell(15).withDescription("This red seaweed is considered a health food when dried.").withRarity(Rarity_JUNK).withLayer("dulse", -1)));
-    Items::WATER_SILK = registerItem("water_silk", new Item(ItemSettings().withName("Water Silk").withSell(15).withDescription("A type of freshwater green algae. Each strand is a spiral under a microscope.").withRarity(Rarity_JUNK).withLayer("water_silk", -1)));
+    Items::KELP = registerItem("kelp", new Item(ItemSettings().withName("Kelp").withSell(10).withDescription("Also known as brown algae. Kelp forests are an important marine habitat.").withRarity(Rarity_JUNK).withLayer("kelp", -1)));
+    Items::DULSE = registerItem("dulse", new Item(ItemSettings().withName("Dulse").withSell(10).withDescription("This red seaweed is considered a health food when dried.").withRarity(Rarity_JUNK).withLayer("dulse", -1)));
+    Items::WATER_SILK = registerItem("water_silk", new Item(ItemSettings().withName("Water Silk").withSell(5).withDescription("A type of freshwater green algae. Each strand is a spiral under a microscope.").withRarity(Rarity_JUNK).withLayer("water_silk", -1)));
 
     toPool("freshwater_small", Items::LARGEMOUTH_BASS, 37);
     toPool("freshwater_small", Items::SMALLMOUTH_BASS, 31);
