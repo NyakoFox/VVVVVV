@@ -1623,6 +1623,7 @@ void scriptclass::run(void)
                 obj.coincollect.clear();
                 obj.opened_gates.clear();
                 game.coins_collected = 0;
+                game.total_coins_collected = 0;
                 game.inventory.clear();
                 game.item_get_displays.clear();
                 game.fish_catch_info.clear();
@@ -3653,6 +3654,7 @@ void scriptclass::hardreset(void)
     obj.coincollect.clear();
     obj.opened_gates.clear();
     game.coins_collected = 0;
+    game.total_coins_collected = 0;
 
     game.fishing_state = FishingState_IDLE;
     game.fishing_item = ItemStack();

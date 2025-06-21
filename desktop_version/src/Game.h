@@ -632,6 +632,7 @@ public:
     bool screenshot_saved_success;
 
     int coins_collected;
+    int total_coins_collected;
     bool fishing_revealed;
 
     std::vector<ItemStack> inventory;

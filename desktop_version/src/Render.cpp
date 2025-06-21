@@ -2536,7 +2536,7 @@ void gamerender(void)
         );
     }
 
-    bool show_coins = game.coins() > 0;
+    bool show_coins = (game.coins() > 0) || (game.total_coins_collected > 0);
 
     if (show_coins)
     {

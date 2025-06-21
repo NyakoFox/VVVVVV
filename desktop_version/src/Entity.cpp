@@ -2850,13 +2850,22 @@ bool entityclass::updateentities( int i )
             {
                 music.playef(Sound_COIN);
                 coincollect.insert(entities[i].para);
+
+                int amount = 0;
+
                 switch (entities[i].behave)
                 {
-                default: game.coins_collected++; break;
-                case 1: game.coins_collected += 10; break;
-                case 2: game.coins_collected += 20; break;
-                case 3: game.coins_collected += 50; break;
-                case 4: game.coins_collected += 100; break;
+                default: amount = 1; break;
+                case 1: amount = 10; break;
+                case 2: amount = 20; break;
+                case 3: amount = 50; break;
+                case 4: amount = 100; break;
+                }
+
+                game.coins_collected += amount;
+                if (amount > 0)
+                {
+                    game.total_coins_collected += amount;
                 }
 
                 return disableentity(i);

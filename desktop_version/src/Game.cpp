@@ -5952,6 +5952,11 @@ void Game::customloadquick(const std::string& savfile)
             coins_collected = help.Int(pText);
         }
 
+        if (SDL_strcmp(pKey, "total_coins_collected") == 0)
+        {
+            total_coins_collected = help.Int(pText);
+        }
+
         if (SDL_strcmp(pKey, "finalmode") == 0)
         {
             map.finalmode = help.Int(pText);
@@ -6231,6 +6236,11 @@ void Game::customloadquick(const std::string& savfile)
                     fish_catch_info.push_back(info);
                 }
             }
+        }
+
+        if (total_coins_collected < coins_collected)
+        {
+            total_coins_collected = coins_collected;
         }
     }
 }
@@ -6615,6 +6625,7 @@ bool Game::customsavequick(const std::string& savfile)
     xml::update_tag(msgs, "fishing_revealed", fishing_revealed);
 
     xml::update_tag(msgs, "coins_collected", coins_collected);
+    xml::update_tag(msgs, "total_coins_collected", total_coins_collected);
 
     tinyxml2::XMLElement* inventory_el = xml::update_element_delete_contents(msgs, "inventory");
     for (size_t i = 0; i < inventory.size(); i++)

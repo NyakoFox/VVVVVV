@@ -3582,6 +3582,7 @@ void shopinput(void)
                             music.playef(Sound_CASH);
                             int sellprice = items[game.shopselect].getSellPrice();
                             game.coins_collected += sellprice;
+                            game.total_coins_collected += sellprice;
                             decrementItem(items[game.shopselect], 1);
                             int inv_size = items.size();
                             removeEmptyInventorySlots();
@@ -3662,6 +3663,7 @@ void shopinput(void)
                             music.playef(Sound_CASH);
                             int sellprice = items[game.shopselect].getSellPrice() * items[game.shopselect].count;
                             game.coins_collected += sellprice;
+                            game.total_coins_collected += sellprice;
                             decrementItem(items[game.shopselect], items[game.shopselect].count);
                             removeEmptyInventorySlots();
                             items = getShopItems();
