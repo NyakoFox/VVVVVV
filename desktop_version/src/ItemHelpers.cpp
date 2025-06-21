@@ -121,6 +121,10 @@ namespace Items
     Item* VIRIDIAN_SPINNER;
     Item* GIANT_BOBBER;
     Item* NAVAL_MINE_BOBBER;
+
+    Item* GUM_BASE;
+    Item* CHARCOAL;
+    Item* JELLYFISH_JUICE;
 }
 
 bool hasItem(Item* item)
@@ -526,6 +530,11 @@ void registerItems(void)
     Items::KELP = registerItem("kelp", new Item(ItemSettings().withName("Kelp").withSell(10).withDescription("Also known as brown algae. Kelp forests are an important marine habitat.").withRarity(Rarity_JUNK).withLayer("kelp", -1)));
     Items::DULSE = registerItem("dulse", new Item(ItemSettings().withName("Dulse").withSell(10).withDescription("This red seaweed is considered a health food when dried.").withRarity(Rarity_JUNK).withLayer("dulse", -1)));
     Items::WATER_SILK = registerItem("water_silk", new Item(ItemSettings().withName("Water Silk").withSell(5).withDescription("A type of freshwater green algae. Each strand is a spiral under a microscope.").withRarity(Rarity_JUNK).withLayer("water_silk", -1)));
+
+    // lol
+    Items::GUM_BASE = registerItem("gum_base", new Item(ItemSettings().withName("Gum Base").withDescription("You should not be able to read this O_O").withLayer("gum_base", -1)));
+    Items::CHARCOAL = registerItem("charcoal", new Item(ItemSettings().withName("Charcoal").withDescription("You should not be able to read this O_O").withLayer("charcoal", -1)));
+    Items::JELLYFISH_JUICE = registerItem("jellyfish_juice", new Item(ItemSettings().withName("Jellyfish Juice").withDescription("You should not be able to read this O_O").withLayer("jellyfish_juice", -1)));
 
     toPool("freshwater_small", Items::LARGEMOUTH_BASS, 37);
     toPool("freshwater_small", Items::SMALLMOUTH_BASS, 31);
