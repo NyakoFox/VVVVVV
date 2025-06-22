@@ -3517,7 +3517,7 @@ void shoprender(void)
                     font::print_wrap(PR_LEFT, 16, desc_y + 16 + 8 * 5, ("Amount caught: " + help.String(info.amount)).c_str(), 196, 196, 196);
                     if (info.largest >= ((FishItem*)item)->max_size)
                     {
-                        font::print_wrap(PR_LEFT, 16, desc_y + 16 + 8 * 6, ("Largest spotted: " + help.String(info.largest) + "cm\u2605").c_str(), 255 - help.glow, 255 - help.glow, 196);
+                        font::print_wrap(PR_LEFT, 16, desc_y + 16 + 8 * 6, ("Largest spotted: " + help.String(info.largest) + "cm \u2605").c_str(), 255 - help.glow, 255 - help.glow, 196);
                     }
                     else
                     {
@@ -3525,7 +3525,7 @@ void shoprender(void)
                     }
                     if (info.smallest >= ((FishItem*)item)->min_size)
                     {
-                        font::print_wrap(PR_LEFT, 16, desc_y + 16 + 8 * 7, ("Smallest spotted: " + help.String(info.smallest) + "cm\u2605").c_str(), 255 - help.glow, 255 - help.glow, 196);
+                        font::print_wrap(PR_LEFT, 16, desc_y + 16 + 8 * 7, ("Smallest spotted: " + help.String(info.smallest) + "cm \u2605").c_str(), 255 - help.glow, 255 - help.glow, 196);
                     }
                     else
                     {
