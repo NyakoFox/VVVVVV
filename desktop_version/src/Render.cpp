@@ -2944,8 +2944,8 @@ void gamerender(void)
         {
             if (obj.entities[i].type == EntityType_BOBBER)
             {
-                int bobber_x = obj.entities[i].xp;
-                int bobber_y = obj.entities[i].yp;
+                int bobber_x = obj.entities[i].xp + obj.entities[i].cx + obj.entities[i].w / 2;
+                int bobber_y = obj.entities[i].yp + obj.entities[i].cy + obj.entities[i].h / 2;
 
                 int off = 16;
                 if (obj.entities[i].bobbergrav == 1)
@@ -2957,7 +2957,36 @@ void gamerender(void)
                 bobber_y += ((fRandom() * 2) - 1);
 
                 float rand = fRandom();
-                font::print(PR_BOR, bobber_x, bobber_y - off, "!", 255 - (rand * 60), 196 - (rand * 30), 196 - (rand * 30));
+                font::print(PR_BOR, bobber_x - 4, (bobber_y - 4) - off, "!", 255 - (rand * 60), 196 - (rand * 30), 196 - (rand * 30));
+            }
+        }
+    }
+
+    if (game.fishing_state == FishingState_WAITING && !hasBait())
+    {
+        if (game.fishing_anim_timer > 160)
+        {
+            float progress = SDL_clamp((((float)game.fishing_anim_timer - 160.0f) / 90.0f), 0, 1);
+
+            for (int i = 0; i < obj.entities.size(); i++)
+            {
+                if (obj.entities[i].type == EntityType_BOBBER)
+                {
+                    int bobber_x = obj.entities[i].xp + obj.entities[i].cx + obj.entities[i].w / 2;
+                    int bobber_y = obj.entities[i].yp + obj.entities[i].cy + obj.entities[i].h / 2;
+
+                    int off = 24;
+                    if (obj.entities[i].bobbergrav == 1)
+                    {
+                        off = -24;
+                    }
+
+                    int text_w = font::len(PR_BOR, "No bait!");
+                    int display_x = SDL_clamp((bobber_x - (text_w / 2)), 10, (SCREEN_WIDTH_PIXELS - text_w - 10));
+                    int display_y = SDL_clamp((bobber_y - off), 10, (SCREEN_HEIGHT_PIXELS - 8 - 10));
+
+                    font::print(PR_BOR, display_x, display_y - 4, "No bait!", lerpReal(0, 255, progress), lerpReal(0, 196, progress), lerpReal(0, 196, progress));
+                }
             }
         }
     }
