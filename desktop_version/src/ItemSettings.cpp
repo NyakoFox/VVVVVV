@@ -16,6 +16,9 @@ ItemSettings::ItemSettings(void)
     buy_price = 0;
     sell_price = 0;
     habitat = Habitat_NONE;
+    short_name = "";
+    uses_short_name = false;
+    trophy_hint = "";
 }
 
 ItemSettings::ItemSettings(const ItemSettings& other)
@@ -30,6 +33,9 @@ ItemSettings::ItemSettings(const ItemSettings& other)
     buy_price = other.buy_price;
     sell_price = other.sell_price;
     habitat = other.habitat;
+    uses_short_name = other.uses_short_name;
+    short_name = other.short_name;
+    trophy_hint = other.trophy_hint;
 }
 
 ItemSettings ItemSettings::withName(std::string name)
@@ -38,9 +44,22 @@ ItemSettings ItemSettings::withName(std::string name)
     return *this;
 }
 
+ItemSettings ItemSettings::withShortName(std::string name)
+{
+    this->uses_short_name = true;
+    this->short_name = name;
+    return *this;
+}
+
 ItemSettings ItemSettings::withDescription(std::string description)
 {
     this->description = description;
+    return *this;
+}
+
+ItemSettings ItemSettings::withTrophyHint(std::string trophy_hint)
+{
+    this->trophy_hint = trophy_hint;
     return *this;
 }
 

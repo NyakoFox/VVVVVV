@@ -667,6 +667,7 @@ public:
     int shopsel_y;
 
     Item* last_item;
+    Item* touched_item;
 
     bool enable_editor;
 

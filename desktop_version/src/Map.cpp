@@ -2035,6 +2035,17 @@ void mapclass::loadlevel(int rx, int ry)
             case 207: // Dripple lamps
                 obj.createentity(ex + 6 - 4, ey + 5 - 4, 207);
                 break;
+            case 208: // Trophy
+                game.last_item = getItem(ent.scriptname);
+                if (game.last_item != NULL && !hasItem(game.last_item))
+                {
+                    obj.createentity(ex, ey, 208, 1);
+                }
+                else
+                {
+                    obj.createentity(ex, ey, 208, 0);
+                }
+                break;
             }
         }
 

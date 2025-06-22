@@ -2999,10 +2999,6 @@ void gameinput(void)
                             {
                                 obj.flags[game.trinketfin_flag] = true;
                             }
-                            if (game.fishing_item.item == Items::NAVAL_MINE)
-                            {
-                                obj.flags[15] = true;
-                            }
                             game.trinketfin_flag = 0;
 
                             useBait();
@@ -3768,7 +3764,7 @@ void shopinput(void)
                 {
                     if (INBOUNDS_VEC(index, items))
                     {
-                        if (hasDiscovered(items[index]))
+                        if (hasCaught(items[index]))
                         {
                             game.shopsubmode = ShopSubMode_FISH;
                             game.shopsubselect = 0;

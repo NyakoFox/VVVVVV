@@ -38,6 +38,18 @@ std::string Item::getName(ItemStack* stack)
     return this->settings.name;
 }
 
+std::string Item::getShortName(ItemStack* stack)
+{
+    if (this->settings.uses_short_name)
+    {
+        return this->settings.short_name;
+    }
+    else
+    {
+        return this->getName(stack);
+    }
+}
+
 std::string Item::getLongName(ItemStack* stack)
 {
     return this->settings.name;
@@ -46,6 +58,11 @@ std::string Item::getLongName(ItemStack* stack)
 std::string Item::getDescription(ItemStack* stack)
 {
     return this->settings.description;
+}
+
+std::string Item::getTrophyHint(ItemStack* stack)
+{
+    return this->settings.trophy_hint;
 }
 
 SDL_Color Item::getNameColor(ItemStack* stack)

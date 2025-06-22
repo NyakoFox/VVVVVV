@@ -91,6 +91,7 @@ void entityclass::init(void)
     oldtrophytext = 0;
     trophytype = 0;
     altstates = 0;
+    trophyunlocked = 0;
 
 
     SDL_memset(customcrewmoods, true, sizeof(customcrewmoods));
@@ -2329,6 +2330,19 @@ void entityclass::createentity(int xp, int yp, int t, int meta1, int meta2, int 
 
         entity.harmful = false;
         break;
+    case 208: // Trophy
+        entity.size = 208;
+        entity.rule = 3;
+        entity.type = EntityType_FISHING_TROPHY;
+        entity.cx = 0;
+        entity.cy = 0;
+        entity.w = 16;
+        entity.h = 16;
+        entity.item = game.last_item;
+
+        entity.onentity = 1;
+        entity.behave = meta1;
+        break;
     }
 
     entity.lerpoldxp = entity.xp;
@@ -3740,8 +3754,20 @@ bool entityclass::updateentities( int i )
                 music.playef(Sound_DRIPPLE);
             }
             break;
-        case EntityType_ITEM:
+        case EntityType_FISHING_TROPHY:
+            //wait for collision
+            if (entities[i].state == 1)
+            {
+                if (!script.running) trophytext += 3;
+                if (trophytext > 30) trophytext = 30;
+                trophytype = -1;
+                game.touched_item = entities[i].item;
+                trophyunlocked = entities[i].behave;
+
+                entities[i].state = 0;
+            }
             break;
+        case EntityType_ITEM:
         case EntityType_INVALID: // Invalid entity, do nothing!
             break;
         }

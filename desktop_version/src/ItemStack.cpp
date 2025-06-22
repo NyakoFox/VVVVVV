@@ -107,6 +107,15 @@ std::string ItemStack::getName(void)
     return this->item->getName(this);
 }
 
+std::string ItemStack::getShortName(void)
+{
+    if (this->item == NULL)
+    {
+        return "null";
+    }
+    return this->item->getShortName(this);
+}
+
 std::string ItemStack::getLongName(void)
 {
     if (this->item == NULL)

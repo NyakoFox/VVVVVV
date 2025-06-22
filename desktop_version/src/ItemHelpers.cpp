@@ -8,6 +8,7 @@
 #include "ItemStack.h"
 #include "Item.h"
 #include "ItemDefinitions.h"
+#include "Map.h"
 #include "Maths.h"
 #include "Music.h"
 #include "UtilityClass.h"
@@ -125,6 +126,17 @@ namespace Items
     Item* GUM_BASE;
     Item* CHARCOAL;
     Item* JELLYFISH_JUICE;
+
+    Item* LAB_ASSISTANT_TROPHY;
+    Item* ICHTHYOLOGIST_TROPHY;
+    Item* CARTOGRAPHER_TROPHY;
+    Item* THE_BIG_ONE_TROPHY;
+    Item* THE_LITTLE_ONE_TROPHY;
+    Item* THE_HARD_WAY_TROPHY;
+    Item* PLUTOMANIAC_TROPHY;
+    Item* TRINKETFIN_TROPHY;
+    Item* RECYCLE_TROPHY;
+    Item* CONTAMINATOR_TROPHY;
 }
 
 bool hasItem(Item* item)
@@ -181,6 +193,22 @@ void giveItem(ItemStack stack, bool display)
         }
     }
     game.inventory.push_back(stack);
+}
+
+void giveItem(Item* item, int count, bool display)
+{
+    ItemStack itemStack;
+    if (item != NULL)
+    {
+        itemStack = ItemStack(item, count);
+    }
+    else
+    {
+        itemStack = ItemStack();
+    }
+    itemStack.item->getDefaultComponents(&itemStack);
+
+    giveItem(itemStack, display);
 }
 
 static Item* registerItem(std::string id, Item* item)
@@ -502,7 +530,7 @@ void registerItems(void)
     Items::TRINKET_SPINNER = registerItem("trinket_spinner", new BobberItem(ItemSettings().withName("Trinket Spinner").withDescription("Equip this to change your bobber to a trinket-shaped one.").withBuy(1500).withLayer("bobber_trinket", -1)));
     Items::VIRIDIAN_SPINNER = registerItem("viridian_spinner", new BobberItem(ItemSettings().withName("Viridian Spinner").withDescription("Equip this to change your bobber to one shaped like you.").withBuy(1500).withLayer("bobber_viridian", -1)));
     Items::GIANT_BOBBER = registerItem("giant_bobber", new BobberItem(ItemSettings().withName("Giant Bobber").withDescription("Equip this to change your bobber to a REALLY big one.").withBuy(2000).withLayer("bobber_giant", -1)));
-    Items::NAVAL_MINE_BOBBER = registerItem("naval_mine_bobber", new BobberItem(ItemSettings().withName("Mine Bobber").withDescription("Equip this to change your bobber to a naval mine.\n...Is this a good idea?").withBuy(2000).withLayer("bobber_naval_mine", -1)));
+    Items::NAVAL_MINE_BOBBER = registerItem("naval_mine_bobber", new BobberItem(ItemSettings().withName("Naval Mine Bobber").withShortName("Mine Bobber").withDescription("Equip this to change your bobber to a naval mine.\n...Is this a good idea?").withBuy(2000).withLayer("bobber_naval_mine", -1)));
 
     // junk
     Items::TIRE = registerItem("tire", new Item(ItemSettings().withName("Tire").withSell(5).withDescription("This tire could be from the 3099 Space Derby Grand Prix.").withRarity(Rarity_JUNK).withLayer("tire", 19)));
@@ -535,6 +563,18 @@ void registerItems(void)
     Items::GUM_BASE = registerItem("gum_base", new Item(ItemSettings().withName("Gum Base").withDescription("You should not be able to read this O_O").withLayer("gum_base", -1)));
     Items::CHARCOAL = registerItem("charcoal", new Item(ItemSettings().withName("Charcoal").withDescription("You should not be able to read this O_O").withLayer("charcoal", -1)));
     Items::JELLYFISH_JUICE = registerItem("jellyfish_juice", new Item(ItemSettings().withName("Jellyfish Juice").withDescription("You should not be able to read this O_O").withLayer("jellyfish_juice", -1)));
+
+    // Trophies
+    Items::LAB_ASSISTANT_TROPHY = registerItem("lab_assistant_trophy", new Item(ItemSettings().withName("\"Lab Assistant\" Trophy").withShortName("Trophy").withDescription("A trophy earned by helping Vitellary with his research.").withTrophyHint("Help Vitellary complete his research").withNameColor(401).withLayer("trophy_science", 400)));
+    Items::ICHTHYOLOGIST_TROPHY = registerItem("ichthyologist_trophy", new Item(ItemSettings().withName("\"Ichthyologist\" Trophy").withShortName("Trophy").withDescription("A trophy earned by completing the Fish Enchiridion.").withTrophyHint("Complete the Fish Enchiridion").withNameColor(401).withLayer("trophy_allfish", 400)));
+    Items::CARTOGRAPHER_TROPHY = registerItem("cartographer_trophy", new Item(ItemSettings().withName("\"Cartographer\" Trophy").withShortName("Trophy").withDescription("A trophy earned by fully exploring the map.").withTrophyHint("Explore").withNameColor(401).withLayer("trophy_explorer", 400)));
+    Items::THE_BIG_ONE_TROPHY = registerItem("the_big_one_trophy", new Item(ItemSettings().withName("\"The Big One\" Trophy").withShortName("Trophy").withDescription("A trophy earned by catching a fish at its maximum size.").withTrophyHint("Catch a fish at its maximum size").withNameColor(401).withLayer("trophy_big", 400)));
+    Items::THE_LITTLE_ONE_TROPHY = registerItem("the_little_one_trophy", new Item(ItemSettings().withName("\"The Little One\" Trophy").withShortName("Trophy").withDescription("A trophy earned by catching a fish at its minimum size.").withTrophyHint("Catch a fish at its minimum size").withNameColor(401).withLayer("trophy_little", 400)));
+    Items::THE_HARD_WAY_TROPHY = registerItem("the_hard_way_trophy", new Item(ItemSettings().withName("\"The Hard Way\" Trophy").withShortName("Trophy").withDescription("A trophy earned by reaching the top of a difficult challenge.").withTrophyHint("Veni, Vidi, Vici").withNameColor(401).withLayer("trophy_dtthw", 400)));
+    Items::PLUTOMANIAC_TROPHY = registerItem("plutomaniac_trophy", new Item(ItemSettings().withName("\"Plutomaniac\" Trophy").withShortName("Trophy").withDescription("A trophy earned by collecting 10,000 coins.").withTrophyHint("Collect 10,000 coins").withNameColor(401).withLayer("trophy_10k", 400)));
+    Items::TRINKETFIN_TROPHY = registerItem("trinketfin_trophy", new Item(ItemSettings().withName("\"Trinketfin\" Trophy").withShortName("Trophy").withDescription("A trophy earned by finding all 5 Trinketfin.").withTrophyHint("Catch every Trinketfin").withNameColor(401).withLayer("trophy_trinketfin", 400)));
+    Items::RECYCLE_TROPHY = registerItem("recycle_trophy", new Item(ItemSettings().withName("\"Reduce Reuse Recycle\" Trophy").withShortName("Trophy").withDescription("A trophy earned by collecting all unique pieces of trash.").withTrophyHint("Become a trash collector").withNameColor(401).withLayer("trophy_trash", 400)));
+    Items::CONTAMINATOR_TROPHY = registerItem("contaminator_trophy", new Item(ItemSettings().withName("\"Contaminator\" Trophy").withShortName("Trophy").withDescription("A trophy earned by emptying a bucket of chemicals into clean water. You monster.").withTrophyHint("Be environmentally irresponsible").withNameColor(401).withLayer("trophy_pollution", 400)));
 
     toPool("freshwater_small", Items::LARGEMOUTH_BASS, 37);
     toPool("freshwater_small", Items::SMALLMOUTH_BASS, 31);
@@ -722,7 +762,7 @@ std::vector<Item*> getBestiaryItems(void)
     return BESTIARY_ITEMS;
 }
 
-bool hasDiscovered(Item* item)
+bool hasCaught(Item* item)
 {
     for (int i = 0; i < game.fish_catch_info.size(); i++)
     {
@@ -734,6 +774,278 @@ bool hasDiscovered(Item* item)
     }
 
     return false;
+}
+
+bool hasCompletedEnchiridion()
+{
+    for (int i = 0; i < BESTIARY_ITEMS.size(); i++)
+    {
+        if (!hasCaught(BESTIARY_ITEMS[i]))
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool hasExploredMap()
+{
+    if (!map.isexplored(7, 0)) return false; // Red key coin room
+
+    // "The Whole Ocean"
+    if (!map.isexplored(5, 1)) return false;
+    if (!map.isexplored(6, 1)) return false;
+    if (!map.isexplored(7, 1)) return false;
+    if (!map.isexplored(8, 1)) return false;
+    if (!map.isexplored(9, 1)) return false;
+    if (!map.isexplored(10, 1)) return false;
+    if (!map.isexplored(11, 1)) return false;
+    if (!map.isexplored(12, 1)) return false;
+    if (!map.isexplored(13, 1)) return false;
+
+    if (!map.isexplored(5, 2)) return false;
+    if (!map.isexplored(6, 2)) return false;
+    if (!map.isexplored(7, 2)) return false;
+    if (!map.isexplored(8, 2)) return false;
+    if (!map.isexplored(9, 2)) return false;
+    if (!map.isexplored(10, 2)) return false;
+    if (!map.isexplored(11, 2)) return false;
+    if (!map.isexplored(12, 2)) return false;
+    if (!map.isexplored(13, 2)) return false;
+
+    if (!map.isexplored(5, 3)) return false;
+    if (!map.isexplored(6, 3)) return false;
+    if (!map.isexplored(7, 3)) return false;
+    if (!map.isexplored(8, 3)) return false;
+    if (!map.isexplored(9, 3)) return false;
+    if (!map.isexplored(10, 3)) return false;
+    if (!map.isexplored(11, 3)) return false;
+    if (!map.isexplored(12, 3)) return false;
+    if (!map.isexplored(13, 3)) return false;
+
+    if (!map.isexplored(4, 4)) return false;
+    if (!map.isexplored(5, 4)) return false;
+    if (!map.isexplored(6, 4)) return false;
+    if (!map.isexplored(7, 4)) return false;
+    if (!map.isexplored(8, 4)) return false;
+    if (!map.isexplored(9, 4)) return false;
+    if (!map.isexplored(10, 4)) return false;
+    if (!map.isexplored(11, 4)) return false;
+    if (!map.isexplored(12, 4)) return false;
+    if (!map.isexplored(13, 4)) return false;
+    if (!map.isexplored(14, 4)) return false;
+    if (!map.isexplored(15, 4)) return false;
+
+    if (!map.isexplored(4, 5)) return false;
+    if (!map.isexplored(5, 5)) return false;
+    if (!map.isexplored(6, 5)) return false;
+    if (!map.isexplored(7, 5)) return false;
+    if (!map.isexplored(8, 5)) return false;
+    if (!map.isexplored(9, 5)) return false;
+    if (!map.isexplored(10, 5)) return false;
+    if (!map.isexplored(11, 5)) return false;
+    if (!map.isexplored(12, 5)) return false;
+    if (!map.isexplored(13, 5)) return false;
+    if (!map.isexplored(14, 5)) return false;
+    if (!map.isexplored(15, 5)) return false;
+    if (!map.isexplored(16, 5)) return false;
+
+    if (!map.isexplored(4, 6)) return false;
+    if (!map.isexplored(5, 6)) return false;
+    if (!map.isexplored(6, 6)) return false;
+    if (!map.isexplored(7, 6)) return false;
+    if (!map.isexplored(8, 6)) return false;
+    if (!map.isexplored(9, 6)) return false;
+    if (!map.isexplored(10, 6)) return false;
+    if (!map.isexplored(11, 6)) return false;
+    if (!map.isexplored(12, 6)) return false;
+    if (!map.isexplored(13, 6)) return false;
+    if (!map.isexplored(14, 6)) return false;
+    if (!map.isexplored(15, 6)) return false;
+    if (!map.isexplored(16, 6)) return false;
+
+    if (!map.isexplored(6, 7)) return false;
+    if (!map.isexplored(7, 7)) return false;
+    if (!map.isexplored(8, 7)) return false;
+    if (!map.isexplored(9, 7)) return false;
+    if (!map.isexplored(10, 7)) return false;
+    if (!map.isexplored(11, 7)) return false;
+    if (!map.isexplored(12, 7)) return false;
+    if (!map.isexplored(13, 7)) return false;
+    if (!map.isexplored(14, 7)) return false;
+    if (!map.isexplored(15, 7)) return false;
+    if (!map.isexplored(16, 7)) return false;
+
+    if (!map.isexplored(6, 8)) return false;
+
+    if (!map.isexplored(9, 8)) return false;
+    if (!map.isexplored(10, 8)) return false;
+    if (!map.isexplored(11, 8)) return false;
+    if (!map.isexplored(12, 8)) return false;
+    if (!map.isexplored(13, 8)) return false;
+    if (!map.isexplored(14, 8)) return false;
+    if (!map.isexplored(15, 8)) return false;
+    if (!map.isexplored(16, 8)) return false;
+    if (!map.isexplored(17, 8)) return false;
+    if (!map.isexplored(18, 8)) return false;
+
+    if (!map.isexplored(19, 8)) return false; // First DTTHW
+
+    if (!map.isexplored(6, 9)) return false;
+    if (!map.isexplored(7, 9)) return false;
+    if (!map.isexplored(8, 9)) return false;
+    if (!map.isexplored(9, 9)) return false;
+    if (!map.isexplored(10, 9)) return false;
+    if (!map.isexplored(11, 9)) return false;
+    if (!map.isexplored(12, 9)) return false;
+    if (!map.isexplored(13, 9)) return false;
+    if (!map.isexplored(14, 9)) return false;
+    if (!map.isexplored(15, 9)) return false;
+    if (!map.isexplored(16, 9)) return false;
+    if (!map.isexplored(17, 9)) return false;
+    if (!map.isexplored(18, 9)) return false;
+
+    if (!map.isexplored(3, 10)) return false;
+    if (!map.isexplored(4, 10)) return false;
+    if (!map.isexplored(5, 10)) return false;
+    if (!map.isexplored(6, 10)) return false;
+    if (!map.isexplored(7, 10)) return false;
+    if (!map.isexplored(8, 10)) return false;
+    if (!map.isexplored(9, 10)) return false;
+    if (!map.isexplored(10, 10)) return false;
+    if (!map.isexplored(11, 10)) return false;
+    if (!map.isexplored(12, 10)) return false;
+    if (!map.isexplored(13, 10)) return false;
+    if (!map.isexplored(14, 10)) return false;
+    if (!map.isexplored(15, 10)) return false;
+    if (!map.isexplored(16, 10)) return false;
+
+    if (!map.isexplored(18, 10)) return false;
+
+    if (!map.isexplored(3, 11)) return false;
+    if (!map.isexplored(4, 11)) return false;
+    if (!map.isexplored(5, 11)) return false;
+
+    if (!map.isexplored(8, 11)) return false;
+    if (!map.isexplored(9, 11)) return false;
+    if (!map.isexplored(10, 11)) return false;
+    if (!map.isexplored(11, 11)) return false;
+    if (!map.isexplored(12, 11)) return false;
+    if (!map.isexplored(13, 11)) return false;
+    if (!map.isexplored(14, 11)) return false;
+    if (!map.isexplored(15, 11)) return false;
+    if (!map.isexplored(16, 11)) return false;
+
+    if (!map.isexplored(3, 12)) return false;
+    if (!map.isexplored(4, 12)) return false;
+    if (!map.isexplored(5, 12)) return false;
+
+    if (!map.isexplored(9, 12)) return false;
+    if (!map.isexplored(10, 12)) return false;
+    if (!map.isexplored(11, 12)) return false;
+    if (!map.isexplored(12, 12)) return false;
+    if (!map.isexplored(13, 12)) return false;
+    if (!map.isexplored(14, 12)) return false;
+    if (!map.isexplored(15, 12)) return false;
+    if (!map.isexplored(16, 12)) return false;
+
+    if (!map.isexplored(13, 13)) return false;
+
+    if (!map.isexplored(16, 13)) return false;
+
+    if (!map.isexplored(12, 14)) return false;
+    if (!map.isexplored(13, 14)) return false;
+    if (!map.isexplored(14, 14)) return false;
+    if (!map.isexplored(15, 14)) return false;
+    if (!map.isexplored(16, 14)) return false;
+    if (!map.isexplored(17, 14)) return false;
+
+    if (!map.isexplored(12, 15)) return false;
+    if (!map.isexplored(13, 15)) return false;
+    if (!map.isexplored(14, 15)) return false;
+    if (!map.isexplored(15, 15)) return false;
+    if (!map.isexplored(16, 15)) return false;
+    if (!map.isexplored(17, 15)) return false;
+    if (!map.isexplored(18, 15)) return false;
+
+    if (!map.isexplored(12, 16)) return false;
+
+    if (!map.isexplored(15, 16)) return false;
+    if (!map.isexplored(16, 16)) return false;
+    if (!map.isexplored(17, 16)) return false;
+    if (!map.isexplored(18, 16)) return false;
+
+    if (!map.isexplored(12, 17)) return false;
+    if (!map.isexplored(13, 17)) return false;
+    if (!map.isexplored(14, 17)) return false;
+    if (!map.isexplored(15, 17)) return false;
+    if (!map.isexplored(16, 17)) return false;
+    if (!map.isexplored(17, 17)) return false;
+    if (!map.isexplored(18, 17)) return false;
+
+    if (!map.isexplored(12, 18)) return false;
+    if (!map.isexplored(13, 18)) return false;
+    if (!map.isexplored(14, 18)) return false;
+    if (!map.isexplored(15, 18)) return false;
+    if (!map.isexplored(16, 18)) return false;
+    if (!map.isexplored(17, 18)) return false;
+    if (!map.isexplored(18, 18)) return false;
+
+    return true;
+}
+
+bool hasMaximumSizedFish()
+{
+    for (int i = 0; i < BESTIARY_ITEMS.size(); i++)
+    {
+        Item* item = BESTIARY_ITEMS[i];
+        if (item == Items::TRINKETFIN) continue; // Doesn't have a size
+        if (item == Items::SPIKE_FISH) continue; // Always 40, don't count for the trophy
+
+        FishCatchInfo info = getFishCatchInfo(item);
+        if (info.largest >= ((FishItem*)item)->max_size)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool hasMinimumSizedFish()
+{
+    for (int i = 0; i < BESTIARY_ITEMS.size(); i++)
+    {
+        Item* item = BESTIARY_ITEMS[i];
+        if (item == Items::TRINKETFIN) continue; // Doesn't have a size
+        if (item == Items::SPIKE_FISH) continue; // Always 40, don't count for the trophy
+
+        FishCatchInfo info = getFishCatchInfo(item);
+        if (info.smallest <= ((FishItem*)item)->min_size)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool hasAllTrash()
+{
+    if (!hasCaught(Items::TIRE)) return false;
+    if (!hasCaught(Items::NAVAL_MINE)) return false;
+    if (!hasCaught(Items::OLD_BOOT)) return false;
+    if (!hasCaught(Items::TIN_CAN)) return false;
+    if (!hasCaught(Items::SODA_CAN)) return false;
+    if (!hasCaught(Items::CAR_BATTERY)) return false;
+    if (!hasCaught(Items::GAME_CARTRIDGE)) return false;
+    if (!hasCaught(Items::DRIFTWOOD)) return false;
+    if (!hasCaught(Items::SEA_GLASS)) return false;
+    if (!hasCaught(Items::KELP)) return false;
+    if (!hasCaught(Items::DULSE)) return false;
+    if (!hasCaught(Items::WATER_SILK)) return false;
+    return true;
 }
 
 FishCatchInfo getFishCatchInfo(Item* item)
@@ -910,7 +1222,7 @@ std::vector<ItemStack> getShopItems(void)
             if (it->second == Items::TRINKET_SPINNER && (hasItem(Items::TRINKET_SPINNER))) continue;
             if (it->second == Items::VIRIDIAN_SPINNER && (hasItem(Items::VIRIDIAN_SPINNER))) continue;
             if (it->second == Items::GIANT_BOBBER && (hasItem(Items::GIANT_BOBBER))) continue;
-            if (it->second == Items::NAVAL_MINE_BOBBER && !obj.flags[15]) continue;
+            if (it->second == Items::NAVAL_MINE_BOBBER && (!hasCaught(Items::NAVAL_MINE))) continue;
             if (it->second == Items::NAVAL_MINE_BOBBER && (hasItem(Items::NAVAL_MINE_BOBBER))) continue;
 
             if (it->second == Items::BLUE_KEY && (hasItem(Items::BLUE_KEY))) continue;

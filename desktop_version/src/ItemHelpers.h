@@ -122,12 +122,24 @@ namespace Items
     extern Item* GUM_BASE;
     extern Item* CHARCOAL;
     extern Item* JELLYFISH_JUICE;
+
+    extern Item* LAB_ASSISTANT_TROPHY;
+    extern Item* ICHTHYOLOGIST_TROPHY;
+    extern Item* CARTOGRAPHER_TROPHY;
+    extern Item* THE_BIG_ONE_TROPHY;
+    extern Item* THE_LITTLE_ONE_TROPHY;
+    extern Item* THE_HARD_WAY_TROPHY;
+    extern Item* PLUTOMANIAC_TROPHY;
+    extern Item* TRINKETFIN_TROPHY;
+    extern Item* RECYCLE_TROPHY;
+    extern Item* CONTAMINATOR_TROPHY;
 }
 
 bool hasItem(Item* item);
 
 void giveItem(ItemStack stack);
 void giveItem(ItemStack stack, bool display);
+void giveItem(Item* item, int count, bool display);
 
 static std::map<std::string, Item*> ITEM_REGISTRY;
 void registerItems(void);
@@ -162,7 +174,12 @@ static std::map<std::string, std::vector<PoolData> > POOLS;
 static std::vector<Item*> BESTIARY_ITEMS;
 
 std::vector<Item*> getBestiaryItems(void);
-bool hasDiscovered(Item* item);
+bool hasCaught(Item* item);
+bool hasCompletedEnchiridion();
+bool hasExploredMap();
+bool hasMaximumSizedFish();
+bool hasMinimumSizedFish();
+bool hasAllTrash();
 FishCatchInfo getFishCatchInfo(Item* item);
 
 SDL_Texture* getBobberTexture(void);

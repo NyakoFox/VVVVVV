@@ -189,6 +189,8 @@ public:
     int trophytext, trophytype;
     int oldtrophytext;
 
+    int trophyunlocked;
+
     //Secret lab scripts
     int altstates;
 

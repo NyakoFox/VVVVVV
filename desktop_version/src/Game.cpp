@@ -401,6 +401,7 @@ void Game::init(void)
     fishing_anim_timer = 0;
     trinketfin_flag = 0;
     last_item = NULL;
+    touched_item = NULL;
 
     fishing_revealed = false;
 

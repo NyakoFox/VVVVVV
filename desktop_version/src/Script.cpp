@@ -1639,6 +1639,7 @@ void scriptclass::run(void)
                 game.fishing_state = FishingState_IDLE;
                 game.fishing_item = ItemStack();
                 game.last_item = NULL;
+                game.touched_item = NULL;
                 game.fishing_timer = 0;
                 game.fishing_total = 0;
                 game.fishing_anim_timer = 0;
@@ -3640,6 +3641,7 @@ void scriptclass::hardreset(void)
     obj.trophytext = 0 ;
     obj.trophytype = 0;
     obj.altstates = 0;
+    obj.trophyunlocked = 0;
 
     obj.resetallflags();
 
@@ -3659,6 +3661,7 @@ void scriptclass::hardreset(void)
     game.fishing_state = FishingState_IDLE;
     game.fishing_item = ItemStack();
     game.last_item = NULL;
+    game.touched_item = NULL;
     game.fishing_timer = 0;
     game.fishing_total = 0;
     game.fishing_anim_timer = 0;

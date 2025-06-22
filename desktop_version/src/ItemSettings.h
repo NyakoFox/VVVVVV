@@ -47,9 +47,14 @@ public:
     int sell_price;
     bool can_buy;
     bool can_sell;
+    bool uses_short_name;
+    std::string short_name;
+    std::string trophy_hint;
 
     ItemSettings withName(std::string name);
+    ItemSettings withShortName(std::string name);
     ItemSettings withDescription(std::string description);
+    ItemSettings withTrophyHint(std::string trophy_hint);
     ItemSettings withLayer(std::string texture_id, int color);
     ItemSettings withLayer(SpriteLayer layer);
     ItemSettings withNameColor(int color);

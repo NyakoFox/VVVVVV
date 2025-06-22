@@ -3262,15 +3262,15 @@ void shoprender(void)
             short name_lines = 1;
             if (game.shopmode == ShopMode_BUY)
             {
-                font::string_wordwrap(PR_LEFT, item.getName().c_str(), 84, &name_lines);
+                font::string_wordwrap(PR_LEFT, item.getShortName().c_str(), 88, &name_lines);
                 if (name_lines == 1)
                 {
                     name_y += 4;
                 }
             }
 
-            int len = font::len(PR_LEFT, item.getName().c_str());
-            font::print(PR_LEFT, x + 33, name_y, item.getName().c_str(), name_col.r, name_col.g, name_col.b);
+            int len = font::len(PR_LEFT, item.getShortName().c_str());
+            font::print(PR_LEFT, x + 33, name_y, item.getShortName().c_str(), name_col.r, name_col.g, name_col.b);
 
             if (game.shopmode == ShopMode_SELL)
             {
@@ -3423,7 +3423,7 @@ void shoprender(void)
                     graphics.drawpixeltextbox(x, y, box_width, box_height, 65, 185, 207);
                 }
 
-                if (hasDiscovered(items[i]))
+                if (hasCaught(items[i]))
                 {
                     items[i]->draw(x + 8, y + 8);
                 }
@@ -3691,12 +3691,12 @@ void maprender(void)
 
                 int name_y = y + 8;
                 short lines;
-                font::string_wordwrap(PR_LEFT, item.getName().c_str(), 84, &lines);
+                font::string_wordwrap(PR_LEFT, item.getShortName().c_str(), box_width - 40, &lines);
                 if (lines == 1)
                 {
                     name_y += 4;
                 }
-                font::print_wrap(PR_LEFT, x + 33, name_y, item.getName().c_str(), name_col.r, name_col.g, name_col.b, 8, box_width - 44);
+                font::print_wrap(PR_LEFT, x + 33, name_y, item.getShortName().c_str(), name_col.r, name_col.g, name_col.b, 8, box_width - 40);
 
                 if (item.count > 1)
                 {

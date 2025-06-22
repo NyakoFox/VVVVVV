@@ -37,7 +37,8 @@ enum EntityType
     EntityType_GATE = 201,
     EntityType_SPECIAL_TERMINAL = 205,
     EntityType_ITEM = 206,
-    EntityType_DRIPPLE_LAMP = 207
+    EntityType_DRIPPLE_LAMP = 207,
+    EntityType_FISHING_TROPHY = 208
 };
 
 class entclass

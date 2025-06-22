@@ -23,8 +23,10 @@ public:
     virtual void use(ItemStack* stack);
     virtual void getDefaultComponents(ItemStack* stack);
     virtual std::string getName(ItemStack* stack);
+    virtual std::string getShortName(ItemStack* stack);
     virtual std::string getLongName(ItemStack* stack);
     virtual std::string getDescription(ItemStack* stack);
+    virtual std::string getTrophyHint(ItemStack* stack);
     virtual std::string getCatchText(ItemStack* stack);
     virtual SDL_Color getNameColor(ItemStack* stack);
     virtual ItemRarity getRarity(ItemStack* stack);

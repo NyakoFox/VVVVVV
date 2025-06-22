@@ -2094,9 +2094,34 @@ void Graphics::drawtrophytext(void)
      * Look at the Steam achievements, they have pretty logical titles that should probably be used. */
     const char* top_text = NULL;
     const char* bottom_text = NULL;
+    bool top_free = false;
+    bool bottom_free = false;
 
     switch(obj.trophytype)
     {
+    case -1:
+        if (game.touched_item == NULL)
+        {
+            top_text = "?";
+            bottom_text = "?";
+        }
+        else
+        {
+            if (obj.trophyunlocked == 1)
+            {
+                top_text = "Locked Trophy";
+                bottom_text = SDL_strdup(game.touched_item->getTrophyHint(NULL).c_str());
+                bottom_free = true;
+            }
+            else
+            {
+                top_text = SDL_strdup(game.touched_item->getName(NULL).c_str());
+                top_free = true;
+                bottom_text = SDL_strdup(game.touched_item->getDescription(NULL).c_str());
+                bottom_free = true;
+            }
+        }
+        break;
     case 1:
         top_text = loc::gettext("SPACE STATION 1 MASTERED");
         bottom_text = loc::gettext("Obtain a V Rank in this Time Trial");
@@ -2176,6 +2201,9 @@ void Graphics::drawtrophytext(void)
         font::string_wordwrap(0, bottom_text, 304, &lines);
         font::print_wrap(PR_CEN | PR_BRIGHTNESS(brightness) | PR_BOR, -1, 221 - (lines - 1) * 5, bottom_text, 196, 196, 255 - help.glow);
     }
+
+    if (top_free) SDL_free((void*) top_text);
+    if (bottom_free) SDL_free((void*) bottom_text);
 }
 
 void Graphics::drawentities(void)
@@ -2753,6 +2781,34 @@ void Graphics::drawentity(const int i, const int yoff)
         if (obj.entities[i].item != NULL)
         {
             obj.entities[i].item->draw(xp, yp - yoff);
+            draw_point_light(xp + 8, yp + 8, 64, 255);
+        }
+        break;
+    case 208: // Trophy
+        if (obj.entities[i].item != NULL)
+        {
+            if (obj.entities[i].behave == 1)
+            {
+                // Draw raw item texture
+                SDL_Texture* texture = item_sprites["trophy_base"];
+                if (texture == NULL)
+                {
+                    break;
+                }
+
+                SDL_Color color = getcol(400);
+
+                set_texture_color_mod(texture, color.r, color.g, color.b);
+                set_texture_alpha_mod(texture, color.a);
+                draw_texture(texture, xp, yp - yoff);
+                set_texture_color_mod(texture, 255, 255, 255);
+                set_texture_alpha_mod(texture, 255);
+            }
+            else
+            {
+                obj.entities[i].item->draw(xp, yp - yoff);
+            }
+
             draw_point_light(xp + 8, yp + 8, 64, 255);
         }
         break;
@@ -4166,6 +4222,23 @@ SDL_Color Graphics::getcol( int t )
         return getRGB(226 - help.glow / 2, 222 - help.glow / 2, 204 - help.glow / 2);
     case 340: // fishbone layer 2
         return getRGB(188 - help.glow / 2, 181 - help.glow / 2, 149 - help.glow / 2);
+
+    case 400: // Trophy
+    {
+        SDL_Color cur = getRGB(255, 255, 150);
+        SDL_Color next = getRGB(158, 112, 37);
+        float time = (game.framecounter % 72) / 36.0f;
+
+        float use_time = SDL_clamp(((time > 1) ? (1 - time + 1) : time), 0, 1);
+        return getRGB(lerpReal(cur.r, next.r, use_time), lerpReal(cur.g, next.g, use_time), lerpReal(cur.b, next.b, use_time));
+    }
+    case 401: // Trophy name
+    {
+        float time = (game.framecounter % 72) / 36.0f;
+        float use_time = SDL_clamp(((time > 1) ? (1 - time + 1) : time), 0, 1);
+
+        return getRGB(255, 255, 255 - (use_time * 105));
+    }
     }
 
     return getRGB(255, 255, 255);

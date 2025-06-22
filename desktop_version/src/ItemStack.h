@@ -33,6 +33,7 @@ public:
     bool canUse(void);
     void use(void);
     std::string getName(void);
+    std::string getShortName(void);
     std::string getLongName(void);
     std::string getDescription(void);
     std::string getCatchText(void);

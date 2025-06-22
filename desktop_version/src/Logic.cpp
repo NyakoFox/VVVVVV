@@ -1540,5 +1540,17 @@ void gamelogic(void)
         game.play_splash2 = false;
     }
 
+    // Check all trophies (uh oh)
+    if (!hasItem(Items::LAB_ASSISTANT_TROPHY) && (getBaitTier() >= 3)) giveItem(Items::LAB_ASSISTANT_TROPHY, 1, true); // Lab Assistant
+    if (!hasItem(Items::ICHTHYOLOGIST_TROPHY) && hasCompletedEnchiridion()) giveItem(Items::ICHTHYOLOGIST_TROPHY, 1, true); // Icthyologist
+    if (!hasItem(Items::CARTOGRAPHER_TROPHY) && hasExploredMap()) giveItem(Items::CARTOGRAPHER_TROPHY, 1, true); // Cartographer
+    if (!hasItem(Items::THE_BIG_ONE_TROPHY) && hasMaximumSizedFish()) giveItem(Items::THE_BIG_ONE_TROPHY, 1, true); // The Big One
+    if (!hasItem(Items::THE_LITTLE_ONE_TROPHY) && hasMinimumSizedFish()) giveItem(Items::THE_LITTLE_ONE_TROPHY, 1, true); // The Little One
+    if (!hasItem(Items::THE_HARD_WAY_TROPHY) && map.isexplored(19, 9)) giveItem(Items::THE_HARD_WAY_TROPHY, 1, true); // The Hard Way
+    if (!hasItem(Items::PLUTOMANIAC_TROPHY) && (game.total_coins_collected >= 10000)) giveItem(Items::PLUTOMANIAC_TROPHY, 1, true); // Plutomaniac
+    if (!hasItem(Items::TRINKETFIN_TROPHY) && (getTrinketFinCount() >= 5)) giveItem(Items::TRINKETFIN_TROPHY, 1, true); // Trinketfin
+    if (!hasItem(Items::RECYCLE_TROPHY) && hasAllTrash()) giveItem(Items::RECYCLE_TROPHY, 1, true); // Reduce Reuse Recycle
+    if (!hasItem(Items::CONTAMINATOR_TROPHY) && obj.flags[15]) giveItem(Items::CONTAMINATOR_TROPHY, 1, true); // Contaminator
+
     level_debugger::logic();
 }
