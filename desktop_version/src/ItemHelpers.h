@@ -161,6 +161,8 @@ void decrementItem(ItemStack stack, int amount);
 
 void updateFishCaughtInfo(void);
 
+bool canBuyMultiple(Item* item);
+
 int getTrinketFinCount(void);
 int getCaughtFishAmount(void);
 ItemStack* getEquippedRod(void);

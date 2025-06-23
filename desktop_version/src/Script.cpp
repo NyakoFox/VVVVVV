@@ -1647,6 +1647,7 @@ void scriptclass::run(void)
                 game.shopmode = ShopMode_BUY;
                 game.shopcoinflash = 0;
                 game.in_item_menu = false;
+                game.scroll_offset = 0;
                 game.deathcounts = 0;
                 game.advancetext = false;
                 game.hascontrol = true;
@@ -3681,6 +3682,7 @@ void scriptclass::hardreset(void)
     game.item_get_displays.clear();
     game.fish_catch_info.clear();
     game.in_item_menu = false;
+    game.scroll_offset = 0;
 
     game.fishing_revealed = false;
 

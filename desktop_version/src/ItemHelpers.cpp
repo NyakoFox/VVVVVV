@@ -168,10 +168,42 @@ void giveItem(ItemStack stack, bool display)
     {
         game.play_item_get = true;
 
-        ItemGetDisplay display;
-        display.stack = stack;
-        display.timer = 0;
-        game.item_get_displays.push_back(display);
+        bool add_new = true;
+
+        // We should try to add to matching displays rather than adding a new one
+        for (int i = 0; i < game.item_get_displays.size(); i++)
+        {
+            ItemGetDisplay* display = &game.item_get_displays[i];
+
+            if (display->timer > 0)
+            {
+                // This isn't a new display, so let's not try to add to it
+                continue;
+            }
+
+            // Is this the same item...?
+            if (display->stack.item == stack.item)
+            {
+                // they're the same item at least, so... check components? i guess?
+                bool components_match = true;
+
+                if (stack.fish_size != display->stack.fish_size) components_match = false;
+
+                if (components_match)
+                {
+                    add_new = false;
+                    display->stack.increment(stack.count);
+                }
+            }
+        }
+
+        if (add_new)
+        {
+            ItemGetDisplay display;
+            display.stack = stack;
+            display.timer = 0;
+            game.item_get_displays.push_back(display);
+        }
     }
 
     // okay first... i guess let's just check if we have any matching stacks.
@@ -1045,6 +1077,28 @@ bool hasAllTrash()
     if (!hasCaught(Items::KELP)) return false;
     if (!hasCaught(Items::DULSE)) return false;
     if (!hasCaught(Items::WATER_SILK)) return false;
+    return true;
+}
+
+bool canBuyMultiple(Item* item)
+{
+    if (item == Items::GREEN_BOBBER) return false;
+    if (item == Items::BLUE_BOBBER) return false;
+    if (item == Items::GREEN_BOBBER) return false;
+    if (item == Items::BLUE_BOBBER) return false;
+    if (item == Items::PURPLE_BOBBER) return false;
+    if (item == Items::BIG_BOBBER) return false;
+    if (item == Items::FISH_SPINNER) return false;
+    if (item == Items::FEATHER_SPINNER) return false;
+    if (item == Items::COIN_SPINNER) return false;
+    if (item == Items::TRINKET_SPINNER) return false;
+    if (item == Items::VIRIDIAN_SPINNER) return false;
+    if (item == Items::GIANT_BOBBER) return false;
+    if (item == Items::NAVAL_MINE_BOBBER) return false;
+    if (item == Items::BLUE_KEY) return false;
+    if (item == Items::PURPLE_KEY) return false;
+    if (item == Items::RED_KEY) return false;
+
     return true;
 }
 

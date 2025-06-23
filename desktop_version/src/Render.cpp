@@ -3329,7 +3329,7 @@ void shoprender(void)
             if (game.shopmode == ShopMode_BUY)
             {
                 bool timesfive = false;
-                if (game.shopsubselect == 2)
+                if (game.shopsubselect == 2 && canBuyMultiple(item.item))
                 {
                     timesfive = true;
                     font::print(PR_LEFT, x + 33 + len, name_y, " x5", 255 - (help.glow / 2), 196, 196);
@@ -3356,6 +3356,7 @@ void shoprender(void)
 
         if (game.shopsubmode == ShopSubMode_CONFIRM)
         {
+
             if (game.shopsubselect == 0) {
                 graphics.drawpixeltextbox(16 + 8, desc_y + 8, 80, 32, 255, 255, 255);
             }
@@ -3370,8 +3371,16 @@ void shoprender(void)
             {
                 graphics.drawpixeltextbox(16 + 8 + 96, desc_y + 8, 80, 32, 65, 185, 207);
             }
-            if (game.shopsubselect == 2) {
+
+            bool cant_buy_multiple = !canBuyMultiple(items[game.shopselect].item);
+
+            if (game.shopsubselect == 2)
+            {
                 graphics.drawpixeltextbox(16 + 8 + 96 + 96, desc_y + 8, 80, 32, 255, 255, 255);
+            }
+            else if (cant_buy_multiple)
+            {
+                graphics.drawpixeltextbox(16 + 8 + 96 + 96, desc_y + 8, 80, 32, 128, 128, 128);
             }
             else
             {
@@ -3380,7 +3389,22 @@ void shoprender(void)
 
             font::print(PR_1X | PR_CEN, 16 + 8 + 40, desc_y + 20, "Return", 196, 196, 255 - help.glow);
             font::print(PR_1X | PR_CEN, 16 + 8 + 96 + 40, desc_y + 20, (game.shopmode == ShopMode_BUY) ? "Buy 1" : "Sell 1", 196, 196, 255 - help.glow);
-            font::print(PR_1X | PR_CEN, 16 + 8 + 96 + 96 + 40, desc_y + 20, (game.shopmode == ShopMode_BUY) ? "Buy 5" : "Sell ALL", 196, 196, 255 - help.glow);
+
+            if (game.shopmode == ShopMode_BUY)
+            {
+                if (cant_buy_multiple)
+                {
+                    font::print(PR_1X | PR_CEN, 16 + 8 + 96 + 96 + 40, desc_y + 20, "Buy 5", 128, 128, 128);
+                }
+                else
+                {
+                    font::print(PR_1X | PR_CEN, 16 + 8 + 96 + 96 + 40, desc_y + 20, "Buy 5", 196, 196, 255 - help.glow);
+                }
+            }
+            else if (game.shopmode == ShopMode_SELL)
+            {
+                font::print(PR_1X | PR_CEN, 16 + 8 + 96 + 96 + 40, desc_y + 20, "Sell ALL", 196, 196, 255 - help.glow);
+            }
         }
         else if (game.shopsubmode == ShopSubMode_MAIN)
         {

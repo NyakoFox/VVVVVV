@@ -3433,6 +3433,7 @@ void gameinput(void)
         game.gamesaved = false;
         game.gamesavefailed = false;
         game.in_item_menu = false;
+        game.scroll_offset = 0;
         game.menupage = 30; // Pause screen
     }
 
@@ -3607,27 +3608,16 @@ void shopinput(void)
                     case 2:
                         if (game.shopmode == ShopMode_BUY)
                         {
-                            bool cant_buy = false;
-                            if (items[game.shopselect].item == Items::GREEN_BOBBER) cant_buy = true;
-                            if (items[game.shopselect].item == Items::BLUE_BOBBER) cant_buy = true;
-                            if (items[game.shopselect].item == Items::GREEN_BOBBER) cant_buy = true;
-                            if (items[game.shopselect].item == Items::BLUE_BOBBER) cant_buy = true;
-                            if (items[game.shopselect].item == Items::PURPLE_BOBBER) cant_buy = true;
-                            if (items[game.shopselect].item == Items::BIG_BOBBER) cant_buy = true;
-                            if (items[game.shopselect].item == Items::FISH_SPINNER) cant_buy = true;
-                            if (items[game.shopselect].item == Items::FEATHER_SPINNER) cant_buy = true;
-                            if (items[game.shopselect].item == Items::COIN_SPINNER) cant_buy = true;
-                            if (items[game.shopselect].item == Items::TRINKET_SPINNER) cant_buy = true;
-                            if (items[game.shopselect].item == Items::VIRIDIAN_SPINNER) cant_buy = true;
-                            if (items[game.shopselect].item == Items::GIANT_BOBBER) cant_buy = true;
-                            if (items[game.shopselect].item == Items::NAVAL_MINE_BOBBER) cant_buy = true;
-                            if (items[game.shopselect].item == Items::BLUE_KEY) cant_buy = true;
-                            if (items[game.shopselect].item == Items::PURPLE_KEY) cant_buy = true;
-                            if (items[game.shopselect].item == Items::RED_KEY) cant_buy = true;
+                            bool cant_buy = !canBuyMultiple(items[game.shopselect].item);
 
                             if (cant_buy || (items[game.shopselect].getBuyPrice() * 5) > game.coins())
                             {
-                                game.shopcoinflash = 15;
+                                if (!cant_buy)
+                                {
+                                    // Only flash the coin display if we don't have enough money
+                                    game.shopcoinflash = 15;
+                                }
+
                                 music.playef(Sound_ERROR);
                             }
                             else
@@ -3635,10 +3625,11 @@ void shopinput(void)
                                 music.playef(Sound_CASH);
                                 game.coins_collected -= items[game.shopselect].getBuyPrice() * 5;
                                 int inv_size = items.size();
-                                for (int i = 0; i < 5; i++)
-                                {
-                                    giveItem(items[game.shopselect]);
-                                }
+
+                                ItemStack new_stack = items[game.shopselect];
+                                new_stack.count *= 5;
+
+                                giveItem(new_stack);
 
                                 items = getShopItems();
                                 if (inv_size != items.size())
@@ -3930,6 +3921,7 @@ void mapinput(void)
                 if (game.in_item_menu)
                 {
                     game.in_item_menu = false;
+                    game.scroll_offset = 0;
                 }
                 else if (game.menupage < 9
                 || (game.menupage >= 20 && game.menupage <= 21))
@@ -3990,6 +3982,7 @@ void mapinput(void)
             if (game.in_item_menu)
             {
                 game.in_item_menu = false;
+                game.scroll_offset = 0;
                 music.playef(Sound_VIRIDIAN);
                 game.mapheld = true;
             }
