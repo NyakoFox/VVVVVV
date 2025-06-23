@@ -1004,7 +1004,7 @@ bool hasMaximumSizedFish()
         if (item == Items::SPIKE_FISH) continue; // Always 40, don't count for the trophy
 
         FishCatchInfo info = getFishCatchInfo(item);
-        if (info.largest >= ((FishItem*)item)->max_size)
+        if ((info.amount > 0) && info.largest >= ((FishItem*)item)->max_size)
         {
             return true;
         }
@@ -1022,7 +1022,7 @@ bool hasMinimumSizedFish()
         if (item == Items::SPIKE_FISH) continue; // Always 40, don't count for the trophy
 
         FishCatchInfo info = getFishCatchInfo(item);
-        if (info.smallest <= ((FishItem*)item)->min_size)
+        if ((info.amount > 0) && info.smallest <= ((FishItem*)item)->min_size)
         {
             return true;
         }

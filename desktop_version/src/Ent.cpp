@@ -271,10 +271,11 @@ void entclass::setenemyroom( int rx, int ry )
 
         break;
         //The Lab
+    // OVERRIDE: Make this fish actually. Blub
     case rn(4, 0):
-        tile = 78;
+        tile = 252;
         colour = EntityColour_ENEMY_GREEN;
-        animate = 1;
+        animate = 999;
         w = 16;
         h = 16;
         break;

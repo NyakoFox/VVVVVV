@@ -3890,6 +3890,27 @@ void entityclass::animateentities( int _i )
             //Variable animation
             switch(entities[_i].animate)
             {
+            case 999:
+                // Fish
+                entities[_i].framedelay--;
+                if (entities[_i].framedelay <= 0)
+                {
+                    entities[_i].framedelay = 8;
+                    entities[_i].walkingframe++;
+                    if (entities[_i].walkingframe == 4)
+                    {
+                        entities[_i].walkingframe = 0;
+                    }
+                }
+
+                entities[_i].drawframe = entities[_i].tile;
+                entities[_i].drawframe += entities[_i].walkingframe;
+
+                if (entities[_i].vx < 0) entities[_i].drawframe += 4;
+                if (entities[_i].vy > 0) entities[_i].drawframe += 8;
+                if (entities[_i].vy < 0) entities[_i].drawframe += 12;
+
+                break;
             case 0:
                 //Simple oscilation
                 entities[_i].framedelay--;

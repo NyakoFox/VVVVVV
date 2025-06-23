@@ -932,7 +932,21 @@ static void draw_entities(void)
                     ed.entcolreal = graphics.getcol(18);
                 }
 
-                graphics.draw_sprite(x, y, ed.get_enemy_tile(room->enemytype), ed.entcolreal);
+                int enemy_tile = ed.get_enemy_tile(room->enemytype);
+                if (enemy_tile == 252)
+                {
+                    switch (movement)
+                    {
+                    case 0: enemy_tile = 260; break;
+                    case 1: enemy_tile = 264; break;
+                    case 2: enemy_tile = 256; break;
+                    case 3: enemy_tile = 252; break;
+                    case 4: enemy_tile = 252; break;
+                    default: enemy_tile = 252; break;
+                    }
+                }
+
+                graphics.draw_sprite(x, y, enemy_tile, ed.entcolreal);
 
                 if (movement >= 0 && movement < 4)
                 {
@@ -4372,7 +4386,7 @@ int editorclass::get_enemy_tile(int t)
     switch(t)
     {
     case 0:
-        return 78;
+        return 252;
         break;
     case 1:
         return 88;
