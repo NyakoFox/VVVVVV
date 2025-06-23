@@ -235,7 +235,7 @@ end:
                     0, /* playlength */
                     0, /* LoopBegin */
                     0, /* LoopLength */
-                    (loop ? FAUDIO_LOOP_INFINITE : 0), /* LoopCount */
+                    (uint32_t)(loop ? FAUDIO_LOOP_INFINITE : 0), /* LoopCount */
                     this /* pContext */
                 };
                 if (vorbis != NULL)
