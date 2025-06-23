@@ -355,7 +355,7 @@ void Game::init(void)
     fadetolab = false;
     fadetolabdelay = 0;
 
-    over30mode = true;
+    over30mode = false;
     showingametimer = false;
 
     ingame_titlemode = false;
