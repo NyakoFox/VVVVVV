@@ -1,14 +1,23 @@
-![logo](logo.gif "VVVVVV")
+![logo](logo.png "VVVVVV: The Depths")
 
-This is the source code to VVVVVV, the 2010 indie game by [Terry Cavanagh](http://distractionware.com/), with music by [Magnus Pålsson](http://souleye.madtracker.net/). You can read the [announcement](http://distractionware.com/blog/2020/01/vvvvvv-is-now-open-source/) of the source code release on Terry's blog!
+This is the source code to the unofficial VVVVVV mod, "VVVVVV: The Depths".
+
+The original game was made by [Terry Cavanagh](http://distractionware.com/), with music by [Magnus Pålsson](http://souleye.madtracker.net/).
 
 The source code for the desktop version is in [this folder](desktop_version).
 
-VVVVVV is still commercially available at [thelettervsixtim.es](https://thelettervsixtim.es/) if you'd like to support it, but you are completely free to compile the game for your own personal use. If you're interested in distributing a compiled version of the game, see [LICENSE.md](LICENSE.md) for more information.
+While this mod does not require you to purchase the original game, we do recommend supporting it by purchasing a copy at [thelettervsixtim.es](https://thelettervsixtim.es/). Without it, this wouldn't be possible. (Plus, Terry deserves your money!)
 
-Discussion about VVVVVV updates mainly happens on the "unofficial" [VVVVVV discord](https://discord.gg/Zf7Nzea), in the `vvvvvv-code` channel.
+If you'd like to talk about the mod, or VVVVVV in general, feel free to join the "unofficial" [VVVVVV discord](https://discord.gg/Zf7Nzea)!
 
-Credits
+Mod Credits
+-------
+- Programmer and co-director: [Alexandra Fox](https://nyako.dev/)
+- Artist and co-director: [mothbeanie](https://bsky.app/profile/mothbeanie.bsky.social)
+- Music by [Allison Fleischer](https://allisonfleischer.bandcamp.com/)
+- Playtesting and support: [Dav999](https://github.com/Daaaav), [stupidcat](https://stupidcat.me/)
+
+Game Credits
 -------
 - Created by [Terry Cavanagh](http://distractionware.com/)
 - Room Names by [Bennett Foddy](http://www.foddy.net)
