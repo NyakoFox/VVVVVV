@@ -741,7 +741,7 @@ int main(int argc, char *argv[])
         min_lang_set = 1;
     }
 
-    if (loc::lang_set < min_lang_set && !loc::languagelist.empty())
+    if (false /*loc::lang_set < min_lang_set && !loc::languagelist.empty()*/)
     {
         loc::pre_title_lang_menu = true;
         game.gamestate = TITLEMODE;
