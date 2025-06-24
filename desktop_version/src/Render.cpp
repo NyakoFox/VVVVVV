@@ -553,7 +553,7 @@ static void menurender(void)
 
         font::print(PR_CEN, -1, 130, loc::gettext("and of course to"), tr, tg, tb);
         font::print(PR_CEN | PR_FONT_8X8, -1, 150, "Terry Cavanagh", 196, 196, 255 - help.glow);
-        font::print(PR_CEN | PR_FONT_8X8, -1, 170, "for making this amazing game!", tr, tg, tb);
+        font::print(PR_CEN, -1, 170, "for making this amazing game!", tr, tg, tb);
         break;
 
     case Menu::credits:
