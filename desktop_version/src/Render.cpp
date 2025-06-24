@@ -542,8 +542,9 @@ static void menurender(void)
         font::print(PR_2X | PR_CEN | PR_FONT_8X8, -1, 55, "mothbeanie", tr, tg, tb);
         font::print(PR_CEN, -1, 100, loc::gettext("Music by"), tr, tg, tb);
         font::print(PR_2X | PR_CEN | PR_FONT_8X8, -1, 115, "Allison Fleischer", tr, tg, tb);
-        font::print(PR_2X | PR_CEN | PR_FONT_8X8, -1, 135, "NyakoFox", tr, tg, tb);
-        font::print(PR_CEN | PR_FONT_8X8, -1, 135 + 20, "(Alexandra Fox)", tr / 2, tg / 2, tb / 2);
+        font::print(PR_2X | PR_CEN | PR_FONT_8X8, -1, 135, "mothbeanie", tr, tg, tb);
+        font::print(PR_2X | PR_CEN | PR_FONT_8X8, -1, 155, "NyakoFox", tr, tg, tb);
+        font::print(PR_CEN | PR_FONT_8X8, -1, 155 + 20, "(Alexandra Fox)", tr / 2, tg / 2, tb / 2);
         break;
     case Menu::depths_credits4:
         font::print(PR_CEN, -1, 30, loc::gettext("Special thanks to"), tr, tg, tb);
@@ -4117,15 +4118,18 @@ void maprender(void)
         {
             font::print(PR_CEN | PR_FONT_LEVEL, -1, FLIP(80, 8), loc::gettext("VVVVVV: The Depths"), 25, 255 - help.glow / 2, 255 - help.glow / 2);
 
-            char buffer[SCREEN_WIDTH_CHARS + 1];
-            vformat_buf(
-                buffer, sizeof(buffer),
-                loc::gettext("Fish caught: {amount}"),
-                "amount:int",
-                getCaughtFishAmount()
-            );
+            if (game.fishing_revealed)
+            {
+                char buffer[SCREEN_WIDTH_CHARS + 1];
+                vformat_buf(
+                    buffer, sizeof(buffer),
+                    loc::gettext("Fish caught: {amount}"),
+                    "amount:int",
+                    getCaughtFishAmount()
+                );
 
-            font::print(PR_CEN | PR_FONT_LEVEL, -1, FLIP(105, 8), buffer, 255 - help.glow / 2, 255 - help.glow / 2, 255 - help.glow / 2);
+                font::print(PR_CEN | PR_FONT_LEVEL, -1, FLIP(105, 8), buffer, 255 - help.glow / 2, 255 - help.glow / 2, 255 - help.glow / 2);
+            }
         }
         else
         {
@@ -4143,14 +4147,22 @@ void maprender(void)
             }
         }
 
-        font::print(0, 59, FLIP(132, 8), game.savetime, 255 - help.glow/2, 255 - help.glow/2, 255 - help.glow/2);
-        char buffer[SCREEN_WIDTH_CHARS + 1];
-        vformat_buf(buffer, sizeof(buffer),
-            loc::gettext("{savebox_n_trinkets|wordy}"),
-            "savebox_n_trinkets:int",
-            game.savetrinkets
-        );
-        font::print(PR_RIGHT, 262, FLIP(132, 8), buffer, 255 - help.glow/2, 255 - help.glow/2, 255 - help.glow/2);
+        font::print(0, 59, FLIP(132, 8), game.savetime, 255 - help.glow / 2, 255 - help.glow / 2, 255 - help.glow / 2);
+
+        if (game.fishing_revealed)
+        {
+            char buffer[SCREEN_WIDTH_CHARS + 1];
+            vformat_buf(buffer, sizeof(buffer),
+                loc::gettext("{trinketfin_count}/5"),
+                "trinketfin_count:int",
+                getTrinketFinCount()
+            );
+            font::print(PR_RIGHT, 262, FLIP(132, 8), buffer, 255 - help.glow / 2, 255 - help.glow / 2, 255 - help.glow / 2);
+        }
+        else
+        {
+            font::print(PR_RIGHT, 262, FLIP(132, 8), "0", 255 - help.glow / 2, 255 - help.glow / 2, 255 - help.glow / 2);
+        }
 
         if (graphics.flipmode)
         {
@@ -4160,7 +4172,25 @@ void maprender(void)
         else
         {
             graphics.draw_sprite(34, FLIP(126, 17), 50, graphics.col_clock);
-            graphics.draw_sprite(270, FLIP(126, 17), 22, graphics.col_trinket);
+            if (game.fishing_revealed)
+            {
+                SDL_Texture* texture = graphics.item_sprites["trinketfin"];
+                if (texture != NULL)
+                {
+
+                    SDL_Color color = graphics.col_trinket;
+
+                    graphics.set_texture_color_mod(texture, color.r, color.g, color.b);
+                    graphics.set_texture_alpha_mod(texture, color.a);
+                    graphics.draw_texture(texture, 270, FLIP(126, 17));
+                    graphics.set_texture_color_mod(texture, 255, 255, 255);
+                    graphics.set_texture_alpha_mod(texture, 255);
+                }
+            }
+            else
+            {
+                graphics.draw_sprite(270, FLIP(126, 17), 22, graphics.col_trinket);
+            }
         }
         break;
     }
