@@ -377,7 +377,7 @@ static void menurender(void)
             break;
         case 5:
             font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Language"), tr, tg, tb);
-            font::print_wrap(PR_CEN, -1, 65, loc::gettext("Change the language."), tr, tg, tb);
+            font::print_wrap(PR_CEN, -1, 65, loc::gettext("Change the language. Disabled for VVVVVV: The Depths."), tr, tg, tb);
         }
         break;
     case Menu::graphicoptions:

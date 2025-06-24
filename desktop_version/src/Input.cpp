@@ -1144,7 +1144,7 @@ static void menuactionpress(void)
             break;
         case 5:
             //language options
-            if (game.translator_cutscene_test)
+            if (true)
             {
                 music.playef(Sound_CRY);
                 break;
