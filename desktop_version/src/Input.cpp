@@ -10,7 +10,6 @@
 #include "Exit.h"
 #include "FileSystemUtils.h"
 #include "Game.h"
-#include "GlitchrunnerMode.h"
 #include "Graphics.h"
 #include "GraphicsUtil.h"
 #include "ItemHelpers.h"
@@ -317,36 +316,6 @@ void recomputetextboxes(void)
         graphics.textboxes[i].updatetext();
         graphics.textboxes[i].applyposition();
     }
-}
-
-static void toggleflipmode(void)
-{
-    if (true)
-    {
-        graphics.setflipmode = false;
-        graphics.flipmode = false;
-        music.playef(Sound_CRY);
-        return;
-    }
-
-    graphics.setflipmode = !graphics.setflipmode;
-    game.savestatsandsettings_menu();
-    if (graphics.setflipmode)
-    {
-        music.playef(Sound_GAMESAVED);
-        game.screenshake = 10;
-        game.flashlight = 5;
-    }
-    else
-    {
-        music.playef(Sound_VIRIDIAN);
-    }
-
-    /* Some text boxes change depending on Flip Mode, so update text boxes. */
-    const bool temp = graphics.flipmode;
-    graphics.flipmode = graphics.setflipmode;
-    recomputetextboxes();
-    graphics.flipmode = temp;
 }
 
 static bool fadetomode = false;
@@ -872,92 +841,18 @@ static void menuactionpress(void)
         }
         break;
     case Menu::speedrunneroptions:
-        switch (game.currentmenuoption)
-        {
-        case 0:
-            // Glitchrunner mode
-            music.playef(Sound_VIRIDIAN);
-            game.createmenu(Menu::setglitchrunner);
-            game.currentmenuoption = GlitchrunnerMode_get();
-            map.nexttowercolour();
-            break;
-        case 1:
-            /* Input delay */
-            music.playef(Sound_VIRIDIAN);
-            game.inputdelay = !game.inputdelay;
-            game.savestatsandsettings_menu();
-            break;
-        case 2:
-            // toggle fake load screen
-            game.skipfakeload = !game.skipfakeload;
-            game.savestatsandsettings_menu();
-            music.playef(Sound_VIRIDIAN);
-            break;
-        case 3:
-            // toggle in game timer
-            game.showingametimer = !game.showingametimer;
-            game.savestatsandsettings_menu();
-            music.playef(Sound_VIRIDIAN);
-            break;
-        case 4:
-            // english sprites
-            loc::english_sprites = !loc::english_sprites;
-            if (!loc::english_sprites)
-            {
-                graphics.grphx.init_translations();
-            }
-            game.savestatsandsettings_menu();
-            music.playef(Sound_VIRIDIAN);
-            break;
-        default:
-            //back
-            music.playef(Sound_VIRIDIAN);
-            game.returnmenu();
-            map.nexttowercolour();
-            break;
-        }
-        break;
-    case Menu::setglitchrunner:
-        GlitchrunnerMode_set((enum GlitchrunnerMode) game.currentmenuoption);
+        //back
         music.playef(Sound_VIRIDIAN);
         game.returnmenu();
-        game.savestatsandsettings_menu();
         map.nexttowercolour();
         break;
+    case Menu::setglitchrunner:
+        break;
     case Menu::advancedoptions:
-        switch (game.currentmenuoption)
-        {
-        case 0:
-            // toggle unfocus pause
-            game.disablepause = !game.disablepause;
-            game.savestatsandsettings_menu();
-            music.playef(Sound_VIRIDIAN);
-            break;
-        case 1:
-            /* toggle unfocus music pause */
-            game.disableaudiopause = !game.disableaudiopause;
-            game.savestatsandsettings_menu();
-            music.playef(Sound_VIRIDIAN);
-            break;
-        case 2:
-            // toggle translucent roomname BG
-            graphics.translucentroomname = !graphics.translucentroomname;
-            game.savestatsandsettings_menu();
-            music.playef(Sound_VIRIDIAN);
-            break;
-        case 3:
-            // toggle checkpoint saving
-            game.checkpoint_saving = !game.checkpoint_saving;
-            game.savestatsandsettings_menu();
-            music.playef(Sound_VIRIDIAN);
-            break;
-        default:
-            //back
-            music.playef(Sound_VIRIDIAN);
-            game.returnmenu();
-            map.nexttowercolour();
-            break;
-        }
+        //back
+        music.playef(Sound_VIRIDIAN);
+        game.returnmenu();
+        map.nexttowercolour();
         break;
     case Menu::accessibility:
     {
@@ -1045,66 +940,50 @@ static void menuactionpress(void)
     }
     case Menu::gameplayoptions:
     {
-        int gameplayoptionsoffset = 0;
-#if !defined(MAKEANDPLAY)
-        if (game.ingame_titlemode && game.unlock[Unlock_FLIPMODE])
-#endif
+        switch (game.currentmenuoption)
         {
-            gameplayoptionsoffset = 1;
-            if (game.currentmenuoption == 0) {
-                if (true)
-                {
-                    music.playef(Sound_CRY);
-                    break;
-                }
-
-                toggleflipmode();
-                // Fix wrong area music in Tower (Positive Force vs. ecroF evitisoP)
-                if (map.custommode)
-                {
-                    break;
-                }
-                int area = map.area(game.roomx, game.roomy);
-                if (area == 3 || area == 11)
-                {
-                    if (graphics.setflipmode)
-                    {
-                        music.play(Music_POSITIVEFORCEREVERSED);
-                    }
-                    else
-                    {
-                        music.play(Music_POSITIVEFORCE);
-                    }
-                }
-            }
-        }
-
-        if (game.currentmenuoption == gameplayoptionsoffset + 0)
-        {
-            //Toggle 30+ FPS
-            music.playef(Sound_VIRIDIAN);
-            game.over30mode = !game.over30mode;
+        case 0:
+            // toggle unfocus pause
+            game.disablepause = !game.disablepause;
             game.savestatsandsettings_menu();
-        }
-        else if (game.currentmenuoption == gameplayoptionsoffset + 1)
-        {
-            //Speedrunner options
             music.playef(Sound_VIRIDIAN);
-            game.createmenu(Menu::speedrunneroptions);
-            map.nexttowercolour();
-        }
-        else if (game.currentmenuoption == gameplayoptionsoffset + 2)
-        {
-            //Advanced options
+            break;
+        case 1:
+            /* toggle unfocus music pause */
+            game.disableaudiopause = !game.disableaudiopause;
+            game.savestatsandsettings_menu();
             music.playef(Sound_VIRIDIAN);
-            game.createmenu(Menu::advancedoptions);
-            map.nexttowercolour();
-        }
-        else if (game.currentmenuoption == gameplayoptionsoffset + 3) {
+            break;
+        case 2:
+            // toggle checkpoint saving
+            game.checkpoint_saving = !game.checkpoint_saving;
+            game.savestatsandsettings_menu();
+            music.playef(Sound_VIRIDIAN);
+            break;
+        case 3:
+            /* Input delay */
+            music.playef(Sound_VIRIDIAN);
+            game.inputdelay = !game.inputdelay;
+            game.savestatsandsettings_menu();
+            break;
+        case 4:
+            // toggle fake load screen
+            game.skipfakeload = !game.skipfakeload;
+            game.savestatsandsettings_menu();
+            music.playef(Sound_VIRIDIAN);
+            break;
+        case 5:
+            // toggle in game timer
+            game.showingametimer = !game.showingametimer;
+            game.savestatsandsettings_menu();
+            music.playef(Sound_VIRIDIAN);
+            break;
+        default:
             //return to previous menu
             music.playef(Sound_VIRIDIAN);
             game.returnmenu();
             map.nexttowercolour();
+            break;
         }
 
         break;
@@ -1113,33 +992,33 @@ static void menuactionpress(void)
         switch (game.currentmenuoption)
         {
         case 0:
-            //gameplay options
-            music.playef(Sound_VIRIDIAN);
-            game.createmenu(Menu::gameplayoptions);
-            map.nexttowercolour();
-            break;
-        case 1:
             //graphic options
             music.playef(Sound_VIRIDIAN);
             game.createmenu(Menu::graphicoptions);
             map.nexttowercolour();
             break;
-        case 2:
+        case 1:
             /* Audio options */
             music.playef(Sound_VIRIDIAN);
             game.createmenu(Menu::audiooptions);
             map.nexttowercolour();
             break;
-        case 3:
+        case 2:
             //gamepad options
             music.playef(Sound_VIRIDIAN);
             game.createmenu(Menu::controller);
             map.nexttowercolour();
             break;
-        case 4:
+        case 3:
             //accessibility options
             music.playef(Sound_VIRIDIAN);
             game.createmenu(Menu::accessibility);
+            map.nexttowercolour();
+            break;
+        case 4:
+            //misc options
+            music.playef(Sound_VIRIDIAN);
+            game.createmenu(Menu::gameplayoptions);
             map.nexttowercolour();
             break;
         case 5:
@@ -1187,25 +1066,7 @@ static void menuactionpress(void)
                 deinitvolumeslider();
             }
             break;
-        case 2:
-            if (!music.mmmmmm)
-            {
-                break;
-            }
-
-            /* Toggle MMMMMM */
-            music.usingmmmmmm = !music.usingmmmmmm;
-            music.playef(Sound_VIRIDIAN);
-            if (music.currentsong > -1)
-            {
-                music.play(music.currentsong);
-            }
-            game.savestatsandsettings_menu();
-            break;
-        }
-
-        if (game.currentmenuoption == 2 + (int) music.mmmmmm)
-        {
+        default:
             /* Return */
             game.returnmenu();
             map.nexttowercolour();
@@ -2145,48 +2006,6 @@ static void menuactionpress(void)
         game.returnmenu();
         map.nexttowercolour();
         break;
-    case Menu::playmodes:
-        if (game.currentmenuoption == 0
-            && !game.nocompetitive_unless_translator())   //go to the time trial menu
-        {
-            music.playef(Sound_VIRIDIAN);
-            game.createmenu(Menu::timetrials);
-            map.nexttowercolour();
-        }
-        else if (game.currentmenuoption == 1
-            && game.unlock[Unlock_INTERMISSION_REPLAYS])
-        {
-            //intermission mode menu
-            music.playef(Sound_VIRIDIAN);
-            game.createmenu(Menu::intermissionmenu);
-            map.nexttowercolour();
-        }
-        else if (game.currentmenuoption == 2
-            && game.unlock[Unlock_NODEATHMODE]
-            && !game.nocompetitive())    //start a game in no death mode
-        {
-            music.playef(Sound_VIRIDIAN);
-            game.createmenu(Menu::startnodeathmode);
-            map.nexttowercolour();
-        }
-        else if (game.currentmenuoption == 3
-            && game.unlock[Unlock_FLIPMODE])    //enable/disable flip mode
-        {
-            toggleflipmode();
-        }
-        else if (game.currentmenuoption == 4)
-        {
-            //back
-            music.playef(Sound_VIRIDIAN);
-            game.returnmenu();
-            map.nexttowercolour();
-        }
-        else
-        {
-            //Can't do yet!
-            music.playef(Sound_CRY);
-        }
-        break;
     case Menu::startnodeathmode:
         switch (game.currentmenuoption)
         {
@@ -2304,7 +2123,7 @@ static void menuactionpress(void)
         //back
         music.playef(Sound_VIRIDIAN);
         music.play(Music_PRESENTINGVVVVVV);
-        game.returntomenu(Menu::playmodes);
+        game.returntomenu(Menu::mainmenu);
         map.nexttowercolour();
         break;
     case Menu::unlocktimetrials:
@@ -3048,8 +2867,7 @@ void gameinput(void)
             }
             else
             {
-                if (GlitchrunnerMode_less_than_or_equal(Glitchrunner2_0)
-                || !game.glitchrunkludge)
+                if (!game.glitchrunkludge)
                 {
                     game.state++;
                     game.unlockstate();
@@ -3778,8 +3596,6 @@ void shopinput(void)
 
 void mapinput(void)
 {
-    const bool version2_2 = GlitchrunnerMode_less_than_or_equal(Glitchrunner2_2);
-
     //TODO Mouse Input!
     //game.mx = (mouseX / 2);
     //game.my = (mouseY / 2);
@@ -3791,43 +3607,7 @@ void mapinput(void)
     game.press_up = false;
     game.press_down = false;
 
-    if (version2_2 && graphics.fademode == FADE_FULLY_BLACK && graphics.menuoffset == 0)
-    {
-        // Deliberate re-addition of the glitchy gamestate-based fadeout!
-
-        // First of all, detecting a black screen means if the glitchy fadeout
-        // gets interrupted but you're still on a black screen, opening a menu
-        // immediately quits you to the title. This has the side effect that if
-        // you accidentally press Esc during a cutscene when it's black, you'll
-        // immediately be quit and lose all your progress, but that's fair in
-        // glitchrunner mode.
-        // Also have to check graphics.menuoffset so this doesn't run every frame
-
-        // Have to close the menu in order to run gamestates
-        graphics.resumegamemode = true;
-        // Remove half-second delay
-        graphics.menuoffset = 250;
-
-        // Technically this was in <=2.2 as well
-        obj.removeallblocks();
-
-        if (game.menupage >= 20 && game.menupage <= 21)
-        {
-            game.setstate(96);
-            game.setstatedelay(0);
-        }
-        else
-        {
-            // Produces more glitchiness! Necessary for credits warp to work.
-            script.running = false;
-            graphics.textboxes.clear();
-
-            game.setstate(80);
-            game.setstatedelay(0);
-        }
-    }
-
-    if (game.fadetomenu && !version2_2)
+    if (game.fadetomenu)
     {
         if (game.fadetomenudelay > 0)
         {
@@ -3841,7 +3621,7 @@ void mapinput(void)
         }
     }
 
-    if (game.fadetolab && !version2_2)
+    if (game.fadetolab)
     {
         if (game.fadetolabdelay > 0)
         {
@@ -3855,7 +3635,7 @@ void mapinput(void)
     }
 
     if(graphics.menuoffset==0
-    && ((!version2_2 && !game.fadetomenu && game.fadetomenudelay <= 0 && !game.fadetolab && game.fadetolabdelay <= 0)
+    && ((!game.fadetomenu && game.fadetomenudelay <= 0 && !game.fadetolab && game.fadetolabdelay <= 0)
     || graphics.fademode == FADE_NONE))
     {
         SDL_Keycode left, right, a, d;
@@ -4089,7 +3869,7 @@ void mapinput(void)
 
         if (game.press_action)
         {
-            mapmenuactionpress(version2_2);
+            mapmenuactionpress(false);
         }
 
         if (game.menupage < 0) game.menupage = 3;

@@ -13,7 +13,6 @@
 #include "EquippableItem.h"
 #include "Exit.h"
 #include "Font.h"
-#include "GlitchrunnerMode.h"
 #include "Graphics.h"
 #include "Item.h"
 #include "ItemHelpers.h"
@@ -2933,22 +2932,6 @@ void scriptclass::startgamemode(const enum StartMode mode)
     player_hitbox;
     SDL_zero(player_hitbox);
 
-    if (GlitchrunnerMode_less_than_or_equal(Glitchrunner2_2))
-    {
-        /* Preserve player hitbox */
-        const int player_idx = obj.getplayer();
-        if (INBOUNDS_VEC(player_idx, obj.entities))
-        {
-            const entclass* player = &obj.entities[player_idx];
-            player_hitbox.initialized = true;
-            player_hitbox.size = player->size;
-            player_hitbox.cx = player->cx;
-            player_hitbox.cy = player->cy;
-            player_hitbox.w = player->w;
-            player_hitbox.h = player->h;
-        }
-    }
-
     /* State which needs to be reset before gameplay starts
      * ex. before custom levels get loaded */
 
@@ -3293,13 +3276,6 @@ void scriptclass::startgamemode(const enum StartMode mode)
     }
 
     game.gravitycontrol = game.savegc;
-    graphics.flipmode = false; // graphics.setflipmode;
-
-    if (!map.custommode && !graphics.setflipmode)
-    {
-        /* Invalidate Flip Mode trophy */
-        obj.flags[73] = true;
-    }
 
     obj.entities.clear();
     obj.createentity(game.savex, game.savey, 0, 0);
@@ -3453,8 +3429,6 @@ void scriptclass::teleport(void)
 
 void scriptclass::hardreset(void)
 {
-    const bool version2_2 = GlitchrunnerMode_less_than_or_equal(Glitchrunner2_2);
-
     if (game.seed_use_sdl_getticks)
     {
         /* The RNG is 32-bit. We don't _really_ need 64-bit... */
@@ -3470,12 +3444,8 @@ void scriptclass::hardreset(void)
     game.gravitycontrol = 0;
     game.teleport = false;
     game.companion = 0;
-    if (!version2_2)
-    {
-        // Ironically, resetting more variables makes the janky fadeout system in glitchrunnermode even more glitchy
-        game.roomx = 0;
-        game.roomy = 0;
-    }
+    game.roomx = 0;
+    game.roomy = 0;
     game.prevroomx = 0;
     game.prevroomy = 0;
     game.teleport_to_new_area = false;
@@ -3511,15 +3481,11 @@ void scriptclass::hardreset(void)
     game.gamesavefailed = false;
     game.savetime = "00:00";
     game.savetrinkets = 0;
-    if (!version2_2)
-    {
-        // Ironically, resetting more variables makes the janky fadeout system in glitchrunnermode even more glitchy
-        game.saverx = 0;
-        game.savery = 0;
-        game.savex = 0;
-        game.savey = 0;
-        game.savegc = 0;
-    }
+    game.saverx = 0;
+    game.savery = 0;
+    game.savex = 0;
+    game.savey = 0;
+    game.savegc = 0;
     game.savecolour = cl.player_colour;
 
     game.intimetrial = false;
@@ -3571,12 +3537,7 @@ void scriptclass::hardreset(void)
     game.statedelay = 0;
 
     game.hascontrol = true;
-    if (!GlitchrunnerMode_less_than_or_equal(Glitchrunner2_0))
-    {
-        // Keep the "- Press ACTION to advance text -" prompt around,
-        // apparently the speedrunners call it the "text storage" glitch
-        game.advancetext = false;
-    }
+    game.advancetext = false;
 
     game.pausescript = false;
     game.completestop = false;
@@ -3618,11 +3579,7 @@ void scriptclass::hardreset(void)
     map.rcol = 0;
     map.custommode=false;
     map.custommodeforreal=false;
-    if (!version2_2)
-    {
-        // Ironically, resetting more variables makes the janky fadeout system even more glitchy
-        map.towermode=false;
-    }
+    map.towermode=false;
     map.cameraseekframe = 0;
     map.resumedelay = 0;
     graphics.towerbg.scrolldir = 1;

@@ -14,7 +14,6 @@
 #include "Entity.h"
 #include "Enums.h"
 #include "FileSystemUtils.h"
-#include "GlitchrunnerMode.h"
 #include "Graphics.h"
 #include "ItemHelpers.h"
 #include "LevelDebugger.h"
@@ -1321,7 +1320,7 @@ static void caughtfish_textbox3(textboxclass* THIS)
 
 void Game::setstate(const int gamestate)
 {
-    if (!statelocked || GlitchrunnerMode_less_than_or_equal(Glitchrunner2_2))
+    if (!statelocked)
     {
         state = gamestate;
     }
@@ -1329,7 +1328,7 @@ void Game::setstate(const int gamestate)
 
 void Game::incstate(void)
 {
-    if (!statelocked || GlitchrunnerMode_less_than_or_equal(Glitchrunner2_2))
+    if (!statelocked)
     {
         state++;
     }
@@ -1337,7 +1336,7 @@ void Game::incstate(void)
 
 void Game::setstatedelay(const int delay)
 {
-    if (!statelocked || GlitchrunnerMode_less_than_or_equal(Glitchrunner2_2))
+    if (!statelocked)
     {
         statedelay = delay;
     }
@@ -4782,9 +4781,6 @@ void Game::deletestats(void)
         swnrecord = 0;
         swnbestrank = 0;
         bestgamedeaths = -1;
-#ifndef MAKEANDPLAY
-        graphics.setflipmode = false;
-#endif
         stat_trinkets = 0;
     }
 }
@@ -4962,12 +4958,6 @@ void Game::deserializesettings(tinyxml2::XMLElement* dataNode, struct ScreenSett
             colourblindmode = help.Int(pText);
         }
 
-        if (SDL_strcmp(pKey, "setflipmode") == 0)
-        {
-            //graphics.setflipmode = help.Int(pText);
-            graphics.setflipmode = false;
-        }
-
         if (SDL_strcmp(pKey, "invincibility") == 0)
         {
             map.invincibility = help.Int(pText);
@@ -4981,11 +4971,6 @@ void Game::deserializesettings(tinyxml2::XMLElement* dataNode, struct ScreenSett
         if (SDL_strcmp(pKey, "advanced_smoothing") == 0)
         {
             screen_settings->badSignal = help.Int(pText);
-        }
-
-        if (SDL_strcmp(pKey, "usingmmmmmm") == 0)
-        {
-            music.usingmmmmmm = (bool) help.Int(pText);
         }
 
         if (SDL_strcmp(pKey, "ghostsenabled") == 0)
@@ -5008,19 +4993,9 @@ void Game::deserializesettings(tinyxml2::XMLElement* dataNode, struct ScreenSett
             disableaudiopause = help.Int(pText);
         }
 
-        if (SDL_strcmp(pKey, "over30mode") == 0)
-        {
-            over30mode = help.Int(pText);
-        }
-
         if (SDL_strcmp(pKey, "inputdelay") == 0)
         {
             inputdelay = help.Int(pText);
-        }
-
-        if (SDL_strcmp(pKey, "glitchrunnermode") == 0)
-        {
-            GlitchrunnerMode_set(GlitchrunnerMode_string_to_enum(pText));
         }
 
         if (SDL_strcmp(pKey, "showingametimer") == 0)
@@ -5036,11 +5011,6 @@ void Game::deserializesettings(tinyxml2::XMLElement* dataNode, struct ScreenSett
         if (SDL_strcmp(pKey, "notextoutline") == 0)
         {
             graphics.notextoutline = help.Int(pText);
-        }
-
-        if (SDL_strcmp(pKey, "translucentroomname") == 0)
-        {
-            graphics.translucentroomname = help.Int(pText);
         }
 
         if (SDL_strcmp(pKey, "musicvolume") == 0)
@@ -5101,31 +5071,6 @@ void Game::deserializesettings(tinyxml2::XMLElement* dataNode, struct ScreenSett
         if (SDL_strcmp(pKey, "controllerSensitivity") == 0)
         {
             key.sensitivity = help.Int(pText);
-        }
-
-        if (SDL_strcmp(pKey, "lang") == 0)
-        {
-            //loc::lang = std::string(pText);
-        }
-
-        if (SDL_strcmp(pKey, "lang_set") == 0)
-        {
-            //loc::lang_set = help.Int(pText);
-        }
-
-        if (SDL_strcmp(pKey, "english_sprites") == 0)
-        {
-            loc::english_sprites = help.Int(pText);
-        }
-
-        if (SDL_strcmp(pKey, "new_level_font") == 0)
-        {
-            loc::new_level_font = std::string(pText);
-        }
-
-        if (SDL_strcmp(pKey, "roomname_translator") == 0 && loc::show_translator_menu)
-        {
-            roomname_translator::set_enabled(help.Int(pText));
         }
 
         if (SDL_strcmp(pKey, "checkpoint_saving") == 0)
@@ -5277,17 +5222,12 @@ void Game::serializesettings(tinyxml2::XMLElement* dataNode, const struct Screen
 
     xml::update_tag(dataNode, "colourblindmode", colourblindmode);
 
-    xml::update_tag(dataNode, "setflipmode", graphics.setflipmode);
-
     xml::update_tag(dataNode, "invincibility", map.invincibility);
 
     xml::update_tag(dataNode, "slowdown", slowdown);
 
 
     xml::update_tag(dataNode, "advanced_smoothing", (int) screen_settings->badSignal);
-
-
-    xml::update_tag(dataNode, "usingmmmmmm", music.usingmmmmmm);
 
     xml::update_tag(dataNode, "ghostsenabled", (int) ghostsenabled);
 
@@ -5299,17 +5239,7 @@ void Game::serializesettings(tinyxml2::XMLElement* dataNode, const struct Screen
 
     xml::update_tag(dataNode, "notextoutline", (int) graphics.notextoutline);
 
-    xml::update_tag(dataNode, "translucentroomname", (int) graphics.translucentroomname);
-
-    xml::update_tag(dataNode, "over30mode", (int) over30mode);
-
     xml::update_tag(dataNode, "inputdelay", (int) inputdelay);
-
-    xml::update_tag(
-        dataNode,
-        "glitchrunnermode",
-        GlitchrunnerMode_enum_to_string(GlitchrunnerMode_get())
-    );
 
     xml::update_tag(dataNode, "showingametimer", (int) showingametimer);
 
@@ -5382,13 +5312,6 @@ void Game::serializesettings(tinyxml2::XMLElement* dataNode, const struct Screen
     }
 
     xml::update_tag(dataNode, "controllerSensitivity", key.sensitivity);
-
-    // For the depths: disable saving the language so we don't overwrite the user's normal language!
-    //xml::update_tag(dataNode, "lang", loc::lang.c_str());
-    //xml::update_tag(dataNode, "lang_set", (int) loc::lang_set);
-    xml::update_tag(dataNode, "english_sprites", (int) loc::english_sprites);
-    xml::update_tag(dataNode, "new_level_font", loc::new_level_font.c_str());
-    xml::update_tag(dataNode, "roomname_translator", (int) roomname_translator::enabled);
 
     xml::update_tag(dataNode, "checkpoint_saving", (int) checkpoint_saving);
 }
@@ -7151,13 +7074,15 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         if (ingame_titlemode && unlock[Unlock_FLIPMODE])
 #endif
         {
-                option(loc::gettext("flip mode"));
+                //option(loc::gettext("flip mode"));
         }
-        option(loc::gettext("toggle fps"));
-        option(loc::gettext("speedrun options"));
-        option(loc::gettext("advanced options"));
-        //option(loc::gettext("clear main game data"));
-        //option(loc::gettext("clear custom level data"));
+        //option(loc::gettext("toggle fps"));
+        option(loc::gettext("unfocus pause"));
+        option(loc::gettext("unfocus audio pause"));
+        option(loc::gettext("checkpoint saving"));
+        option(loc::gettext("input delay"));
+        option(loc::gettext("fake load screen"));
+        option(loc::gettext("toggle in-game timer"));
         option(loc::gettext("return"));
         menuyoff = -10;
         maxspacing = 15;
@@ -7235,43 +7160,25 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         break;
     }
     case Menu::options:
-        option(loc::gettext("gameplay"));
         option(loc::gettext("graphics"));
         option(loc::gettext("audio"));
         option(loc::gettext("game pad"));
         option(loc::gettext("accessibility"));
+        option(loc::gettext("advanced"));
         option(loc::gettext("language"), false);
         option(loc::gettext("return"));
         menuyoff = 0;
         maxspacing = 15;
         break;
     case Menu::speedrunneroptions:
-        option(loc::gettext("glitchrunner mode"));
-        option(loc::gettext("input delay"));
-        option(loc::gettext("fake load screen"));
-        option(loc::gettext("toggle in-game timer"));
-        option(loc::gettext("english sprites"));
         option(loc::gettext("return"));
         menuyoff = 0;
         maxspacing = 15;
         break;
     case Menu::setglitchrunner:
     {
-        int i;
-
-        option(loc::gettext("none"));
-
-        for (i = 1; i < GlitchrunnerNumVersions; ++i)
-        {
-            option(loc::gettext(GlitchrunnerMode_enum_to_string((enum GlitchrunnerMode) i)));
-        }
-        break;
     }
     case Menu::advancedoptions:
-        option(loc::gettext("unfocus pause"));
-        option(loc::gettext("unfocus audio pause"));
-        option(loc::gettext("room name background"));
-        option(loc::gettext("checkpoint saving"));
         option(loc::gettext("return"));
         menuyoff = 0;
         maxspacing = 15;
@@ -7279,10 +7186,6 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
     case Menu::audiooptions:
         option(loc::gettext("music volume"));
         option(loc::gettext("sound volume"));
-        if (music.mmmmmm)
-        {
-            option(loc::gettext("soundtrack"));
-        }
         option(loc::gettext("return"));
         menuyoff = 0;
         maxspacing = 15;
@@ -7306,7 +7209,7 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         option(loc::gettext("bind enter"));
         option(loc::gettext("bind menu"));
         option(loc::gettext("bind restart"));
-        option(loc::gettext("bind interact"));
+        option(loc::gettext("bind item"));
         option(loc::gettext("return"));
         menuyoff = 12;
         maxspacing = 10;
@@ -7516,15 +7419,6 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         option(loc::gettext("start new game"));
         option(loc::gettext("return"));
         menuyoff = 64;
-        break;
-    case Menu::playmodes:
-        option(loc::gettext("time trials"), !nocompetitive_unless_translator());
-        option(loc::gettext("intermissions"), unlock[Unlock_INTERMISSION_REPLAYS]);
-        option(loc::gettext("no death mode"), unlock[Unlock_NODEATHMODE] && !nocompetitive());
-        option(loc::gettext("flip mode"), unlock[Unlock_FLIPMODE]);
-        option(loc::gettext("return"));
-        menuyoff = 8;
-        maxspacing = 20;
         break;
     case Menu::intermissionmenu:
         option(loc::gettext("play intermission 1"));
@@ -7922,10 +7816,6 @@ void Game::quittomenu(void)
     {
         returntomenu(Menu::intermissionmenu);
     }
-    else if (nodeathmode)
-    {
-        returntomenu(Menu::playmodes);
-    }
     else if (map.custommode)
     {
         if (map.custommodeforreal)
@@ -8047,11 +7937,6 @@ static void setfademode(void)
     graphics.fademode = graphics.ingame_fademode;
 }
 
-static void setflipmode(void)
-{
-    graphics.flipmode = graphics.setflipmode;
-}
-
 void Game::returntoingame(void)
 {
     ingame_titlemode = false;
@@ -8068,12 +7953,7 @@ void Game::returntoingame(void)
     {
         DEFER_CALLBACK(returntoingametemp);
         gamestate = MAPMODE;
-        DEFER_CALLBACK(setflipmode);
         DEFER_CALLBACK(setfademode);
-        if (!map.custommode && !graphics.setflipmode)
-        {
-            obj.flags[73] = true;
-        }
     }
     DEFER_CALLBACK(nextbgcolor);
 

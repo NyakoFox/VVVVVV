@@ -9,7 +9,6 @@
 #include "Entity.h"
 #include "FileSystemUtils.h"
 #include "Font.h"
-#include "GlitchrunnerMode.h"
 #include "Graphics.h"
 #include "GraphicsUtil.h"
 #include "InterimVersion.h"
@@ -125,33 +124,6 @@ static void volumesliderrender(void)
     font::print(PR_CEN, -1, 95, buffer, tr, tg, tb);
 }
 
-static void inline drawglitchrunnertext(const int y)
-{
-    int tempr = tr;
-    int tempg = tg;
-    int tempb = tb;
-
-    char buffer[SCREEN_WIDTH_CHARS + 1];
-
-    const enum GlitchrunnerMode mode = GlitchrunnerMode_get();
-
-    if (mode == GlitchrunnerNone)
-    {
-        tempr /= 2;
-        tempg /= 2;
-        tempb /= 2;
-
-        SDL_strlcpy(buffer, loc::gettext("Glitchrunner mode is OFF"), sizeof(buffer));
-    }
-    else
-    {
-        const char* mode_string = loc::gettext(GlitchrunnerMode_enum_to_string(mode));
-        vformat_buf(buffer, sizeof(buffer), loc::gettext("Glitchrunner mode is {version}"), "version:str", mode_string);
-    }
-
-    font::print_wrap(PR_CEN, -1, y, buffer, tempr, tempg, tempb);
-}
-
 static inline void draw_skip_message()
 {
     /* Unlock 18 is Flip Mode.
@@ -235,10 +207,6 @@ static void menurender(void)
         {
             left_msg = "[No lang folder]";
         }
-        else if (music.mmmmmm)
-        {
-            left_msg = loc::gettext("[MMMMMM Mod Installed]");
-        }
 
         if (left_msg != NULL)
         {
@@ -299,48 +267,88 @@ static void menurender(void)
         break;
     case Menu::gameplayoptions:
     {
-        int gameplayoptionsoffset = 0;
-#if !defined(MAKEANDPLAY)
-        if (game.ingame_titlemode && game.unlock[Unlock_FLIPMODE])
-#endif
+        switch (game.currentmenuoption)
         {
-            gameplayoptionsoffset = 1;
-            if (game.currentmenuoption == 0) {
-                font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Flip Mode"), tr, tg, tb);
-                int next_y = font::print_wrap(PR_CEN, -1, 65, loc::gettext("Unavailable for VVVVVV: The Depths."), tr, tg, tb);
-                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Forcibly Disabled."), tr / 2, tg / 2, tb / 2);
-            }
-        }
-
-        if (game.currentmenuoption == gameplayoptionsoffset + 0)
+        case 0:
         {
-            //Toggle FPS
-            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Toggle 30+ FPS"), tr, tg, tb);
-            int next_y = 65;
-            int next_y2 = next_y;
-
-            if (!game.over30mode)
+            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Unfocus Pause"), tr, tg, tb);
+            int next_y = font::print_wrap(PR_CEN, -1, 65, loc::gettext("Toggle if the game will pause when the window is unfocused."), tr, tg, tb);
+            if (game.disablepause)
             {
-                next_y2 = font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Current mode: 30 FPS"), tr / 2, tg / 2, tb / 2);
+                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Unfocus pause is OFF"), tr / 2, tg / 2, tb / 2);
             }
             else
             {
-                next_y2 = font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Current mode: Over 30 FPS"), tr, tg, tb);
+                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Unfocus pause is ON"), tr, tg, tb);
             }
-            font::print_wrap(PR_CEN, -1, next_y2, loc::gettext("WARNING: Over 30 FPS is largely untested in VVVVVV: The Depths."), tr / 2, tg / 2, tb / 2);
             break;
         }
-        else if (game.currentmenuoption == gameplayoptionsoffset + 1)
+        case 1:
         {
-            //Speedrunner options
-            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Speedrunner Options"), tr, tg, tb);
-            font::print_wrap(PR_CEN, -1, 65, loc::gettext("Access some advanced settings that might be of interest to speedrunners."), tr, tg, tb);
+            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Unfocus Audio"), tr, tg, tb);
+            int next_y = font::print_wrap(PR_CEN, -1, 65, loc::gettext("Toggle if the audio will pause when the window is unfocused."), tr, tg, tb);
+            if (game.disableaudiopause)
+            {
+                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Unfocus audio pause is OFF"), tr / 2, tg / 2, tb / 2);
+            }
+            else
+            {
+                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Unfocus audio pause is ON"), tr, tg, tb);
+            }
+            break;
         }
-        else if (game.currentmenuoption == gameplayoptionsoffset + 2)
+        case 2:
         {
-            //Advanced options
-            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Advanced Options"), tr, tg, tb);
-            font::print_wrap(PR_CEN, -1, 65, loc::gettext("All other gameplay settings."), tr, tg, tb);
+            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Checkpoint Saving"), tr, tg, tb);
+            int next_y = font::print_wrap(PR_CEN, -1, 65, loc::gettext("Toggle if checkpoints should save the game."), tr, tg, tb);
+            if (!game.checkpoint_saving)
+            {
+                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Checkpoint saving is OFF"), tr / 2, tg / 2, tb / 2);
+            }
+            else
+            {
+                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Checkpoint saving is ON"), tr, tg, tb);
+            }
+            break;
+        }
+        case 3:
+        {
+            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Input Delay"), tr, tg, tb);
+            int next_y = font::print_wrap(PR_CEN, -1, 65, loc::gettext("Re-enable the 1-frame input delay from older versions of VVVVVV."), tr, tg, tb);
+            if (game.inputdelay)
+            {
+                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Input delay is ON"), tr, tg, tb);
+            }
+            else
+            {
+                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Input delay is OFF"), tr / 2, tg / 2, tb / 2);
+            }
+            break;
+        }
+        case 4:
+        {
+            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Fake Load Screen"), tr, tg, tb);
+            int next_y = font::print_wrap(PR_CEN, -1, 65, loc::gettext("Disable the fake loading screen which appears on game launch."), tr, tg, tb);
+            if (game.skipfakeload)
+                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Fake loading screen is OFF"), tr / 2, tg / 2, tb / 2);
+            else
+                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Fake loading screen is ON"), tr, tg, tb);
+            break;
+        }
+        case 5:
+        {
+            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("In-Game Timer"), tr, tg, tb);
+            int next_y = font::print_wrap(PR_CEN, -1, 65, loc::gettext("Toggle the in-game timer."), tr, tg, tb);
+            if (game.showingametimer)
+            {
+                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("In-Game Timer is ON"), tr, tg, tb);
+            }
+            else
+            {
+                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("In-Game Timer is OFF"), tr / 2, tg / 2, tb / 2);
+            }
+            break;
+        }
         }
 
         break;
@@ -349,31 +357,24 @@ static void menurender(void)
         switch (game.currentmenuoption)
         {
         case 0:
-            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Gameplay Options"), tr, tg, tb);
-            font::print_wrap(PR_CEN, -1, 65, loc::gettext("Adjust various gameplay settings."), tr, tg, tb);
-            break;
-        case 1:
             font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Graphics Options"), tr, tg, tb);
             font::print_wrap(PR_CEN, -1, 65, loc::gettext("Adjust screen settings."), tr, tg, tb);
             break;
-        case 2:
+        case 1:
             font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Audio Options"), tr, tg, tb);
-            if (music.mmmmmm)
-            {
-                font::print_wrap(PR_CEN, -1, 65, loc::gettext("Adjust volume settings and soundtrack."), tr, tg, tb);
-            }
-            else
-            {
-                font::print_wrap(PR_CEN, -1, 65, loc::gettext("Adjust volume settings."), tr, tg, tb);
-            }
+            font::print_wrap(PR_CEN, -1, 65, loc::gettext("Adjust volume settings."), tr, tg, tb);
             break;
-        case 3:
+        case 2:
             font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Game Pad Options"), tr, tg, tb);
             font::print_wrap(PR_CEN, -1, 65, loc::gettext("Rebind your controller's buttons and adjust sensitivity."), tr, tg, tb);
             break;
-        case 4:
+        case 3:
             font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Accessibility"), tr, tg, tb);
             font::print_wrap(PR_CEN, -1, 65, loc::gettext("Disable screen effects, enable slowdown modes or invincibility."), tr, tg, tb);
+            break;
+        case 4:
+            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Misc Options"), tr, tg, tb);
+            font::print_wrap(PR_CEN, -1, 65, loc::gettext("Adjust various settings which don't fit in other categories."), tr, tg, tb);
             break;
         case 5:
             font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Language"), tr, tg, tb);
@@ -484,29 +485,6 @@ static void menurender(void)
             font::print_wrap(PR_CEN, -1, 65, loc::gettext("Change the volume of sound effects."), tr, tg, tb);
             volumesliderrender();
             break;
-        case 2:
-        {
-            if (!music.mmmmmm)
-            {
-                break;
-            }
-
-            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Soundtrack"), tr, tg, tb);
-            int next_y = font::print_wrap(PR_CEN, -1, 65, loc::gettext("Toggle between MMMMMM and PPPPPP."), tr, tg, tb);
-
-            const char* soundtrack;
-            if (music.usingmmmmmm)
-            {
-                soundtrack = loc::gettext("Current soundtrack: MMMMMM");
-            }
-            else
-            {
-                soundtrack = loc::gettext("Current soundtrack: PPPPPP");
-            }
-            font::print_wrap(PR_CEN, -1, next_y, soundtrack, tr, tg, tb);
-            break;
-        }
-
         }
         break;
     case Menu::depths_credits:
@@ -549,12 +527,13 @@ static void menurender(void)
     case Menu::depths_credits4:
         font::print(PR_CEN, -1, 30, loc::gettext("Special thanks to"), tr, tg, tb);
         font::print(PR_CEN | PR_FONT_8X8, -1, 55, "Dav999 (Code assistance, testing)", tr, tg, tb);
-        font::print(PR_CEN | PR_FONT_8X8, -1, 75, "Allison Fleischer (Music, playtesting)", tr, tg, tb);
-        font::print(PR_CEN | PR_FONT_8X8, -1, 95, "stupid cat (Playtesting)", tr, tg, tb);
+        font::print(PR_CEN | PR_FONT_8X8, -1, 65, "Allison Fleischer (Music, playtesting)", tr, tg, tb);
+        font::print(PR_CEN | PR_FONT_8X8, -1, 75, "stupid cat (Playtesting)", tr, tg, tb);
+        font::print(PR_CEN | PR_FONT_8X8, -1, 85, "leo60228 (Mac build system)", tr, tg, tb);
 
-        font::print(PR_CEN, -1, 130, loc::gettext("and of course to"), tr, tg, tb);
-        font::print(PR_CEN | PR_FONT_8X8, -1, 150, "Terry Cavanagh", 196, 196, 255 - help.glow);
-        font::print(PR_CEN, -1, 170, "for making this amazing game!", tr, tg, tb);
+        font::print(PR_CEN, -1, 110, loc::gettext("and of course to"), tr, tg, tb);
+        font::print(PR_2X | PR_CEN | PR_FONT_8X8, -1, 130, "Terry Cavanagh", tr, tg, tb);
+        font::print(PR_CEN, -1, 160, "for making this amazing game!", tr, tg, tb);
         break;
 
     case Menu::credits:
@@ -760,7 +739,7 @@ static void menurender(void)
             case 2: title = loc::gettext("Bind Enter"); break;
             case 3: title = loc::gettext("Bind Menu"); break;
             case 4: title = loc::gettext("Bind Restart"); break;
-            case 5: title = loc::gettext("Bind Interact"); break;
+            case 5: title = loc::gettext("Bind Item"); break;
             }
             font::print(PR_2X | PR_CEN, -1, 30, title, tr, tg, tb);
 
@@ -828,7 +807,7 @@ static void menurender(void)
                     action = Action_InGame_Restart;
                     break;
                 default:
-                    lbl = loc::gettext("Interact is bound to: ");
+                    lbl = loc::gettext("Item is bound to: ");
                     actionset = ActionSet_InGame;
                     action = Action_InGame_Interact;
                 }
@@ -1112,132 +1091,10 @@ static void menurender(void)
         font::print_wrap(PR_CEN, -1, 95, loc::gettext("ERROR: Could not write to language folder! Make sure there is no \"lang\" folder next to the regular saves."), tr, tg, tb);
         break;
     case Menu::speedrunneroptions:
-        switch (game.currentmenuoption)
-        {
-        case 0:
-        {
-            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Glitchrunner Mode"), tr, tg, tb);
-            int next_y = font::print_wrap(PR_CEN, -1, 65, loc::gettext("Re-enable glitches that existed in previous versions of the game."), tr, tg, tb);
-            drawglitchrunnertext(next_y);
-            break;
-        }
-        case 1:
-        {
-            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Input Delay"), tr, tg, tb);
-            int next_y = font::print_wrap(PR_CEN, -1, 65, loc::gettext("Re-enable the 1-frame input delay from previous versions of the game."), tr, tg, tb);
-            if (game.inputdelay)
-            {
-                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Input delay is ON"), tr, tg, tb);
-            }
-            else
-            {
-                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Input delay is OFF"), tr / 2, tg / 2, tb / 2);
-            }
-            break;
-        }
-        case 2:
-        {
-            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Fake Load Screen"), tr, tg, tb);
-            int next_y = font::print_wrap(PR_CEN, -1, 65, loc::gettext("Disable the fake loading screen which appears on game launch."), tr, tg, tb);
-            if (game.skipfakeload)
-                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Fake loading screen is OFF"), tr / 2, tg / 2, tb / 2);
-            else
-                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Fake loading screen is ON"), tr, tg, tb);
-            break;
-        }
-        case 3:
-        {
-            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("In-Game Timer"), tr, tg, tb);
-            int next_y = font::print_wrap(PR_CEN, -1, 65, loc::gettext("Toggle the in-game timer outside of time trials."), tr, tg, tb);
-            if (game.showingametimer)
-            {
-                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("In-Game Timer is ON"), tr, tg, tb);
-            }
-            else
-            {
-                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("In-Game Timer is OFF"), tr / 2, tg / 2, tb / 2);
-            }
-            break;
-        }
-        case 4:
-        {
-            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("English Sprites"), tr, tg, tb);
-            int next_y = font::print_wrap(PR_CEN, -1, 65, loc::gettext("Show the original English word enemies regardless of your language setting."), tr, tg, tb);
-            if (loc::english_sprites)
-            {
-                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Sprites are currently ALWAYS ENGLISH"), tr, tg, tb);
-            }
-            else
-            {
-                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Sprites are currently translated"), tr / 2, tg / 2, tb / 2);
-            }
-            break;
-        }
-        }
         break;
     case Menu::setglitchrunner:
-    {
-        font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Glitchrunner Mode"), tr, tg, tb);
-        int next_y = font::print_wrap(PR_CEN, -1, 65, loc::gettext("Select a new glitchrunner version below."), tr, tg, tb);
-        drawglitchrunnertext(next_y);
         break;
-    }
     case Menu::advancedoptions:
-        switch (game.currentmenuoption)
-        {
-        case 0:
-        {
-            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Unfocus Pause"), tr, tg, tb);
-            int next_y = font::print_wrap(PR_CEN, -1, 65, loc::gettext("Toggle if the game will pause when the window is unfocused."), tr, tg, tb);
-            if (game.disablepause)
-            {
-                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Unfocus pause is OFF"), tr/2, tg/2, tb/2);
-            }
-            else
-            {
-                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Unfocus pause is ON"), tr, tg, tb);
-            }
-            break;
-        }
-        case 1:
-        {
-            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Unfocus Audio"), tr, tg, tb);
-            int next_y = font::print_wrap(PR_CEN, -1, 65, loc::gettext("Toggle if the audio will pause when the window is unfocused."), tr, tg, tb);
-            if (game.disableaudiopause)
-            {
-                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Unfocus audio pause is OFF"), tr/2, tg/2, tb/2);
-            }
-            else
-            {
-                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Unfocus audio pause is ON"), tr, tg, tb);
-            }
-            break;
-        }
-        case 2:
-        {
-            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Room Name BG"), tr, tg, tb);
-            int next_y = font::print_wrap(PR_CEN, -1, 65, loc::gettext("Lets you see through what is behind the name at the bottom of the screen."), tr, tg, tb);
-            if (graphics.translucentroomname)
-                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Room name background is TRANSLUCENT"), tr/2, tg/2, tb/2);
-            else
-                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Room name background is OPAQUE"), tr, tg, tb);
-            break;
-        }
-        case 3:
-        {
-            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Checkpoint Saving"), tr, tg, tb);
-            int next_y = font::print_wrap(PR_CEN, -1, 65, loc::gettext("Toggle if checkpoints should save the game."), tr, tg, tb);
-            if (!game.checkpoint_saving)
-            {
-                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Checkpoint saving is OFF"), tr / 2, tg / 2, tb / 2);
-            }
-            else
-            {
-                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Checkpoint saving is ON"), tr, tg, tb);
-            }
-            break;
-        }
-        }
         break;
     case Menu::accessibility:
     {
@@ -1334,69 +1191,6 @@ static void menurender(void)
     case Menu::playint1:
     case Menu::playint2:
         font::print_wrap(PR_CEN, -1, 65, loc::gettext("Who do you want to play the level with?"), tr, tg, tb);
-        break;
-    case Menu::playmodes:
-        switch (game.currentmenuoption)
-        {
-        case 0:
-        {
-            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Time Trials"), tr, tg, tb);
-            int next_y = font::print_wrap(PR_CEN, -1, 65, loc::gettext("Replay any level in the game in a competitive time trial mode."), tr, tg, tb);
-
-            if (game.nocompetitive())
-            {
-                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Time Trials are not available with slowdown or invincibility."), tr, tg, tb);
-            }
-            break;
-        }
-        case 1:
-        {
-            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Intermissions"), tr, tg, tb);
-            int next_y = font::print_wrap(PR_CEN, -1, 65, loc::gettext("Replay the intermission levels."), tr, tg, tb);
-
-            if (!game.unlock[Unlock_INTERMISSION_REPLAYS])
-            {
-                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("TO UNLOCK: Complete the intermission levels in-game."), tr, tg, tb);
-            }
-            break;
-        }
-        case 2:
-        {
-            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("No Death Mode"), tr, tg, tb);
-            int next_y = font::print_wrap(PR_CEN, -1, 65, loc::gettext("Play the entire game without dying once."), tr, tg, tb);
-
-            if (game.nocompetitive())
-            {
-                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("No Death Mode is not available with slowdown or invincibility."), tr, tg, tb);
-            }
-            else if (!game.unlock[Unlock_NODEATHMODE])
-            {
-                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("TO UNLOCK: Achieve an S-rank or above in at least 4 time trials."), tr, tg, tb);
-            }
-            break;
-        }
-        case 3:
-            // WARNING: Partially duplicated in Menu::options
-            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Flip Mode"), tr, tg, tb);
-            int next_y = font::print_wrap(PR_CEN, -1, 65, loc::gettext("Flip the entire game vertically. Compatible with other game modes."), tr, tg, tb);
-
-            if (game.unlock[Unlock_FLIPMODE])
-            {
-                if (graphics.setflipmode)
-                {
-                    font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Currently ENABLED!"), tr, tg, tb);
-                }
-                else
-                {
-                    font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Currently Disabled."), tr/2, tg/2, tb/2);
-                }
-            }
-            else
-            {
-                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("TO UNLOCK: Complete the game."), tr, tg, tb);
-            }
-            break;
-        }
         break;
     case Menu::youwannaquit:
         font::print_wrap(PR_CEN, -1, 75, loc::gettext("Are you sure you want to quit?"), tr, tg, tb);
@@ -2439,26 +2233,6 @@ static void mode_indicator_text(const int alpha)
         y += spacing;
     }
 
-    enum GlitchrunnerMode mode = GlitchrunnerMode_get();
-    if (mode != GlitchrunnerNone)
-    {
-        char buffer[SCREEN_WIDTH_CHARS + 1];
-        const char* english = "Glitchrunner mode enabled ({version})";
-        const char* text = loc::gettext(english);
-        if (loc::lang != "en" && SDL_strcmp(english, text) == 0)
-        {
-            /* Substitute text */
-            SDL_strlcpy(buffer, loc::gettext("Glitchrunner Mode"), sizeof(buffer));
-        }
-        else
-        {
-            const char* mode_string = loc::gettext(GlitchrunnerMode_enum_to_string(mode));
-            vformat_buf(buffer, sizeof(buffer), text, "version:str", mode_string);
-        }
-        font::print(flags, x, y, buffer, r, g, b);
-        y += spacing;
-    }
-
     if (graphics.flipmode)
     {
         const char* english = "Flip Mode enabled";
@@ -2595,7 +2369,6 @@ void gamerender(void)
         game.old_mode_indicator_timer, game.mode_indicator_timer
     );
     bool any_mode_active = map.invincibility
-        || GlitchrunnerMode_get() != GlitchrunnerNone
         || graphics.flipmode
         || game.slowdown < 30;
     bool draw_mode_indicator_text = mode_indicator_alpha > 100 && any_mode_active;
@@ -4409,8 +4182,7 @@ void maprender(void)
     // We need to draw the black screen above the menu in order to disguise it
     // being jankily brought down in glitchrunner mode when exiting to the title
     // Otherwise, there's no reason to obscure the menu
-    if (GlitchrunnerMode_less_than_or_equal(Glitchrunner2_2)
-        || FADEMODE_IS_FADING(graphics.fademode)
+    if (FADEMODE_IS_FADING(graphics.fademode)
         || game.fadetomenu
         || game.fadetolab)
     {

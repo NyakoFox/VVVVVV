@@ -131,14 +131,8 @@ public:
 
     bool quick_fade;
 
-    // MMMMMM mod settings
-    bool mmmmmm;
-    bool usingmmmmmm;
-
     binaryBlob pppppp_blob;
-    binaryBlob mmmmmm_blob;
     int num_pppppp_tracks;
-    int num_mmmmmm_tracks;
 };
 
 #ifndef MUSIC_DEFINITION

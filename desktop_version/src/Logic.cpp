@@ -3,7 +3,6 @@
 #include "Enums.h"
 #include "FileSystemUtils.h"
 #include "Game.h"
-#include "GlitchrunnerMode.h"
 #include "Graphics.h"
 #include "ItemHelpers.h"
 #include "LevelDebugger.h"
@@ -1029,18 +1028,16 @@ void gamelogic(void)
 
         //Using warplines?
         if (obj.customwarpmode) {
-            if (!GlitchrunnerMode_less_than_or_equal(Glitchrunner2_0)) {
-                //Rewritten system for mobile update: basically, the new logic is to
-                //check if the player is leaving the map, and if so do a special check against
-                //warp lines for collision
-                obj.customwarpmodehon = false;
-                obj.customwarpmodevon = false;
+            //Rewritten system for mobile update: basically, the new logic is to
+            //check if the player is leaving the map, and if so do a special check against
+            //warp lines for collision
+            obj.customwarpmodehon = false;
+            obj.customwarpmodevon = false;
 
-                int i = obj.getplayer();
-                if (INBOUNDS_VEC(i, obj.entities) && (obj.entities[i].yp >= 226-16 || obj.entities[i].yp < -2+16 || obj.entities[i].xp < -14+16 || obj.entities[i].xp >= 308-16)){
-                    //Player is leaving room
-                    obj.customwarplinecheck(i);
-                }
+            int i = obj.getplayer();
+            if (INBOUNDS_VEC(i, obj.entities) && (obj.entities[i].yp >= 226-16 || obj.entities[i].yp < -2+16 || obj.entities[i].xp < -14+16 || obj.entities[i].xp >= 308-16)){
+                //Player is leaving room
+                obj.customwarplinecheck(i);
             }
 
             if(obj.customwarpmodehon){ map.warpy=true;

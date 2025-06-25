@@ -1865,7 +1865,7 @@ static void draw_main_ui(void)
             graphics.footerrect.y = 240 - graphics.footerrect.h + ed.roomnamehide;
 
             graphics.set_blendmode(SDL_BLENDMODE_BLEND);
-            graphics.fill_rect(&graphics.footerrect, graphics.getRGBA(0, 0, 0, graphics.translucentroomname ? 127 : 255));
+            graphics.fill_rect(&graphics.footerrect, graphics.getRGBA(0, 0, 0, 127));
             graphics.set_blendmode(SDL_BLENDMODE_NONE);
 
             font::print(PR_CEN | PR_BOR | PR_FONT_LEVEL | PR_CJK_LOW, -1, graphics.footerrect.y + 1 + ed.roomnamehide, room->roomname, 196, 196, 255 - help.glow);

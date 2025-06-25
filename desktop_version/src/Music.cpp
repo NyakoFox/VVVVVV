@@ -749,8 +749,6 @@ musicclass::musicclass(void)
     nicechange = -1;
     nicefade = false;
     quick_fade = true;
-
-    usingmmmmmm = false;
 }
 
 void musicclass::init(void)
@@ -820,20 +818,14 @@ void musicclass::init(void)
     musicWriteBlob.clear();
 #endif
 
-    num_mmmmmm_tracks = 0;
     num_pppppp_tracks = 0;
 
-    if (!mmmmmm_blob.unPackBinary("mmmmmm.vvv"))
+    if (pppppp_blob.unPackBinary("vvvvvvmusic.vvv"))
     {
-        if (pppppp_blob.unPackBinary("vvvvvvmusic.vvv"))
-        {
-            vlog_info("Loading music from PPPPPP blob...");
+        vlog_info("Loading music from PPPPPP blob...");
 
-            mmmmmm = false;
-            usingmmmmmm=false;
-
-            int index;
-            SDL_RWops* rw;
+        int index;
+        SDL_RWops* rw;
 
 #define TRACK_LOAD_BLOB(blob, track_name) \
     index = blob.getIndex("data/" track_name); \
@@ -855,12 +847,12 @@ void musicclass::init(void)
             TRACK_NAMES(pppppp_blob)
 
 #undef FOREACH_TRACK
-        }
-        else
-        {
-            vlog_info("Loading music from loose files...");
+    }
+    else
+    {
+        vlog_info("Loading music from loose files...");
 
-            SDL_RWops* rw;
+        SDL_RWops* rw;
 
 #define FOREACH_TRACK(_, track_name) \
     rw = PHYSFSRWOPS_openRead(track_name); \
@@ -876,42 +868,10 @@ void musicclass::init(void)
             TRACK_NAMES(_)
 
 #undef FOREACH_TRACK
-        }
     }
-    else
-    {
-        vlog_info("Loading PPPPPP and MMMMMM blobs...");
-
-        mmmmmm = true;
-        int index;
-        SDL_RWops* rw;
-
-#define FOREACH_TRACK(blob, track_name) TRACK_LOAD_BLOB(blob, track_name)
-
-        TRACK_NAMES(mmmmmm_blob)
-
-        num_mmmmmm_tracks += musicTracks.size();
-
-        size_t index_ = 0;
-        while (mmmmmm_blob.nextExtra(&index_))
-        {
-            rw = SDL_RWFromConstMem(mmmmmm_blob.getAddress(index_), mmmmmm_blob.getSize(index_));
-            musicTracks.push_back(MusicTrack( rw ));
-
-            num_mmmmmm_tracks++;
-            index_++;
-        }
-
-        bool ohCrap = pppppp_blob.unPackBinary("vvvvvvmusic.vvv");
-        SDL_assert(ohCrap && "Music not found!");
-
-    TRACK_NAMES(pppppp_blob)
-
-#undef FOREACH_TRACK
 #undef TRACK_LOAD_BLOB
-    }
 
-    num_pppppp_tracks += musicTracks.size() - num_mmmmmm_tracks;
+    num_pppppp_tracks = musicTracks.size();
 
     SDL_RWops* rw;
     size_t index_ = 0;
@@ -941,7 +901,6 @@ void musicclass::destroy(void)
     musicTracks.clear();
 
     pppppp_blob.clear();
-    mmmmmm_blob.clear();
     VVV_freefunc(FAudioVoice_DestroyVoice, masteringvoice);
     VVV_freefunc(FAudio_Release, faudioctx);
 }
@@ -958,22 +917,9 @@ void musicclass::set_sound_volume(int volume)
 
 void musicclass::play(int t)
 {
-    if (mmmmmm && usingmmmmmm)
-    {
-        // Don't conjoin this if-statement with the above one...
-        if (num_mmmmmm_tracks > 0)
-        {
-            t %= num_mmmmmm_tracks;
-        }
-    }
-    else if (num_pppppp_tracks > 0)
+    if (num_pppppp_tracks > 0)
     {
         t %= num_pppppp_tracks;
-    }
-
-    if (mmmmmm && !usingmmmmmm)
-    {
-        t += num_mmmmmm_tracks;
     }
 
     safeToProcessMusic = true;
@@ -1000,8 +946,7 @@ void musicclass::play(int t)
 
     if (currentsong == Music_PATHCOMPLETE ||
         currentsong == Music_PLENARY ||
-        (!map.custommode && (currentsong == Music_PATHCOMPLETE + num_mmmmmm_tracks
-                             || currentsong == Music_PLENARY + num_mmmmmm_tracks)))
+        (!map.custommode && (currentsong == Music_PATHCOMPLETE || currentsong == Music_PLENARY)))
     {
         // No fade in or repeat
         if (musicTracks[t].Play(false))
@@ -1228,9 +1173,7 @@ void musicclass::processmusic(void)
 void musicclass::niceplay(int t)
 {
     /* important: do nothing if the correct song is playing! */
-    if ((!mmmmmm && currentsong != t)
-    || (mmmmmm && usingmmmmmm && currentsong != t)
-    || (mmmmmm && !usingmmmmmm && currentsong != t + num_mmmmmm_tracks))
+    if (currentsong != t)
     {
         if (currentsong != -1)
         {
@@ -1293,14 +1236,7 @@ void musicclass::changemusicarea(int x, int y)
         return;
     case -2:
         /* Special case: Tower music, changes with Flip Mode. */
-        if (graphics.setflipmode)
-        {
-            track = 9; /* ecroF evitisoP */
-        }
-        else
-        {
-            track = 2; /* Positive Force */
-        }
+        track = 2; /* Positive Force */
         break;
     case -3:
         /* Special case: start of Space Station 2. */

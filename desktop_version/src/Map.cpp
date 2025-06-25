@@ -6,7 +6,6 @@
 #include "CustomLevels.h"
 #include "Entity.h"
 #include "Game.h"
-#include "GlitchrunnerMode.h"
 #include "Graphics.h"
 #include "ItemHelpers.h"
 #include "Localization.h"
@@ -824,14 +823,12 @@ void mapclass::resetplayer(const bool player_died)
         {
             obj.entities[i].invis = false;
         }
-        if (!GlitchrunnerMode_less_than_or_equal(Glitchrunner2_2))
-        {
-            obj.entities[i].size = 0;
-            obj.entities[i].cx = 6;
-            obj.entities[i].cy = 2;
-            obj.entities[i].w = 12;
-            obj.entities[i].h = 21;
-        }
+
+        obj.entities[i].size = 0;
+        obj.entities[i].cx = 6;
+        obj.entities[i].cy = 2;
+        obj.entities[i].w = 12;
+        obj.entities[i].h = 21;
 
         // If we entered a tower as part of respawn, reposition camera
         if (!was_in_tower && towermode)
@@ -2304,9 +2301,7 @@ void mapclass::twoframedelayfix(void)
     // and when the script gets loaded script.run() has already ran for that frame, too.
     // A bit kludge-y, but it's the least we can do without changing the frame ordering.
 
-    if (GlitchrunnerMode_less_than_or_equal(Glitchrunner2_2)
-        || !custommode
-        || game.deathseq != -1)
+    if (!custommode || game.deathseq != -1)
         return;
 
     int block_idx = -1;

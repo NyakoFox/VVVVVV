@@ -140,7 +140,6 @@ set(VVV_CXX_SRC
 )
 set(VVV_C_SRC
     src/DeferCallbacks.c
-    src/GlitchrunnerMode.c
     src/Network.c
     src/Textbook.c
     src/ThirdPartyDeps.c

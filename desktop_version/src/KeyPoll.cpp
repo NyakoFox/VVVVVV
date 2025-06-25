@@ -9,7 +9,6 @@
 #include "Editor.h"
 #include "Exit.h"
 #include "Game.h"
-#include "GlitchrunnerMode.h"
 #include "Graphics.h"
 #include "GraphicsUtil.h"
 #include "Localization.h"
@@ -92,13 +91,6 @@ void KeyPoll::toggleFullscreen(void)
     gameScreen.toggleFullScreen();
 
     keymap.clear(); /* we lost the input due to a new window. */
-    if (GlitchrunnerMode_less_than_or_equal(Glitchrunner2_2))
-    {
-        game.press_left = false;
-        game.press_right = false;
-        game.press_action = true;
-        game.press_map = false;
-    }
 }
 
 static int changemousestate(

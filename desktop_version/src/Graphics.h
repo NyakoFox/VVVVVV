@@ -487,8 +487,6 @@ public:
 
     int warpskip;
 
-    bool translucentroomname;
-
 #ifndef GAME_DEFINITION
     float inline lerp(const float v0, const float v1)
     {

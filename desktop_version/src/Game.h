@@ -101,7 +101,6 @@ namespace Menu
         unlockintermission,
         unlockflipmode,
         newgamewarning,
-        playmodes,
         intermissionmenu,
         playint1,
         playint2,

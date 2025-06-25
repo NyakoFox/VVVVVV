@@ -135,8 +135,6 @@ void Graphics::init(void)
     trinketg = 0;
     trinketb = 0;
 
-    translucentroomname = false;
-
     alpha = 1.0f;
 
     screenshake_x = 0;
@@ -4913,7 +4911,7 @@ void Graphics::render_roomname(uint32_t font_flag, const char* roomname, int r, 
     footerrect.y = 240 - footerrect.h;
 
     set_blendmode(SDL_BLENDMODE_BLEND);
-    fill_rect(&footerrect, getRGBA(0, 0, 0, translucentroomname ? 127 : 255));
+    fill_rect(&footerrect, getRGBA(0, 0, 0, 127));
     font::print(font_flag | PR_CEN | PR_BOR | PR_CJK_LOW, -1, footerrect.y+1, roomname, r, g, b);
     set_blendmode(SDL_BLENDMODE_NONE);
 }
