@@ -1978,11 +1978,111 @@ void titlerender(void)
     }
     else
     {
-        if(!game.colourblindmode) graphics.drawtowerbackground(graphics.titlebg);
+        if (!game.colourblindmode)
+        {
+            graphics.drawtowerbackground(graphics.titlebg);
+        }
 
         tr = graphics.col_tr;
         tg = graphics.col_tg;
         tb = graphics.col_tb;
+
+        if (!game.colourblindmode)
+        {
+            SDL_Color color = graphics.getRGB(10, 3, 4);
+
+            // could probably get this from the image but whatever. also only a few are needed anyway... only multiples of 5...
+            // but whatever
+
+            switch (graphics.titlebg.colstate)
+            {
+            case 0: color = graphics.getRGB(10, 3, 4); break;
+            case 1: color = graphics.getRGB(10, 5, 4); break;
+            case 2: color = graphics.getRGB(10, 6, 4); break;
+            case 3: color = graphics.getRGB(10, 7, 3); break;
+            case 4: color = graphics.getRGB(10, 8, 3); break;
+            case 5: color = graphics.getRGB(10, 10, 3); break;
+            case 6: color = graphics.getRGB(9, 10, 3); break;
+            case 7: color = graphics.getRGB(8, 10, 3); break;
+            case 8: color = graphics.getRGB(7, 10, 3); break;
+            case 9: color = graphics.getRGB(7, 10, 3); break;
+            case 10: color = graphics.getRGB(6, 10, 3); break;
+            case 11: color = graphics.getRGB(5, 10, 5); break;
+            case 12: color = graphics.getRGB(5, 10, 6); break;
+            case 13: color = graphics.getRGB(4, 9, 7); break;
+            case 14: color = graphics.getRGB(4, 9, 8); break;
+            case 15: color = graphics.getRGB(3, 9, 10); break;
+            case 16: color = graphics.getRGB(4, 8, 10); break;
+            case 17: color = graphics.getRGB(5, 7, 10); break;
+            case 18: color = graphics.getRGB(5, 6, 10); break;
+            case 19: color = graphics.getRGB(6, 4, 10); break;
+            case 20: color = graphics.getRGB(7, 3, 10); break;
+            case 21: color = graphics.getRGB(7, 3, 10); break;
+            case 22: color = graphics.getRGB(8, 3, 10); break;
+            case 23: color = graphics.getRGB(8, 3, 10); break;
+            case 24: color = graphics.getRGB(9, 3, 10); break;
+            case 25: color = graphics.getRGB(10, 3, 10); break;
+            case 26: color = graphics.getRGB(10, 3, 9); break;
+            case 27: color = graphics.getRGB(10, 3, 7); break;
+            case 28: color = graphics.getRGB(10, 3, 6); break;
+            case 29: color = graphics.getRGB(10, 3, 6); break;
+            }
+
+            std::vector<SDL_Rect> rects_to_draw;
+            rects_to_draw.clear();
+
+            int title_cursor_y = 0;
+            bool inside_rect = false;
+            int rect_start = 0;
+            int rect_end = 0;
+
+            while (title_cursor_y <= 320)
+            {
+                bool now_inside_rect = false;
+                if (title_cursor_y == 320)
+                {
+                    now_inside_rect = true;
+                }
+                else
+                {
+                    for (int i = 0; i < graphics.title_windows.size(); i++)
+                    {
+                        TitleWindow* window = &graphics.title_windows[i];
+
+                        if (title_cursor_y >= window->y && title_cursor_y < (window->y + window->height))
+                        {
+                            now_inside_rect = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!inside_rect && now_inside_rect)
+                {
+                    rect_end = title_cursor_y;
+                    SDL_Rect rect;
+                    rect.x = 0;
+                    rect.y = rect_start;
+                    rect.w = SCREEN_WIDTH_PIXELS;
+                    rect.h = rect_end - rect_start;
+                    rects_to_draw.push_back(rect);
+                }
+
+                inside_rect = now_inside_rect;
+
+                title_cursor_y++;
+                if (now_inside_rect)
+                {
+                    rect_start = title_cursor_y;
+                }
+            }
+
+            for (int i = 0; i < rects_to_draw.size(); i++)
+            {
+                graphics.fill_rect(&rects_to_draw[i], color);
+            }
+
+        }
 
         menurender();
 

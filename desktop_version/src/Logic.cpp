@@ -19,8 +19,9 @@ void titlelogic(void)
     //map.updatetowerglow(graphics.titlebg);
     help.updateglow();
 
-    graphics.titlebg.bypos -= 2;
-    graphics.titlebg.bscroll = -2;
+    // Fishing mod: we want to scroll up instead
+    graphics.titlebg.bypos += 1;
+    graphics.titlebg.bscroll = 1;
 
     if (game.menucountdown > 0)
     {
@@ -83,7 +84,7 @@ void gamecompletelogic(void)
         graphics.setbars(0);
         graphics.oldcutscenebarspos_fast = 0;
         graphics.cutscenebarspos = 0;
-        graphics.titlebg.scrolldir = 0;
+        graphics.titlebg.scrolldir = 1;
         graphics.titlebg.bypos = 0;
         //Return to game
         game.gamestate = GAMECOMPLETE2;

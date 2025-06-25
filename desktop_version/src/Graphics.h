@@ -88,6 +88,13 @@ enum EntityColour
     EntityColour_TELEPORTER_FLASHING = 102
 };
 
+struct TitleWindow
+{
+    float y;
+    int height;
+    float speed;
+};
+
 class Graphics
 {
 public:
@@ -515,6 +522,8 @@ public:
     void render_roomname(uint32_t font_flag, const char* roomname, int r, int g, int b);
 
     void print_roomtext(int x, int y, const char* text, bool rtl);
+
+    std::vector<TitleWindow> title_windows;
 };
 
 #ifndef GRAPHICS_DEFINITION

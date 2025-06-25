@@ -177,6 +177,29 @@ void titlerenderfixed(void)
     if (!game.colourblindmode)
     {
         graphics.updatetowerbackground(graphics.titlebg);
+
+        for (int i = graphics.title_windows.size() - 1; i >= 0; i--)
+        {
+            TitleWindow* window = &graphics.title_windows[i];
+
+            window->y += window->speed;
+            if (window->y + window->height < 0)
+            {
+                graphics.title_windows.erase(graphics.title_windows.begin() + i);
+            }
+        }
+
+        if (game.framecounter % 20 == 0)
+        {
+            if ((fRandom() > 0.75) || (game.framecounter % 40 == 0))
+            {
+                TitleWindow window;
+                window.y = 320.0f;
+                window.speed = -(1.0f + (fRandom() * 0.6f));
+                window.height = (int)(8 + (int)(fRandom() * 8.0f));
+                graphics.title_windows.push_back(window);
+            }
+        }
     }
 
     if (!game.menustart)

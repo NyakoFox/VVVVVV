@@ -130,6 +130,7 @@ void Graphics::init(void)
     tempScreenshot2x = NULL;
     towerbg = TowerBG();
     titlebg = TowerBG();
+    titlebg.scrolldir = 1;
     trinketr = 0;
     trinketg = 0;
     trinketb = 0;
@@ -164,6 +165,20 @@ void Graphics::init(void)
     levelcomplete_mounted = false;
     flipgamecomplete_mounted = false;
     fliplevelcomplete_mounted = false;
+
+    title_windows.clear();
+
+    for (int i = 0; i < 10; i++)
+    {
+        if (fRandom() > 0.5)
+        {
+            TitleWindow window;
+            window.y = fRandom() * 320;
+            window.speed = -(1.0f + (fRandom() * 0.6f));
+            window.height = (int)(8 + (int)(fRandom() * 8.0f));
+            title_windows.push_back(window);
+        }
+    }
 }
 
 void Graphics::destroy(void)

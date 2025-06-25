@@ -8020,7 +8020,7 @@ void Game::returntoeditor(void)
            cl.roomproperties[i+(j*cl.maxwidth)].warpdir=ed.kludgewarpdir[i+(j*cl.maxwidth)];
         }
     }
-    graphics.titlebg.scrolldir = 0;
+    graphics.titlebg.scrolldir = 1;
     graphics.backgrounddrawn = false;
     graphics.foregrounddrawn = false;
 }

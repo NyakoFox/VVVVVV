@@ -20,6 +20,24 @@ EquippableItem::EquippableItem(void)
 {
 }
 
+std::string EquippableItem::getShortName(ItemStack* stack)
+{
+    if (!this->settings.uses_short_name)
+    {
+        return this->getName(stack);
+    }
+
+    if (stack == NULL)
+    {
+        return this->settings.short_name;
+    }
+    if (stack->isEquipped())
+    {
+        return "\u2605 " + this->settings.short_name;
+    }
+    return this->settings.short_name;
+}
+
 std::string EquippableItem::getName(ItemStack* stack)
 {
     if (stack == NULL)

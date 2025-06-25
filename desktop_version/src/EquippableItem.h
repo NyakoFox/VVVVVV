@@ -17,6 +17,7 @@ public:
     virtual bool canUse(ItemStack* stack) override;
     virtual void use(ItemStack* stack) override;
     virtual std::string getName(ItemStack* stack) override;
+    virtual std::string getShortName(ItemStack* stack) override;
     virtual std::string getLongName(ItemStack* stack) override;
     virtual SDL_Color getNameColor(ItemStack* stack) override;
 };

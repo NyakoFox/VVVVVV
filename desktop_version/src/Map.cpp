@@ -629,16 +629,16 @@ void mapclass::nexttowercolour(void)
     }
     nexttowercolour_set = true;
 
-    graphics.titlebg.colstate+=5;
-    if (graphics.titlebg.colstate >= 30) graphics.titlebg.colstate = 0;
+    graphics.titlebg.colstate += 5;
+    graphics.titlebg.colstate = POS_MOD(graphics.titlebg.colstate, 30);
 
     updatebgobj(graphics.titlebg);
 }
 
 void mapclass::settowercolour(int t)
 {
-    graphics.titlebg.colstate=t*5;
-    if (graphics.titlebg.colstate >= 30) graphics.titlebg.colstate = 0;
+    graphics.titlebg.colstate = (t * 5);
+    graphics.titlebg.colstate = POS_MOD(graphics.titlebg.colstate, 30);
 
     updatebgobj(graphics.titlebg);
 }

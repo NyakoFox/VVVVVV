@@ -3625,7 +3625,7 @@ void scriptclass::hardreset(void)
     }
     map.cameraseekframe = 0;
     map.resumedelay = 0;
-    graphics.towerbg.scrolldir = 0;
+    graphics.towerbg.scrolldir = 1;
     map.customshowmm = true;
     map.revealmap = true;
 
