@@ -373,8 +373,8 @@ static void menurender(void)
             font::print_wrap(PR_CEN, -1, 65, loc::gettext("Disable screen effects, enable slowdown modes or invincibility."), tr, tg, tb);
             break;
         case 4:
-            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Misc Options"), tr, tg, tb);
-            font::print_wrap(PR_CEN, -1, 65, loc::gettext("Adjust various settings which don't fit in other categories."), tr, tg, tb);
+            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Advanced Options"), tr, tg, tb);
+            font::print_wrap(PR_CEN, -1, 65, loc::gettext("Adjust various advanced settings."), tr, tg, tb);
             break;
         case 5:
             font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Language"), tr, tg, tb);
