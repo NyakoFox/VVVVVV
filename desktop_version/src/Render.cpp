@@ -4161,7 +4161,7 @@ void maprender(void)
         }
         else
         {
-            font::print(PR_RIGHT, 262, FLIP(132, 8), "0", 255 - help.glow / 2, 255 - help.glow / 2, 255 - help.glow / 2);
+            font::print(PR_RIGHT, 262, FLIP(132, 8), "Zero", 255 - help.glow / 2, 255 - help.glow / 2, 255 - help.glow / 2);
         }
 
         if (graphics.flipmode)
