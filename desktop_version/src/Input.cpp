@@ -3474,17 +3474,21 @@ void shopinput(void)
     {
         game.press_action = true;
     }
+    if (key.isDown(KEYBOARD_ENTER) || key.isDown(27) || key.isDown(game.controllerButton_map))
+    {
+        game.press_map = true;
+    }
 
     if (!game.press_action && !game.press_left && !game.press_right && !game.press_up && !game.press_down)
     {
         game.jumpheld = false;
     }
-    if (!game.press_map && !key.isDown(27))
+    if (!game.press_map && !key.isDown(27) && !key.isDown(game.controllerButton_map))
     {
         game.mapheld = false;
     }
 
-    if (key.isDown(27) && !game.mapheld)
+    if (game.press_map && !game.mapheld)
     {
         game.mapheld = true;
 
