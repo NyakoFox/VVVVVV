@@ -2351,6 +2351,10 @@ void gamerender(void)
             graphics.draw_texture(graphics.darknessTexture, 0, 0);
             graphics.set_texture_alpha_mod(graphics.darknessTexture, 255);
         }
+		else
+		{
+			graphics.set_render_target(target);
+		}
 
         // End lighting
     }

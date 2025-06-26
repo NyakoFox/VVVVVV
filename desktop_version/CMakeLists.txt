@@ -24,6 +24,8 @@ option(MAKEANDPLAY "Compile a version of the game without the main campaign (pro
 
 option(REMOVE_ABSOLUTE_PATHS "If supported by the compiler, replace all absolute paths to source directories compiled into the binary (if any) with relative paths" ON)
 
+option(VS2013 "Whether you're using Visual Studio 2013 or not" OFF)
+
 option(APP_BUNDLE "Produce an application bundle on Apple platforms" OFF)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
@@ -251,6 +253,10 @@ if(GOG)
     target_compile_definitions(VVVVVV PRIVATE -DGOG_NETWORK)
 endif()
 
+if (VS2013)
+    target_compile_definitions(VVVVVV PRIVATE -DVS2013)
+endif()
+
 set(XML2_SRC
     ../third_party/tinyxml2/tinyxml2.cpp
 )
@@ -362,6 +368,10 @@ if(MSVC)
     string(REPLACE "/GR" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
     set_source_files_properties(${VVV_CXX_SRC} PROPERTIES COMPILE_FLAGS "/EHsc /GR-")
 
+    if(VS2013)
+        target_compile_definitions(VVVVVV PRIVATE -DENABLE_VIRTUAL_TERMINAL_PROCESSING=0x0004)
+    endif()
+
     if(MSVC_VERSION GREATER 1900)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /utf-8")
         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /utf-8")
@@ -390,6 +400,10 @@ target_compile_definitions(lodepng-static PRIVATE
 
 add_library(c-hashmap-static STATIC ${CHM_SRC})
 
+if(MSVC AND VS2013)
+    target_compile_definitions(c-hashmap-static PRIVATE -Dinline=__inline)
+endif()
+
 add_library(sheenbidi-static STATIC ${SBIDI_SRC})
 
 target_compile_definitions(sheenbidi-static PRIVATE
@@ -411,6 +425,9 @@ if(BUNDLE_DEPENDENCIES)
     target_compile_definitions(physfs-static PRIVATE
         -DPHYSFS_SUPPORTS_DEFAULT=0 -DPHYSFS_SUPPORTS_ZIP=1
     )
+    if(MSVC AND VS2013)
+        target_compile_definitions(physfs-static PRIVATE -D_WIN32_WINNT=0x0501)
+    endif()
     add_library(faudio-static STATIC ${FAUDIO_SRC})
     target_include_directories(
         faudio-static PRIVATE

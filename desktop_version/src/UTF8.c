@@ -1,5 +1,9 @@
 #include "UTF8.h"
 
+#if (defined(VS2013) && !defined(inline))
+#define inline __inline
+#endif
+
 #define STARTS_0(byte) ((byte & 0x80) == 0x00)
 #define STARTS_10(byte) ((byte & 0xC0) == 0x80)
 #define STARTS_110(byte) ((byte & 0xE0) == 0xC0)

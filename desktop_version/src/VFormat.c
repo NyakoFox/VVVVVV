@@ -8,6 +8,9 @@
 #include "CWrappers.h"
 #include "UTF8.h"
 
+#if (defined(VS2013) && !defined(inline))
+#define inline __inline
+#endif
 
 static inline bool is_whitespace(char ch)
 {

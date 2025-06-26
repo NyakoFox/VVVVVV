@@ -1,6 +1,7 @@
 # Build objects
 build/
 lbuild/
+vs2013build/
 flibitBuild/
 CMakeCache.txt
 CMakeFiles/
