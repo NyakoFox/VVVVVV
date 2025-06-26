@@ -405,6 +405,8 @@ int main(int argc, char *argv[])
 
     vlog_init();
 
+	SDL_SetHintWithPriority(SDL_HINT_RENDER_DRIVER, "opengles2", SDL_HINT_OVERRIDE);
+
     for (int i = 1; i < argc; ++i)
     {
 #define ARG(name) (SDL_strcmp(argv[i], name) == 0)
