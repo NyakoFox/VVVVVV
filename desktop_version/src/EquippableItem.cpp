@@ -33,7 +33,7 @@ std::string EquippableItem::getShortName(ItemStack* stack)
     }
     if (stack->isEquipped())
     {
-        return "\u2605 " + this->settings.short_name;
+        return "\xE2\x98\x85 " + this->settings.short_name;
     }
     return this->settings.short_name;
 }
@@ -46,7 +46,7 @@ std::string EquippableItem::getName(ItemStack* stack)
     }
     if (stack->isEquipped())
     {
-        return "\u2605 " + this->settings.name;
+        return "\xE2\x98\x85 " + this->settings.name;
     }
     return this->settings.name;
 }
@@ -59,7 +59,7 @@ std::string EquippableItem::getLongName(ItemStack* stack)
     }
     if (stack->isEquipped())
     {
-        return "\u2605 " + this->settings.name + " (Equipped)";
+        return "\xE2\x98\x85 " + this->settings.name + " (Equipped)";
     }
     return this->settings.name;
 }

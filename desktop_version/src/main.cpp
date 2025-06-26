@@ -405,8 +405,6 @@ int main(int argc, char *argv[])
 
     vlog_init();
 
-	SDL_SetHintWithPriority(SDL_HINT_RENDER_DRIVER, "opengles2", SDL_HINT_OVERRIDE);
-
     for (int i = 1; i < argc; ++i)
     {
 #define ARG(name) (SDL_strcmp(argv[i], name) == 0)
@@ -583,7 +581,7 @@ int main(int argc, char *argv[])
     {
         /* Just print the version and exit. No vlogging. */
         puts(
-            "VVVVVV " RELEASE_VERSION " THE DEPTHS v1.1"
+            "VVVVVV " RELEASE_VERSION " THE DEPTHS v1.1.1"
         );
 #ifdef INTERIM_VERSION_EXISTS
         puts(COMMIT_DATE);
