@@ -529,7 +529,7 @@ static void menurender(void)
         font::print(PR_CEN | PR_FONT_8X8, -1, 55, "Dav999 (Code assistance, testing)", tr, tg, tb);
         font::print(PR_CEN | PR_FONT_8X8, -1, 65, "Allison Fleischer (Music, playtesting)", tr, tg, tb);
         font::print(PR_CEN | PR_FONT_8X8, -1, 75, "stupid cat (Playtesting)", tr, tg, tb);
-        font::print(PR_CEN | PR_FONT_8X8, -1, 85, "leo60228 (Mac build system)", tr, tg, tb);
+        font::print(PR_CEN | PR_FONT_8X8, -1, 85, "leo vriska (Mac build system)", tr, tg, tb);
 
         font::print(PR_CEN, -1, 110, loc::gettext("and of course to"), tr, tg, tb);
         font::print(PR_2X | PR_CEN | PR_FONT_8X8, -1, 130, "Terry Cavanagh", tr, tg, tb);
