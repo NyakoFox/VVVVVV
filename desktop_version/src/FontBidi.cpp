@@ -1,7 +1,7 @@
 #include "FontBidi.h"
 
 #include <SDL.h>
-#include <SheenBidi/SheenBidi.h>
+#include <SheenBidi.h>
 
 #include "Alloc.h"
 #include "UTF8.h"
