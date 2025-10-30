@@ -83,6 +83,9 @@ extern "C" DECLSPEC GhostInfo SDLCALL get_ghost_info(int index)
 extern "C" DECLSPEC void SDLCALL clear_input(void)
 {
     key.keymap.clear();
+    key.leftbutton = 0;
+    key.rightbutton = 0;
+    key.middlebutton = 0;
 }
 
 extern "C" DECLSPEC bool SDLCALL get_flag(int flag)
