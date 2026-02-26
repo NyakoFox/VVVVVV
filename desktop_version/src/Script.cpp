@@ -181,6 +181,29 @@ static void foundlab_textbox2(textboxclass* THIS)
     THIS->wrap(0);
 }
 
+static bool relative_room_x(const char* word, int* room_x)
+{
+    if (endsWith(word, "r") || endsWith(word, "R"))
+    {
+        // X is relative (ex. 1R)
+        *room_x = (game.roomx - 100) + ss_toi(word);
+        *room_x = POS_MOD(*room_x, cl.mapwidth);
+        return true;
+    }
+    return false;
+}
+static bool relative_room_y(const char* word, int* room_y)
+{
+    if (endsWith(word, "r") || endsWith(word, "R"))
+    {
+        // Y is relative (ex. 1R)
+        *room_y = (game.roomy - 100) + ss_toi(word);
+        *room_y = POS_MOD(*room_y, cl.mapheight);
+        return true;
+    }
+    return false;
+}
+
 void scriptclass::run(void)
 {
     if (!running)
@@ -229,33 +252,46 @@ void scriptclass::run(void)
             }
             if (words[0] == "warpdir")
             {
-                int temprx = ss_toi(words[1]) - 1;
-                int tempry = ss_toi(words[2]) - 1;
-                const RoomProperty* room;
-                cl.setroomwarpdir(temprx, tempry, ss_toi(words[3]));
+                // USAGE: warpdir(x,y,dir), accepts relative coordinates
+                int room_x;
+                int room_y;
 
-                room = cl.getroomprop(temprx, tempry);
-
-                //Do we update our own room?
-                if (game.roomx - 100 == temprx && game.roomy - 100 == tempry)
+                if (!relative_room_x(words[1].c_str(), &room_x))
                 {
-                    //If screen warping, then override all that:
+                    // X is not relative. Manually subtract 1 since this command is 1-indexed
+                    room_x = ss_toi(words[1]) - 1;
+                }
+                if (!relative_room_y(words[2].c_str(), &room_y))
+                {
+                    // Y is not relative. Manually subtract 1 since this command is 1-indexed
+                    room_y = ss_toi(words[2]) - 1;
+                }
+
+                const RoomProperty* room;
+                cl.setroomwarpdir(room_x, room_y, ss_toi(words[3]));
+
+                room = cl.getroomprop(room_x, room_y);
+
+                // Do we update our own room?
+                if (game.roomx - 100 == room_x && game.roomy - 100 == room_y)
+                {
+                    // If screen warping, then override all that:
                     graphics.backgrounddrawn = false;
                     map.warpx = false;
                     map.warpy = false;
                     if (room->warpdir == 0)
                     {
                         map.background = 1;
-                        //Be careful, we could be in a Lab or Warp Zone room...
+                        // Be careful, we could be in a Lab or Warp Zone room...
                         if (room->tileset == 2)
                         {
-                            //Lab
+                            // Lab
                             map.background = 2;
                             graphics.rcol = room->tilecol;
                         }
                         else if (room->tileset == 3)
                         {
-                            //Warp Zone
+                            // Warp Zone
                             map.background = 6;
                         }
                     }
@@ -263,26 +299,42 @@ void scriptclass::run(void)
                     {
                         map.warpx = true;
                         map.background = 3;
-                        graphics.rcol = cl.getwarpbackground(temprx, tempry);
+                        graphics.rcol = cl.getwarpbackground(room_x, room_y);
                     }
                     else if (room->warpdir == 2)
                     {
                         map.warpy = true;
                         map.background = 4;
-                        graphics.rcol = cl.getwarpbackground(temprx, tempry);
+                        graphics.rcol = cl.getwarpbackground(room_x, room_y);
                     }
                     else if (room->warpdir == 3)
                     {
                         map.warpx = true;
                         map.warpy = true;
                         map.background = 5;
-                        graphics.rcol = cl.getwarpbackground(temprx, tempry);
+                        graphics.rcol = cl.getwarpbackground(room_x, room_y);
                     }
                 }
             }
             if (words[0] == "ifwarp")
             {
-                const RoomProperty* const room = cl.getroomprop(ss_toi(words[1])-1, ss_toi(words[2])-1);
+                // USAGE: ifwarp(x,y,dir,script2), accepts relative coordinates
+                int room_x;
+                int room_y;
+
+                if (!relative_room_x(words[1].c_str(), &room_x))
+                {
+                    // X is not relative. Manually subtract 1 since this command is 1-indexed
+                    room_x = ss_toi(words[1]) - 1;
+                }
+
+                if (!relative_room_y(words[2].c_str(), &room_y))
+                {
+                    // Y is not relative. Manually subtract 1 since this command is 1-indexed
+                    room_y = ss_toi(words[2]) - 1;
+                }
+
+                const RoomProperty* const room = cl.getroomprop(room_x, room_y);
                 if (room->warpdir == ss_toi(words[3]))
                 {
                     loadalts("custom_" + words[4], "custom_" + raw_words[4]);
@@ -551,22 +603,63 @@ void scriptclass::run(void)
             }
             if (words[0] == "gotoposition")
             {
-                //USAGE: gotoposition(x position, y position, gravity position)
+                // USAGE: gotoposition(x, y, flipped), accepts relative coordinates
+                // if flipped is -1, the player's gravity is not changed
                 int player = obj.getplayer();
                 if (INBOUNDS_VEC(player, obj.entities))
                 {
-                    obj.entities[player].xp = ss_toi(words[1]);
-                    obj.entities[player].yp = ss_toi(words[2]);
+                    if (endsWith(words[1].c_str(), "r") || endsWith(words[1].c_str(), "R"))
+                    {
+                        // X is relative (ex. 1R)
+                        obj.entities[player].xp += ss_toi(words[1]);
+                    }
+                    else
+                    {
+                        // X is not relative
+                        obj.entities[player].xp = ss_toi(words[1]);
+                    }
+
+                    if (endsWith(words[2].c_str(), "r") || endsWith(words[2].c_str(), "R"))
+                    {
+                        // Y is relative (ex. 1R)
+                        obj.entities[player].yp += ss_toi(words[2]);
+                    }
+                    else
+                    {
+                        // Y is not relative
+                        obj.entities[player].yp = ss_toi(words[2]);
+                    }
+
                     obj.entities[player].lerpoldxp = obj.entities[player].xp;
                     obj.entities[player].lerpoldyp = obj.entities[player].yp;
                 }
-                game.gravitycontrol = ss_toi(words[3]);
+
+                int gravity = ss_toi(words[3]);
+                if (gravity != -1) {
+                    game.gravitycontrol = ss_toi(words[3]);
+                }
 
             }
             if (words[0] == "gotoroom")
             {
-                //USAGE: gotoroom(x,y) (manually add 100)
-                map.gotoroom(ss_toi(words[1])+100, ss_toi(words[2])+100);
+                // USAGE: gotoroom(x,y), accepts relative coordinates
+
+                int room_x;
+                int room_y;
+
+                if (!relative_room_x(words[1].c_str(), &room_x))
+                {
+                    // X is not relative
+                    room_x = ss_toi(words[1]);
+                }
+
+                if (!relative_room_y(words[2].c_str(), &room_y))
+                {
+                    // Y is not relative
+                    room_y = ss_toi(words[2]);
+                }
+
+                map.gotoroom(room_x + 100, room_y + 100);
             }
             if (words[0] == "cutscene")
             {
@@ -1369,7 +1462,22 @@ void scriptclass::run(void)
             }
             else if (words[0] == "ifexplored")
             {
-                if (map.isexplored(ss_toi(words[1]), ss_toi(words[2])))
+                int room_x;
+                int room_y;
+
+                if (!relative_room_x(words[1].c_str(), &room_x))
+                {
+                    // X is not relative
+                    room_x = ss_toi(words[1]);
+                }
+
+                if (!relative_room_y(words[2].c_str(), &room_y))
+                {
+                    // Y is not relative
+                    room_y = ss_toi(words[2]);
+                }
+
+                if (map.isexplored(room_x, room_y))
                 {
                     loadalts(words[3], raw_words[3]);
                     position--;
@@ -1427,11 +1535,41 @@ void scriptclass::run(void)
             }
             else if (words[0] == "hidecoordinates")
             {
-                map.setexplored(ss_toi(words[1]), ss_toi(words[2]), false);
+                int room_x;
+                int room_y;
+
+                if (!relative_room_x(words[1].c_str(), &room_x))
+                {
+                    // X is not relative
+                    room_x = ss_toi(words[1]);
+                }
+
+                if (!relative_room_y(words[2].c_str(), &room_y))
+                {
+                    // Y is not relative
+                    room_y = ss_toi(words[2]);
+                }
+
+                map.setexplored(room_x, room_y, false);
             }
             else if (words[0] == "showcoordinates")
             {
-                map.setexplored(ss_toi(words[1]), ss_toi(words[2]), true);
+                int room_x;
+                int room_y;
+
+                if (!relative_room_x(words[1].c_str(), &room_x))
+                {
+                    // X is not relative
+                    room_x = ss_toi(words[1]);
+                }
+
+                if (!relative_room_y(words[2].c_str(), &room_y))
+                {
+                    // Y is not relative
+                    room_y = ss_toi(words[2]);
+                }
+
+                map.setexplored(room_x, room_y, true);
             }
             else if (words[0] == "hideship")
             {
