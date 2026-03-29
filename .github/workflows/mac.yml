@@ -31,11 +31,18 @@ jobs:
         path: desktop_version/build/data-zip
         key: data-zip-folder
 
+    - name: Read configuration.json
+      id: config
+      shell: bash
+      run: |
+        echo "datazip=$(jq -r '.datazip' desktop_version/configuration.json)" >> $GITHUB_OUTPUT
+        echo "product_name=$(jq -r '.xcode.product_name' desktop_version/configuration.json)" >> $GITHUB_OUTPUT
+
     - name: Download data.zip
       run: |
         mkdir -p desktop_version/build/data-zip
         cd desktop_version/build/data-zip
-        curl -JLO https://thelettervsixtim.es/makeandplay/data.zip
+        curl -JLO "${{ steps.config.outputs.datazip }}"
       if: steps.cache-data.outputs.cache-hit != 'true'
 
     - name: Cache SDL
@@ -61,7 +68,7 @@ jobs:
       run: |
         cmake --build desktop_version/build --config Release
         shopt -s extglob
-        rm -rf desktop_version/build/Release/!(VVVVVV.app)
+        rm -rf desktop_version/build/Release/!("${{ steps.config.outputs.product_name }}.app")
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
