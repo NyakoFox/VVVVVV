@@ -1,7 +1,38 @@
 # CMake File for VVVVVV
 # Written by Ethan "flibitijibibo" Lee
 
-cmake_minimum_required(VERSION 2.8.12...3.5)
+cmake_minimum_required(VERSION 3.19)
+
+file(READ "${CMAKE_CURRENT_LIST_DIR}/configuration.json" config_json)
+
+string(JSON MOD_NAME GET "${config_json}" name)
+string(JSON MOD_VERSION GET "${config_json}" version)
+string(JSON MOD_RELEASE_BUILD GET "${config_json}" release_build)
+
+string(JSON APP_BUNDLE GET "${config_json}" xcode produce_app_bundle)
+string(JSON PRODUCT_BUNDLE_IDENTIFIER GET "${config_json}" xcode product_bundle_identifier)
+string(JSON PRODUCT_BUNDLE_IDENTIFIER_MOBILE GET "${config_json}" xcode product_bundle_identifier_mobile)
+string(JSON XCODE_PRODUCT_NAME GET "${config_json}" xcode product_name)
+string(JSON XCODE_PROJECT_VERSION GET "${config_json}" xcode project_version)
+string(JSON XCODE_MARKETING_VERSION GET "${config_json}" xcode marketing_version)
+
+MESSAGE(STATUS "Configuring build for ${MOD_NAME} version ${MOD_VERSION}")
+MESSAGE(STATUS "Producing APP BUNDLE? ${APP_BUNDLE}")
+if(APP_BUNDLE)
+    MESSAGE(STATUS "Product Bundle Identifier: ${PRODUCT_BUNDLE_IDENTIFIER}")
+    MESSAGE(STATUS "Product Bundle Identifier (Mobile): ${PRODUCT_BUNDLE_IDENTIFIER_MOBILE}")
+    MESSAGE(STATUS "Xcode Product Name: ${XCODE_PRODUCT_NAME}")
+    MESSAGE(STATUS "Xcode Project Version: ${XCODE_PROJECT_VERSION}")
+    MESSAGE(STATUS "Xcode Marketing Version: ${XCODE_MARKETING_VERSION}")
+endif()
+
+MESSAGE(STATUS "Release build? ${MOD_RELEASE_BUILD}")
+
+if(MOD_RELEASE_BUILD)
+    set(OFFICIAL_BUILD ON)
+else()
+    set(OFFICIAL_BUILD OFF)
+endif()
 
 # CMake Options
 option(ENABLE_WARNINGS "Enable compilation warnings" ON)
@@ -9,21 +40,13 @@ option(ENABLE_WERROR "Treat compilation warnings as errors" OFF)
 
 option(BUNDLE_DEPENDENCIES "Use bundled TinyXML-2, PhysicsFS, and FAudio (if disabled, TinyXML-2, PhysicsFS, and FAudio will be dynamically linked; LodePNG, C-HashMap and SheenBidi will still be statically linked)" ON)
 
-option(STEAM "Use the Steam API" OFF)
-option(GOG "Use the GOG API" OFF)
-
 option(OFFICIAL_BUILD "Compile an official build of the game" OFF)
 
 option(MAKEANDPLAY "Compile a version of the game without the main campaign (provided for convenience; consider modifying MakeAndPlay.h instead" OFF)
 
-if(OFFICIAL_BUILD AND NOT MAKEANDPLAY)
-    set(STEAM ON)
-    set(GOG ON)
-endif()
-
 option(REMOVE_ABSOLUTE_PATHS "If supported by the compiler, replace all absolute paths to source directories compiled into the binary (if any) with relative paths" ON)
 
-option(APP_BUNDLE "Produce an application bundle on Apple platforms" OFF)
+option(APP_BUNDLE "Produce an application bundle on Apple platforms")
 
 if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
     set(APP_BUNDLE ON)
@@ -139,12 +162,7 @@ set(VVV_C_SRC
     src/Xoshiro.c
     ../third_party/physfs/extras/physfsrwops.c
 )
-if(STEAM)
-    list(APPEND VVV_C_SRC src/SteamNetwork.c)
-endif()
-if(GOG)
-    list(APPEND VVV_C_SRC src/GOGNetwork.c)
-endif()
+
 if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
     list(APPEND VVV_C_SRC src/SDL_uikit_main.c)
 endif()
@@ -167,14 +185,14 @@ elseif(APP_BUNDLE)
 
     add_executable(VVVVVV MACOSX_BUNDLE ${VVV_SRC} ${DATA_ZIP} ${REPO_RESOURCES})
     set_target_properties(VVVVVV PROPERTIES
-        XCODE_ATTRIBUTE_PRODUCT_NAME "VVVVVV"
-        XCODE_ATTRIBUTE_CURRENT_PROJECT_VERSION "2.5"
-        XCODE_ATTRIBUTE_MARKETING_VERSION "2.5"
+        XCODE_ATTRIBUTE_PRODUCT_NAME ${XCODE_PRODUCT_NAME}
+        XCODE_ATTRIBUTE_CURRENT_PROJECT_VERSION ${XCODE_PROJECT_VERSION}
+        XCODE_ATTRIBUTE_MARKETING_VERSION ${XCODE_MARKETING_VERSION}
     )
 
     if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
         set_target_properties(VVVVVV PROPERTIES
-            XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "com.distractionware.vvvvvvmobile"
+            XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER ${PRODUCT_BUNDLE_IDENTIFIER_MOBILE}
             XCODE_ATTRIBUTE_ASSETCATALOG_COMPILER_APPICON_NAME AppIcon
             XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY "1,2" # iPhone, iPad
             XCODE_ATTRIBUTE_INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace YES
@@ -184,7 +202,7 @@ elseif(APP_BUNDLE)
         )
     else()
         set_target_properties(VVVVVV PROPERTIES
-            XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "com.distractionware.vvvvvv"
+            XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER ${PRODUCT_BUNDLE_IDENTIFIER}
             XCODE_ATTRIBUTE_INFOPLIST_KEY_CFBundleIconFile icon.icns
             MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/Info-mac.plist"
             RESOURCE "${DATA_ZIP}"
@@ -231,13 +249,6 @@ endif()
 
 if(MAKEANDPLAY)
     target_compile_definitions(VVVVVV PRIVATE -DMAKEANDPLAY)
-endif()
-
-if(STEAM)
-    target_compile_definitions(VVVVVV PRIVATE -DSTEAM_NETWORK)
-endif()
-if(GOG)
-    target_compile_definitions(VVVVVV PRIVATE -DGOG_NETWORK)
 endif()
 
 set(XML2_SRC
