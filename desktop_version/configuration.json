@@ -1,0 +1,16 @@
+{
+    "name": "VVVVVV",
+    "version": "2.5",
+    "release_build": true,
+
+    "datazip": "https://thelettervsixtim.es/makeandplay/data.zip",
+
+    "xcode": {
+        "produce_app_bundle": true,
+        "product_bundle_identifier": "com.distractionware.vvvvvv",
+        "product_bundle_identifier_mobile": "com.distractionware.vvvvvvmobile",
+        "product_name": "VVVVVV",
+        "project_version": "2.5",
+        "marketing_version": "2.5"
+    }
+}
