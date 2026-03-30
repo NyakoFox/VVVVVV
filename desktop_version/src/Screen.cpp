@@ -75,8 +75,7 @@ void Screen::init(const struct ScreenSettings* settings)
      * ( https://stackoverflow.com/a/24014513/ ).
      * Really though, just don't use super long branch names. */
     char title[256];
-    SDL_snprintf(title, sizeof(title), "%s [% s]", MOD_NAME, BRANCH_NAME);
-    SDL_SetWindowTitle(m_window, title);
+    SDL_snprintf(title, sizeof(title), MOD_NAME " [%s]", BRANCH_NAME);
 #else
     SDL_SetWindowTitle(m_window, MOD_NAME);
 #endif

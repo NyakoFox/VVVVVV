@@ -1945,9 +1945,7 @@ void titlerender(void)
         graphics.draw_texture(graphics.grphx.im_logo, TITLE_LOGO_X, TITLE_LOGO_Y);
         graphics.set_texture_color_mod(graphics.grphx.im_logo, 255, 255, 255);
 
-#if defined(MAKEANDPLAY)
         font::print(PR_RIGHT, TITLE_EDITION_TEXT_X, TITLE_EDITION_TEXT_Y, loc::gettext(TITLE_EDITION_TEXT), tr, tg, tb);
-#endif
 
         char buffer[SCREEN_WIDTH_CHARS*2 + 1];
         vformat_buf(
