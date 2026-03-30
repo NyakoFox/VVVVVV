@@ -35,14 +35,15 @@ jobs:
       id: config
       shell: bash
       run: |
-        echo "datazip=$(jq -r '.datazip' desktop_version/configuration.json)" >> $GITHUB_OUTPUT
+        echo "data_url=$(jq -r '.data_url' desktop_version/configuration.json)" >> $GITHUB_OUTPUT
+        echo "data_name=$(jq -r '.data_name' desktop_version/configuration.json)" >> $GITHUB_OUTPUT
         echo "product_name=$(jq -r '.xcode.product_name' desktop_version/configuration.json)" >> $GITHUB_OUTPUT
 
     - name: Download data.zip
       run: |
         mkdir -p desktop_version/build/data-zip
         cd desktop_version/build/data-zip
-        curl -JLO "${{ steps.config.outputs.datazip }}"
+        curl -JLO "${{ steps.config.outputs.data_url }}"
       if: steps.cache-data.outputs.cache-hit != 'true'
 
     - name: Cache SDL
@@ -63,7 +64,7 @@ jobs:
       run: |
         hdiutil attach -noverify SDL2-$SDL_VERSION.dmg
         cd desktop_version/build
-        cmake -G Xcode .. -DOFFICIAL_BUILD=ON -DMAKEANDPLAY=ON -DAPP_BUNDLE=ON -DDATA_ZIP=$PWD/data-zip/data.zip -DSDL2_FRAMEWORK=/Volumes/SDL2/SDL2.framework -DCMAKE_OSX_ARCHITECTURES='arm64;x86_64' -DCMAKE_OSX_DEPLOYMENT_TARGET=10.13
+        cmake -G Xcode .. -DOFFICIAL_BUILD=ON -DMAKEANDPLAY=ON -DAPP_BUNDLE=ON -DDATA_ZIP=$PWD/data-zip/${{ steps.config.outputs.data_name }} -DSDL2_FRAMEWORK=/Volumes/SDL2/SDL2.framework -DCMAKE_OSX_ARCHITECTURES='arm64;x86_64' -DCMAKE_OSX_DEPLOYMENT_TARGET=10.13
     - name: Build (M&P)
       run: |
         cmake --build desktop_version/build --config Release

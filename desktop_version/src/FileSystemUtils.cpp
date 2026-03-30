@@ -306,8 +306,8 @@ int FILESYSTEM_init(char *argvZero, char* baseDir, char *assetsPath, char* langD
         doesFontsDirExist = true;
     }
 
-    PHYSFS_File* dataZip = PHYSFS_openRead("/apk/assets/data.zip");
-    if (!dataZip || !PHYSFS_mountHandle(dataZip, "data.zip", NULL, 1))
+    PHYSFS_File* dataZip = PHYSFS_openRead("/apk/assets/" DATA_NAME);
+    if (!dataZip || !PHYSFS_mountHandle(dataZip, DATA_NAME, NULL, 1))
 #else
     doesLangDirExist = mount_pre_datazip(mainLangDir, "lang", "lang/", langDir);
     vlog_info("Languages directory: %s", mainLangDir);
@@ -323,25 +323,21 @@ int FILESYSTEM_init(char *argvZero, char* baseDir, char *assetsPath, char* langD
     {
         SDL_snprintf(output, sizeof(output), "%s%s",
             basePath,
-            "data.zip"
+            DATA_NAME
         );
     }
     if (!PHYSFS_mount(output, NULL, 1))
 #endif
     {
-        vlog_error("Error: data.zip missing!");
-        vlog_error("You do not have data.zip!");
-        vlog_error("Grab it from your purchased copy of the game,");
-        vlog_error("or get it from the free Make and Play Edition.");
-        vlog_error("https://thelettervsixtim.es/makeandplay/");
+        vlog_error("Error: " DATA_NAME " missing!");
+        vlog_error("You do not have " DATA_NAME "!");
+        vlog_error(DATA_URL);
 
         SDL_MessageBoxData messagebox;
         messagebox.flags = SDL_MESSAGEBOX_ERROR;
         messagebox.window = NULL;
-        messagebox.title = "data.zip missing!";
-        messagebox.message = "You do not have data.zip!"
-                             "\n\nGrab it from your purchased copy of the game,"
-                             "\nor get it from the free Make and Play Edition.";
+        messagebox.title = DATA_NAME " missing!";
+        messagebox.message = "You do not have " DATA_NAME "!";
 
         messagebox.numbuttons = 2;
         SDL_MessageBoxButtonData buttons[2];
@@ -359,7 +355,7 @@ int FILESYSTEM_init(char *argvZero, char* baseDir, char *assetsPath, char* langD
         SDL_ShowMessageBox(&messagebox, &clicked);
         if (clicked == 1)
         {
-            SDL_OpenURL("https://thelettervsixtim.es/makeandplay/");
+            SDL_OpenURL(DATA_URL);
         }
 
         VVV_exit(1);

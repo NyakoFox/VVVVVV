@@ -46,7 +46,7 @@ void Screen::init(const struct ScreenSettings* settings)
     // SDL_SetHintWithPriority(SDL_HINT_RENDER_DRIVER, "software", SDL_HINT_OVERRIDE);
 
     m_window = SDL_CreateWindow(
-        "VVVVVV",
+        MOD_NAME,
         SDL_WINDOWPOS_CENTERED_DISPLAY(windowDisplay),
         SDL_WINDOWPOS_CENTERED_DISPLAY(windowDisplay),
         SCREEN_WIDTH_PIXELS * 2,
@@ -75,10 +75,10 @@ void Screen::init(const struct ScreenSettings* settings)
      * ( https://stackoverflow.com/a/24014513/ ).
      * Really though, just don't use super long branch names. */
     char title[256];
-    SDL_snprintf(title, sizeof(title), "VVVVVV [%s]", BRANCH_NAME);
+    SDL_snprintf(title, sizeof(title), "%s [% s]", MOD_NAME, BRANCH_NAME);
     SDL_SetWindowTitle(m_window, title);
 #else
-    SDL_SetWindowTitle(m_window, "VVVVVV");
+    SDL_SetWindowTitle(m_window, MOD_NAME);
 #endif
 
     SDL_SetWindowMinimumSize(m_window, SCREEN_WIDTH_PIXELS, SCREEN_HEIGHT_PIXELS);

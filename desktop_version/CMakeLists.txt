@@ -3,11 +3,30 @@
 
 cmake_minimum_required(VERSION 3.19)
 
-file(READ "${CMAKE_CURRENT_LIST_DIR}/configuration.json" config_json)
+set(JSON_FILE "${CMAKE_CURRENT_LIST_DIR}/configuration.json")
+file(READ "${JSON_FILE}" config_json)
+
+# make sure configuration.json triggers cmake rebuilds
+set_property(DIRECTORY APPEND PROPERTY
+    CMAKE_CONFIGURE_DEPENDS "${JSON_FILE}"
+)
 
 string(JSON MOD_NAME GET "${config_json}" name)
 string(JSON MOD_VERSION GET "${config_json}" version)
 string(JSON MOD_RELEASE_BUILD GET "${config_json}" release_build)
+string(JSON MENU_VERSION GET "${config_json}" menu_version)
+
+string(JSON TITLE_LOGO_X GET "${config_json}" title logo_x)
+string(JSON TITLE_LOGO_Y GET "${config_json}" title logo_y)
+string(JSON TITLE_EDITION_TEXT GET "${config_json}" title edition_text)
+string(JSON TITLE_EDITION_TEXT_X GET "${config_json}" title edition_text_x)
+string(JSON TITLE_EDITION_TEXT_Y GET "${config_json}" title edition_text_y)
+
+string(JSON LEVEL_FILENAME GET "${config_json}" level_filename)
+string(JSON ALLOW_CUSTOM_LEVELS GET "${config_json}" allow_custom_levels)
+
+string(JSON DATA_NAME GET "${config_json}" data_name)
+string(JSON DATA_URL GET "${config_json}" data_url)
 
 string(JSON APP_BUNDLE GET "${config_json}" xcode produce_app_bundle)
 string(JSON PRODUCT_BUNDLE_IDENTIFIER GET "${config_json}" xcode product_bundle_identifier)
@@ -42,8 +61,6 @@ option(BUNDLE_DEPENDENCIES "Use bundled TinyXML-2, PhysicsFS, and FAudio (if dis
 
 option(OFFICIAL_BUILD "Compile an official build of the game" OFF)
 
-option(MAKEANDPLAY "Compile a version of the game without the main campaign (provided for convenience; consider modifying MakeAndPlay.h instead" OFF)
-
 option(REMOVE_ABSOLUTE_PATHS "If supported by the compiler, replace all absolute paths to source directories compiled into the binary (if any) with relative paths" ON)
 
 option(APP_BUNDLE "Produce an application bundle on Apple platforms")
@@ -51,7 +68,6 @@ option(APP_BUNDLE "Produce an application bundle on Apple platforms")
 if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
     set(APP_BUNDLE ON)
 endif()
-
 
 # Architecture Flags
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
@@ -247,8 +263,23 @@ else()
     )
 endif()
 
-if(MAKEANDPLAY)
-    target_compile_definitions(VVVVVV PRIVATE -DMAKEANDPLAY)
+target_compile_definitions(VVVVVV PRIVATE MOD_NAME="${MOD_NAME}")
+target_compile_definitions(VVVVVV PRIVATE MOD_VERSION="${MOD_VERSION}")
+target_compile_definitions(VVVVVV PRIVATE MENU_VERSION="${MENU_VERSION}")
+
+target_compile_definitions(VVVVVV PRIVATE TITLE_LOGO_X=${TITLE_LOGO_X})
+target_compile_definitions(VVVVVV PRIVATE TITLE_LOGO_Y=${TITLE_LOGO_Y})
+target_compile_definitions(VVVVVV PRIVATE TITLE_EDITION_TEXT="${TITLE_EDITION_TEXT}")
+target_compile_definitions(VVVVVV PRIVATE TITLE_EDITION_TEXT_X=${TITLE_EDITION_TEXT_X})
+target_compile_definitions(VVVVVV PRIVATE TITLE_EDITION_TEXT_Y=${TITLE_EDITION_TEXT_Y})
+
+target_compile_definitions(VVVVVV PRIVATE DATA_NAME="${DATA_NAME}")
+target_compile_definitions(VVVVVV PRIVATE DATA_URL="${DATA_URL}")
+
+target_compile_definitions(VVVVVV PRIVATE LEVEL_FILENAME="${LEVEL_FILENAME}")
+
+if(ALLOW_CUSTOM_LEVELS)
+    target_compile_definitions(VVVVVV PRIVATE ALLOW_CUSTOM_LEVELS)
 endif()
 
 set(XML2_SRC
