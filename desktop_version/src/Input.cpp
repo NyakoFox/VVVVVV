@@ -7,6 +7,7 @@
 #include "Editor.h"
 #include "Entity.h"
 #include "Enums.h"
+#include "Exit.h"
 #include "FileSystemUtils.h"
 #include "Game.h"
 #include "GlitchrunnerMode.h"
@@ -444,10 +445,10 @@ static void menuactionpress(void)
             option_id = id; \
         } \
         option_seq++;
-#if !defined(MAKEANDPLAY)
         OPTION_ID(0) /* play */
-#endif
+#if defined(ALLOW_CUSTOM_LEVELS)
         OPTION_ID(1) /* levels */
+#endif
         OPTION_ID(2) /* options */
         if (loc::show_translator_menu)
         {
@@ -458,27 +459,46 @@ static void menuactionpress(void)
 
 #undef OPTION_ID
 
-
         switch (option_id)
         {
-#if !defined(MAKEANDPLAY)
         case 0:
-            //Play
-            if (!game.save_exists() && !game.anything_unlocked())
             {
-                //No saves exist, just start a new game
+                // Play
                 music.playef(Sound_VIRIDIAN);
-                startmode(Start_MAINGAME);
-            }
-            else
-            {
-                //Bring you to the normal playmenu
-                music.playef(Sound_VIRIDIAN);
-                game.createmenu(Menu::play);
-                map.nexttowercolour();
+
+                game.levelpage = 0;
+                game.playcustomlevel = 0;
+                game.menustart = true;
+
+                std::string playtestname = "levels/" LEVEL_FILENAME ".vvvvvv";
+
+                LevelMetaData meta;
+                CliPlaytestArgs pt_args;
+                if (cl.getLevelMetaDataAndPlaytestArgs(playtestname, meta, &pt_args)) {
+                    cl.ListOfMetaData.clear();
+                    cl.ListOfMetaData.push_back(meta);
+                }
+                else
+                {
+                    vlog_error("Level not found");
+                    VVV_exit(1);
+                }
+
+                game.loadcustomlevelstats();
+                game.customleveltitle = cl.ListOfMetaData[game.playcustomlevel].title;
+                game.customlevelfilename = cl.ListOfMetaData[game.playcustomlevel].filename;
+
+                tinyxml2::XMLDocument doc;
+                if (!FILESYSTEM_loadTiXml2Document("saves/" LEVEL_FILENAME ".vvvvvv.vvv", doc)) {
+                    startmode(Start_CUSTOM);
+                }
+                else {
+                    game.createmenu(Menu::play);
+                    map.nexttowercolour();
+                }
             }
             break;
-#endif
+#if defined(ALLOW_CUSTOM_LEVELS)
         case 1:
             //Bring you to the normal playmenu
             music.playef(Sound_VIRIDIAN);
@@ -486,6 +506,7 @@ static void menuactionpress(void)
             game.createmenu(Menu::playerworlds);
             map.nexttowercolour();
             break;
+#endif
         case 2:
             //Options
             music.playef(Sound_VIRIDIAN);
@@ -1916,60 +1937,19 @@ static void menuactionpress(void)
         break;
     case Menu::play:
     {
-        //Do we have the Secret Lab option?
-        int sloffset = game.unlock[Unlock_SECRETLAB] ? 0 : -1;
-        //Do we have a telesave or quicksave?
-        int ngoffset = game.save_exists() ? 0 : -1;
         if (game.currentmenuoption == 0)
         {
-            //continue
-            //right, this depends on what saves you've got
-            if (!game.save_exists())
-            {
-                //You have no saves but have something unlocked, or you couldn't have gotten here
-                music.playef(Sound_VIRIDIAN);
-                startmode(Start_MAINGAME);
-            }
-            else if (!game.last_telesave.exists)
-            {
-                //You at least have a quicksave, or you couldn't have gotten here
-                music.playef(Sound_VIRIDIAN);
-                startmode(Start_MAINGAME_QUICKSAVE);
-            }
-            else if (!game.last_quicksave.exists)
-            {
-                //You at least have a telesave, or you couldn't have gotten here
-                music.playef(Sound_VIRIDIAN);
-                startmode(Start_MAINGAME_TELESAVE);
-            }
-            else
-            {
-                //go to a menu!
-                music.playef(Sound_VIRIDIAN);
-                game.loadsummary(); //Prepare save slots to display
-                game.createmenu(Menu::continuemenu);
-            }
-        }
-        else if (game.currentmenuoption == 1 && game.unlock[Unlock_SECRETLAB])
-        {
             music.playef(Sound_VIRIDIAN);
-            startmode(Start_SECRETLAB);
+            startmode(Start_CUSTOM_QUICKSAVE);
         }
-        else if (game.currentmenuoption == sloffset+2)
-        {
-            //play modes
-            music.playef(Sound_VIRIDIAN);
-            game.createmenu(Menu::playmodes);
-            map.nexttowercolour();
-        }
-        else if (game.currentmenuoption == sloffset+3 && game.save_exists())
+        else if (game.currentmenuoption == 1)
         {
             //newgame
             music.playef(Sound_VIRIDIAN);
             game.createmenu(Menu::newgamewarning);
             map.nexttowercolour();
         }
-        else if (game.currentmenuoption == sloffset+ngoffset+4)
+        else if (game.currentmenuoption == 2)
         {
             //back
             music.playef(Sound_VIRIDIAN);
@@ -1984,9 +1964,8 @@ static void menuactionpress(void)
         case 0:
             //yep
             music.playef(Sound_VIRIDIAN);
-            startmode(Start_MAINGAME);
-            game.deletequick();
-            game.deletetele();
+            startmode(Start_CUSTOM);
+            game.customdeletequick(game.customlevelfilename);
             break;
         default:
             //back

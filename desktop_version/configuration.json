@@ -2,11 +2,24 @@
     "name": "VVVVVV: Modding Base",
     "version": "1.0",
     "release_build": true,
+    "menu_version": "modding base v1.0",
 
-    "datazip": "https://thelettervsixtim.es/makeandplay/data.zip",
+    "title": {
+        "logo_x": 67,
+        "logo_y": 54,
+        "edition_text": "MODDING BASE",
+        "edition_text_x": 264,
+        "edition_text_y": 85
+    },
+
+    "level_filename": "testlevel",
+    "allow_custom_levels": false,
+
+    "data_name": "data_modbase.zip",
+    "data_url": "https://example.com/data_modbase.zip",
 
     "xcode": {
-        "produce_app_bundle": true,
+        "produce_app_bundle": false,
         "product_bundle_identifier": "gay.nyako.vvvvvvmodbase",
         "product_bundle_identifier_mobile": "gay.nyako.vvvvvvmodbasemobile",
         "product_name": "VVVVVV Modding Base",

@@ -195,22 +195,19 @@ static void menurender(void)
     {
     case Menu::mainmenu:
     {
-        const int temp = 50;
-        graphics.draw_sprite((160 - 96) + 0 * 32, temp, 23, tr, tg, tb);
-        graphics.draw_sprite((160 - 96) + 1 * 32, temp, 23, tr, tg, tb);
-        graphics.draw_sprite((160 - 96) + 2 * 32, temp, 23, tr, tg, tb);
-        graphics.draw_sprite((160 - 96) + 3 * 32, temp, 23, tr, tg, tb);
-        graphics.draw_sprite((160 - 96) + 4 * 32, temp, 23, tr, tg, tb);
-        graphics.draw_sprite((160 - 96) + 5 * 32, temp, 23, tr, tg, tb);
-#if defined(MAKEANDPLAY)
-        font::print(PR_RIGHT, 264, temp+35, loc::gettext("MAKE AND PLAY EDITION"), tr, tg, tb);
-#endif
+
+        graphics.set_texture_color_mod(graphics.grphx.im_logo, tr, tg, tb);
+        graphics.draw_texture(graphics.grphx.im_logo, TITLE_LOGO_X, TITLE_LOGO_Y);
+        graphics.set_texture_color_mod(graphics.grphx.im_logo, 255, 255, 255);
+
+        font::print(PR_RIGHT, TITLE_EDITION_TEXT_X, TITLE_EDITION_TEXT_Y, loc::gettext(TITLE_EDITION_TEXT), tr, tg, tb);
+
 #ifdef INTERIM_VERSION_EXISTS
         font::print(PR_RIGHT | PR_FONT_8X8, 310, 200, COMMIT_DATE, tr/2, tg/2, tb/2);
         font::print(PR_RIGHT | PR_FONT_8X8, 310, 210, INTERIM_COMMIT, tr/2, tg/2, tb/2);
         font::print(PR_RIGHT | PR_FONT_8X8, 310, 220, BRANCH_NAME, tr/2, tg/2, tb/2);
 #endif
-        font::print(PR_RIGHT, 310, 230, RELEASE_VERSION, tr/2, tg/2, tb/2);
+        font::print(PR_RIGHT, 310, 230, MENU_VERSION, tr / 2, tg / 2, tb / 2);
 
         const char* left_msg = NULL;
 
@@ -1944,15 +1941,12 @@ void titlerender(void)
         tg = graphics.col_tg;
         tb = graphics.col_tb;
 
-        int temp = 50;
-        graphics.draw_sprite((160 - 96) + 0 * 32, temp, 23, tr, tg, tb);
-        graphics.draw_sprite((160 - 96) + 1 * 32, temp, 23, tr, tg, tb);
-        graphics.draw_sprite((160 - 96) + 2 * 32, temp, 23, tr, tg, tb);
-        graphics.draw_sprite((160 - 96) + 3 * 32, temp, 23, tr, tg, tb);
-        graphics.draw_sprite((160 - 96) + 4 * 32, temp, 23, tr, tg, tb);
-        graphics.draw_sprite((160 - 96) + 5 * 32, temp, 23, tr, tg, tb);
+        graphics.set_texture_color_mod(graphics.grphx.im_logo, tr, tg, tb);
+        graphics.draw_texture(graphics.grphx.im_logo, TITLE_LOGO_X, TITLE_LOGO_Y);
+        graphics.set_texture_color_mod(graphics.grphx.im_logo, 255, 255, 255);
+
 #if defined(MAKEANDPLAY)
-        font::print(PR_RIGHT, 264, temp+35, loc::gettext("MAKE AND PLAY EDITION"), tr, tg, tb);
+        font::print(PR_RIGHT, TITLE_EDITION_TEXT_X, TITLE_EDITION_TEXT_Y, loc::gettext(TITLE_EDITION_TEXT), tr, tg, tb);
 #endif
 
         char buffer[SCREEN_WIDTH_CHARS*2 + 1];

@@ -429,6 +429,8 @@ void GraphicsResources::init(void)
     im_image10 = LoadImage("graphics/ending.png");
     im_image11 = LoadImage("graphics/site4.png", TEX_WHITE);
 
+    im_logo = LoadImage("graphics/logo.png");
+
     im_sprites_translated = NULL;
     im_flipsprites_translated = NULL;
 
@@ -500,6 +502,8 @@ void GraphicsResources::destroy(void)
     CLEAR(im_image10);
     CLEAR(im_image11);
     CLEAR(im_image12);
+
+    CLEAR(im_logo);
 
     CLEAR(im_sprites_translated);
     CLEAR(im_flipsprites_translated);
