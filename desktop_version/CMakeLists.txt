@@ -14,8 +14,8 @@ set_property(DIRECTORY APPEND PROPERTY
 string(JSON MOD_NAME GET "${config_json}" name)
 string(JSON MOD_VERSION GET "${config_json}" version)
 string(JSON MOD_RELEASE_BUILD GET "${config_json}" release_build)
-string(JSON MENU_VERSION GET "${config_json}" menu_version)
 
+string(JSON MENU_VERSION GET "${config_json}" title menu_version)
 string(JSON TITLE_LOGO_X GET "${config_json}" title logo_x)
 string(JSON TITLE_LOGO_Y GET "${config_json}" title logo_y)
 string(JSON TITLE_EDITION_TEXT GET "${config_json}" title edition_text)
@@ -58,8 +58,6 @@ option(ENABLE_WARNINGS "Enable compilation warnings" ON)
 option(ENABLE_WERROR "Treat compilation warnings as errors" OFF)
 
 option(BUNDLE_DEPENDENCIES "Use bundled TinyXML-2, PhysicsFS, and FAudio (if disabled, TinyXML-2, PhysicsFS, and FAudio will be dynamically linked; LodePNG, C-HashMap and SheenBidi will still be statically linked)" ON)
-
-option(OFFICIAL_BUILD "Compile an official build of the game" OFF)
 
 option(REMOVE_ABSOLUTE_PATHS "If supported by the compiler, replace all absolute paths to source directories compiled into the binary (if any) with relative paths" ON)
 
