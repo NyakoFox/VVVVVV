@@ -2,9 +2,9 @@
     "name": "VVVVVV: Modding Base",
     "version": "1.0",
     "release_build": true,
-    "menu_version": "modding base v1.0",
 
     "title": {
+        "menu_version": "modding base v1.0",
         "logo_x": 67,
         "logo_y": 54,
         "edition_text": "MODDING BASE",
