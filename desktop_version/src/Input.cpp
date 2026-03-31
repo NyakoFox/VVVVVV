@@ -454,8 +454,9 @@ static void menuactionpress(void)
         {
             OPTION_ID(3) /* translator */
         }
-        OPTION_ID(4) /* credits */
-        OPTION_ID(5) /* quit */
+        OPTION_ID(4) /* mod credits */
+        OPTION_ID(5) /* game credits */
+        OPTION_ID(6) /* quit */
 
 #undef OPTION_ID
 
