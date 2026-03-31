@@ -6698,7 +6698,8 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         {
             option(loc::gettext("translator"));
         }
-        option(loc::gettext("credits"));
+        option(loc::gettext("mod credits"));
+        option(loc::gettext("game credits"));
         option(loc::gettext("quit"));
         menuyoff = -10;
         maxspacing = 15;
@@ -7320,6 +7321,10 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
     case Menu::warninglevellist:
         option(loc::gettext("ok"));
         menuyoff = 50;
+        break;
+    case Menu::modcredits:
+        option(loc::gettext("return"));
+        menuyoff = 64;
         break;
     }
 

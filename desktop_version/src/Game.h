@@ -110,7 +110,8 @@ namespace Menu
         timetrialcomplete,
         timetrialcomplete2,
         timetrialcomplete3,
-        gamecompletecontinue
+        gamecompletecontinue,
+        modcredits
     };
 }
 
