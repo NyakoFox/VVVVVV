@@ -49,6 +49,7 @@ editorclass::editorclass(void)
     register_tool(EditorTool_CREWMATES, "Crewmates", "O", SDLK_o, false);
     register_tool(EditorTool_START_POINT, "Start Point", "P", SDLK_p, false);
     register_tool(EditorTool_TELEPORTERS, "Teleporters", "^1", SDLK_1, true);
+    register_tool(EditorTool_ACTIVITY_ZONES, "Activity Zones", "^2", SDLK_2, true);
 
     static const short basic[] = {
         121, 121, 121, 121, 121, 121, 121, 160, 121, 121, 121, 121, 121, 121, 121,
@@ -997,6 +998,19 @@ static void draw_entities(void)
             case 9: // Shiny Trinkets
                 graphics.draw_sprite(x, y, 22, 196, 196, 196);
                 graphics.draw_rect(x, y, 16, 16, graphics.getRGB(255, 164, 164));
+
+                if (entity->p1 == 1)
+                {
+                    if (i == edent_under_cursor)
+                    {
+                        font::print(PR_BOR | PR_CJK_HIGH, x, y, "DISPLAY", 210, 210, 255);
+                        font::print(PR_FONT_LEVEL | PR_BOR | PR_CJK_HIGH, x, y - 8, help.String(entity->p2), 210, 210, 255);
+                    }
+                    else
+                    {
+                        font::print(PR_BOR | PR_CJK_HIGH, x, y, "D", 210, 210, 255);
+                    }
+                }
                 break;
             case 10: // Checkpoints
                 graphics.draw_sprite(x, y, 20 + entity->p1, 196, 196, 196);
@@ -1120,6 +1134,15 @@ static void draw_entities(void)
                 graphics.draw_rect(x, y, 8, 8, graphics.getRGB(255, 255, 255));
                 if (i == edent_under_cursor)
                 {
+                    font::print(PR_FONT_LEVEL | PR_BOR | PR_CJK_HIGH, x, y - 8, entity->scriptname, 210, 210, 255);
+                }
+                break;
+            case 20: // Activity Zones
+                graphics.draw_rect(x, y, entity->p1 * 8, entity->p2 * 8, graphics.getRGB(164, 255, 255));
+                graphics.draw_rect(x, y, 8, 8, graphics.getRGB(255, 255, 255));
+                if (i == edent_under_cursor)
+                {
+                    font::print(PR_FONT_LEVEL | PR_BOR | PR_CJK_HIGH, x, y - 16, help.String(entity->p3), 210, 210, 255);
                     font::print(PR_FONT_LEVEL | PR_BOR | PR_CJK_HIGH, x, y - 8, entity->scriptname, 210, 210, 255);
                 }
                 break;
@@ -1361,6 +1384,7 @@ static void draw_cursor(void)
     case EditorTool_GRAVITY_LINES:
     case EditorTool_ROOMTEXT:
     case EditorTool_SCRIPTS:
+    case EditorTool_ACTIVITY_ZONES:
         // 1x1
         graphics.draw_rect(x, y, 8, 8, blue);
         break;
@@ -1750,6 +1774,9 @@ void editorclass::draw_tool(EditorTools tool, int x, int y)
     case EditorTool_GRAVITY_LINES:
         graphics.fill_rect(x + 2, y + 8, 12, 1, graphics.getRGB(255, 255, 255));
         break;
+    case EditorTool_ACTIVITY_ZONES:
+        graphics.fill_rect(x + 2, y + 8, 12, 1, graphics.getRGB(255, 255, 255));
+        break;
     case EditorTool_ROOMTEXT:
         font::print(PR_FONT_8X8, x + 1, y, "AB", 196, 196, 255 - help.glow);
         font::print(PR_FONT_8X8, x + 1, y + 9, "CD", 196, 196, 255 - help.glow);
@@ -2102,6 +2129,11 @@ static void input_submitted(void)
 
     switch (ed.current_text_mode)
     {
+    case TEXT_ACTIVITY_ZONE_ID:
+        customentities[ed.text_entity].p3 = help.Int(key.keybuffer.c_str());
+        reset_text_mode = false;
+        ed.get_input_line(TEXT_ACTIVITY_ZONE_SCRIPT, "Enter script name:", &(customentities[ed.text_entity].scriptname));
+        break;
     case TEXT_GOTOROOM:
     {
         char coord_x[16];
@@ -2489,6 +2521,10 @@ void editorclass::entity_clicked(const int index)
         }
         break;
     }
+    case 9:
+        // Trinkets
+        entity->p1 = (entity->p1 == 1 ? 0 : 1);
+        break;
     case 10:
         // Checkpoints
         // If it's not textured as a checkpoint, then just leave it be
@@ -2617,6 +2653,15 @@ void editorclass::tool_place()
         substate = EditorSubState_DRAW_BOX;
         box_corner = BoxCorner_LAST;
         box_type = BoxType_SCRIPT;
+        box_point.x = tilex * 8;
+        box_point.y = tiley * 8;
+
+        lclickdelay = 1;
+        break;
+    case EditorTool_ACTIVITY_ZONES:
+        substate = EditorSubState_DRAW_BOX;
+        box_corner = BoxCorner_LAST;
+        box_type = BoxType_ACTIVITY_ZONE;
         box_point.x = tilex * 8;
         box_point.y = tiley * 8;
 
@@ -3469,6 +3514,13 @@ void editorinput(void)
                         ed.add_entity(ed.levx, ed.levy, left / 8, top / 8, 19, (right - left) / 8, (bottom - top) / 8);
 
                         ed.get_input_line(TEXT_SCRIPT, "Enter script name:", &(customentities[ed.text_entity].scriptname));
+                        break;
+                    case BoxType_ACTIVITY_ZONE:
+                        ed.text_entity = customentities.size();
+
+                        ed.add_entity(ed.levx, ed.levy, left / 8, top / 8, 20, (right - left) / 8, (bottom - top) / 8);
+
+                        ed.get_input_line(TEXT_ACTIVITY_ZONE_ID, "Enter activity zone ID:", NULL);
                         break;
                     case BoxType_ENEMY:
                         cl.setroomenemyx1(ed.levx, ed.levy, left);

@@ -1877,7 +1877,14 @@ void mapclass::loadlevel(int rx, int ry)
                 obj.createentity(ex, ey, 3);
                 break;
             case 9: // Trinkets
-                obj.createentity(ex, ey, 9, cl.findtrinket(edi));
+                if (ent.p1 == 1)
+                {
+                    obj.createentity(ex, ey, 22, ent.p2);
+                }
+                else
+                {
+                    obj.createentity(ex, ey, 9, cl.findtrinket(edi));
+                }
                 break;
             case 10: // Checkpoints
                 obj.createentity(ex, ey, 10, ent.p1, (rx + ry*100) * 20 + tempcheckpoints);
@@ -1951,6 +1958,8 @@ void mapclass::loadlevel(int rx, int ry)
                 obj.createblock(TRIGGER, ex, ey, ent.p1 * 8, ent.p2 * 8, 300 + tempscriptbox, "custom_" + ent.scriptname);
                 tempscriptbox++;
                 break;
+            case 20: // Activity Zones
+                obj.createblock(ACTIVITY, ex, ey, ent.p1 * 8, ent.p2 * 8, ent.p3, "custom_" + ent.scriptname);
             case 50: // Warp Lines
                 obj.customwarpmode=true;
                 switch (ent.p1)

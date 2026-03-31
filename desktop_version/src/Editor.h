@@ -50,6 +50,7 @@ enum EditorTools
     EditorTool_CREWMATES,
     EditorTool_START_POINT,
     EditorTool_TELEPORTERS,
+    EditorTool_ACTIVITY_ZONES,
 
     NUM_EditorTools
 };
@@ -86,7 +87,8 @@ enum BoxTypes
     BoxType_SCRIPT,
     BoxType_ENEMY,
     BoxType_PLATFORM,
-    BoxType_COPY
+    BoxType_COPY,
+    BoxType_ACTIVITY_ZONE
 };
 
 enum BoxCorner
@@ -105,6 +107,8 @@ enum TextMode
     TEXT_SAVE,
     TEXT_ROOMNAME,
     TEXT_SCRIPT,
+    TEXT_ACTIVITY_ZONE_ID,
+    TEXT_ACTIVITY_ZONE_SCRIPT,
     TEXT_ROOMTEXT,
     TEXT_GOTOROOM,
     LAST_EDTEXT = TEXT_GOTOROOM,

@@ -1076,12 +1076,23 @@ void entityclass::createblock( int t, int xp, int yp, int w, int h, int trig /*=
             {
                 block.prompt = "Press {button} to activate terminal";
             }
-            block.script = "custom_"+customscript;
+            block.script = "custom_" + customscript;
             block.setblockcolour("orange");
             trig=0;
             break;
+        case 36:
+            block.prompt = "Press {button} to activate terminal";
+            block.script = script;
+            block.setblockcolour("orange");
+            trig = 0;
+            break;
+        case 37:
+            block.prompt = "Press {button} to activate terminals";
+            block.script = script;
+            block.setblockcolour("orange");
+            trig = 0;
+            break;
         }
-        break;
     }
 
     if (customactivitytext != "")
