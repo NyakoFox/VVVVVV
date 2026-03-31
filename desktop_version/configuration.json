@@ -1,28 +1,28 @@
 {
-    "name": "VVVVVV: Modding Base",
+    "name": "VVVVVV: Space Station 3",
     "version": "1.0",
     "release_build": true,
 
     "title": {
-        "menu_version": "modding base v1.0",
+        "menu_version": "space station 3 v1.0",
         "logo_x": 67,
         "logo_y": 54,
-        "edition_text": "MODDING BASE",
+        "edition_text": "Space Station 3",
         "edition_text_x": 264,
         "edition_text_y": 85
     },
 
-    "level_filename": "testlevel",
-    "allow_custom_levels": false,
+    "level_filename": "spacestation3",
+    "allow_custom_levels": true,
 
-    "data_name": "data_modbase.zip",
-    "data_url": "https://example.com/data_modbase.zip",
+    "data_name": "data_spacestation3.zip",
+    "data_url": "https://example.com/data_spacestation3.zip",
 
     "xcode": {
         "produce_app_bundle": false,
-        "product_bundle_identifier": "gay.nyako.vvvvvvmodbase",
-        "product_bundle_identifier_mobile": "gay.nyako.vvvvvvmodbasemobile",
-        "product_name": "VVVVVV Modding Base",
+        "product_bundle_identifier": "gay.nyako.vvvvvvspacestation3",
+        "product_bundle_identifier_mobile": "gay.nyako.vvvvvvspacestation3mobile",
+        "product_name": "VVVVVV Space Station 3",
         "project_version": "1.0",
         "marketing_version": "1.0"
     }
