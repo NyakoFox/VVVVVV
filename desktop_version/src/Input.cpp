@@ -520,12 +520,18 @@ static void menuactionpress(void)
             map.nexttowercolour();
             break;
         case 4:
+            // Mod credits
+            music.playef(Sound_VIRIDIAN);
+            game.createmenu(Menu::modcredits);
+            map.nexttowercolour();
+            break;
+        case 5:
             //Credits
             music.playef(Sound_VIRIDIAN);
             game.createmenu(Menu::credits);
             map.nexttowercolour();
             break;
-        case 5:
+        case 6:
             music.playef(Sound_VIRIDIAN);
             game.createmenu(Menu::youwannaquit);
             map.nexttowercolour();
@@ -2300,6 +2306,12 @@ static void menuactionpress(void)
         break;
     case Menu::errorloadinglevel:
     case Menu::warninglevellist:
+        music.playef(Sound_VIRIDIAN);
+        game.returnmenu();
+        map.nexttowercolour();
+        break;
+    case Menu::modcredits:
+        //back
         music.playef(Sound_VIRIDIAN);
         game.returnmenu();
         map.nexttowercolour();

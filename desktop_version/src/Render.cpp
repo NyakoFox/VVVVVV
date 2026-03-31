@@ -1927,6 +1927,17 @@ static void menurender(void)
         font::print_wrap(PR_CEN, -1, 65, message, tr, tg, tb);
         break;
     }
+    case Menu::modcredits:
+        graphics.set_texture_color_mod(graphics.grphx.im_logo, tr, tg, tb);
+        graphics.draw_texture(graphics.grphx.im_logo, TITLE_LOGO_X, 40);
+        graphics.set_texture_color_mod(graphics.grphx.im_logo, 255, 255, 255);
+
+        font::print(PR_CEN, -1, 93, loc::gettext("...is a VVVVVV mod by"), tr, tg, tb);
+        font::print(PR_2X | PR_CEN | PR_FONT_8X8, -1, 121, "NyakoFox", tr, tg, tb);
+        font::print(PR_CEN | PR_FONT_8X8, -1, 141, "(Alexandra Fox)", tr / 2, tg / 2, tb / 2);
+
+        font::print(PR_CEN, -1, 170, "(TODO: change this!)", tr / 2, tg / 2, tb / 2);
+        break;
     default:
         break;
     }
