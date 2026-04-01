@@ -1978,6 +1978,10 @@ void mapclass::loadlevel(int rx, int ry)
                     break;
                 }
                 break;
+            case 200: // Prophecy panel
+                obj.customscript = ent.scriptname;
+                obj.createentity(ex, ey, 200, ent.p1, ent.p2);
+                break;
             }
         }
 

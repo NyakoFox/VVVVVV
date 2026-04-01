@@ -2400,6 +2400,7 @@ void gamerender(void)
             {
                 graphics.clear();
             }
+            graphics.drawentities(true);
             graphics.drawtowermap();
         }
         else
@@ -2412,6 +2413,7 @@ void gamerender(void)
             {
                 graphics.clear();
             }
+            graphics.drawentities(true);
             if ((map.finalmode || map.custommode) && map.final_colormode)
             {
                 graphics.drawfinalmap();
@@ -2423,7 +2425,7 @@ void gamerender(void)
         }
 
 
-        graphics.drawentities();
+        graphics.drawentities(false);
         if (map.towermode)
         {
             graphics.drawtowerspikes();

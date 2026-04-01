@@ -431,6 +431,10 @@ void GraphicsResources::init(void)
 
     im_logo = LoadImage("graphics/logo.png");
 
+    im_depth_extend_mono_seamless = LoadImage("graphics/IMAGE_DEPTH_EXTEND_MONO_SEAMLESS.png");
+    im_depth_extend_seamless = LoadImage("graphics/IMAGE_DEPTH_EXTEND_SEAMLESS.png");
+    im_gradient20 = LoadImage("graphics/gradient20.png");
+
     im_sprites_translated = NULL;
     im_flipsprites_translated = NULL;
 
@@ -471,6 +475,20 @@ void GraphicsResources::init(void)
         graphics.customminimaps[i] = LoadImage(full_item);
     }
     FILESYSTEM_freeEnumerate(&handle);
+
+    graphics.prophecy_sprites.clear();
+
+    EnumHandle handle_items = {};
+    while ((item = FILESYSTEM_enumerate("graphics/prophecy", &handle_items)) != NULL)
+    {
+        SDL_snprintf(full_item, sizeof(full_item), "graphics/prophecy/%s", item);
+        // chop off .png
+        std::string name = item;
+        name = name.substr(0, name.size() - 4);
+        graphics.prophecy_sprites[name] = LoadImage(full_item);
+    }
+    FILESYSTEM_freeEnumerate(&handle_items);
+
 }
 
 
@@ -505,6 +523,10 @@ void GraphicsResources::destroy(void)
 
     CLEAR(im_logo);
 
+    CLEAR(im_depth_extend_mono_seamless);
+    CLEAR(im_depth_extend_seamless);
+    CLEAR(im_gradient20);
+
     CLEAR(im_sprites_translated);
     CLEAR(im_flipsprites_translated);
 
@@ -512,6 +534,14 @@ void GraphicsResources::destroy(void)
     {
         CLEAR(graphics.customminimaps[i]);
     }
+
+    std::map<std::string, SDL_Texture*>::iterator it;
+    for (it = graphics.prophecy_sprites.begin(); it != graphics.prophecy_sprites.end(); it++)
+    {
+        CLEAR(it->second);
+    }
+    graphics.prophecy_sprites.clear();
+
 #undef CLEAR
 
     VVV_freefunc(SDL_FreeSurface, im_sprites_surf);

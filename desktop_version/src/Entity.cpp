@@ -1147,6 +1147,7 @@ bool entityclass::disableentity(int t)
     entities[t].type = EntityType_INVALID;
     entities[t].rule = -1;
     entities[t].isplatform = false;
+    entities[t].panel = "";
 
     return true;
 }
@@ -2195,6 +2196,17 @@ void entityclass::createentity(int xp, int yp, int t, int meta1, int meta2, int 
     case 100: // Invalid enemy, but gets treated as a teleporter
         entity.type = EntityType_TELEPORTER;
         break;
+    case 200: // Prophecy panel
+        entity.rule = 2;
+        entity.type = EntityType_PROPHECY;
+        entity.size = 200;
+        entity.panel = customscript;
+        entity.behave = meta1;
+        entity.para = meta2;
+        entity.w = 199;
+        entity.h = 124;
+        entity.colour = -1;
+        break;
     }
 
     entity.lerpoldxp = entity.xp;
@@ -2263,6 +2275,9 @@ bool entityclass::updateentities( int i )
     {
         switch(entities[i].type)
         {
+        case EntityType_PROPHECY:
+            entities[i].life++;
+            break;
         case EntityType_PLAYER:  //Player
             break;
         case EntityType_MOVING:  //Movement behaviors

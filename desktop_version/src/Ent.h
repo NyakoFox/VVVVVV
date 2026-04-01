@@ -3,6 +3,8 @@
 
 #include <SDL.h>
 
+#include <string>
+
 #define        rn( rx,  ry) ((rx) + ((ry) * 100))
 
 enum EntityType
@@ -30,7 +32,8 @@ enum EntityType
     EntityType_WARP_LINE_TOP = 53,
     EntityType_WARP_LINE_BOTTOM = 54,
     EntityType_COLLECTABLE_CREWMATE = 55,
-    EntityType_TELEPORTER = 100
+    EntityType_TELEPORTER = 100,
+    EntityType_PROPHECY = 200
 };
 
 class entclass
@@ -61,6 +64,7 @@ public:
     float para;
     int life;
     int colour; // As out-of-bounds colours are allowed, this should be an int instead of an EnemyColour.
+    std::string panel;
 
     //Position and velocity
     int oldxp, oldyp;

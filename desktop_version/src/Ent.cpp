@@ -68,6 +68,8 @@ void entclass::clear(void)
     SDL_zero(realcol);
     lerpoldxp = 0;
     lerpoldyp = 0;
+
+    panel = "";
 }
 
 bool entclass::outside(void)
@@ -619,6 +621,7 @@ void entclass::updatecolour(void)
     case 9: // Really Big Sprite! (2x2)
     case 10: // 2x1 Sprite
     case 13: // Special for epilogue: huge hero!
+    case 200: // prophecy panel
         realcol = graphics.getcol(colour);
         break;
     case 5: // Horizontal gravity line

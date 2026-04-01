@@ -114,6 +114,8 @@ void Graphics::init(void)
     foregroundTexture = NULL;
     tempScreenshot = NULL;
     tempScreenshot2x = NULL;
+    prophecyTexture1 = NULL;
+    prophecyTexture2 = NULL;
     towerbg = TowerBG();
     titlebg = TowerBG();
     trinketr = 0;
@@ -150,6 +152,21 @@ void Graphics::init(void)
     levelcomplete_mounted = false;
     flipgamecomplete_mounted = false;
     fliplevelcomplete_mounted = false;
+
+    bm_normal = SDL_ComposeCustomBlendMode(
+        SDL_BLENDFACTOR_SRC_ALPHA, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD,
+        SDL_BLENDFACTOR_SRC_ALPHA, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD
+    );
+
+    bm_add = SDL_ComposeCustomBlendMode(
+        SDL_BLENDFACTOR_SRC_ALPHA, SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_ADD,
+        SDL_BLENDFACTOR_SRC_ALPHA, SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_ADD
+    );
+
+    bm_subtract = SDL_ComposeCustomBlendMode(
+        SDL_BLENDFACTOR_ZERO, SDL_BLENDFACTOR_ONE_MINUS_SRC_COLOR, SDL_BLENDOPERATION_ADD,
+        SDL_BLENDFACTOR_ZERO, SDL_BLENDFACTOR_ONE_MINUS_SRC_COLOR, SDL_BLENDOPERATION_ADD 
+    );
 }
 
 void Graphics::destroy(void)
@@ -193,6 +210,8 @@ void Graphics::create_buffers(void)
     tempScrollingTexture = CREATE_SCROLL_TEXTURE;
     towerbg.texture = CREATE_SCROLL_TEXTURE;
     titlebg.texture = CREATE_SCROLL_TEXTURE;
+    prophecyTexture1 = CREATE_TEXTURE_WITH_DIMENSIONS(320, 90);
+    prophecyTexture2 = CREATE_TEXTURE_WITH_DIMENSIONS(150, 90);
 
 #undef CREATE_SCROLL_TEXTURE
 #undef CREATE_TEXTURE
@@ -221,6 +240,8 @@ void Graphics::destroy_buffers(void)
     VVV_freefunc(SDL_DestroyTexture, tempScrollingTexture);
     VVV_freefunc(SDL_DestroyTexture, towerbg.texture);
     VVV_freefunc(SDL_DestroyTexture, titlebg.texture);
+    VVV_freefunc(SDL_DestroyTexture, prophecyTexture1);
+    VVV_freefunc(SDL_DestroyTexture, prophecyTexture2);
     VVV_freefunc(SDL_FreeSurface, tempFilterSrc);
     VVV_freefunc(SDL_FreeSurface, tempFilterDest);
     VVV_freefunc(SDL_FreeSurface, tempScreenshot);
@@ -1183,6 +1204,31 @@ void Graphics::draw_texture(SDL_Texture* image, const int x, const int y)
     copy_texture(image, NULL, &dstrect);
 }
 
+void Graphics::draw_texture(SDL_Texture* image, const int x, const int y, const float scalex, const float scaley)
+{
+    int w, h;
+
+    if (query_texture(image, NULL, NULL, &w, &h) != 0)
+    {
+        return;
+    }
+
+    int flip = SDL_FLIP_NONE;
+
+    if (scalex < 0)
+    {
+        flip |= SDL_FLIP_HORIZONTAL;
+    }
+    if (scaley < 0)
+    {
+        flip |= SDL_FLIP_VERTICAL;
+    }
+
+    const SDL_Rect dstrect = { x, y, w * SDL_abs(scalex), h * SDL_abs(scaley) };
+
+    copy_texture(image, NULL, &dstrect, 0, NULL, (SDL_RendererFlip)flip);
+}
+
 void Graphics::draw_texture_part(SDL_Texture* image, const int x, const int y, const int x2, const int y2, const int w, const int h, const int scalex, const int scaley)
 {
     const SDL_Rect srcrect = {x2, y2, w, h};
@@ -1978,7 +2024,7 @@ void Graphics::drawtrophytext(void)
     }
 }
 
-void Graphics::drawentities(void)
+void Graphics::drawentities(bool background)
 {
     const int yoff = map.towermode ? lerp(map.oldypos, map.ypos) : 0;
 
@@ -2004,6 +2050,15 @@ void Graphics::drawentities(void)
     {
         for (int i = obj.entities.size() - 1; i >= 0; i--)
         {
+            if (background && (obj.entities[i].size != 200))
+            {
+                continue;
+            }
+            else if (!background && (obj.entities[i].size == 200))
+            {
+                continue;
+            }
+
             drawentity(i, yoff);
         }
     }
@@ -2309,6 +2364,12 @@ void Graphics::drawentity(const int i, const int yoff)
     {
         // Special for epilogue: huge hero!
         draw_grid_tile(grphx.im_sprites, obj.entities[i].drawframe, xp, yp - yoff, sprites_rect.w, sprites_rect.h, obj.entities[i].realcol, 6, 6);
+        break;
+    }
+    case 200:
+    {
+        // prophecy panel
+        draw_prophecy(xp, yp - yoff, obj.entities[i].panel, obj.entities[i].life, obj.entities[i].behave, obj.entities[i].para);
         break;
     }
     }
@@ -3665,6 +3726,128 @@ void Graphics::drawtele(int x, int y, int t, const SDL_Color color)
     if (t < 1) t = 1;
 
     draw_grid_tile(grphx.im_teleporter, t, x, y, tele_rect.w, tele_rect.h, color);
+}
+
+SDL_Color Graphics::merge_color(SDL_Color color_1, SDL_Color color_2, float amount)
+{
+    const Uint8 r = (Uint8) ((color_1.r * (1.0f - amount)) + (color_2.r * amount));
+    const Uint8 g = (Uint8) ((color_1.g * (1.0f - amount)) + (color_2.g * amount));
+    const Uint8 b = (Uint8) ((color_1.b * (1.0f - amount)) + (color_2.b * amount));
+    const Uint8 a = (Uint8) ((color_1.a * (1.0f - amount)) + (color_2.a * amount));
+    return getRGBA(r, g, b, a);
+}
+
+void Graphics::draw_texture_tiled(SDL_Texture* texture, int x, int y)
+{
+    int texture_width;
+    int texture_height;
+    if (query_texture(texture, NULL, NULL, &texture_width, &texture_height) != 0)
+    {
+        return;
+    }
+
+    int start_x = ((POS_MOD((x), (texture_width))) - texture_width);
+    int start_y = ((POS_MOD((y), (texture_height))) - texture_height);
+
+    for (int use_x = start_x; use_x < SCREEN_WIDTH_PIXELS; use_x += texture_width)
+    {
+        for (int use_y = start_y; use_y < SCREEN_HEIGHT_PIXELS; use_y += texture_height)
+        {
+            draw_texture(texture, use_x, use_y);
+        }
+    }
+}
+
+void Graphics::draw_prophecy(int x, int y, std::string type, int timer, int text_off_x, int text_off_y)
+{
+    SDL_Texture* target = SDL_GetRenderTarget(gameScreen.m_renderer);
+
+    SDL_Texture* icon_sprite = prophecy_sprites[type + "_sprite"];
+    SDL_Texture* icon_text = prophecy_sprites[type + "_text"];
+
+    const int width = 150;
+    const int height = 90;
+    float xsin = 0.0;
+    float ysin = SDL_cosf(timer / 12.0f) * 4.0f;
+
+    int alpha = 255;
+
+    set_render_target(prophecyTexture1);
+    clear(0, 0, 0, 0);
+
+    set_blendmode(grphx.im_depth_extend_mono_seamless, bm_normal);
+    set_texture_color_mod(grphx.im_depth_extend_mono_seamless, 66, 208, 255);
+    draw_texture_tiled(grphx.im_depth_extend_mono_seamless, SDL_ceilf(timer / 2.0f), SDL_ceilf(timer / 2.0f));
+    set_texture_color_mod(grphx.im_depth_extend_mono_seamless, 255, 255, 255);
+
+    set_blendmode(icon_sprite, bm_subtract);
+    set_texture_color_mod(icon_sprite, 0, 0, 0);
+
+    draw_texture(icon_sprite, (width / 2) - 99, 28 - 62);
+    set_texture_color_mod(icon_sprite, 255, 255, 255);
+
+    set_render_target(prophecyTexture2);
+    clear(0, 0, 0, 0);
+    set_blendmode(bm_normal);
+    set_blendmode(grphx.im_depth_extend_seamless, bm_normal);
+    set_blendmode(grphx.im_gradient20, bm_normal);
+    fill_rect(0, 0, width + 1, height + 1, 0, 0, 0);
+
+    SDL_Color linecol = merge_color(getRGB(139, 233, 239), getRGB(23, 237, 255), 0.5f + (SDL_sinf(timer / 120.0f) * 0.5f));
+
+    set_texture_color_mod(grphx.im_depth_extend_seamless, linecol.r, linecol.g, linecol.b);
+    draw_texture_tiled(grphx.im_depth_extend_seamless, SDL_ceilf(-timer / 2.0f), SDL_ceilf(-timer / 2.0f));
+    set_texture_color_mod(grphx.im_depth_extend_seamless, 255, 255, 255);
+
+    set_texture_color_mod(grphx.im_gradient20, 0, 0, 0);
+    draw_texture(grphx.im_gradient20, 0, 0);
+    set_texture_color_mod(grphx.im_gradient20, 255, 255, 255);
+
+    set_blendmode(prophecyTexture1, bm_add);
+    draw_texture(prophecyTexture1, 0, 0);
+    draw_texture(prophecyTexture1, 0, 0);
+    draw_texture(prophecyTexture1, 0, 0);
+    set_blendmode(prophecyTexture1, bm_normal);
+
+    // text
+    set_render_target(prophecyTexture1);
+    set_blendmode(grphx.im_depth_extend_seamless, bm_normal);
+    clear(0, 255, 255, 255);
+
+    set_texture_alpha_mod(grphx.im_depth_extend_seamless, 153);
+    draw_texture_tiled(grphx.im_depth_extend_seamless, SDL_ceilf(timer / 20.0f), SDL_ceilf(timer / 2.0f));
+    set_texture_alpha_mod(grphx.im_depth_extend_seamless, 255);
+
+    set_blendmode(icon_text, bm_subtract);
+
+    set_texture_color_mod(icon_text, 0, 0, 0);
+    draw_texture(icon_text, 0, -10);
+    set_texture_color_mod(icon_text, 255, 255, 255);
+
+    set_render_target(target);
+
+    int rx = x - width / 2;
+    int ry = y - height / 2;
+
+    // if theres a sprite...
+    set_blendmode(prophecyTexture2, bm_normal);
+    for (int i = 1; i < 2; i++)
+    {
+        set_texture_alpha_mod(prophecyTexture2, alpha / 4);
+        draw_texture(prophecyTexture2, rx + (ysin * (2 * i)), ry + (ysin * (2 * i)));
+    }
+
+    set_texture_alpha_mod(prophecyTexture2, alpha);
+    draw_texture(prophecyTexture2, rx + xsin, ry + ysin);
+    set_texture_alpha_mod(prophecyTexture2, 255);
+
+    // if theres text...
+    set_blendmode(prophecyTexture1, bm_add);
+
+    set_texture_alpha_mod(prophecyTexture1, alpha);
+    draw_texture(prophecyTexture1, rx + xsin + text_off_x, ry + ysin + text_off_y);
+    draw_texture(prophecyTexture1, rx + xsin + text_off_x, ry + ysin + text_off_y);
+
 }
 
 SDL_Color Graphics::getRGBA(const Uint8 r, const Uint8 g, const Uint8 b, const Uint8 a)

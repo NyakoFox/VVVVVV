@@ -210,6 +210,8 @@ public:
 
     void draw_texture(SDL_Texture* image, int x, int y);
 
+    void draw_texture(SDL_Texture* image, const int x, const int y, const float scalex, const float scaley);
+
     void draw_texture_part(SDL_Texture* image, int x, int y, int x2, int y2, int w, int h, int scalex, int scaley);
 
     void draw_grid_tile(SDL_Texture* texture, int t, int x, int y, int width, int height, int scalex, int scaley);
@@ -322,13 +324,19 @@ public:
 
     bool Hitest(SDL_Surface* surface1, SDL_Point p1, SDL_Surface* surface2, SDL_Point p2);
 
-    void drawentities(void);
+    void drawentities(bool background);
 
     void drawentity(const int i, const int yoff);
 
     void drawtrophytext(void);
 
     void drawtele(int x, int y, int t, SDL_Color c);
+
+    SDL_Color merge_color(SDL_Color color_1, SDL_Color color_2, float amount);
+
+    void draw_texture_tiled(SDL_Texture* texture, int x, int y);
+
+    void draw_prophecy(int x, int y, std::string type, int timer, int text_off_x, int text_off_y);
 
     SDL_Color getRGBA(Uint8 r, Uint8 g, Uint8 b, Uint8 a);
 
@@ -389,6 +397,7 @@ public:
     SDL_Texture* images[NUM_IMAGES];
 
     SDL_Texture* customminimaps[401];
+    std::map<std::string, SDL_Texture*> prophecy_sprites;
 
     bool flipmode;
     bool setflipmode;
@@ -402,6 +411,9 @@ public:
     SDL_Texture* backgroundTexture;
     SDL_Texture* foregroundTexture;
     SDL_Texture* tempScrollingTexture;
+    SDL_Texture* prophecyTexture1;
+    SDL_Texture* prophecyTexture2;
+    SDL_Texture* prophecyTexture3;
     SDL_Surface* tempScreenshot;
     SDL_Surface* tempScreenshot2x;
 
@@ -413,6 +425,10 @@ public:
     SDL_Rect tele_rect;
 
     SDL_Rect footerrect;
+
+    SDL_BlendMode bm_normal;
+    SDL_BlendMode bm_add;
+    SDL_BlendMode bm_subtract;
 
     int linestate, linedelay;
     int backoffset;

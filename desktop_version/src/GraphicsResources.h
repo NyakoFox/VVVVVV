@@ -48,6 +48,10 @@ public:
 
     SDL_Texture* im_logo;
 
+    SDL_Texture* im_depth_extend_mono_seamless;
+    SDL_Texture* im_depth_extend_seamless;
+    SDL_Texture* im_gradient20;
+
     SDL_Texture* im_sprites_translated;
     SDL_Texture* im_flipsprites_translated;
 };
