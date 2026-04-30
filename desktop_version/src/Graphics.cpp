@@ -4043,6 +4043,9 @@ SDL_Color Graphics::getcol( int t )
         return getRGB(lerpReal(cur.r, next.r, time), lerpReal(cur.g, next.g, time), lerpReal(cur.b, next.b, time));
     }
     case 241: // Prismatic trout, rainbow cycle
+#ifndef M_PI
+#define M_PI    3.14159265358979323846264338327950288
+#endif
         return getRGB(
             sinf(0.05 * game.framecounter + 0 * M_PI / 3) * 127 + 128,
             sinf(0.05 * game.framecounter + 2 * M_PI / 3) * 127 + 128,

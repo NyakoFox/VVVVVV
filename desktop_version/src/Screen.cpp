@@ -52,8 +52,13 @@ void Screen::init(const struct ScreenSettings* settings)
         "VVVVVV: The Depths",
         SDL_WINDOWPOS_CENTERED_DISPLAY(windowDisplay),
         SDL_WINDOWPOS_CENTERED_DISPLAY(windowDisplay),
+#ifdef __SWITCH__
+        SWITCH_WIDTH,
+        SWITCH_HEIGHT,
+#else
         SCREEN_WIDTH_PIXELS * 2,
         SCREEN_HEIGHT_PIXELS * 2,
+#endif
         SDL_WINDOW_HIDDEN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI
     );
 
@@ -107,8 +112,13 @@ void Screen::GetSettings(struct ScreenSettings* settings)
         windowDisplay = 0;
     }
     settings->windowDisplay = windowDisplay;
+#ifdef __SWITCH__
     settings->windowWidth = windowWidth;
     settings->windowHeight = windowHeight;
+#else
+    settings->windowWidth = SWITCH_WIDTH;
+    settings->windowHeight = SWITCH_HEIGHT;
+#endif
 
     settings->fullscreen = !isWindowed;
     settings->useVsync = vsync;
@@ -271,6 +281,10 @@ void Screen::ResizeToNearestMultiple(void)
 
 void Screen::GetScreenSize(int* x, int* y)
 {
+#ifdef __SWITCH__
+    *x = SWITCH_WIDTH;
+    *y = SWITCH_HEIGHT;
+#else
     if (SDL_GetRendererOutputSize(m_renderer, x, y) != 0)
     {
         vlog_error("Could not get window size: %s", SDL_GetError());
@@ -278,6 +292,7 @@ void Screen::GetScreenSize(int* x, int* y)
         *x = SCREEN_WIDTH_PIXELS;
         *y = SCREEN_HEIGHT_PIXELS;
     }
+#endif
 }
 
 void Screen::RenderPresent(void)
@@ -388,7 +403,7 @@ bool Screen::isForcedFullscreen(void)
      * If you're working on a tenfoot-only build, add a def that always
      * returns true!
      */
-#if defined(__ANDROID__) || TARGET_OS_IPHONE
+#if defined(__ANDROID__) || TARGET_OS_IPHONE || defined(__SWITCH__)
     return true;
 #else
     return SDL_GetHintBoolean("SteamTenfoot", SDL_FALSE);
