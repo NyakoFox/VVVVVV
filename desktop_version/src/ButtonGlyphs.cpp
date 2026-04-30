@@ -199,6 +199,9 @@ void BUTTONGLYPHS_keyboard_set_active(bool active)
 
 void BUTTONGLYPHS_update_layout(SDL_GameController *c)
 {
+#ifdef __SWITCH__
+    layout = LAYOUT_NINTENDO_SWITCH_PRO;
+#else
     Uint16 vendor = SDL_GameControllerGetVendor(c);
     Uint16 product = SDL_GameControllerGetProduct(c);
 
@@ -260,6 +263,7 @@ void BUTTONGLYPHS_update_layout(SDL_GameController *c)
          */
         layout = LAYOUT_XBOX;
     }
+#endif
 }
 
 const char* BUTTONGLYPHS_get_wasd_text(void)
