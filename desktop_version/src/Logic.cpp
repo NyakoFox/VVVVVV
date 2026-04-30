@@ -773,7 +773,14 @@ void gamelogic(void)
                         music.play(Music_POTENTIALFORANYTHING);
                         break;
                     case TimeTrial_TOWER:
-                        music.play(Music_POSITIVEFORCE);
+                        if (graphics.flipmode)
+                        {
+                            music.play(Music_POSITIVEFORCEREVERSED);
+                        }
+                        else
+                        {
+                            music.play(Music_POSITIVEFORCE);
+                        }
                         break;
                     case TimeTrial_SPACESTATION2:
                         music.play(Music_PUSHINGONWARDS);

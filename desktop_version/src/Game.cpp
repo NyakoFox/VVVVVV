@@ -7815,7 +7815,6 @@ void Game::mapmenuchange(const enum GameGamestate newgamestate, const bool user_
     gamestate = newgamestate;
     graphics.resumegamemode = false;
     mapheld = true;
-    gameScreen.recacheTextures();
 
     if (prevgamestate == GAMEMODE)
     {
