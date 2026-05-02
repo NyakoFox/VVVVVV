@@ -342,6 +342,7 @@ int FILESYSTEM_init(char *argvZero, char* baseDir, char *assetsPath, char* langD
             "\nso grab it from there.",
             NULL
         );
+
         VVV_exit(1);
         return 0;
     }

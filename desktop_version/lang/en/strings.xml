@@ -229,6 +229,7 @@
     <string english="E" translation="" explanation="keyboard key E. Speedrunner options menu"/>
     <string english="ENTER" translation="" explanation="keyboard key ENTER. Speedrunner options menu"/>
     <string english="ESC" translation="" explanation="keyboard key ESC"/>
+    <string english="TAB" translation="" explanation="keyboard key TAB"/>
     <string english="ACTION" translation="" explanation="the ACTION key is either the SPACE key, Z or V (this is explained on the title screen). It's used in strings like `Press ACTION to advance text`"/>
     <string english="Interact button: {button}" translation="" explanation="keyboard key (E or ENTER) is filled in for {button}. Speedrunner options menu" max="38*2"/>
     <string english="fake load screen" translation="" explanation="menu option"/>
@@ -637,6 +638,8 @@
     <string english="Enemy Type Changed" translation="" explanation="level editor, user changed enemy appearance for the room" max="38*3"/>
     <string english="Platform speed is now {speed}" translation="" explanation="level editor, user changed speed of platforms for the room" max="38*3"/>
     <string english="Enemy speed is now {speed}" translation="" explanation="level editor, user changed speed of enemies for the room" max="38*3"/>
+    <string english="ERROR: Nothing to undo" translation="" explanation="level editor, user tried to undo with nothing to undo" max="38*3"/>
+    <string english="ERROR: Nothing to redo" translation="" explanation="level editor, user tried to redo with nothing to redo" max="38*3"/>
     <string english="Reloaded resources" translation="" explanation="level editor, reloaded graphics assets/resources, music and sound effects" max="38*3"/>
     <string english="ERROR: Invalid format" translation="" explanation="user was supposed to enter something like `12,12`, but entered `as@df`" max="38*3"/>
     <string english="Loaded map: {filename}.vvvvvv" translation="" explanation="successfully loaded level file" max="38*3"/>

@@ -93,7 +93,7 @@ static FAudioMasteringVoice* masteringvoice = NULL;
 class SoundTrack
 {
 public:
-    SoundTrack(const char* fileName)
+    SoundTrack(const char* fileName, const char* _id, bool _extra)
     {
         unsigned char* mem;
         size_t length;
@@ -118,6 +118,9 @@ public:
         {
             LoadWAV(fileName, mem, length);
         }
+
+        extra = _extra;
+        id = SDL_strdup(_id);
     }
 
     void LoadWAV(const char* fileName, unsigned char* mem, const size_t length)
@@ -134,7 +137,7 @@ public:
         format.nSamplesPerSec = spec.freq;
         format.wFormatTag = FAUDIO_FORMAT_PCM;
         format.wBitsPerSample = SDL_AUDIO_BITSIZE(spec.format);
-        format.nBlockAlign = format.nChannels * format.wBitsPerSample;
+        format.nBlockAlign = format.nChannels * (format.wBitsPerSample / 8);
         format.nAvgBytesPerSec = format.nSamplesPerSec * format.nBlockAlign;
         format.cbSize = 0;
         valid = true;
@@ -158,7 +161,7 @@ end:
         format.wBitsPerSample = sizeof(float) * 8;
         format.nChannels = vorbis_info.channels;
         format.nSamplesPerSec = vorbis_info.sample_rate;
-        format.nBlockAlign = format.nChannels * format.wBitsPerSample;
+        format.nBlockAlign = format.nChannels * (format.wBitsPerSample / 8);
         format.nAvgBytesPerSec = format.nSamplesPerSec * format.nBlockAlign;
         format.cbSize = 0;
 
@@ -180,6 +183,7 @@ end:
         VVV_free(decoded_buf_reserve);
         VVV_freefunc(stb_vorbis_close, vorbis);
         VVV_free(ogg_file);
+        VVV_free(id);
     }
 
     void Stop(void)
@@ -229,7 +233,7 @@ end:
                 }
                 FAudioBuffer faudio_buffer = {
                     FAUDIO_END_OF_STREAM, /* Flags */
-                    wav_length * 8, /* AudioBytes */
+                    wav_length, /* AudioBytes */
                     wav_buffer, /* AudioData */
                     0, /* playbegin */
                     0, /* playlength */
@@ -286,7 +290,7 @@ end:
                 format.nSamplesPerSec = audio_rate;
                 format.wFormatTag = FAUDIO_FORMAT_PCM;
                 format.wBitsPerSample = 16;
-                format.nBlockAlign = format.nChannels * format.wBitsPerSample;
+                format.nBlockAlign = format.nChannels * (format.wBitsPerSample / 8);
                 format.nAvgBytesPerSec = format.nSamplesPerSec * format.nBlockAlign;
                 format.cbSize = 0;
                 voice_formats[i] = format;
@@ -388,6 +392,9 @@ end:
     static FAudioSourceVoice** voices;
     static FAudioWaveFormatEx voice_formats[VVV_MAX_CHANNELS];
     static float volume;
+
+    char* id;
+    bool extra;
 };
 FAudioSourceVoice** SoundTrack::voices = NULL;
 FAudioWaveFormatEx SoundTrack::voice_formats[VVV_MAX_CHANNELS];
@@ -416,7 +423,7 @@ public:
         format.wBitsPerSample = sizeof(float) * 8;
         format.nChannels = vorbis_info.channels;
         format.nSamplesPerSec = vorbis_info.sample_rate;
-        format.nBlockAlign = format.nChannels * format.wBitsPerSample;
+        format.nBlockAlign = format.nChannels * (format.wBitsPerSample / 8);
         format.nAvgBytesPerSec = format.nSamplesPerSec * format.nBlockAlign;
         format.cbSize = 0;
 
@@ -751,9 +758,16 @@ musicclass::musicclass(void)
     quick_fade = true;
 }
 
+static void add_builtin_sound(const char* id)
+{
+    char asset_filename[256];
+    SDL_snprintf(asset_filename, sizeof(asset_filename), "sounds/%s.wav", id);
+    soundTracks.push_back(SoundTrack(asset_filename, id, false));
+}
+
 void musicclass::init(void)
 {
-    if (FAudioCreate(&faudioctx, 0, FAUDIO_DEFAULT_PROCESSOR))
+    if (FAudioCreate(&faudioctx, FAUDIO_1024_QUANTUM, FAUDIO_DEFAULT_PROCESSOR))
     {
         vlog_error("Unable to initialize FAudio");
         return;
@@ -766,47 +780,97 @@ void musicclass::init(void)
 
     SoundTrack::Init(44100);
 
-    soundTracks.push_back(SoundTrack( "sounds/jump.wav" ));
-    soundTracks.push_back(SoundTrack( "sounds/jump2.wav" ));
-    soundTracks.push_back(SoundTrack( "sounds/hurt.wav" ));
-    soundTracks.push_back(SoundTrack( "sounds/souleyeminijingle.wav" ));
-    soundTracks.push_back(SoundTrack( "sounds/coin.wav" ));
-    soundTracks.push_back(SoundTrack( "sounds/save.wav" ));
-    soundTracks.push_back(SoundTrack( "sounds/crumble.wav" ));
-    soundTracks.push_back(SoundTrack( "sounds/vanish.wav" ));
-    soundTracks.push_back(SoundTrack( "sounds/blip.wav" ));
-    soundTracks.push_back(SoundTrack( "sounds/preteleport.wav" ));
-    soundTracks.push_back(SoundTrack( "sounds/teleport.wav" ));
-    soundTracks.push_back(SoundTrack( "sounds/crew1.wav" ));
-    soundTracks.push_back(SoundTrack( "sounds/crew2.wav" ));
-    soundTracks.push_back(SoundTrack( "sounds/crew3.wav" ));
-    soundTracks.push_back(SoundTrack( "sounds/crew4.wav" ));
-    soundTracks.push_back(SoundTrack( "sounds/crew5.wav" ));
-    soundTracks.push_back(SoundTrack( "sounds/crew6.wav" ));
-    soundTracks.push_back(SoundTrack( "sounds/terminal.wav" ));
-    soundTracks.push_back(SoundTrack( "sounds/gamesaved.wav" ));
-    soundTracks.push_back(SoundTrack( "sounds/crashing.wav" ));
-    soundTracks.push_back(SoundTrack( "sounds/blip2.wav" ));
-    soundTracks.push_back(SoundTrack( "sounds/countdown.wav" ));
-    soundTracks.push_back(SoundTrack( "sounds/go.wav" ));
-    soundTracks.push_back(SoundTrack( "sounds/crash.wav" ));
-    soundTracks.push_back(SoundTrack( "sounds/combine.wav" ));
-    soundTracks.push_back(SoundTrack( "sounds/newrecord.wav" ));
-    soundTracks.push_back(SoundTrack( "sounds/trophy.wav" ));
-    soundTracks.push_back(SoundTrack( "sounds/rescue.wav" ));
-    soundTracks.push_back(SoundTrack( "sounds/splash.wav" ));
-    soundTracks.push_back(SoundTrack( "sounds/menuopen.wav" ));
-    soundTracks.push_back(SoundTrack( "sounds/menuclose.wav" ));
-    soundTracks.push_back(SoundTrack( "sounds/itemget.wav" ));
-    soundTracks.push_back(SoundTrack( "sounds/reel.wav" ));
-    soundTracks.push_back(SoundTrack( "sounds/splash2.wav" ));
-    soundTracks.push_back(SoundTrack( "sounds/fishalert.wav" ));
-    soundTracks.push_back(SoundTrack( "sounds/fishcaught.wav" ));
-    soundTracks.push_back(SoundTrack( "sounds/gate.wav" ));
-    soundTracks.push_back(SoundTrack( "sounds/fillbucket.wav" ));
-    soundTracks.push_back(SoundTrack( "sounds/error.wav" ));
-    soundTracks.push_back(SoundTrack( "sounds/cash.wav" ));
-    soundTracks.push_back(SoundTrack( "sounds/dripple.wav" ));
+    add_builtin_sound("jump");
+    add_builtin_sound("jump2");
+    add_builtin_sound("hurt");
+    add_builtin_sound("souleyeminijingle");
+    add_builtin_sound("coin");
+    add_builtin_sound("save");
+    add_builtin_sound("crumble");
+    add_builtin_sound("vanish");
+    add_builtin_sound("blip");
+    add_builtin_sound("preteleport");
+    add_builtin_sound("teleport");
+    add_builtin_sound("crew1");
+    add_builtin_sound("crew2");
+    add_builtin_sound("crew3");
+    add_builtin_sound("crew4");
+    add_builtin_sound("crew5");
+    add_builtin_sound("crew6");
+    add_builtin_sound("terminal");
+    add_builtin_sound("gamesaved");
+    add_builtin_sound("crashing");
+    add_builtin_sound("blip2");
+    add_builtin_sound("countdown");
+    add_builtin_sound("go");
+    add_builtin_sound("crash");
+    add_builtin_sound("combine");
+    add_builtin_sound("newrecord");
+    add_builtin_sound("trophy");
+    add_builtin_sound("rescue");
+    add_builtin_sound("splash");
+    add_builtin_sound("menuopen");
+    add_builtin_sound("menuclose");
+    add_builtin_sound("itemget");
+    add_builtin_sound("reel");
+    add_builtin_sound("splash2");
+    add_builtin_sound("fishalert");
+    add_builtin_sound("fishcaught");
+    add_builtin_sound("gate");
+    add_builtin_sound("fillbucket");
+    add_builtin_sound("error");
+    add_builtin_sound("cash");
+    add_builtin_sound("dripple");
+
+    EnumHandle handle = {};
+    const char* item;
+    while ((item = FILESYSTEM_enumerateAssets("sounds", &handle)) != NULL)
+    {
+        char asset_filename[256];
+        char id[256];
+        SDL_snprintf(asset_filename, sizeof(asset_filename), "sounds/%s", item);
+
+        // Create the ID
+        size_t current_char = 0;
+        size_t item_len = SDL_strlen(item);
+        for (size_t i = 0; i < item_len; i++)
+        {
+            // If it's a space, we don't want to include this.
+            if (item[i] == ' ')
+            {
+                continue;
+            }
+            // Otherwise, add it to our ID string, lowered
+            id[current_char] = SDL_tolower(item[i]);
+
+            current_char++;
+
+            if (current_char >= 255)
+            {
+                break;
+            }
+        }
+
+        // Null-terminate the string
+        id[current_char] = '\0';
+
+        // Chop off the extension!
+        char* dot = SDL_strrchr(id, '.');
+        if (dot != NULL)
+        {
+            *dot = '\0';
+        }
+
+        if (soundidexists(id))
+        {
+            // Make sure we haven't already loaded this file
+            continue;
+        }
+
+        vlog_info("Reading extra sound file %s as %s", item, id);
+        soundTracks.push_back(SoundTrack(asset_filename, id, true));
+    }
+    FILESYSTEM_freeEnumerate(&handle);
 
 #ifdef VVV_COMPILEMUSIC
     binaryBlob musicWriteBlob;
@@ -1272,13 +1336,61 @@ void musicclass::loopef(int t)
     soundTracks[t].Play(true);
 }
 
-void musicclass::playef(int t)
+bool musicclass::playef(int t)
 {
     if (!INBOUNDS_VEC(t, soundTracks))
     {
-        return;
+        return false;
     }
-    soundTracks[t].Play();
+    if (soundTracks[t].valid)
+    {
+        soundTracks[t].Play();
+        return true;
+    }
+    return false;
+}
+
+bool musicclass::playefid(const char* id)
+{
+    for (size_t i = 0; i < soundTracks.size(); i++)
+    {
+        if (SDL_strcmp(soundTracks[i].id, id) == 0)
+        {
+            return playef(i);
+        }
+    }
+    vlog_error("playefid() couldn't find sound ID: %s", id);
+    return false;
+}
+
+bool musicclass::soundidexists(const char* id)
+{
+    for (size_t i = 0; i < soundTracks.size(); i++)
+    {
+        if (SDL_strcmp(soundTracks[i].id, id) == 0)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool musicclass::soundisextra(int t)
+{
+    if (INBOUNDS_VEC(t, soundTracks))
+    {
+        return soundTracks[t].extra;
+    }
+    return false;
+}
+
+const char* musicclass::getsoundid(int t)
+{
+    if (INBOUNDS_VEC(t, soundTracks))
+    {
+        return soundTracks[t].id;
+    }
+    return NULL;
 }
 
 void musicclass::pauseef(void)

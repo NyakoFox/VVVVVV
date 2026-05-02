@@ -107,9 +107,13 @@ public:
     int currentsong;
     int haltedsong;
 
-    void playef(int t);
     void loopef(int t);
     void stopef(int t);
+    bool playef(int t);
+    bool playefid(const char* id);
+    bool soundidexists(const char* id);
+    bool soundisextra(int t);
+    const char* getsoundid(int t);
     void pauseef(void);
     void resumeef(void);
 
