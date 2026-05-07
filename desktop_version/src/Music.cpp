@@ -3,7 +3,6 @@
 
 #include <SDL.h>
 #include <FAudio.h>
-#include <physfsrwops.h>
 
 #include "Alloc.h"
 #include "BinaryBlob.h"
@@ -379,7 +378,7 @@ float SoundTrack::volume = 0.0f;
 class MusicTrack
 {
 public:
-    MusicTrack(SDL_RWops *rw)
+    MusicTrack(SDL_RWops *rw, const char* _id, bool _loose_extra)
     {
         SDL_zerop(this);
         read_buf = (Uint8*) SDL_malloc(rw->size(rw));
@@ -387,6 +386,10 @@ public:
         int err;
         stb_vorbis_info vorbis_info;
         stb_vorbis_comment vorbis_comment;
+
+        id = SDL_strdup(_id);
+
+        loose_extra = _loose_extra;
         vorbis = stb_vorbis_open_memory(read_buf, rw->size(rw), &err, NULL);
         if (vorbis == NULL)
         {
@@ -425,6 +428,7 @@ end:
         VVV_free(read_buf);
         VVV_free(decoded_buf_playing);
         VVV_free(decoded_buf_reserve);
+        VVV_free(id);
         if (!IsHalted())
         {
             VVV_freefunc(FAudioVoice_DestroyVoice, musicVoice);
@@ -533,6 +537,8 @@ end:
     Uint8* decoded_buf_playing;
     Uint8* decoded_buf_reserve;
     Uint8* read_buf;
+    char* id;
+    bool loose_extra;
     bool shouldloop;
     bool valid;
 
@@ -736,6 +742,42 @@ musicclass::musicclass(void)
     usingmmmmmm = false;
 }
 
+static void make_id_from_filename(char* id, size_t id_size, const char* filename)
+{
+    // Create the ID
+    size_t current_char = 0;
+    size_t item_len = SDL_strlen(filename);
+
+    for (size_t i = 0; i < item_len; i++)
+    {
+        // If it's a space, we don't want to include this.
+        if (filename[i] == ' ')
+        {
+            continue;
+        }
+
+        // Otherwise, add it to our ID string, lowered
+        id[current_char] = SDL_tolower(filename[i]);
+
+        current_char++;
+
+        if (current_char >= (id_size - 1))
+        {
+            break;
+        }
+    }
+
+    // Null-terminate the string
+    id[current_char] = '\0';
+
+    // Chop off the extension!
+    char* dot = SDL_strrchr(id, '.');
+    if (dot != NULL)
+    {
+        *dot = '\0';
+    }
+}
+
 static void add_builtin_sound(const char* id)
 {
     char asset_filename[256];
@@ -743,9 +785,31 @@ static void add_builtin_sound(const char* id)
     soundTracks.push_back(SoundTrack(asset_filename, id, false));
 }
 
+static void add_builtin_track(SDL_RWops* rw, const char* track_name)
+{
+    // Make an ID from the track name
+    char id[256];
+    SDL_strlcpy(id, track_name, sizeof(id));
+
+    // Strip "music/" prefix if it exists
+    if (SDL_strncmp(id, "music/", 6) == 0)
+    {
+        SDL_memmove(id, id + 6, SDL_strlen(id) - 5);
+    }
+
+    // Strip file extension if any
+    char* dot = SDL_strrchr(id, '.');
+    if (dot != NULL)
+    {
+        *dot = '\0';
+    }
+
+    musicTracks.push_back(MusicTrack(rw, id, false));
+}
+
 void musicclass::init(void)
 {
-    if (FAudioCreate(&faudioctx, 0, FAUDIO_DEFAULT_PROCESSOR))
+    if (FAudioCreate(&faudioctx, FAUDIO_1024_QUANTUM, FAUDIO_DEFAULT_PROCESSOR))
     {
         vlog_error("Unable to initialize FAudio");
         return;
@@ -795,36 +859,7 @@ void musicclass::init(void)
         char id[256];
         SDL_snprintf(asset_filename, sizeof(asset_filename), "sounds/%s", item);
 
-        // Create the ID
-        size_t current_char = 0;
-        size_t item_len = SDL_strlen(item);
-        for (size_t i = 0; i < item_len; i++)
-        {
-            // If it's a space, we don't want to include this.
-            if (item[i] == ' ')
-            {
-                continue;
-            }
-            // Otherwise, add it to our ID string, lowered
-            id[current_char] = SDL_tolower(item[i]);
-
-            current_char++;
-
-            if (current_char >= 255)
-            {
-                break;
-            }
-        }
-
-        // Null-terminate the string
-        id[current_char] = '\0';
-
-        // Chop off the extension!
-        char* dot = SDL_strrchr(id, '.');
-        if (dot != NULL)
-        {
-            *dot = '\0';
-        }
+        make_id_from_filename(id, sizeof(id), item);
 
         if (soundidexists(id))
         {
@@ -852,28 +887,41 @@ void musicclass::init(void)
 
     if (!mmmmmm_blob.unPackBinary("mmmmmm.vvv"))
     {
+        // If mmmmmm.vvv is invalid, or doesn't exist...
+
+        SDL_RWops* rw;
+
         if (pppppp_blob.unPackBinary("vvvvvvmusic.vvv"))
         {
             vlog_info("Loading music from PPPPPP blob...");
 
             mmmmmm = false;
-            usingmmmmmm=false;
+            usingmmmmmm = false;
 
             int index;
-            SDL_RWops* rw;
 
 #define TRACK_LOAD_BLOB(blob, track_name) \
-    index = blob.getIndex("data/" track_name); \
-    if (index >= 0 && index < blob.max_headers) \
+    vlog_debug("Searching for track " track_name " as loose file"); \
+    rw = FILESYSTEM_loadAssetRWops(track_name); \
+    if (rw != NULL) \
     { \
-        rw = SDL_RWFromConstMem(blob.getAddress(index), blob.getSize(index)); \
-        if (rw == NULL) \
+        vlog_debug("Found loose music file " track_name); \
+        add_builtin_track(rw, track_name); \
+    } \
+    else \
+    { \
+        index = blob.getIndex("data/" track_name); \
+        if (index >= 0 && index < blob.max_headers) \
         { \
-            vlog_error("Unable to read music file header: %s", SDL_GetError()); \
-        } \
-        else \
-        { \
-            musicTracks.push_back(MusicTrack(rw)); \
+            rw = SDL_RWFromConstMem(blob.getAddress(index), blob.getSize(index)); \
+            if (rw == NULL) \
+            { \
+                vlog_error("Unable to read music file header: %s", SDL_GetError()); \
+            } \
+            else \
+            { \
+                add_builtin_track(rw, track_name); \
+            } \
         } \
     }
 
@@ -885,20 +933,22 @@ void musicclass::init(void)
         }
         else
         {
-            vlog_info("Loading music from loose files...");
+            vlog_info("No music blobs found");
 
-            SDL_RWops* rw;
-
-#define FOREACH_TRACK(_, track_name) \
-    rw = PHYSFSRWOPS_openRead(track_name); \
-    if (rw == NULL) \
+#define TRACK_LOAD_LOOSE(_, track_name) \
+    vlog_debug("Searching for track " track_name " as loose file"); \
+    rw = FILESYSTEM_loadAssetRWops(track_name); \
+    if (rw != NULL) \
     { \
-        vlog_error("Unable to read loose music file: %s", SDL_GetError()); \
+        vlog_debug("Found loose music file \"" track_name "\""); \
+        add_builtin_track(rw, track_name); \
     } \
     else \
     { \
-        musicTracks.push_back(MusicTrack(rw)); \
+        vlog_error("Unable to load loose music file: %s", SDL_GetError()); \
     }
+
+#define FOREACH_TRACK(_, track_name) TRACK_LOAD_LOOSE(_, track_name)
 
             TRACK_NAMES(_)
 
@@ -923,7 +973,7 @@ void musicclass::init(void)
         while (mmmmmm_blob.nextExtra(&index_))
         {
             rw = SDL_RWFromConstMem(mmmmmm_blob.getAddress(index_), mmmmmm_blob.getSize(index_));
-            musicTracks.push_back(MusicTrack( rw ));
+            add_builtin_track(rw, mmmmmm_blob.m_headers[index_].name);
 
             num_mmmmmm_tracks++;
             index_++;
@@ -945,11 +995,53 @@ void musicclass::init(void)
     while (pppppp_blob.nextExtra(&index_))
     {
         rw = SDL_RWFromConstMem(pppppp_blob.getAddress(index_), pppppp_blob.getSize(index_));
-        musicTracks.push_back(MusicTrack( rw ));
+        add_builtin_track(rw, pppppp_blob.m_headers[index_].name);
 
         num_pppppp_tracks++;
         index_++;
     }
+
+    EnumHandle music_handle = {};
+    const char* music_item;
+    while ((music_item = FILESYSTEM_enumerateAssets("music", &music_handle)) != NULL)
+    {
+        char asset_filename[256];
+        char id[256];
+        SDL_snprintf(asset_filename, sizeof(asset_filename), "music/%s", music_item);
+
+        make_id_from_filename(id, sizeof(id), music_item);
+
+        if (idexists(id))
+        {
+            // Make sure we haven't already loaded this file
+            continue;
+        }
+
+        vlog_info("Reading loose extra music file %s as %s", music_item, id);
+
+        unsigned char* mem;
+        size_t len;
+        FILESYSTEM_loadAssetToMemory(asset_filename, &mem, &len);
+        if (mem == NULL)
+        {
+            vlog_error("Unable to load loose extra music file to memory: %s", SDL_GetError());
+        }
+        else
+        {
+            rw = SDL_RWFromConstMem(mem, len);
+            if (rw == NULL)
+            {
+                vlog_error("Unable to read loose extra music file from memory: %s", SDL_GetError());
+            }
+            else
+            {
+                musicTracks.push_back(MusicTrack(rw, id, true));
+                num_pppppp_tracks++;
+            }
+            VVV_free(mem);
+        }
+    }
+    FILESYSTEM_freeEnumerate(&music_handle);
 }
 
 void musicclass::destroy(void)
@@ -983,7 +1075,7 @@ void musicclass::set_sound_volume(int volume)
     SoundTrack::SetVolume(volume * user_sound_volume / USER_VOLUME_MAX);
 }
 
-void musicclass::play(int t)
+bool musicclass::play(int t)
 {
     if (mmmmmm && usingmmmmmm)
     {
@@ -1007,7 +1099,7 @@ void musicclass::play(int t)
 
     if (currentsong == t && !m_doFadeOutVol)
     {
-        return;
+        return true;
     }
 
     currentsong = t;
@@ -1015,14 +1107,14 @@ void musicclass::play(int t)
 
     if (t == -1)
     {
-        return;
+        return true;
     }
 
     if (!INBOUNDS_VEC(t, musicTracks))
     {
         vlog_error("play() out-of-bounds!");
         currentsong = -1;
-        return;
+        return false;
     }
 
     if (currentsong == Music_PATHCOMPLETE ||
@@ -1064,6 +1156,51 @@ void musicclass::play(int t)
             fadeMusicVolumeIn(3000);
         }
     }
+
+    return true;
+}
+
+bool musicclass::playid(const char* id)
+{
+    for (size_t i = 0; i < musicTracks.size(); i++)
+    {
+        if (SDL_strcmp(musicTracks[i].id, id) == 0)
+        {
+            return play(i);
+        }
+    }
+    vlog_error("playid() couldn't find music ID: %s", id);
+    return false;
+}
+
+bool musicclass::idexists(const char* id)
+{
+    for (size_t i = 0; i < musicTracks.size(); i++)
+    {
+        if (SDL_strcmp(musicTracks[i].id, id) == 0)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool musicclass::isextra(int t)
+{
+    if (INBOUNDS_VEC(t, musicTracks))
+    {
+        return musicTracks[t].loose_extra;
+    }
+    return false;
+}
+
+const char* musicclass::getid(int t)
+{
+    if (INBOUNDS_VEC(t, musicTracks))
+    {
+        return musicTracks[t].id;
+    }
+    return NULL;
 }
 
 void musicclass::resume(void)
