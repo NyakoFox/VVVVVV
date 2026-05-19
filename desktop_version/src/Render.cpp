@@ -291,6 +291,7 @@ static void menurender(void)
     case Menu::gameplayoptions:
     {
         int gameplayoptionsoffset = 0;
+#if defined(ALLOW_FLIP_MODE)
 #if !defined(MAKEANDPLAY)
         if (game.ingame_titlemode && game.unlock[Unlock_FLIPMODE])
 #endif
@@ -309,7 +310,8 @@ static void menurender(void)
                 }
             }
         }
-
+#endif
+#if defined(ALLOW_FPS_INTERPOLATION)
         if (game.currentmenuoption == gameplayoptionsoffset + 0)
         {
             //Toggle FPS
@@ -326,7 +328,11 @@ static void menurender(void)
             }
             break;
         }
-        else if (game.currentmenuoption == gameplayoptionsoffset + 1)
+        else
+#else
+        gameplayoptionsoffset--;
+#endif
+        if (game.currentmenuoption == gameplayoptionsoffset + 1)
         {
             //Speedrunner options
             font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Speedrunner Options"), tr, tg, tb);
@@ -382,9 +388,11 @@ static void menurender(void)
             font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Accessibility"), tr, tg, tb);
             font::print_wrap(PR_CEN, -1, 65, loc::gettext("Disable screen effects, enable slowdown modes or invincibility."), tr, tg, tb);
             break;
+#if defined(ALLOW_LANGUAGE_SELECTION)
         case 5:
             font::print(PR_2X | PR_CEN,  -1, 30, loc::gettext("Language"), tr, tg, tb);
             font::print_wrap(PR_CEN, -1, 65, loc::gettext("Change the language."), tr, tg, tb);
+#endif
         }
         break;
     case Menu::graphicoptions:

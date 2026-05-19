@@ -50,6 +50,12 @@ Nonetheless, here are the features:
     "level_filename": "testlevel", // The level file to load into (remove the .vvvvvv, and do not use zips)
     "allow_custom_levels": false, // Whether or not the custom levels menu is accessible or not
 
+    "allow_flip_mode": false, // Whether or not flip mode is allowed
+    "allow_language_selection": false, // Whether or not language selection is allowed (defaults to English if not)
+    "allow_fps_interpolation": true, // Whether or not 30+ FPS mode is allowed
+
+    "default_to_interpolated": false, // Whether to default to 30 FPS or 30+ FPS mode (does nothing if FPS interpolation is not allowed)
+
     "data_name": "data_modbase.zip", // The name of the data.zip to use
     "data_url": "https://example.com/data_modbase.zip", // Your modified copy of data.zip hosted somewhere
 

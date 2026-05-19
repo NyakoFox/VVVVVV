@@ -1027,6 +1027,7 @@ static void menuactionpress(void)
     case Menu::gameplayoptions:
     {
         int gameplayoptionsoffset = 0;
+#if defined(ALLOW_FLIP_MODE)
 #if !defined(MAKEANDPLAY)
         if (game.ingame_titlemode && game.unlock[Unlock_FLIPMODE])
 #endif
@@ -1053,7 +1054,9 @@ static void menuactionpress(void)
                 }
             }
         }
+#endif
 
+#if defined(ALLOW_FPS_INTERPOLATION)
         if (game.currentmenuoption == gameplayoptionsoffset + 0)
         {
             //Toggle 30+ FPS
@@ -1061,7 +1064,11 @@ static void menuactionpress(void)
             game.over30mode = !game.over30mode;
             game.savestatsandsettings_menu();
         }
-        else if (game.currentmenuoption == gameplayoptionsoffset + 1)
+        else
+#else
+        gameplayoptionsoffset--;
+#endif
+        if (game.currentmenuoption == gameplayoptionsoffset + 1)
         {
             //Speedrunner options
             music.playef(Sound_VIRIDIAN);
@@ -1130,6 +1137,7 @@ static void menuactionpress(void)
             game.createmenu(Menu::accessibility);
             map.nexttowercolour();
             break;
+#if defined(ALLOW_LANGUAGE_SELECTION)
         case 5:
             //language options
             if (game.translator_cutscene_test)
@@ -1145,6 +1153,7 @@ static void menuactionpress(void)
             game.currentmenuoption = loc::languagelist_curlang;
             map.nexttowercolour();
             break;
+#endif
         default:
             /* Return */
             music.playef(Sound_VIRIDIAN);

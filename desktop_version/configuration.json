@@ -15,6 +15,12 @@
     "level_filename": "testlevel",
     "allow_custom_levels": false,
 
+    "allow_flip_mode": false,
+    "allow_language_selection": false,
+    "allow_fps_interpolation": true,
+
+    "default_to_interpolated": false,
+
     "data_name": "data_modbase.zip",
     "data_url": "https://example.com/data_modbase.zip",
 

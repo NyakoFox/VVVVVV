@@ -726,6 +726,7 @@ int main(int argc, char *argv[])
         min_lang_set = 1;
     }
 
+#if defined(ALLOW_LANGUAGE_SELECTION)
     if (loc::lang_set < min_lang_set && !loc::languagelist.empty())
     {
         loc::pre_title_lang_menu = true;
@@ -734,6 +735,7 @@ int main(int argc, char *argv[])
         game.createmenu(Menu::language);
         game.currentmenuoption = loc::languagelist_curlang;
     }
+#endif
 
     //Check to see if you've already unlocked some achievements here from before the update
     if (game.swnbestrank > 0){

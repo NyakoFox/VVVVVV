@@ -357,7 +357,11 @@ void Game::init(void)
     fadetolab = false;
     fadetolabdelay = 0;
 
+#if defined(ALLOW_FPS_INTERPOLATION) && defined(DEFAULT_TO_INTERPOLATED)
     over30mode = true;
+#else
+    over30mode = false;
+#endif
     showingametimer = false;
 
     ingame_titlemode = false;
@@ -4801,10 +4805,12 @@ void Game::deserializesettings(tinyxml2::XMLElement* dataNode, struct ScreenSett
             colourblindmode = help.Int(pText);
         }
 
+#if defined(ALLOW_FLIP_MODE)
         if (SDL_strcmp(pKey, "setflipmode") == 0)
         {
             graphics.setflipmode = help.Int(pText);
         }
+#endif
 
         if (SDL_strcmp(pKey, "invincibility") == 0)
         {
@@ -4846,10 +4852,12 @@ void Game::deserializesettings(tinyxml2::XMLElement* dataNode, struct ScreenSett
             disableaudiopause = help.Int(pText);
         }
 
+#if defined(ALLOW_FPS_INTERPOLATION)
         if (SDL_strcmp(pKey, "over30mode") == 0)
         {
             over30mode = help.Int(pText);
         }
+#endif
 
         if (SDL_strcmp(pKey, "inputdelay") == 0)
         {
@@ -4946,6 +4954,7 @@ void Game::deserializesettings(tinyxml2::XMLElement* dataNode, struct ScreenSett
             key.sensitivity = help.Int(pText);
         }
 
+#if defined(ALLOW_LANGUAGE_SELECTION)
         if (SDL_strcmp(pKey, "lang") == 0)
         {
             loc::lang = std::string(pText);
@@ -4955,6 +4964,7 @@ void Game::deserializesettings(tinyxml2::XMLElement* dataNode, struct ScreenSett
         {
             loc::lang_set = help.Int(pText);
         }
+#endif
 
         if (SDL_strcmp(pKey, "english_sprites") == 0)
         {
@@ -5120,7 +5130,9 @@ void Game::serializesettings(tinyxml2::XMLElement* dataNode, const struct Screen
 
     xml::update_tag(dataNode, "colourblindmode", colourblindmode);
 
+#if defined(ALLOW_FLIP_MODE)
     xml::update_tag(dataNode, "setflipmode", graphics.setflipmode);
+#endif
 
     xml::update_tag(dataNode, "invincibility", map.invincibility);
 
@@ -5144,7 +5156,9 @@ void Game::serializesettings(tinyxml2::XMLElement* dataNode, const struct Screen
 
     xml::update_tag(dataNode, "translucentroomname", (int) graphics.translucentroomname);
 
+#if defined(ALLOW_FPS_INTERPOLATION)
     xml::update_tag(dataNode, "over30mode", (int) over30mode);
+#endif
 
     xml::update_tag(dataNode, "inputdelay", (int) inputdelay);
 
@@ -5228,8 +5242,11 @@ void Game::serializesettings(tinyxml2::XMLElement* dataNode, const struct Screen
 
     xml::update_tag(dataNode, "controllerSensitivity", key.sensitivity);
 
+#if defined(ALLOW_LANGUAGE_SELECTION)
     xml::update_tag(dataNode, "lang", loc::lang.c_str());
     xml::update_tag(dataNode, "lang_set", (int) loc::lang_set);
+#endif
+
     xml::update_tag(dataNode, "english_sprites", (int) loc::english_sprites);
     xml::update_tag(dataNode, "new_level_font", loc::new_level_font.c_str());
     xml::update_tag(dataNode, "roomname_translator", (int) roomname_translator::enabled);
@@ -6852,13 +6869,17 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         menuyoff = -20;
         break;
     case Menu::gameplayoptions:
+#if defined(ALLOW_FLIP_MODE)
 #if !defined(MAKEANDPLAY)
         if (ingame_titlemode && unlock[Unlock_FLIPMODE])
 #endif
         {
                 option(loc::gettext("flip mode"));
         }
+#endif
+#if defined(ALLOW_FPS_INTERPOLATION)
         option(loc::gettext("toggle fps"));
+#endif
         option(loc::gettext("speedrun options"));
         option(loc::gettext("advanced options"));
         option(loc::gettext("clear main game data"));
@@ -6945,7 +6966,9 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         option(loc::gettext("audio"));
         option(loc::gettext("game pad"));
         option(loc::gettext("accessibility"));
+#if defined(ALLOW_LANGUAGE_SELECTION)
         option(loc::gettext("language"), !translator_cutscene_test);
+#endif
         option(loc::gettext("return"));
         menuyoff = 0;
         maxspacing = 15;

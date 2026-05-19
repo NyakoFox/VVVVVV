@@ -25,6 +25,12 @@ string(JSON TITLE_EDITION_TEXT_Y GET "${config_json}" title edition_text_y)
 string(JSON LEVEL_FILENAME GET "${config_json}" level_filename)
 string(JSON ALLOW_CUSTOM_LEVELS GET "${config_json}" allow_custom_levels)
 
+string(JSON ALLOW_FLIP_MODE GET "${config_json}" allow_flip_mode)
+string(JSON ALLOW_LANGUAGE_SELECTION GET "${config_json}" allow_language_selection)
+string(JSON ALLOW_FPS_INTERPOLATION GET "${config_json}" allow_fps_interpolation)
+
+string(JSON DEFAULT_TO_INTERPOLATED GET "${config_json}" default_to_interpolated)
+
 string(JSON DATA_NAME GET "${config_json}" data_name)
 string(JSON DATA_URL GET "${config_json}" data_url)
 
@@ -278,6 +284,22 @@ target_compile_definitions(VVVVVV PRIVATE LEVEL_FILENAME="${LEVEL_FILENAME}")
 
 if(ALLOW_CUSTOM_LEVELS)
     target_compile_definitions(VVVVVV PRIVATE ALLOW_CUSTOM_LEVELS)
+endif()
+
+if(ALLOW_FLIP_MODE)
+    target_compile_definitions(VVVVVV PRIVATE ALLOW_FLIP_MODE)
+endif()
+
+if(ALLOW_LANGUAGE_SELECTION)
+    target_compile_definitions(VVVVVV PRIVATE ALLOW_LANGUAGE_SELECTION)
+endif()
+
+if (ALLOW_FPS_INTERPOLATION)
+    target_compile_definitions(VVVVVV PRIVATE ALLOW_FPS_INTERPOLATION)
+endif()
+
+if (DEFAULT_TO_INTERPOLATED)
+    target_compile_definitions(VVVVVV PRIVATE DEFAULT_TO_INTERPOLATED)
 endif()
 
 set(XML2_SRC
