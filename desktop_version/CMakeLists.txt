@@ -20,9 +20,14 @@ option(OFFICIAL_BUILD "Compile an official build of the game" OFF)
 
 option(MAKEANDPLAY "Compile a version of the game without the main campaign (provided for convenience; consider modifying MakeAndPlay.h instead" OFF)
 
-if(OFFICIAL_BUILD AND NOT MAKEANDPLAY)
-    set(STEAM ON)
-    set(GOG ON)
+option(WINXP "Compile with Windows XP support. You must set your toolkit version to v141_xp for this to work." OFF)
+
+if(OFFICIAL_BUILD)
+    set(WINXP ON)
+    if(NOT MAKEANDPLAY)
+        set(STEAM ON)
+        set(GOG ON)
+    endif()
 endif()
 
 option(REMOVE_ABSOLUTE_PATHS "If supported by the compiler, replace all absolute paths to source directories compiled into the binary (if any) with relative paths" ON)
@@ -56,18 +61,18 @@ endif()
 # RPATH
 if(NOT WIN32)
     if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
-        set(BIN_LIBROOT "Frameworks")
         set(BIN_RPATH "@executable_path/Frameworks")
     elseif(APPLE)
-        set(BIN_LIBROOT "osx")
         set(BIN_RPATH "@executable_path/osx")
-    elseif(CMAKE_SIZEOF_VOID_P MATCHES "8")
-        set(BIN_LIBROOT "lib64")
-        set(BIN_RPATH "\$ORIGIN/lib64")
-        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--disable-new-dtags")
     else()
-        set(BIN_LIBROOT "lib")
-        set(BIN_RPATH "\$ORIGIN/lib")
+        SET(CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} "-Wl,--disable-new-dtags")
+
+        if (CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
+            # Naming quirk for backward compatibility
+            SET(BIN_RPATH "\$ORIGIN/lib64")
+        else()
+            SET(BIN_RPATH "\$ORIGIN/lib${CMAKE_SYSTEM_PROCESSOR}")
+        endif()
     endif()
     set(CMAKE_SKIP_BUILD_RPATH TRUE)
     set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
@@ -350,6 +355,11 @@ if(BUNDLE_DEPENDENCIES)
     target_compile_definitions(physfs-static PRIVATE
         -DPHYSFS_SUPPORTS_DEFAULT=0 -DPHYSFS_SUPPORTS_ZIP=1
     )
+
+   if(MSVC AND WINXP)
+        target_compile_definitions(physfs-static PRIVATE -D_WIN32_WINNT=0x0501)
+    endif()
+
     add_library(faudio-static STATIC ${FAUDIO_SRC})
     target_include_directories(
         faudio-static PRIVATE

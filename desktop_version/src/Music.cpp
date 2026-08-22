@@ -381,15 +381,22 @@ public:
     MusicTrack(SDL_RWops *rw, const char* _id, bool _loose_extra)
     {
         SDL_zerop(this);
+
+        id = SDL_strdup(_id);
+        loose_extra = _loose_extra;
+
+        if (rw->size(rw) <= 1)
+        {
+            // Don't bother
+            vlog_debug("Skipping empty music track");
+            goto end;
+        }
         read_buf = (Uint8*) SDL_malloc(rw->size(rw));
         SDL_RWread(rw, read_buf, rw->size(rw), 1);
         int err;
         stb_vorbis_info vorbis_info;
         stb_vorbis_comment vorbis_comment;
 
-        id = SDL_strdup(_id);
-
-        loose_extra = _loose_extra;
         vorbis = stb_vorbis_open_memory(read_buf, rw->size(rw), &err, NULL);
         if (vorbis == NULL)
         {
