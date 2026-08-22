@@ -171,7 +171,7 @@ jobs:
       run: |
         mkdir $env:SRC_DIR_PATH/build-64
         cd $env:SRC_DIR_PATH/build-64
-        cmake -G "Visual Studio 17 2022" -A x64 `
+        cmake -G "Visual Studio 18 2026" -A x64 `
               -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT\scripts\buildsystems\vcpkg.cmake" `
               -DVCPKG_TARGET_TRIPLET=x64-windows-static `
               -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded `
