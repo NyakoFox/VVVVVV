@@ -447,10 +447,13 @@
     <string english="Are you sure you want to show the levels path? This may reveal sensitive information if you are streaming." translation="Показати шлях до папки з рівнями? Якщо ви ведете стрім, глядачі можуть випадково побачити вашу особисту інформацію." explanation="" max="38*4"/>
     <string english="The levels path is:" translation="Шлях до рівнів:" explanation="" max="40"/>
     <string english="[ Press {button} to Start ]" translation="[ Почати: натисніть {button} ]" explanation="title screen. Expect `ACTION`" max="38*2"/>
+    <string english="[ Tap screen to Start ]" translation="" explanation="title screen, using touch input" max="38*2"/>
     <string english="ACTION = Space, Z, or V" translation="КНОПКА ДІЇ = пробіл, Z або V" explanation="title screen" max="38*3"/>
     <string english="[Press {button} to return to editor]" translation="[Вернутись у редактор: натисніть {button}]" explanation="`to editor` is sorta redundant" max="40"/>
     <string english="- Press {button} to advance text -" translation="- Читати далі: натискайте {button} -" explanation="to dismiss a textbox. Expect `ACTION`" max="40"/>
+    <string english="- Tap screen to advance text -" translation="" explanation="to dismiss a textbox, using touch input" max="40"/>
     <string english="Press {button} to continue" translation="Продовжити: натисніть {button}" explanation="Expect `ACTION`" max="34"/>
+    <string english="Tap screen to continue" translation="" explanation="using touch input" max="34"/>
     <string english="[Press {button} to unfreeze gameplay]" translation="[Запустити гру: {button}]" explanation="in level debugger: {button} makes everything start moving as normal. Limit is treacherous, expect TAB for {button}. Frozen is the initial state, so this is the first string of the two that users will see!" max="39"/>
     <string english="[Press {button} to freeze gameplay]" translation="[Зупинити гру: {button}]" explanation="in level debugger: {button} makes everything stop moving. Limit is treacherous, expect TAB for {button}." max="39"/>
     <string english="Current Time" translation="Поточний час" explanation="super gravitron, stopwatch time" max="20"/>

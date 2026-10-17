@@ -17,6 +17,7 @@
 #include "LocalizationStorage.h"
 #include "Music.h"
 #include "Screen.h"
+#include "Touch.h"
 #include "UTF8.h"
 #include "UtilityClass.h"
 #include "Vlogging.h"
@@ -58,11 +59,14 @@ KeyPoll::KeyPoll(void)
     mousex = 0;
     mousey = 0;
     resetWindow = 0;
-    pressedbackspace=false;
+    pressedbackspace = false;
+    pressed_android_back = false;
 
     linealreadyemptykludge = false;
 
     isActive = true;
+
+    using_touch = false;
 }
 
 void KeyPoll::enabletextentry(void)
@@ -226,6 +230,32 @@ void KeyPoll::Poll(void)
     bool should_recompute_textboxes = false;
     bool active_input_device_changed = false;
     bool keyboard_was_active = BUTTONGLYPHS_keyboard_is_active();
+
+    int screen_width;
+    int screen_height;
+    gameScreen.GetScreenSize(&screen_width, &screen_height);
+
+    pressed_android_back = false;
+
+    // Update our finger states
+    std::map<SDL_FingerID, VVV_Finger>::iterator it;
+    for (it = fingers.begin(); it != fingers.end(); /* nothing */)
+    {
+        if (!it->second.down)
+        {
+            fingers.erase(it++);
+        }
+        else
+        {
+            if (it->second.just_pressed)
+            {
+                it->second.just_pressed = false;
+            }
+
+            ++it;
+        }
+    }
+
     while (SDL_PollEvent(&evt))
     {
         switch (evt.type)
@@ -234,6 +264,11 @@ void KeyPoll::Poll(void)
         case SDL_EVENT_KEY_DOWN:
         {
             keymap[evt.key.key] = true;
+
+            if (evt.key.scancode == SDL_SCANCODE_AC_BACK)
+            {
+                pressed_android_back = true;
+            }
 
             if (evt.key.key == SDLK_BACKSPACE)
             {
@@ -446,6 +481,43 @@ void KeyPoll::Poll(void)
             break;
         }
 
+        /* Touch Input */
+        case SDL_EVENT_FINGER_DOWN:
+            using_touch = true;
+
+            VVV_Finger finger;
+            finger.just_pressed = true;
+            finger.just_released = false;
+            finger.down = true;
+            finger.x = evt.tfinger.x * (float)screen_width;
+            finger.y = evt.tfinger.y * (float)screen_height;
+
+            fingers[evt.tfinger.fingerID] = finger;
+            break;
+        case SDL_EVENT_FINGER_MOTION:
+            if (fingers.count(evt.tfinger.fingerID) != 0)
+            {
+                fingers[evt.tfinger.fingerID].x = evt.tfinger.x * (float)screen_width;
+                fingers[evt.tfinger.fingerID].y = evt.tfinger.y * (float)screen_height;
+            }
+            break;
+        case SDL_EVENT_FINGER_UP:
+            if (fingers.count(evt.tfinger.fingerID) != 0)
+            {
+                fingers[evt.tfinger.fingerID].just_released = true;
+                fingers[evt.tfinger.fingerID].down = false;
+            }
+            break;
+        case SDL_EVENT_FINGER_CANCELED:
+            // Uh oh, cancelled by the OS
+            // Basically the same as up, except let's not trigger anything (no released state)
+
+            if (fingers.count(evt.tfinger.fingerID) != 0)
+            {
+                fingers[evt.tfinger.fingerID].down = false;
+            }
+            break;
+
         case SDL_EVENT_RENDER_TARGETS_RESET:
             gameScreen.recacheTextures();
             break;
@@ -524,6 +596,8 @@ void KeyPoll::Poll(void)
         switch (evt.type)
         {
         case SDL_EVENT_KEY_DOWN:
+            using_touch = false;
+
             if (evt.key.repeat == 0)
             {
                 hidemouse = true;
@@ -532,6 +606,7 @@ void KeyPoll::Poll(void)
         case SDL_EVENT_TEXT_INPUT:
         case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
         case SDL_EVENT_GAMEPAD_AXIS_MOTION:
+            using_touch = false;
             hidemouse = true;
             break;
         case SDL_EVENT_MOUSE_MOTION:
@@ -641,4 +716,19 @@ bool KeyPoll::controllerWantsUp(void)
 bool KeyPoll::controllerWantsDown(void)
 {
     return buttonmap[SDL_GAMEPAD_BUTTON_DPAD_DOWN] || yVel > 0;
+}
+
+bool KeyPoll::touchPressed(void)
+{
+    std::map<SDL_FingerID, VVV_Finger>::iterator it;
+
+    for (it = fingers.begin(); it != fingers.end(); ++it)
+    {
+        if (it->second.just_pressed)
+        {
+            return true;
+        }
+    }
+
+    return false;
 }

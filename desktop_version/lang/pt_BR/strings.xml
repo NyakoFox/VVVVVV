@@ -447,10 +447,13 @@
     <string english="Are you sure you want to show the levels path? This may reveal sensitive information if you are streaming." translation="Quer mesmo mostrar o diretório dos níveis? Isso pode revelar informações confidenciais se você estiver transmitindo em vídeo." explanation="" max="38*4"/>
     <string english="The levels path is:" translation="O diretório dos níveis é:" explanation="" max="40"/>
     <string english="[ Press {button} to Start ]" translation="[ Pressione {button} para começar ]" explanation="title screen. Expect `ACTION`" max="38*2"/>
+    <string english="[ Tap screen to Start ]" translation="" explanation="title screen, using touch input" max="38*2"/>
     <string english="ACTION = Space, Z, or V" translation="AÇÃO = Espaço, Z ou V" explanation="title screen" max="38*3"/>
     <string english="[Press {button} to return to editor]" translation="[Pressione {button} para voltar]" explanation="`to editor` is sorta redundant" max="40"/>
     <string english="- Press {button} to advance text -" translation="- Pressione {button} para avançar o texto -" explanation="to dismiss a textbox. Expect `ACTION`" max="40"/>
+    <string english="- Tap screen to advance text -" translation="" explanation="to dismiss a textbox, using touch input" max="40"/>
     <string english="Press {button} to continue" translation="Pressione {button} para continuar" explanation="Expect `ACTION`" max="34"/>
+    <string english="Tap screen to continue" translation="" explanation="using touch input" max="34"/>
     <string english="[Press {button} to unfreeze gameplay]" translation="[Pressione {button} para descongelar o jogo]" explanation="in level debugger: {button} makes everything start moving as normal. Limit is treacherous, expect TAB for {button}. Frozen is the initial state, so this is the first string of the two that users will see!" max="39"/>
     <string english="[Press {button} to freeze gameplay]" translation="[Pressione {button} para congelar o jogo]" explanation="in level debugger: {button} makes everything stop moving. Limit is treacherous, expect TAB for {button}." max="39"/>
     <string english="Current Time" translation="Tempo atual" explanation="super gravitron, stopwatch time" max="20"/>

@@ -453,10 +453,13 @@
     <string english="Are you sure you want to show the levels path? This may reveal sensitive information if you are streaming." translation="قبل إظهار مسار المستويات، يرجى التأكد لتجنب افتضاح أي معلومات حساسة أثناء البثوث. هل نظهره؟" explanation="" max="38*4" max_local="38*4"/>
     <string english="The levels path is:" translation="مسار مجلد levels للمستويات:" explanation="" max="40" max_local="40"/>
     <string english="[ Press {button} to Start ]" translation="[ نضغط {button} للبدء]" explanation="title screen. Expect `ACTION`" max="38*2" max_local="38*2"/>
+    <string english="[ Tap screen to Start ]" translation="" explanation="title screen, using touch input" max="38*2" max_local="38*2"/>
     <string english="ACTION = Space, Z, or V" translation="زر الفعل = المسافة أو Z أو V" explanation="title screen" max="38*3" max_local="38*3"/>
     <string english="[Press {button} to return to editor]" translation="[نضغط {button} للعودة للمحرر]" explanation="`to editor` is sorta redundant" max="40" max_local="40"/>
     <string english="- Press {button} to advance text -" translation="- نضغط {button} للتقدم في النص -" explanation="to dismiss a textbox. Expect `ACTION`" max="40" max_local="40"/>
+    <string english="- Tap screen to advance text -" translation="" explanation="to dismiss a textbox, using touch input" max="40" max_local="40"/>
     <string english="Press {button} to continue" translation="نضغط {button} للمواصلة" explanation="Expect `ACTION`" max="34" max_local="34"/>
+    <string english="Tap screen to continue" translation="" explanation="using touch input" max="34" max_local="34"/>
     <string english="[Press {button} to unfreeze gameplay]" translation="[نضغط {button} لوقف تجميد اللعب العادي]" explanation="in level debugger: {button} makes everything start moving as normal. Limit is treacherous, expect TAB for {button}. Frozen is the initial state, so this is the first string of the two that users will see!" max="39" max_local="39"/>
     <string english="[Press {button} to freeze gameplay]" translation="[نضغط {button} لتجميد اللعب العادي]" explanation="in level debugger: {button} makes everything stop moving. Limit is treacherous, expect TAB for {button}." max="39" max_local="39"/>
     <string english="Current Time" translation="وقتك الحالي" explanation="super gravitron, stopwatch time" max="20" max_local="20"/>

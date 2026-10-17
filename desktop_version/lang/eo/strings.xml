@@ -447,10 +447,13 @@
     <string english="Are you sure you want to show the levels path? This may reveal sensitive information if you are streaming." translation="Ĉu vi vere volas montri la dosierindikon? Tio eble malkaŝos konfidencajn informojn se vi elsendas." explanation="" max="38*4"/>
     <string english="The levels path is:" translation="La nivela dosierindiko estas:" explanation="" max="40"/>
     <string english="[ Press {button} to Start ]" translation="[ Premu {button} por komenci ]" explanation="title screen. Expect `ACTION`" max="38*2"/>
+    <string english="[ Tap screen to Start ]" translation="" explanation="title screen, using touch input" max="38*2"/>
     <string english="ACTION = Space, Z, or V" translation="AGOKLAVO = Spaceto, Z aŭ V" explanation="title screen" max="38*3"/>
     <string english="[Press {button} to return to editor]" translation="[Premu {button} por reveni al redaktilo]" explanation="`to editor` is sorta redundant" max="40"/>
     <string english="- Press {button} to advance text -" translation="- Premu {button} por daŭrigi -" explanation="to dismiss a textbox. Expect `ACTION`" max="40"/>
+    <string english="- Tap screen to advance text -" translation="" explanation="to dismiss a textbox, using touch input" max="40"/>
     <string english="Press {button} to continue" translation="Premu {button} por daŭrigi" explanation="Expect `ACTION`" max="34"/>
+    <string english="Tap screen to continue" translation="" explanation="using touch input" max="34"/>
     <string english="[Press {button} to unfreeze gameplay]" translation="[Premu {button} por malfrostigi ludon]" explanation="in level debugger: {button} makes everything start moving as normal. Limit is treacherous, expect TAB for {button}. Frozen is the initial state, so this is the first string of the two that users will see!" max="39"/>
     <string english="[Press {button} to freeze gameplay]" translation="[Premu {button} por frostigi ludon]" explanation="in level debugger: {button} makes everything stop moving. Limit is treacherous, expect TAB for {button}." max="39"/>
     <string english="Current Time" translation="Nuna tempo" explanation="super gravitron, stopwatch time" max="20"/>

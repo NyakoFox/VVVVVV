@@ -804,15 +804,23 @@ static void compute_actionprompt_textbox(textboxclass* THIS)
 {
     THIS->lines.clear();
 
-    char buffer[SCREEN_WIDTH_CHARS + 1];
-    vformat_buf(
-        buffer, sizeof(buffer),
-        loc::gettext("Press {button} to continue"),
-        "button:but",
-        vformat_button(ActionSet_InGame, Action_InGame_ACTION)
-    );
+    if (key.using_touch)
+    {
+        THIS->lines.push_back("Tap screen to continue");
+    }
+    else
+    {
+        char buffer[SCREEN_WIDTH_CHARS + 1];
+        vformat_buf(
+            buffer, sizeof(buffer),
+            loc::gettext("Press {button} to continue"),
+            "button:but",
+            vformat_button(ActionSet_InGame, Action_InGame_ACTION)
+        );
 
-    THIS->lines.push_back(buffer);
+        THIS->lines.push_back(buffer);
+    }
+
     THIS->pad(1, 1);
 }
 
@@ -2809,7 +2817,7 @@ void Game::updatestate(void)
             actionprompt_textbox();
             break;
         case 3010:
-            if (jumppressed)
+            if (jumppressed || key.touchPressed())
             {
                 incstate();
                 setstatedelay(30);
@@ -2851,7 +2859,7 @@ void Game::updatestate(void)
             actionprompt_textbox();
             break;
         case 3024:
-            if (jumppressed)
+            if (jumppressed || key.touchPressed())
             {
                 incstate();
                 setstatedelay(30);
@@ -2892,7 +2900,7 @@ void Game::updatestate(void)
             actionprompt_textbox();
             break;
         case 3044:
-            if (jumppressed)
+            if (jumppressed || key.touchPressed())
             {
                 incstate();
                 setstatedelay(30);
@@ -2934,7 +2942,7 @@ void Game::updatestate(void)
             actionprompt_textbox();
             break;
         case 3054:
-            if (jumppressed)
+            if (jumppressed || key.touchPressed())
             {
                 incstate();
                 setstatedelay(30);
@@ -3000,7 +3008,7 @@ void Game::updatestate(void)
             actionprompt_textbox();
             break;
         case 3064:
-            if (jumppressed)
+            if (jumppressed || key.touchPressed())
             {
                 incstate();
                 setstatedelay(30);
@@ -3296,7 +3304,7 @@ void Game::updatestate(void)
             actionprompt_textbox();
             break;
         case 3509:
-            if (jumppressed)
+            if (jumppressed || key.touchPressed())
             {
                 incstate();
                 setstatedelay(30);

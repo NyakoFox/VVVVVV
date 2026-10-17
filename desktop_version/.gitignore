@@ -12,6 +12,10 @@ VVVVVV
 src/Version.h.out
 src/InterimVersion.out.c
 
+# Android archive files
+VVVVVV-android/app/libs/*
+!VVVVVV-android/app/libs/.gitkeep
+
 # Game data
 data.zip
 

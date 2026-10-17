@@ -5,6 +5,7 @@
 #include <SDL3/SDL.h>
 #include <string>
 #include <vector>
+#include "Touch.h"
 
 enum Kybrd
 {
@@ -62,23 +63,29 @@ public:
     bool controllerWantsUp(void);
     bool controllerWantsDown(void);
 
+    bool touchPressed(void);
+
     int leftbutton, rightbutton, middlebutton;
     int mousex;
     int mousey;
 
     bool textentry(void);
     bool pressedbackspace;
+    bool pressed_android_back;
     std::string keybuffer;
     std::string imebuffer;
     int imebuffer_start;
     int imebuffer_length;
 
     bool linealreadyemptykludge;
+    bool using_touch;
 
 private:
     std::map<SDL_JoystickID, SDL_Gamepad*> controllers;
     std::map<SDL_GamepadButton, bool> buttonmap;
     int xVel, yVel;
+
+    std::map<SDL_FingerID, VVV_Finger> fingers;
     Uint32 wasFullscreen;
 };
 
