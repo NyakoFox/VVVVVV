@@ -1955,17 +1955,24 @@ void titlerender(void)
         font::print(PR_RIGHT, 264, temp+35, loc::gettext("MAKE AND PLAY EDITION"), tr, tg, tb);
 #endif
 
-        char buffer[SCREEN_WIDTH_CHARS*2 + 1];
-        vformat_buf(
-            buffer, sizeof(buffer),
-            loc::gettext("[ Press {button} to Start ]"),
-            "button:but",
-            vformat_button(ActionSet_Menu, Action_Menu_Accept)
-        );
-        font::print_wrap(PR_CEN, -1, 175, buffer, tr, tg, tb);
-        if (BUTTONGLYPHS_keyboard_is_active())
+        if (key.using_touch)
         {
-            font::print_wrap(PR_CEN, -1, 195, loc::gettext("ACTION = Space, Z, or V"), int(tr*0.5f), int(tg*0.5f), int(tb*0.5f));
+            font::print_wrap(PR_CEN, -1, 175, "[ Tap screen to Start ]", tr, tg, tb);
+        }
+        else
+        {
+            char buffer[SCREEN_WIDTH_CHARS * 2 + 1];
+            vformat_buf(
+                buffer, sizeof(buffer),
+                loc::gettext("[ Press {button} to Start ]"),
+                "button:but",
+                vformat_button(ActionSet_Menu, Action_Menu_Accept)
+            );
+            font::print_wrap(PR_CEN, -1, 175, buffer, tr, tg, tb);
+            if (BUTTONGLYPHS_keyboard_is_active())
+            {
+                font::print_wrap(PR_CEN, -1, 195, loc::gettext("ACTION = Space, Z, or V"), int(tr * 0.5f), int(tg * 0.5f), int(tb * 0.5f));
+            }
         }
     }
     else
@@ -2530,12 +2537,20 @@ void gamerender(void)
     if (game.advancetext)
     {
         char buffer_adv[SCREEN_WIDTH_CHARS + 1];
-        vformat_buf(
-            buffer_adv, sizeof(buffer_adv),
-            loc::gettext("- Press {button} to advance text -"),
-            "button:but",
-            vformat_button(ActionSet_InGame, Action_InGame_ACTION)
-        );
+
+        if (key.using_touch)
+        {
+            SDL_strlcpy(buffer_adv, "- Tap screen to advance text -", sizeof(buffer_adv));
+        }
+        else
+        {
+            vformat_buf(
+                buffer_adv, sizeof(buffer_adv),
+                loc::gettext("- Press {button} to advance text -"),
+                "button:but",
+                vformat_button(ActionSet_InGame, Action_InGame_ACTION)
+            );
+        }
 
         font::print(PR_CEN | PR_BOR, -1, graphics.flipmode ? 228 : 5, buffer_adv, 220 - (help.glow), 220 - (help.glow), 255 - (help.glow / 2));
     }
@@ -3612,12 +3627,20 @@ void teleporterrender(void)
     if (game.advancetext)
     {
         char buffer_adv[SCREEN_WIDTH_CHARS + 1];
-        vformat_buf(
-            buffer_adv, sizeof(buffer_adv),
-            loc::gettext("- Press {button} to advance text -"),
-            "button:but",
-            vformat_button(ActionSet_InGame, Action_InGame_ACTION)
-        );
+
+        if (key.using_touch)
+        {
+            SDL_strlcpy(buffer_adv, "- Tap screen to advance text -", sizeof(buffer_adv));
+        }
+        else
+        {
+            vformat_buf(
+                buffer_adv, sizeof(buffer_adv),
+                loc::gettext("- Press {button} to advance text -"),
+                "button:but",
+                vformat_button(ActionSet_InGame, Action_InGame_ACTION)
+            );
+        }
 
         font::print(PR_CEN | PR_BOR, -1, graphics.flipmode ? 228 : 5, buffer_adv, 220 - (help.glow), 220 - (help.glow), 255 - (help.glow / 2));
     }

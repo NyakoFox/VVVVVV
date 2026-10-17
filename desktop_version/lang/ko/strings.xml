@@ -447,10 +447,13 @@
     <string english="Are you sure you want to show the levels path? This may reveal sensitive information if you are streaming." translation="정말로 레벨 경로를 보여드리길 원하십니까? 방송 중이라면 민감한 정보가 유출될 수 있습니다." explanation="" max="38*4" max_local="30*4"/>
     <string english="The levels path is:" translation="레벨 경로:" explanation="" max="40" max_local="32"/>
     <string english="[ Press {button} to Start ]" translation="[ {button} 버튼을 눌러 시작 ]" explanation="title screen. Expect `ACTION`" max="38*2" max_local="30*2"/>
+    <string english="[ Tap screen to Start ]" translation="" explanation="title screen, using touch input" max="38*2" max_local="30*2"/>
     <string english="ACTION = Space, Z, or V" translation="행동 = Space, Z, V" explanation="title screen" max="38*3" max_local="30*3"/>
     <string english="[Press {button} to return to editor]" translation="[{button} 버튼을 눌러 에디터로 돌아갑니다]" explanation="`to editor` is sorta redundant" max="40" max_local="32"/>
     <string english="- Press {button} to advance text -" translation="- {button} 버튼을 눌러 텍스트를 진행합니다 -" explanation="to dismiss a textbox. Expect `ACTION`" max="40" max_local="32"/>
+    <string english="- Tap screen to advance text -" translation="" explanation="to dismiss a textbox, using touch input" max="40" max_local="32"/>
     <string english="Press {button} to continue" translation="{button} 버튼을 눌러 계속" explanation="Expect `ACTION`" max="34" max_local="27"/>
+    <string english="Tap screen to continue" translation="" explanation="using touch input" max="34" max_local="27"/>
     <string english="[Press {button} to unfreeze gameplay]" translation="[게임플레이 정지 상태를 풀려면 {button} 누르기]" explanation="in level debugger: {button} makes everything start moving as normal. Limit is treacherous, expect TAB for {button}. Frozen is the initial state, so this is the first string of the two that users will see!" max="39" max_local="31"/>
     <string english="[Press {button} to freeze gameplay]" translation="[게임플레이를 정지시키려면 {button} 누르기]" explanation="in level debugger: {button} makes everything stop moving. Limit is treacherous, expect TAB for {button}." max="39" max_local="31"/>
     <string english="Current Time" translation="현재 시간" explanation="super gravitron, stopwatch time" max="20" max_local="16"/>

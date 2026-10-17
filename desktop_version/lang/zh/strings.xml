@@ -457,10 +457,13 @@
 这可能会透露一些敏感的信息。" explanation="" max="38*4" max_local="25*3"/>
     <string english="The levels path is:" translation="文件夹路径是：" explanation="" max="40" max_local="26"/>
     <string english="[ Press {button} to Start ]" translation="[ 按 {button} 开始 ]" explanation="title screen. Expect `ACTION`" max="38*2" max_local="25*1"/>
+    <string english="[ Tap screen to Start ]" translation="" explanation="title screen, using touch input" max="38*2" max_local="25*1"/>
     <string english="ACTION = Space, Z, or V" translation="行动键 = 空格、Z或V" explanation="title screen" max="38*3" max_local="25*2"/>
     <string english="[Press {button} to return to editor]" translation="[按 {button} 返回编辑器]" explanation="`to editor` is sorta redundant" max="40" max_local="26"/>
     <string english="- Press {button} to advance text -" translation="按 {button} 来推进文本 -" explanation="to dismiss a textbox. Expect `ACTION`" max="40" max_local="26"/>
+    <string english="- Tap screen to advance text -" translation="" explanation="to dismiss a textbox, using touch input" max="40" max_local="26"/>
     <string english="Press {button} to continue" translation="按 {button} 继续" explanation="Expect `ACTION`" max="34" max_local="22"/>
+    <string english="Tap screen to continue" translation="" explanation="using touch input" max="34" max_local="22"/>
     <string english="[Press {button} to unfreeze gameplay]" translation="[按 {button} 解除游戏暂停]" explanation="in level debugger: {button} makes everything start moving as normal. Limit is treacherous, expect TAB for {button}. Frozen is the initial state, so this is the first string of the two that users will see!" max="39" max_local="26"/>
     <string english="[Press {button} to freeze gameplay]" translation="[按 {button} 让游戏暂停]" explanation="in level debugger: {button} makes everything stop moving. Limit is treacherous, expect TAB for {button}." max="39" max_local="26"/>
     <string english="Current Time" translation="当前时间" explanation="super gravitron, stopwatch time" max="20" max_local="13"/>

@@ -523,6 +523,10 @@ int main(int argc, char *argv[])
         {
             loc::show_translator_menu = true;
         }
+        else if (ARG("-emulate-touch"))
+        {
+            SDL_SetHint(SDL_HINT_MOUSE_TOUCH_EVENTS, "1");
+        }
 #ifdef _WIN32
         else if (ARG("-console"))
         {
@@ -598,6 +602,7 @@ int main(int argc, char *argv[])
 
     SDL_SetHintWithPriority(SDL_HINT_IME_IMPLEMENTED_UI, "1", SDL_HINT_OVERRIDE);
     SDL_SetHintWithPriority(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight", SDL_HINT_OVERRIDE);
+    SDL_SetHintWithPriority(SDL_HINT_ANDROID_TRAP_BACK_BUTTON, "1", SDL_HINT_OVERRIDE);
 
     if(!FILESYSTEM_init(argv[0], baseDir, assetsPath, langDir, fontsDir))
     {
@@ -850,6 +855,14 @@ int main(int argc, char *argv[])
     SDL_ShowWindow(gameScreen.m_window);
 
     key.isActive = true;
+
+    int touch_devices;
+    SDL_GetTouchDevices(&touch_devices);
+
+    if (touch_devices > 0)
+    {
+        key.using_touch = true;
+    }
 
     gamestate_funcs = get_gamestate_funcs(game.gamestate, &num_gamestate_funcs);
     loop_assign_active_funcs();
