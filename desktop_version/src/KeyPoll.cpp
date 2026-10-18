@@ -71,6 +71,10 @@ KeyPoll::KeyPoll(void)
     next_finger_id = 1; // 0 is invalid
     fingers.clear();
     sdl_finger_to_vvv_finger.clear();
+
+    swipe_finger = 0;
+    swipe_previous = 0;
+    swipe_dir = SwipeDirection_NONE;
 }
 
 void KeyPoll::enabletextentry(void)
@@ -496,6 +500,7 @@ void KeyPoll::Poll(void)
             finger.down = true;
             finger.x = evt.tfinger.x * (float)screen_width;
             finger.y = evt.tfinger.y * (float)screen_height;
+            finger.x_normalized = evt.tfinger.x;
 
             sdl_finger_to_vvv_finger[evt.tfinger.fingerID] = next_finger_id;
             fingers[next_finger_id++] = finger;
@@ -509,6 +514,7 @@ void KeyPoll::Poll(void)
             {
                 finger->x = evt.tfinger.x * (float)screen_width;
                 finger->y = evt.tfinger.y * (float)screen_height;
+                finger->x_normalized = evt.tfinger.x;
             }
             break;
         }
@@ -766,6 +772,96 @@ bool KeyPoll::touchDown(void)
     for (it = fingers.begin(); it != fingers.end(); ++it)
     {
         if (it->second.down)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void KeyPoll::resetSwipe(void)
+{
+    swipe_finger = 0;
+    swipe_dir = SwipeDirection_NONE;
+}
+
+void KeyPoll::updateSwipe(void)
+{
+    if (fingers.count(swipe_finger) == 0)
+    {
+        resetSwipe();
+    }
+
+    if (swipe_finger == 0)
+    {
+        int screen_width;
+        int screen_height;
+        gameScreen.GetScreenSize(&screen_width, &screen_height);
+
+        // no swipe finger -- does a finger exist on the left side?
+        std::map<SDL_FingerID, VVV_Finger>::iterator it;
+
+        for (it = fingers.begin(); it != fingers.end(); ++it)
+        {
+            if (it->second.just_pressed && it->second.x_normalized < 0.5)
+            {
+                // This is the one we want! Let's consume the press & use it
+                it->second.just_pressed = false;
+
+                swipe_finger = it->first;
+
+                swipe_previous = it->second.x_normalized;
+                swipe_dir = SwipeDirection_NONE;
+                break;
+            }
+        }
+    }
+
+    // We have a swipe finger
+    if (swipe_finger != 0)
+    {
+        VVV_Finger* finger = &fingers[swipe_finger];
+
+        // extra sanity check
+        if (finger == NULL)
+        {
+            resetSwipe();
+            return;
+        }
+
+        float delta = finger->x_normalized - swipe_previous;
+
+        if (delta > TOUCH_SWIPE_SENSITIVITY)
+        {
+            swipe_dir = SwipeDirection_RIGHT;
+            swipe_previous = finger->x_normalized;
+        }
+        else if (delta < -TOUCH_SWIPE_SENSITIVITY)
+        {
+            swipe_dir = SwipeDirection_LEFT;
+            swipe_previous = finger->x_normalized;
+        }
+    }
+}
+
+bool KeyPoll::touchWantsLeft(void)
+{
+    return swipe_dir == SwipeDirection_LEFT;
+}
+
+bool KeyPoll::touchWantsRight(void)
+{
+    return swipe_dir == SwipeDirection_RIGHT;
+}
+
+bool KeyPoll::touchWantsFlip(void)
+{
+    std::map<SDL_FingerID, VVV_Finger>::iterator it;
+
+    for (it = fingers.begin(); it != fingers.end(); ++it)
+    {
+        if (it->second.down && (it->first != swipe_finger) && (it->second.x_normalized >= 0.5))
         {
             return true;
         }

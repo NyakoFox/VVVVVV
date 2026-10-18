@@ -66,6 +66,12 @@ public:
 
     bool touchPressed(void);
     bool touchDown(void);
+    bool touchWantsLeft(void);
+    bool touchWantsRight(void);
+    bool touchWantsFlip(void);
+
+    void resetSwipe(void);
+    void updateSwipe(void);
 
     int leftbutton, rightbutton, middlebutton;
     int mousex;
@@ -93,6 +99,10 @@ private:
     std::map<VVV_FingerID, VVV_Finger> fingers;
     std::map<SDL_FingerID, VVV_FingerID> sdl_finger_to_vvv_finger;
     Uint32 wasFullscreen;
+
+    VVV_FingerID swipe_finger;
+    float swipe_previous;
+    SwipeDirection swipe_dir;
 };
 
 #ifndef KEY_DEFINITION
