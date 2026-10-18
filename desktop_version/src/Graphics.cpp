@@ -3566,7 +3566,7 @@ void Graphics::screenshake(void)
     draw_window_background();
 
     SDL_FRect rect;
-    get_stretch_info(&rect);
+    gameScreen.get_stretch_info(&rect);
 
     copy_texture(tempShakeTexture, NULL, &rect, 0, NULL, flipmode ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE);
 }
@@ -3580,59 +3580,6 @@ void Graphics::updatescreenshake(void)
 void Graphics::draw_window_background(void)
 {
     clear();
-}
-
-void Graphics::get_stretch_info(SDL_FRect* rect)
-{
-    int width;
-    int height;
-    gameScreen.GetScreenSize(&width, &height);
-
-    switch (gameScreen.scalingMode)
-    {
-    case SCALING_INTEGER:
-    {
-        int scale = SDL_min(width / SCREEN_WIDTH_PIXELS, height / SCREEN_HEIGHT_PIXELS);
-        rect->x = (width - SCREEN_WIDTH_PIXELS * scale) / 2;
-        rect->y = (height - SCREEN_HEIGHT_PIXELS * scale) / 2;
-        rect->w = SCREEN_WIDTH_PIXELS * scale;
-        rect->h = SCREEN_HEIGHT_PIXELS * scale;
-        break;
-    }
-    case SCALING_LETTERBOX:
-        if (width * SCREEN_HEIGHT_PIXELS > height * SCREEN_WIDTH_PIXELS)
-        {
-            rect->x = (width - height * SCREEN_WIDTH_PIXELS / SCREEN_HEIGHT_PIXELS) / 2;
-            rect->y = 0;
-            rect->w = height * SCREEN_WIDTH_PIXELS / SCREEN_HEIGHT_PIXELS;
-            rect->h = height;
-        }
-        else
-        {
-            rect->x = 0;
-            rect->y = (height - width * SCREEN_HEIGHT_PIXELS / SCREEN_WIDTH_PIXELS) / 2;
-            rect->w = width;
-            rect->h = width * SCREEN_HEIGHT_PIXELS / SCREEN_WIDTH_PIXELS;
-        }
-        break;
-    case SCALING_STRETCH:
-        /* Could pass NULL to copy_texture instead, but this feels better */
-        rect->x = 0;
-        rect->y = 0;
-        rect->w = width;
-        rect->h = height;
-        break;
-    default:
-        SDL_assert(0 && "Invalid scaling mode!");
-        rect->x = 0;
-        rect->y = 0;
-        rect->w = width;
-        rect->h = height;
-    }
-
-    // In case anything accidentally set the width/height to 0, we'll clamp it to avoid crashing from a division by 0
-    rect->w = SDL_max(1, rect->w);
-    rect->h = SDL_max(1, rect->h);
 }
 
 void Graphics::render(void)
@@ -3651,7 +3598,7 @@ void Graphics::render(void)
     draw_window_background();
 
     SDL_FRect stretch_info;
-    get_stretch_info(&stretch_info);
+    gameScreen.get_stretch_info(&stretch_info);
 
     ime_set_rect(&stretch_info);
 

@@ -397,3 +397,82 @@ bool Screen::isForcedFullscreen(void)
     return SDL_GetHintBoolean("SteamTenfoot", false);
 #endif
 }
+
+
+void Screen::get_stretch_info(SDL_FRect* rect)
+{
+    int width;
+    int height;
+    GetScreenSize(&width, &height);
+
+    switch (scalingMode)
+    {
+        case SCALING_INTEGER:
+        {
+            int scale = SDL_min(width / SCREEN_WIDTH_PIXELS, height / SCREEN_HEIGHT_PIXELS);
+            rect->x = (width - SCREEN_WIDTH_PIXELS * scale) / 2;
+            rect->y = (height - SCREEN_HEIGHT_PIXELS * scale) / 2;
+            rect->w = SCREEN_WIDTH_PIXELS * scale;
+            rect->h = SCREEN_HEIGHT_PIXELS * scale;
+            break;
+        }
+        case SCALING_LETTERBOX:
+            if (width * SCREEN_HEIGHT_PIXELS > height * SCREEN_WIDTH_PIXELS)
+            {
+                rect->x = (width - height * SCREEN_WIDTH_PIXELS / SCREEN_HEIGHT_PIXELS) / 2;
+                rect->y = 0;
+                rect->w = height * SCREEN_WIDTH_PIXELS / SCREEN_HEIGHT_PIXELS;
+                rect->h = height;
+            }
+            else
+            {
+                rect->x = 0;
+                rect->y = (height - width * SCREEN_HEIGHT_PIXELS / SCREEN_WIDTH_PIXELS) / 2;
+                rect->w = width;
+                rect->h = width * SCREEN_HEIGHT_PIXELS / SCREEN_WIDTH_PIXELS;
+            }
+            break;
+        case SCALING_STRETCH:
+            /* Could pass NULL to copy_texture instead, but this feels better */
+            rect->x = 0;
+            rect->y = 0;
+            rect->w = width;
+            rect->h = height;
+            break;
+        default:
+            SDL_assert(0 && "Invalid scaling mode!");
+            rect->x = 0;
+            rect->y = 0;
+            rect->w = width;
+            rect->h = height;
+    }
+
+    // In case anything accidentally set the width/height to 0, we'll clamp it to avoid crashing from a division by 0
+    rect->w = SDL_max(1, rect->w);
+    rect->h = SDL_max(1, rect->h);
+}
+
+SDL_Point Screen::transform_screen_to_world(int point_x, int point_y)
+{
+    SDL_FRect rect;
+    get_stretch_info(&rect);
+
+    int window_width;
+    int window_height;
+    SDL_GetWindowSizeInPixels(m_window, &window_width, &window_height);
+
+    int scaled_window_width;
+    int scaled_window_height;
+    SDL_GetWindowSize(m_window, &scaled_window_width, &scaled_window_height);
+
+    float scale_x = (float)window_width / (float)scaled_window_width;
+    float scale_y = (float)window_height / (float)scaled_window_height;
+
+    SDL_Point point;
+
+    // Use screen stretch information to modify the coordinates (as we implement stretching manually)
+    point.x = ((point_x * scale_x) - rect.x) * SCREEN_WIDTH_PIXELS / rect.w;
+    point.y = ((point_y * scale_y) - rect.y) * SCREEN_HEIGHT_PIXELS / rect.h;
+
+    return point;
+}
