@@ -643,23 +643,9 @@ void KeyPoll::Poll(void)
         toggleFullscreen();
     }
 
-    SDL_FRect rect;
-    graphics.get_stretch_info(&rect);
-
-    int window_width;
-    int window_height;
-    SDL_GetWindowSizeInPixels(gameScreen.m_window, &window_width, &window_height);
-
-    int scaled_window_width;
-    int scaled_window_height;
-    SDL_GetWindowSize(gameScreen.m_window, &scaled_window_width, &scaled_window_height);
-
-    float scale_x = (float)window_width / (float)scaled_window_width;
-    float scale_y = (float)window_height / (float)scaled_window_height;
-
-    // Use screen stretch information to modify the coordinates (as we implement stretching manually)
-    mousex = ((raw_mousex * scale_x) - rect.x) * SCREEN_WIDTH_PIXELS / rect.w;
-    mousey = ((raw_mousey * scale_y) - rect.y) * SCREEN_HEIGHT_PIXELS / rect.h;
+    SDL_Point mouse = gameScreen.transform_screen_to_world(raw_mousex, raw_mousey);
+    mousex = mouse.x;
+    mousey = mouse.y;
 
     active_input_device_changed = keyboard_was_active != BUTTONGLYPHS_keyboard_is_active();
     should_recompute_textboxes |= active_input_device_changed;

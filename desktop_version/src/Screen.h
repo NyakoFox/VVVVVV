@@ -19,6 +19,9 @@ public:
     void ResizeToNearestMultiple(void);
     void GetScreenSize(int* x, int* y);
 
+    void get_stretch_info(SDL_FRect* rect);
+    SDL_Point transform_screen_to_world(int point_x, int point_y);
+
     void RenderPresent(void);
 
     void toggleFullScreen(void);
