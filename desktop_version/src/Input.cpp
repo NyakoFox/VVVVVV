@@ -2635,16 +2635,27 @@ void gameinput(void)
         game.press_action = false;
         game.press_interact = false;
 
-        if (key.isDown(KEYBOARD_LEFT) || key.isDown(KEYBOARD_a) || key.controllerWantsLeft(false))
+        // unfortunately, this game doesn't have great state
+        if (game.advancetext || game.completestop || game.pausescript || !game.hascontrol)
+        {
+            key.resetSwipe();
+        }
+        else
+        {
+            key.updateSwipe();
+        }
+
+        if (key.isDown(KEYBOARD_LEFT) || key.isDown(KEYBOARD_a) || key.controllerWantsLeft(false) || key.touchWantsLeft())
         {
             game.press_left = true;
         }
-        if (key.isDown(KEYBOARD_RIGHT) || key.isDown(KEYBOARD_d) || key.controllerWantsRight(false))
+        if (key.isDown(KEYBOARD_RIGHT) || key.isDown(KEYBOARD_d) || key.controllerWantsRight(false) || key.touchWantsRight())
         {
             game.press_right = true;
         }
         if (key.isDown(KEYBOARD_z) || key.isDown(KEYBOARD_SPACE) || key.isDown(KEYBOARD_v)
-                || key.isDown(KEYBOARD_UP) || key.isDown(KEYBOARD_DOWN) || key.isDown(KEYBOARD_w) || key.isDown(KEYBOARD_s)|| key.isDown(game.controllerButton_flip))
+                || key.isDown(KEYBOARD_UP) || key.isDown(KEYBOARD_DOWN) || key.isDown(KEYBOARD_w) || key.isDown(KEYBOARD_s)
+                || key.isDown(game.controllerButton_flip) || key.touchWantsFlip())
         {
             game.press_action = true;
         }
@@ -2653,6 +2664,10 @@ void gameinput(void)
         {
             game.press_interact = true;
         }
+    }
+    else
+    {
+        key.resetSwipe();
     }
 
     game.press_map = false;

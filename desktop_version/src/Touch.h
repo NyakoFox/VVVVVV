@@ -1,10 +1,13 @@
 #ifndef TOUCH_H
 #define TOUCH_H
 
+#define TOUCH_SWIPE_SENSITIVITY 0.005
+
 struct VVV_Finger
 {
     float x;
     float y;
+    float x_normalized;
 
     // Rather than collapsing this into one state,
     // it's best if these are tracked separately.
@@ -17,6 +20,13 @@ struct VVV_Finger
     bool just_pressed;
     bool just_released;
     bool down;
+};
+
+enum SwipeDirection
+{
+    SwipeDirection_LEFT,
+    SwipeDirection_NONE,
+    SwipeDirection_RIGHT
 };
 
 #endif /* TOUCH_H */

@@ -5,6 +5,7 @@
 #include <SDL3/SDL.h>
 #include <string>
 #include <vector>
+
 #include "Touch.h"
 
 enum Kybrd
@@ -64,6 +65,12 @@ public:
     bool controllerWantsDown(void);
 
     bool touchPressed(void);
+    bool touchWantsLeft(void);
+    bool touchWantsRight(void);
+    bool touchWantsFlip(void);
+
+    void resetSwipe(void);
+    void updateSwipe(void);
 
     int leftbutton, rightbutton, middlebutton;
     int mousex;
@@ -87,6 +94,10 @@ private:
 
     std::map<SDL_FingerID, VVV_Finger> fingers;
     Uint32 wasFullscreen;
+
+    SDL_FingerID swipe_finger;
+    float swipe_previous;
+    SwipeDirection swipe_dir;
 };
 
 #ifndef KEY_DEFINITION
