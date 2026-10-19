@@ -18,28 +18,45 @@ namespace touch
         dynamic_controls.clear();
     }
 
-    TouchControl* create_menu_button(int x, int y, int width, int height, const std::string& text, int option_id, bool active)
+    TouchControl* create_control(TouchControlType type, int x, int y, int width, int height)
     {
         TouchControl control;
-        control.type = TouchControlType_MENU_BUTTON;
+        control.type = type;
         control.rect.x = x;
         control.rect.y = y;
         control.rect.w = width;
         control.rect.h = height;
         control.down = false;
         control.pressed_finger = 0;
-        control.active = active;
-
-        control.text = text;
-        control.option_id = option_id;
+        control.active = true;
 
         dynamic_controls.push_back(control);
         return &dynamic_controls.back();
     }
 
+    TouchControl* create_menu_button(int x, int y, int width, int height, const std::string& text, int option_id, bool active)
+    {
+        TouchControl* control = create_control(TouchControlType_MENU_BUTTON, x, y, width, height);
+        control->active = active;
+
+        control->text = text;
+        control->option_id = option_id;
+
+        return control;
+    }
+
     TouchControl* create_menu_button(int x, int y, int width, int height, const std::string& text, int option_id)
     {
         return create_menu_button(x, y, width, height, text, option_id, true);
+    }
+
+
+    TouchControl* create_menu_button(int x, int y, int width, int height, SDL_Texture* icon, int option_id)
+    {
+        TouchControl* control = create_control(TouchControlType_MENU_BUTTON_ICON, x, y, width, height);
+        control->image = const_cast<SDL_Texture*>(icon);
+        control->option_id = option_id;
+        return control;
     }
 
     static void control_press(TouchControl* control)
@@ -55,6 +72,7 @@ namespace touch
         switch (control->type)
         {
         case TouchControlType_MENU_BUTTON:
+        case TouchControlType_MENU_BUTTON_ICON:
             if (key.isFingerInRect(control->pressed_finger, control->rect, true))
             {
                 // We've released a press on a menu button, so let's simulate selecting it
@@ -71,30 +89,84 @@ namespace touch
     {
     }
 
+    static void draw_button_background(TouchControl* control, int r, int g, int b, int scale)
+    {
+        int use_r = control->active ? r : 127;
+        int use_g = control->active ? g : 127;
+        int use_b = control->active ? b : 127;
+
+        int offset = control->down ? 1 : 0;
+
+        // The shadow
+        graphics.fill_rect(
+            control->rect.x + 4 * scale,
+            control->rect.y + 4 * scale,
+            control->rect.w,
+            control->rect.h,
+            use_r / 4, use_g / 4, use_b / 4
+        );
+
+        // The outer rectangle (the border)
+        graphics.fill_rect(
+            control->rect.x + offset * scale,
+            control->rect.y + offset * scale,
+            control->rect.w,
+            control->rect.h,
+            use_r, use_g, use_b
+        );
+
+        // The inner rectangle
+        graphics.fill_rect(
+            control->rect.x + (offset + 2) * scale,
+            control->rect.y + (2 + offset) * scale,
+            control->rect.w - 4 * scale,
+            control->rect.h - 4 * scale,
+            use_r / 1.5, use_g / 1.5, use_b / 1.5
+        );
+    }
+
     static void control_render(TouchControl* control, int r, int g, int b, int scale)
     {
         switch (control->type)
         {
         case TouchControlType_MENU_BUTTON:
         {
-            int use_r = control->active ? r : 127;
-            int use_g = control->active ? g : 127;
-            int use_b = control->active ? b : 127;
-
-            float shadow_div = 4;
-            float inner_div = 1.5;
+            draw_button_background(control, r, g, b, scale);
 
             int offset = control->down ? 1 : 0;
 
             int font_scale = SDL_min((scale - 1), 7);
             int height = font::height(PR_CJK_LOW | font_scale);
 
-            graphics.fill_rect(control->rect.x + 4 * scale, control->rect.y + 4 * scale, control->rect.w, control->rect.h, use_r / shadow_div, use_g / shadow_div, use_b / shadow_div);
+            font::print(
+                PR_CEN | PR_CJK_LOW | font_scale,
+                control->rect.x + (control->rect.w / 2) + offset * scale,
+                control->rect.y + ((control->rect.h - height) / 2 + offset * scale),
+                control->text,
+                196, 196, 255 - help.glow
+            );
 
-            graphics.fill_rect(control->rect.x + offset * scale, control->rect.y + offset * scale, control->rect.w, control->rect.h, use_r, use_g, use_b);
-            graphics.fill_rect(control->rect.x + (offset + 2) * scale, control->rect.y + (2 + offset) * scale, control->rect.w - 4 * scale, control->rect.h - 4 * scale, use_r / inner_div, use_g / inner_div, use_b / inner_div);
+            break;
+        }
+        case TouchControlType_MENU_BUTTON_ICON:
+        {
+            draw_button_background(control, r, g, b, scale);
 
-            font::print(PR_CEN | PR_CJK_LOW | font_scale, control->rect.x + (control->rect.w / 2) + offset * scale, control->rect.y + ((control->rect.h - height) / 2 + offset * scale), control->text, 196, 196, 255 - help.glow);
+            int offset = control->down ? 1 : 0;
+
+            int width;
+            int height;
+
+            graphics.query_texture(control->image, NULL, NULL, &width, &height);
+
+            int x = control->rect.x + (control->rect.w - width) / 2;
+            int y = control->rect.y + (control->rect.h - height) / 2;
+
+            // Draw the icon
+            graphics.set_texture_color_mod(control->image, 196, 196, 255 - help.glow);
+            graphics.draw_texture(control->image, (x + offset) * scale, (y + offset) * scale, scale, scale);
+            graphics.set_texture_color_mod(control->image, 255, 255, 255);
+
             break;
         }
         default:

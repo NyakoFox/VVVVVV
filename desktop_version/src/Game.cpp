@@ -6727,7 +6727,7 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         }
 
         // Special for the touch menu: language button
-        touch::create_menu_button(loc::langmeta.rtl ? 80 : 214, 160, 26, 26, "L", -1);
+        touch::create_menu_button(loc::langmeta.rtl ? 80 : 214, 160, 26, 26, graphics.grphx.im_button_globe, -1);
 
         option(loc::gettext("credits"));
         touch::create_menu_button(80, 192, 160, 26, loc::gettext("credits"), offset++);

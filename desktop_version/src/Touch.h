@@ -37,7 +37,8 @@ enum SwipeDirection
 
 enum TouchControlType
 {
-    TouchControlType_MENU_BUTTON
+    TouchControlType_MENU_BUTTON,
+    TouchControlType_MENU_BUTTON_ICON
 };
 
 struct TouchControl
@@ -51,6 +52,7 @@ struct TouchControl
     // Menu buttons
     std::string text;
     int option_id;
+    SDL_Texture* image;
 };
 
 namespace touch
@@ -65,8 +67,10 @@ namespace touch
 
     void clear_dynamic_controls(void);
 
+    TouchControl* create_control(TouchControlType type, int x, int y, int width, int height);
     TouchControl* create_menu_button(int x, int y, int width, int height, const std::string& text, int option_id, bool active);
     TouchControl* create_menu_button(int x, int y, int width, int height, const std::string& text, int option_id);
+    TouchControl* create_menu_button(int x, int y, int width, int height, SDL_Texture* icon, int option_id);
 }
 
 #endif /* TOUCH_H */

@@ -208,6 +208,7 @@ public:
 
     void drawimagecol(int t, int xp, int yp, SDL_Color ct, bool cent= false);
 
+    void draw_texture(SDL_Texture* image, const int x, const int y, const int scale_x, const int scale_y);
     void draw_texture(SDL_Texture* image, int x, int y);
 
     void draw_texture_part(SDL_Texture* image, int x, int y, int x2, int y2, int w, int h, int scalex, int scaley);

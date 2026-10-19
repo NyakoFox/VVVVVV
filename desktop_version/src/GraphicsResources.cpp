@@ -424,6 +424,8 @@ void GraphicsResources::init(void)
     im_image10 = LoadImage("graphics/ending.png");
     im_image11 = LoadImage("graphics/site4.png", TEX_WHITE);
 
+	im_button_globe = LoadImage("graphics/button_globe.png", TEX_WHITE);
+
     im_sprites_translated = NULL;
     im_flipsprites_translated = NULL;
 
@@ -498,6 +500,8 @@ void GraphicsResources::destroy(void)
 
     CLEAR(im_sprites_translated);
     CLEAR(im_flipsprites_translated);
+
+    CLEAR(im_button_globe);
 
     for (size_t i = 0; i < SDL_arraysize(graphics.customminimaps); i++)
     {
