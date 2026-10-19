@@ -1209,6 +1209,36 @@ void Graphics::drawpartimage(const int t, const int xp, const int yp, const int 
     draw_texture_part(images[t], xp, yp, 0, 0, wp, hp, 1, 1);
 }
 
+void Graphics::draw_texture(SDL_Texture* image, const int x, const int y, const int scale_x, const int scale_y)
+{
+    int w, h;
+
+    if (!query_texture(image, NULL, NULL, &w, &h))
+    {
+        return;
+    }
+
+    int flip = SDL_FLIP_NONE;
+
+    if (scale_x < 0)
+    {
+        flip |= SDL_FLIP_HORIZONTAL;
+    }
+    if (scale_y < 0)
+    {
+        flip |= SDL_FLIP_VERTICAL;
+    }
+
+    const SDL_FRect dstrect = {
+        static_cast<float>(x),
+        static_cast<float>(y),
+        static_cast<float>(w * SDL_abs(scale_x)),
+        static_cast<float>(h * SDL_abs(scale_y))
+    };
+
+    copy_texture(image, NULL, &dstrect, 0, NULL, (SDL_FlipMode)flip);
+}
+
 void Graphics::draw_texture(SDL_Texture* image, const int x, const int y)
 {
     int w, h;
