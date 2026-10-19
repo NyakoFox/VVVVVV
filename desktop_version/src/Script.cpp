@@ -21,6 +21,7 @@
 #include "Map.h"
 #include "Music.h"
 #include "ReleaseVersion.h"
+#include "Touch.h"
 #include "Unreachable.h"
 #include "UtilityClass.h"
 #include "VFormat.h"
@@ -2760,6 +2761,8 @@ void scriptclass::startgamemode(const enum StartMode mode)
             player_hitbox.h = player->h;
         }
     }
+
+    touch::clear_dynamic_controls();
 
     /* State which needs to be reset before gameplay starts
      * ex. before custom levels get loaded */

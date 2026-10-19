@@ -272,6 +272,7 @@ void KeyPoll::Poll(void)
             if (evt.key.scancode == SDL_SCANCODE_AC_BACK)
             {
                 pressed_android_back = true;
+                return;
             }
 
             if (evt.key.key == SDLK_BACKSPACE)
@@ -813,4 +814,60 @@ bool KeyPoll::touchWantsFlip(void)
     }
 
     return false;
+}
+
+VVV_Finger* KeyPoll::getFinger(SDL_FingerID finger_id)
+{
+    if (fingers.count(finger_id) == 0)
+    {
+        return NULL;
+    }
+    return &fingers[finger_id];
+}
+
+bool KeyPoll::isFingerInRect(SDL_FingerID finger_id, const SDL_FRect& rect, bool scaled)
+{
+    if (fingers.count(finger_id) == 0)
+    {
+        return false;
+    }
+
+    VVV_Finger* finger = &fingers[finger_id];
+
+    if (finger == NULL)
+    {
+        return false;
+    }
+
+    SDL_FPoint point;
+
+    if (scaled)
+    {
+        SDL_Point transformed = gameScreen.transform_screen_to_world(finger->x, finger->y);
+        point.x = transformed.x;
+        point.y = transformed.y;
+    }
+    else
+    {
+        point.x = finger->x;
+        point.y = finger->y;
+    }
+    return SDL_PointInRectFloat(&point, &rect);
+}
+
+SDL_FingerID KeyPoll::capturePressedFingerAtRect(const SDL_FRect& rect, bool scaled)
+{
+    std::map<SDL_FingerID, VVV_Finger>::iterator it;
+    for (it = fingers.begin(); it != fingers.end(); ++it)
+    {
+        if (it->second.just_pressed && isFingerInRect(it->first, rect, scaled))
+        {
+            // Capture it, and return
+            it->second.just_pressed = false;
+
+            return it->first;
+        }
+    }
+
+    return 0;
 }

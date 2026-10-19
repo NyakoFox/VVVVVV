@@ -6684,33 +6684,62 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
 
     currentmenuname = t;
     menuyoff = 0;
+
+    int button_y_offset = 0;
+    bool auto_buttons = true;
+    int button_height = 26;
+    int button_spacing = 8;
+
     int maxspacing = 30; // maximum value for menuspacing, can only become lower.
+    bool auto_center = true;
+
     menucountdown = 0;
     menuoptions.clear();
+
+    touch::clear_dynamic_controls();
 
     switch (t)
     {
     case Menu::mainmenu:
+    {
         if (ingame_titlemode)
         {
             /* We shouldn't be here! */
             SDL_assert(0 && "Entering main menu from in-game options!");
             break;
         }
+        int offset = 0;
+
 #if !defined(MAKEANDPLAY)
         option(loc::gettext("play"));
+        touch::create_menu_button(80, 96, 160, 26, loc::gettext("play"), offset++);
 #endif
         option(loc::gettext("levels"));
+        touch::create_menu_button(80, 128, 160, 26, loc::gettext("levels"), offset++);
+
         option(loc::gettext("options"));
+        touch::create_menu_button(80, 160, 128, 26, loc::gettext("options"), offset++);
+
         if (loc::show_translator_menu)
         {
             option(loc::gettext("translator"));
+            offset++;
         }
+
+        // Special for the touch menu: language button
+        touch::create_menu_button(214, 160, 26, 26, "L", -1);
+
         option(loc::gettext("credits"));
+        touch::create_menu_button(80, 192, 160, 26, loc::gettext("credits"), offset++);
+
         option(loc::gettext("quit"));
+
         menuyoff = -10;
         maxspacing = 15;
+
+        auto_buttons = false;
         break;
+    }
     case Menu::playerworlds:
         option(loc::gettext("play a level"));
         option(loc::gettext("level editor"), !editor_disabled);
@@ -6834,7 +6863,7 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
             menuxoff = 20;
             menuyoff = 70-(menuoptions.size()*10);
             menuspacing = 5;
-            return; // skip automatic centering, will turn out bad with levels list
+            auto_center = false;
         }
         break;
     case Menu::quickloadlevel:
@@ -7121,7 +7150,8 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         menuxoff = 20;
         menuyoff = 55-(menuoptions.size()*10);
         menuspacing = 5;
-        return; // skip automatic centering, will turn out bad with scripts list
+        auto_center = false;
+        break;
     case Menu::translator_maintenance:
         option(loc::gettext("sync language files"));
         option(loc::gettext("global statistics"), false);
@@ -7325,6 +7355,7 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
                 if (unlock[Unlock_SECRETLAB])
                 {
                     menuyoff = -30;
+                    button_y_offset = -40;
                 }
                 else
                 {
@@ -7467,25 +7498,48 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         break;
     }
 
-    // Automatically center the menu. We must check the width of the menu with the initial horizontal spacing.
-    // If it's too wide, reduce the horizontal spacing by 5 and retry.
-    // Try to limit the menu width to 272 pixels: 320 minus 16*2 for square brackets, minus 8*2 padding.
-    // The square brackets fall outside the menu width (i.e. selected menu options are printed 16 pixels to the left)
-    bool done_once = false;
-    int menuwidth = 0;
-    for (; !done_once || (menuwidth > 272 && menuspacing > 0); maxspacing -= 5)
+    if (auto_center)
     {
-        done_once = true;
-        menuspacing = maxspacing;
-        menuwidth = 0;
+        // Automatically center the menu. We must check the width of the menu with the initial horizontal spacing.
+        // If it's too wide, reduce the horizontal spacing by 5 and retry.
+        // Try to limit the menu width to 272 pixels: 320 minus 16*2 for square brackets, minus 8*2 padding.
+        // The square brackets fall outside the menu width (i.e. selected menu options are printed 16 pixels to the left)
+        bool done_once = false;
+        int menuwidth = 0;
+        for (; !done_once || (menuwidth > 272 && menuspacing > 0); maxspacing -= 5)
+        {
+            done_once = true;
+            menuspacing = maxspacing;
+            menuwidth = 0;
+            for (size_t i = 0; i < menuoptions.size(); i++)
+            {
+                int width = i * menuspacing + font::len(menuoptions[i].print_flags, menuoptions[i].text);
+                if (width > menuwidth)
+                    menuwidth = width;
+            }
+        }
+        menuxoff = (320 - menuwidth) / 2;
+    }
+
+    if (auto_buttons)
+    {
+        int base_y = 128 + menuyoff + button_y_offset;
+
         for (size_t i = 0; i < menuoptions.size(); i++)
         {
-            int width = i*menuspacing + font::len(menuoptions[i].print_flags, menuoptions[i].text);
-            if (width > menuwidth)
-                menuwidth = width;
+            int button_width = SDL_max(160, font::len(menuoptions[i].print_flags, menuoptions[i].text) + 16);
+
+            touch::create_menu_button(
+                (320 - button_width) / 2,
+                base_y + i * (button_height + button_spacing),
+                button_width,
+                button_height,
+                menuoptions[i].text,
+                i,
+                menuoptions[i].active
+            );
         }
     }
-    menuxoff = (320-menuwidth)/2;
 }
 
 bool Game::can_unlock_ndm(void)

@@ -656,6 +656,9 @@ int main(int argc, char *argv[])
     // Set up screen
     graphics.init();
 
+    // Set up touch input
+    touch::init();
+
     game.init();
     game.seed_use_sdl_getticks = seed_use_sdl_getticks;
 

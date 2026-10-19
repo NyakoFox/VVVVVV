@@ -20,6 +20,7 @@
 #include "RoomnameTranslator.h"
 #include "Screen.h"
 #include "Script.h"
+#include "Touch.h"
 #include "UtilityClass.h"
 #include "VFormat.h"
 #include "Vlogging.h"

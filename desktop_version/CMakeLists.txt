@@ -116,6 +116,7 @@ set(VVV_CXX_SRC
     src/Spacestation2.cpp
     src/TerminalScripts.cpp
     src/Textbox.cpp
+    src/Touch.cpp
     src/Tower.cpp
     src/UtilityClass.cpp
     src/WarpClass.cpp
