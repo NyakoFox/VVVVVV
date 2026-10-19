@@ -195,7 +195,7 @@ static void menurender(void)
     {
     case Menu::mainmenu:
     {
-        const int temp = 50;
+        const int temp = key.using_touch ? 38 : 50;
         graphics.draw_sprite((160 - 96) + 0 * 32, temp, 23, tr, tg, tb);
         graphics.draw_sprite((160 - 96) + 1 * 32, temp, 23, tr, tg, tb);
         graphics.draw_sprite((160 - 96) + 2 * 32, temp, 23, tr, tg, tb);
@@ -1883,7 +1883,7 @@ static void menurender(void)
                 }
             }
         }
-        else
+        else if (!key.using_touch)
         {
             font::print_wrap(PR_CEN, -1, 180, loc::gettext("To install new player levels, copy the .vvvvvv files to the levels folder."), tr, tg, tb);
         }
@@ -1994,7 +1994,15 @@ void titlerender(void)
         if(tg>255) tg=255;
         if (tb < 0) tb = 0;
         if(tb>255) tb=255;
-        graphics.drawmenu(tr, tg, tb, game.currentmenuname);
+
+        if (key.using_touch)
+        {
+            touch::render_dynamic_controls(tr, tg, tb);
+        }
+        else
+        {
+            graphics.drawmenu(tr, tg, tb, game.currentmenuname);
+        }
     }
 
     graphics.drawfade();

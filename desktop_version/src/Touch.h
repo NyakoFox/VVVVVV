@@ -2,8 +2,11 @@
 #define TOUCH_H
 
 #include <SDL3/SDL.h>
+#include <string>
+#include <vector>
 
 #define VVV_FingerID Uint64
+
 #define TOUCH_SWIPE_SENSITIVITY 0.005
 
 struct VVV_Finger
@@ -31,5 +34,39 @@ enum SwipeDirection
     SwipeDirection_NONE,
     SwipeDirection_RIGHT
 };
+
+enum TouchControlType
+{
+    TouchControlType_MENU_BUTTON
+};
+
+struct TouchControl
+{
+    TouchControlType type;
+    SDL_FRect rect;
+    bool down;
+    VVV_FingerID pressed_finger;
+    bool active;
+
+    // Menu buttons
+    std::string text;
+    int option_id;
+};
+
+namespace touch
+{
+    extern std::vector<TouchControl> dynamic_controls;
+
+    void init(void);
+
+    void input(void);
+
+    void render_dynamic_controls(int r, int g, int b);
+
+    void clear_dynamic_controls(void);
+
+    TouchControl* create_menu_button(int x, int y, int width, int height, const std::string& text, int option_id, bool active);
+    TouchControl* create_menu_button(int x, int y, int width, int height, const std::string& text, int option_id);
+}
 
 #endif /* TOUCH_H */

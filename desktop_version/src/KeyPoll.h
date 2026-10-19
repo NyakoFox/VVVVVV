@@ -73,6 +73,11 @@ public:
     void resetSwipe(void);
     void updateSwipe(void);
 
+	VVV_Finger* getFinger(VVV_FingerID finger_id);
+
+    bool isFingerInRect(VVV_FingerID finger_id, const SDL_FRect& rect, bool scaled);
+    VVV_FingerID capturePressedFingerAtRect(const SDL_FRect& rect, bool scaled);
+
     int leftbutton, rightbutton, middlebutton;
     int mousex;
     int mousey;

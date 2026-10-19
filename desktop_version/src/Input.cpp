@@ -23,6 +23,7 @@
 #include "RoomnameTranslator.h"
 #include "Screen.h"
 #include "Script.h"
+#include "Touch.h"
 #include "UtilityClass.h"
 #include "Vlogging.h"
 #include "Alloc.h"
@@ -422,7 +423,7 @@ static void slidermodeinput(void)
     *user_changing_volume = SDL_clamp(*user_changing_volume, 0, USER_VOLUME_MAX);
 }
 
-static void menuactionpress(void)
+void menuactionpress(void)
 {
     if (game.menutestmode)
     {
@@ -463,6 +464,15 @@ static void menuactionpress(void)
         switch (option_id)
         {
 #if !defined(MAKEANDPLAY)
+        case -1:
+            // Special case for touch input: language button!
+            music.playef(Sound_VIRIDIAN);
+            loc::loadlanguagelist();
+            loc::pre_title_lang_menu = false;
+            game.createmenu(Menu::language);
+            game.currentmenuoption = loc::languagelist_curlang;
+            map.nexttowercolour();
+            break;
         case 0:
             //Play
             if (!game.save_exists() && !game.anything_unlocked())
@@ -2345,6 +2355,11 @@ void titleinput(void)
     game.press_interact = false;
 
     bool lang_press_horizontal = false;
+
+    if (game.menustart && graphics.fademode == FADE_NONE)
+    {
+        touch::input();
+    }
 
     if (graphics.flipmode)
     {

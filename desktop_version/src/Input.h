@@ -13,4 +13,6 @@ void gamecompleteinput(void);
 
 void gamecompleteinput2(void);
 
+void menuactionpress(void);
+
 #endif /* INPUT_H */
