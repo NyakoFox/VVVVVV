@@ -6747,6 +6747,7 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         {
             option(loc::gettext("open level folder"), FILESYSTEM_openDirectoryEnabled());
             option(loc::gettext("show level folder path"));
+            button_y_offset = -40;
         }
         option(loc::gettext("return"));
         menuyoff = -40;
@@ -6877,6 +6878,7 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         option(loc::gettext("no! don't delete"));
         option(loc::gettext("yes, delete save"));
         menuyoff = 64;
+        button_y_offset = -40;
         break;
     case Menu::youwannaquit:
         option(loc::gettext("yes, quit"));
@@ -7173,11 +7175,13 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         option(loc::gettext("no! don't delete"));
         option(loc::gettext("yes, delete everything"));
         menuyoff = 64;
+        button_y_offset = -40;
         break;
     case Menu::setinvincibility:
         option(loc::gettext("no, return to options"));
         option(loc::gettext("yes, enable"));
         menuyoff = 64;
+        button_y_offset = -40;
         break;
     case Menu::setslowdown:
         option(loc::gettext("normal speed"));
@@ -7377,6 +7381,7 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         option(loc::gettext("start new game"));
         option(loc::gettext("return"));
         menuyoff = 64;
+        button_y_offset = -40;
         break;
     case Menu::playmodes:
         option(loc::gettext("time trials"), !nocompetitive_unless_translator());
@@ -7423,6 +7428,7 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         option(loc::gettext("enable cutscenes"));
         option(loc::gettext("return"));
         menuyoff = 40;
+        button_y_offset = -32;
         break;
     case Menu::gameover:
         menucountdown = 120;
