@@ -491,10 +491,20 @@ void menuactionpress(void)
             break;
 #endif
         case 1:
-            //Bring you to the normal playmenu
+            // Bring you to the normal playmenu
             music.playef(Sound_VIRIDIAN);
             game.editor_disabled = !BUTTONGLYPHS_keyboard_is_available();
-            game.createmenu(Menu::playerworlds);
+
+            if (game.editor_disabled && key.using_touch)
+            {
+                // If we don't have editor access, and we're using touch input, skip directly to the level list
+                game.createmenu(Menu::levellist);
+            }
+            else
+            {
+                game.createmenu(Menu::playerworlds);
+            }
+
             map.nexttowercolour();
             break;
         case 2:
