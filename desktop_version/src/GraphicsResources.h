@@ -50,6 +50,8 @@ public:
     SDL_Texture* im_flipsprites_translated;
 
     SDL_Texture* im_button_globe;
+    SDL_Texture* im_button_left;
+    SDL_Texture* im_button_right;
 };
 
 SDL_Surface* LoadImageSurface(const char* filename);

@@ -838,7 +838,7 @@ static void menurender(void)
         {
             font::print_wrap(PR_CEN, -1, 90, loc::gettext("ERROR: No language files found."), tr, tg, tb);
         }
-        else if ((unsigned)game.currentmenuoption < loc::languagelist.size())
+        else if ((unsigned)game.currentmenuoption < loc::languagelist.size() && !key.using_touch)
         {
             font::print_wrap(PR_CEN, -1, 8, loc::languagelist[game.currentmenuoption].credit.c_str(), tr/2, tg/2, tb/2);
             const char* select_hint;

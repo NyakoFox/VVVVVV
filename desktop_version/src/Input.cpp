@@ -1206,33 +1206,105 @@ void menuactionpress(void)
 
         music.playef(Sound_VIRIDIAN);
 
-        if (loc::languagelist.size() != 0 && (unsigned)game.currentmenuoption < loc::languagelist.size())
+        if (game.currentmenuoption == -3)
         {
-            /* Update code also used in KeyPoll.cpp. */
-            loc::languagelist_curlang = game.currentmenuoption;
-            loc::lang = loc::languagelist[game.currentmenuoption].code;
-            loc::loadtext(false);
-            loc::lang_set = loc::lang_set_current;
-            graphics.grphx.init_translations();
-        }
+            // Return
 
-        if (loc::pre_title_lang_menu)
+            if (loc::pre_title_lang_menu)
+            {
+                /* Make the title screen appear, we haven't seen it yet.
+                 * game.returnmenu() works because Menu::mainmenu
+                 * is created before the language menu. */
+                game.menustart = false;
+                loc::pre_title_lang_menu = false;
+            }
+            else
+            {
+                map.nexttowercolour();
+                game.currentmenuoption = loc::languagelist_curlang;
+            }
+
+            game.returnmenu();
+        }
+        else if (game.currentmenuoption == -2)
         {
-            /* Make the title screen appear, we haven't seen it yet.
-             * game.returnmenu() works because Menu::mainmenu
-             * is created before the language menu. */
-            game.menustart = false;
-            loc::pre_title_lang_menu = false;
-        }
+            // Previous page
 
-        if (prev_lang != loc::lang)
+            if (game.language_page == 0)
+            {
+                game.language_page = (unsigned short)((loc::languagelist.size() - 1) / 14);
+            }
+            else
+            {
+                game.language_page--;
+            }
+
+            loc::loadlanguagelist();
+            game.createmenu(Menu::language, true);
+            game.currentmenuoption = loc::languagelist_curlang;
+            map.nexttowercolour();
+        }
+        else if (game.currentmenuoption == -1)
         {
-            recomputetextboxes();
+            // Next page
+            if ((size_t) ((game.language_page * 14) + 14) >= loc::languagelist.size())
+            {
+                game.language_page = 0;
+            }
+            else
+            {
+                game.language_page++;
+            }
+            loc::loadlanguagelist();
+            game.createmenu(Menu::language, true);
+            game.currentmenuoption = loc::languagelist_curlang;
+            map.nexttowercolour();
         }
+        else
+        {
 
-        game.returnmenu();
-        map.nexttowercolour();
-        game.savestatsandsettings_menu();
+            if (loc::languagelist.size() != 0 && (unsigned)game.currentmenuoption < loc::languagelist.size())
+            {
+                /* Update code also used in KeyPoll.cpp. */
+                loc::languagelist_curlang = game.currentmenuoption;
+                loc::lang = loc::languagelist[game.currentmenuoption].code;
+                loc::loadtext(false);
+                loc::lang_set = loc::lang_set_current;
+                graphics.grphx.init_translations();
+            }
+
+            if (loc::pre_title_lang_menu)
+            {
+                /* Make the title screen appear, we haven't seen it yet.
+                 * game.returnmenu() works because Menu::mainmenu
+                 * is created before the language menu. */
+                game.menustart = false;
+                loc::pre_title_lang_menu = false;
+            }
+
+            if (prev_lang != loc::lang)
+            {
+                recomputetextboxes();
+            }
+
+            if (!key.using_touch)
+            {
+                // We selected a language, return
+                game.returnmenu();
+                map.nexttowercolour();
+            }
+            else
+            {
+                // We're using touch input, so stay in the language menu
+                // Though, we now have to respawn the buttons, so...
+
+                loc::loadlanguagelist();
+                game.createmenu(Menu::language, true);
+                game.currentmenuoption = loc::languagelist_curlang;
+            }
+
+            game.savestatsandsettings_menu();
+        }
 
         break;
     }

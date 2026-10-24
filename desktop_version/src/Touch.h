@@ -37,8 +37,9 @@ enum SwipeDirection
 
 enum TouchControlType
 {
-    TouchControlType_MENU_BUTTON,
-    TouchControlType_MENU_BUTTON_ICON
+    TouchControlType_MENU_BUTTON, // A text button in the menu system
+    TouchControlType_MENU_BUTTON_ICON, // A button in the menu system, which displays an icon instead of text
+    TouchControlType_MENU_BUTTON_LANGUAGE // A specific language option in the language selection menu
 };
 
 struct TouchControl
@@ -51,6 +52,7 @@ struct TouchControl
 
     // Menu buttons
     std::string text;
+    Uint8 text_flags;
     int option_id;
     SDL_Texture* image;
 };

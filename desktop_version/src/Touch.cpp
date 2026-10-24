@@ -6,6 +6,7 @@
 #include "Graphics.h"
 #include "Input.h"
 #include "KeyPoll.h"
+#include "Localization.h"
 #include "Screen.h"
 #include "UtilityClass.h"
 
@@ -40,6 +41,7 @@ namespace touch
         control->active = active;
 
         control->text = text;
+        control->text_flags = 0;
         control->option_id = option_id;
 
         return control;
@@ -73,6 +75,7 @@ namespace touch
         {
         case TouchControlType_MENU_BUTTON:
         case TouchControlType_MENU_BUTTON_ICON:
+        case TouchControlType_MENU_BUTTON_LANGUAGE:
             if (key.isFingerInRect(control->pressed_finger, control->rect, true))
             {
                 // We've released a press on a menu button, so let's simulate selecting it
@@ -129,6 +132,16 @@ namespace touch
     {
         switch (control->type)
         {
+        case TouchControlType_MENU_BUTTON_LANGUAGE:
+            // Specifically for the language menu; dim buttons that aren't the current language
+            if (control->option_id != loc::languagelist_curlang && control->option_id >= 0)
+            {
+                r /= 2;
+                g /= 2;
+                b /= 2;
+            }
+
+            SDL_FALLTHROUGH;
         case TouchControlType_MENU_BUTTON:
         {
             draw_button_background(control, r, g, b, scale);
@@ -136,10 +149,10 @@ namespace touch
             int offset = control->down ? 1 : 0;
 
             int font_scale = SDL_min((scale - 1), 7);
-            int height = font::height(PR_CJK_LOW | font_scale);
+            int height = font::height(PR_CJK_LOW | font_scale | control->text_flags);
 
             font::print(
-                PR_CEN | PR_CJK_LOW | font_scale,
+                PR_CEN | PR_CJK_LOW | font_scale | control->text_flags,
                 control->rect.x + (control->rect.w / 2) + offset * scale,
                 control->rect.y + ((control->rect.h - height) / 2 + offset * scale),
                 control->text,

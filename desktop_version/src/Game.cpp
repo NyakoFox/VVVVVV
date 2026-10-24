@@ -387,6 +387,8 @@ void Game::init(void)
     checkpoint_saving = false;
 #endif
 
+    language_page = 0;
+
     setdefaultcontrollerbuttons();
 }
 
@@ -7063,24 +7065,62 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         }
         else
         {
+            auto_buttons = false;
+            int button_count = -1;
+
             for (size_t i = 0; i < loc::languagelist.size(); i++)
             {
+                int button_x = 0;
+                int button_y = 0;
+                bool spawn_buttons = false;
+                if (i >= (language_page * 14))
+                {
+                    spawn_buttons = true;
+                    button_count++;
+                    button_x = (button_count >= 7) ? 240 : 80;
+                    button_y = 10 + 26 * (button_count % 7);
+                    if (button_count >= 14)
+                    {
+                        spawn_buttons = false;
+                    }
+                }
+
                 if (loc::languagelist[i].nativename.empty())
                 {
                     option(loc::languagelist[i].code.c_str());
+
+                    if (spawn_buttons)
+                    {
+                        int button_width = SDL_max(136, font::len(PR_1X, loc::languagelist[i].code.c_str()) + 16);
+                        TouchControl* control = touch::create_menu_button(button_x - button_width / 2, button_y, button_width, 24, loc::languagelist[i].code.c_str(), i);
+                        control->type = TouchControlType_MENU_BUTTON_LANGUAGE;
+                    }
                 }
                 else
                 {
+                    Uint8 flags = PR_FONT_IDX(loc::languagelist[i].font_idx, loc::languagelist[i].rtl);
                     option(
                         loc::languagelist[i].nativename.c_str(),
                         true,
-                        PR_FONT_IDX(loc::languagelist[i].font_idx, loc::languagelist[i].rtl)
+                        flags
                     );
+
+                    if (spawn_buttons)
+                    {
+                        int button_width = SDL_max(136, font::len(flags, loc::languagelist[i].nativename.c_str()) + 16);
+                        TouchControl* control = touch::create_menu_button(button_x - button_width / 2, button_y, button_width, 24, loc::languagelist[i].nativename.c_str(), i);
+                        control->text_flags = flags;
+                        control->type = TouchControlType_MENU_BUTTON_LANGUAGE;
+                    }
                 }
             }
 
             menuyoff = 70-(menuoptions.size()*10);
             maxspacing = 5;
+
+            touch::create_menu_button(30, 200, 60, 26, graphics.grphx.im_button_left, loc::langmeta.rtl ? -1 : -2);
+            touch::create_menu_button(106, 200, 108, 26, loc::gettext("ok"), -3);
+            touch::create_menu_button(230, 200, 60, 26, graphics.grphx.im_button_right, loc::langmeta.rtl ? -2 : -1);
         }
         break;
     case Menu::translator_main:
