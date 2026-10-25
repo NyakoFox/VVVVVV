@@ -7248,6 +7248,11 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         option(loc::gettext("last page"));
         option(loc::gettext("return"));
         menuyoff = 64;
+
+        touch::create_menu_button(30, 200, 60, 26, graphics.grphx.im_button_left, loc::langmeta.rtl ? 0 : 1);
+        touch::create_menu_button(106, 200, 108, 26, loc::gettext("return"), 2);
+        touch::create_menu_button(230, 200, 60, 26, graphics.grphx.im_button_right, loc::langmeta.rtl ? 1 : 0);
+        auto_buttons = false;
         break;
     case Menu::credits2:
     case Menu::credits25:
@@ -7260,12 +7265,22 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         option(loc::gettext("previous page"));
         option(loc::gettext("return"));
         menuyoff = 64;
+
+        touch::create_menu_button(30, 200, 60, 26, graphics.grphx.im_button_left, loc::langmeta.rtl ? 0 : 1);
+        touch::create_menu_button(106, 200, 108, 26, loc::gettext("return"), 2);
+        touch::create_menu_button(230, 200, 60, 26, graphics.grphx.im_button_right, loc::langmeta.rtl ? 1 : 0);
+        auto_buttons = false;
         break;
     case Menu::credits6:
         option(loc::gettext("first page"));
         option(loc::gettext("previous page"));
         option(loc::gettext("return"));
         menuyoff = 64;
+
+        touch::create_menu_button(30, 200, 60, 26, graphics.grphx.im_button_left, loc::langmeta.rtl ? 0 : 1);
+        touch::create_menu_button(106, 200, 108, 26, loc::gettext("return"), 2);
+        touch::create_menu_button(230, 200, 60, 26, graphics.grphx.im_button_right, loc::langmeta.rtl ? 1 : 0);
+        auto_buttons = false;
         break;
     case Menu::play:
     {
