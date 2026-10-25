@@ -7457,12 +7457,26 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         menuyoff = 10;
         break;
     case Menu::continuemenu:
+    {
         map.settowercolour(3);
         option(loc::gettext("continue from teleporter"));
         option(loc::gettext("continue from quicksave"));
         option(loc::gettext("return"));
         menuyoff = 20;
+        auto_buttons = false;
+
+        TouchControl* telesave_button = touch::create_control(TouchControlType_MENU_BUTTON_TELESAVE, 17, 14, 286, 90);
+        TouchControl* quicksave_button = touch::create_control(TouchControlType_MENU_BUTTON_QUICKSAVE, 17, 109, 286, 90);
+
+        telesave_button->text = loc::gettext("Tele Save");
+        telesave_button->option_id = 0;
+
+        quicksave_button->text = loc::gettext("Quick Save");
+        quicksave_button->option_id = 1;
+
+        touch::create_menu_button(17, 205, 286, 26, loc::gettext("return"), 2);
         break;
+    }
     case Menu::startnodeathmode:
         option(loc::gettext("disable cutscenes"));
         option(loc::gettext("enable cutscenes"));

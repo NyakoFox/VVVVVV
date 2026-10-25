@@ -1516,6 +1516,42 @@ void Graphics::drawpixeltextbox(
     drawcoloredtile(x + w - 8, y + h - 8, 47, r, g, b);
 }
 
+void Graphics::draw_summary(Game::Summary* summary, int x_offset, int y_offset)
+{
+    font::print(
+        PR_CEN, (SCREEN_WIDTH_PIXELS / 2) + x_offset, y_offset,
+        loc::gettext_roomname_special(map.currentarea(summary->saverx, summary->savery)),
+        25, 255 - (help.glow / 2), 255 - (help.glow / 2)
+    );
+
+    for (int i = 0; i < 6; i++)
+    {
+        drawcrewman(169 - (3 * 42) + (i * 42) + x_offset, 15 + y_offset, i, summary->crewstats[i], true);
+    }
+
+    font::print(
+        0, 59 + x_offset, 52 + y_offset,
+        game.giventimestring(
+            summary->hours,
+            summary->minutes,
+            summary->seconds
+        ),
+        255 - (help.glow / 2), 255 - (help.glow / 2), 255 - (help.glow / 2)
+    );
+
+    char buffer[SCREEN_WIDTH_CHARS + 1];
+    vformat_buf(buffer, sizeof(buffer),
+        loc::gettext("{savebox_n_trinkets|wordy}"),
+        "savebox_n_trinkets:int",
+        summary->trinkets
+    );
+
+    font::print(PR_RIGHT, 262 + x_offset, 52 + y_offset, buffer, 255 - (help.glow / 2), 255 - (help.glow / 2), 255 - (help.glow / 2));
+
+    draw_sprite(34 + x_offset, 46 + y_offset, 50, col_clock);
+    draw_sprite(270 + x_offset, 46 + y_offset, 22, col_trinket);
+}
+
 void Graphics::textboxactive(void)
 {
     //Remove all but the most recent textbox

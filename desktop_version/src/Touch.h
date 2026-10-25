@@ -39,7 +39,9 @@ enum TouchControlType
 {
     TouchControlType_MENU_BUTTON, // A text button in the menu system
     TouchControlType_MENU_BUTTON_ICON, // A button in the menu system, which displays an icon instead of text
-    TouchControlType_MENU_BUTTON_LANGUAGE // A specific language option in the language selection menu
+    TouchControlType_MENU_BUTTON_LANGUAGE, // A specific language option in the language selection menu
+    TouchControlType_MENU_BUTTON_TELESAVE, // The telesave summary button in the continue menu
+    TouchControlType_MENU_BUTTON_QUICKSAVE // The quicksave summary button in the continue menu
 };
 
 struct TouchControl

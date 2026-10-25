@@ -194,6 +194,8 @@ public:
 
     void drawpixeltextbox(int x, int y, int w, int h, int r, int g, int b);
 
+    void draw_summary(Game::Summary* summary, int x_offset, int y_offset);
+
     void drawcrewman(int x, int y, int t, bool act, bool noshift =false);
 
     int crewcolour(const int t);

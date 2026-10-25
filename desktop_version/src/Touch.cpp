@@ -76,6 +76,8 @@ namespace touch
         case TouchControlType_MENU_BUTTON:
         case TouchControlType_MENU_BUTTON_ICON:
         case TouchControlType_MENU_BUTTON_LANGUAGE:
+        case TouchControlType_MENU_BUTTON_TELESAVE:
+        case TouchControlType_MENU_BUTTON_QUICKSAVE:
             if (key.isFingerInRect(control->pressed_finger, control->rect, true))
             {
                 // We've released a press on a menu button, so let's simulate selecting it
@@ -92,11 +94,15 @@ namespace touch
     {
     }
 
-    static void draw_button_background(TouchControl* control, int r, int g, int b, int scale)
+    static void draw_button_background(TouchControl* control, int r, int g, int b, int back_r, int back_g, int back_b, int scale)
     {
         int use_r = control->active ? r : 127;
         int use_g = control->active ? g : 127;
         int use_b = control->active ? b : 127;
+
+        int use_back_r = control->active ? back_r : 84;
+        int use_back_g = control->active ? back_g : 84;
+        int use_back_b = control->active ? back_b : 84;
 
         int offset = control->down ? 1 : 0;
 
@@ -124,8 +130,13 @@ namespace touch
             control->rect.y + (2 + offset) * scale,
             control->rect.w - 4 * scale,
             control->rect.h - 4 * scale,
-            use_r / 1.5, use_g / 1.5, use_b / 1.5
+            use_back_r, use_back_g, use_back_b
         );
+    }
+
+    static void draw_button_background(TouchControl* control, int r, int g, int b, int scale)
+    {
+        draw_button_background(control, r, g, b, r / 1.5, g / 1.5, b / 1.5, scale);
     }
 
     static void control_render(TouchControl* control, int r, int g, int b, int scale)
@@ -180,6 +191,17 @@ namespace touch
             graphics.draw_texture(control->image, (x + offset) * scale, (y + offset) * scale, scale, scale);
             graphics.set_texture_color_mod(control->image, 255, 255, 255);
 
+            break;
+        }
+        case TouchControlType_MENU_BUTTON_TELESAVE:
+        case TouchControlType_MENU_BUTTON_QUICKSAVE:
+        {
+            draw_button_background(control, r, g, b, 65 / 6, 185 / 6, 207 / 6, 1);
+
+            int offset = control->down ? 1 : 0;
+
+            font::print(PR_CEN | PR_BOR, control->rect.x + (control->rect.w / 2) + offset, control->rect.y + offset + 6, control->text, 196, 196, 255 - help.glow);
+            graphics.draw_summary(control->type == TouchControlType_MENU_BUTTON_TELESAVE  ? &game.last_telesave : &game.last_quicksave, offset, control->rect.y + 22 + offset);
             break;
         }
         default:

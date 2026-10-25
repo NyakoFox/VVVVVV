@@ -1413,39 +1413,11 @@ static void menurender(void)
             break;
         }
 
-        if (summary != NULL)
+        if (summary != NULL && !key.using_touch)
         {
-            graphics.drawpixeltextbox(17, 65-20, 286, 90, 65, 185, 207);
-
+            graphics.drawpixeltextbox(17, 65 - 20, 286, 90, 65, 185, 207);
             font::print(PR_2X | PR_CEN, -1, 20, title, tr, tg, tb);
-            font::print(
-                PR_CEN, -1, 80-20,
-                loc::gettext_roomname_special(map.currentarea(summary->saverx, summary->savery)),
-                25, 255 - (help.glow / 2), 255 - (help.glow / 2)
-            );
-            for (int i = 0; i < 6; i++)
-            {
-                graphics.drawcrewman(169-(3*42)+(i*42), 95-20, i, summary->crewstats[i], true);
-            }
-            font::print(
-                0, 59, 132-20,
-                game.giventimestring(
-                    summary->hours,
-                    summary->minutes,
-                    summary->seconds
-                ),
-                255 - (help.glow / 2), 255 - (help.glow / 2), 255 - (help.glow / 2)
-            );
-            char buffer[SCREEN_WIDTH_CHARS + 1];
-            vformat_buf(buffer, sizeof(buffer),
-                loc::gettext("{savebox_n_trinkets|wordy}"),
-                "savebox_n_trinkets:int",
-                summary->trinkets
-            );
-            font::print(PR_RIGHT, 262, 132-20, buffer, 255 - (help.glow / 2), 255 - (help.glow / 2), 255 - (help.glow / 2));
-
-            graphics.draw_sprite(34, 126-20, 50, graphics.col_clock);
-            graphics.draw_sprite(270, 126-20, 22, graphics.col_trinket);
+            graphics.draw_summary(summary, 0, 60);
         }
         break;
     }
