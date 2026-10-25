@@ -6659,11 +6659,14 @@ void Game::returntomenu(enum Menu::MenuName t)
 
         if (is_the_menu_we_want)
         {
-            break;
+            return;
         }
 
         i--;
     }
+
+    // It wasn't found in the stack, so let's create it
+    createmenu(t);
 }
 
 void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
