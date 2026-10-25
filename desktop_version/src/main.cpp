@@ -864,6 +864,7 @@ int main(int argc, char *argv[])
 
     if (touch_devices > 0)
     {
+        key.was_using_touch = true;
         key.using_touch = true;
     }
 

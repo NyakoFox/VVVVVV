@@ -34,6 +34,9 @@
     <string english="start new game" translation="начать новую игру" explanation="menu option, extra confirmation"/>
     <string english="secret lab" translation="секретная лаборатория" explanation="menu option"/>
     <string english="play modes" translation="режимы игры" explanation="menu option"/>
+    <string english="start" translation="" explanation="touch input menu button, start the current selected play mode"/>
+    <string english="enable" translation="" explanation="touch input menu button, enable flip mode"/>
+    <string english="disable" translation="" explanation="touch input menu button, disable flip mode"/>
     <string english="ERROR: No levels found." translation="ОШИБКА: Уровни не найдены." explanation="" max="38*3"/>
     <string english="ERROR: This level has no start point!" translation="ОШИБКА: В этом уровне нет точки начала!" explanation="" max="38*5"/>
     <string english="ERROR" translation="ОШИБКА" explanation="title" max="20"/>

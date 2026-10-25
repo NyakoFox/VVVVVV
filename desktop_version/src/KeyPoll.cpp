@@ -66,6 +66,7 @@ KeyPoll::KeyPoll(void)
 
     isActive = true;
 
+    was_using_touch = false;
     using_touch = false;
 
     next_finger_id = 1; // 0 is invalid

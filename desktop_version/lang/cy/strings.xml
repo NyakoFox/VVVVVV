@@ -34,6 +34,9 @@
     <string english="start new game" translation="dechrau gêm newydd" explanation="menu option, extra confirmation"/>
     <string english="secret lab" translation="labordy cyfrinachol" explanation="menu option"/>
     <string english="play modes" translation="moddau chwarae" explanation="menu option"/>
+    <string english="start" translation="" explanation="touch input menu button, start the current selected play mode"/>
+    <string english="enable" translation="" explanation="touch input menu button, enable flip mode"/>
+    <string english="disable" translation="" explanation="touch input menu button, disable flip mode"/>
     <string english="ERROR: No levels found." translation="GWALL: Heb ganfod lefelau." explanation="" max="38*3"/>
     <string english="ERROR: This level has no start point!" translation="GWALL: Nid oes gan y lefel hon fan cychwyn!" explanation="" max="38*5"/>
     <string english="ERROR" translation="GWALL" explanation="title" max="20"/>

@@ -34,6 +34,9 @@
     <string english="start new game" translation="開始新遊戲" explanation="menu option, extra confirmation"/>
     <string english="secret lab" translation="秘密實驗室" explanation="menu option"/>
     <string english="play modes" translation="遊玩模式" explanation="menu option"/>
+    <string english="start" translation="" explanation="touch input menu button, start the current selected play mode"/>
+    <string english="enable" translation="" explanation="touch input menu button, enable flip mode"/>
+    <string english="disable" translation="" explanation="touch input menu button, disable flip mode"/>
     <string english="ERROR: No levels found." translation="錯誤：沒有找到關卡。" explanation="" max="38*3" max_local="25*2"/>
     <string english="ERROR: This level has no start point!" translation="錯誤：這個關卡沒有起始點！" explanation="" max="38*5" max_local="25*4"/>
     <string english="ERROR" translation="錯誤" explanation="title" max="20" max_local="13"/>

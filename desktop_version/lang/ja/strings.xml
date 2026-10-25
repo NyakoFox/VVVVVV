@@ -34,6 +34,9 @@
     <string english="start new game" translation="スタートする" explanation="menu option, extra confirmation"/>
     <string english="secret lab" translation="シークレットラボ" explanation="menu option"/>
     <string english="play modes" translation="プレイモード" explanation="menu option"/>
+    <string english="start" translation="" explanation="touch input menu button, start the current selected play mode"/>
+    <string english="enable" translation="" explanation="touch input menu button, enable flip mode"/>
+    <string english="disable" translation="" explanation="touch input menu button, disable flip mode"/>
     <string english="ERROR: No levels found." translation="エラー: ステージがありません。" explanation="" max="38*3" max_local="38*2"/>
     <string english="ERROR: This level has no start point!" translation="エラー: ステージにスタート地点がありません!" explanation="" max="38*5" max_local="38*4"/>
     <string english="ERROR" translation="エラー" explanation="title" max="20" max_local="20"/>

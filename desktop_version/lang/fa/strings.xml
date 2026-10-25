@@ -34,6 +34,9 @@
     <string english="start new game" translation="شروع بازی جدید" explanation="menu option, extra confirmation"/>
     <string english="secret lab" translation="آزمایشگاه سری" explanation="menu option"/>
     <string english="play modes" translation="حالت‌های بازی" explanation="menu option"/>
+    <string english="start" translation="" explanation="touch input menu button, start the current selected play mode"/>
+    <string english="enable" translation="" explanation="touch input menu button, enable flip mode"/>
+    <string english="disable" translation="" explanation="touch input menu button, disable flip mode"/>
     <string english="ERROR: No levels found." translation="خطا: مرحله‌ای یافت نشد." explanation="" max="38*3" max_local="38*3"/>
     <string english="ERROR: This level has no start point!" translation="خطا: این مرحله نقطه شروعی ندارد!" explanation="" max="38*5" max_local="38*5"/>
     <string english="ERROR" translation="خطا" explanation="title" max="20" max_local="20"/>

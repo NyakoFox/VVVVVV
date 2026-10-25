@@ -10,6 +10,7 @@
 #include "Music.h"
 #include "Network.h"
 #include "Script.h"
+#include "Touch.h"
 #include "UtilityClass.h"
 
 void titlelogic(void)

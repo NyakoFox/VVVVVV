@@ -91,6 +91,7 @@ public:
     int imebuffer_length;
 
     bool linealreadyemptykludge;
+    bool was_using_touch;
     bool using_touch;
 
 private:

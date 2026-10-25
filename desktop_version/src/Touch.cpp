@@ -7,6 +7,8 @@
 #include "Input.h"
 #include "KeyPoll.h"
 #include "Localization.h"
+#include "Map.h"
+#include "Music.h"
 #include "Screen.h"
 #include "UtilityClass.h"
 
@@ -85,6 +87,19 @@ namespace touch
                 menuactionpress();
             }
             break;
+        case TouchControlType_MENU_BUTTON_OPTION:
+        case TouchControlType_MENU_BUTTON_OPTION_ICON:
+            if (key.isFingerInRect(control->pressed_finger, control->rect, true))
+            {
+                // We've released a press, set option
+                game.currentmenuoption = control->option_id;
+
+                // Also recreate the menu
+                music.playef(Sound_VIRIDIAN);
+                game.createmenu(game.currentmenuname, true);
+                map.nexttowercolour();
+            }
+            break;
         default:
             break;
         }
@@ -153,8 +168,10 @@ namespace touch
             }
 
             SDL_FALLTHROUGH;
+        case TouchControlType_MENU_BUTTON_OPTION:
         case TouchControlType_MENU_BUTTON:
         {
+            // Just a normal button
             draw_button_background(control, r, g, b, scale);
 
             int offset = control->down ? 1 : 0;
@@ -172,6 +189,7 @@ namespace touch
 
             break;
         }
+        case TouchControlType_MENU_BUTTON_OPTION_ICON:
         case TouchControlType_MENU_BUTTON_ICON:
         {
             draw_button_background(control, r, g, b, scale);
@@ -265,6 +283,15 @@ namespace touch
                 }
             }
         }
+
+        // Some ugly kludge, but let's make sure our buttons are always up-to-date
+        if (!key.was_using_touch && key.using_touch)
+        {
+            // Just started using touch, so... reset the menu
+            game.createmenu(game.currentmenuname, true);
+        }
+
+        key.was_using_touch = key.using_touch;
     }
 
     void render_dynamic_controls(int r, int g, int b)

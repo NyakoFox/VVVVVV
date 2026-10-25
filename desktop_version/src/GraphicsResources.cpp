@@ -427,6 +427,7 @@ void GraphicsResources::init(void)
 	im_button_globe = LoadImage("graphics/button_globe.png", TEX_WHITE);
     im_button_left = LoadImage("graphics/button_left.png", TEX_WHITE);
     im_button_right = LoadImage("graphics/button_right.png", TEX_WHITE);
+    im_button_menu = LoadImage("graphics/button_menu.png", TEX_WHITE);
 
     im_sprites_translated = NULL;
     im_flipsprites_translated = NULL;
@@ -506,6 +507,7 @@ void GraphicsResources::destroy(void)
     CLEAR(im_button_globe);
     CLEAR(im_button_left);
     CLEAR(im_button_right);
+    CLEAR(im_button_menu);
 
     for (size_t i = 0; i < SDL_arraysize(graphics.customminimaps); i++)
     {

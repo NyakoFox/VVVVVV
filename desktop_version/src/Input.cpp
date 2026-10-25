@@ -2158,7 +2158,20 @@ void menuactionpress(void)
         map.nexttowercolour();
         break;
     case Menu::playmodes:
-        if (game.currentmenuoption == 0
+        if (game.currentmenuoption == -1)
+        {
+            // Touch input: we're trying to show all menu options in a quick menu
+            // so just reload the menu, basically
+
+            // We'll replace the return menu (option 4) since that wouldn't work right in touch mode, anyway
+            // especially since you can activate touch input whenever
+            game.currentmenuoption = 4;
+
+            music.playef(Sound_VIRIDIAN);
+            game.createmenu(Menu::playmodes, true);
+            map.nexttowercolour();
+        }
+        else if (game.currentmenuoption == 0
             && !game.nocompetitive_unless_translator())   //go to the time trial menu
         {
             music.playef(Sound_VIRIDIAN);
@@ -2185,6 +2198,9 @@ void menuactionpress(void)
             && game.unlock[Unlock_FLIPMODE])    //enable/disable flip mode
         {
             toggleflipmode();
+
+            // Recreate the menu, because we need to update the button text
+            game.createmenu(Menu::playmodes, true);
         }
         else if (game.currentmenuoption == 4)
         {

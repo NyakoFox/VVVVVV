@@ -6620,7 +6620,11 @@ void Game::returnmenu(void)
     //Store this in case createmenu() removes the stack frame
     int previousoption = frame.option;
 
+    // Set it before, in case a menu tries to use the current value...
+    currentmenuoption = frame.option;
     createmenu(frame.name, true);
+
+    // ... and set it after, in case it got changed by the menu.
     currentmenuoption = previousoption;
 
     //Remove the stackframe now, but createmenu() might have already gotten to it
@@ -7442,6 +7446,7 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         button_y_offset = -40;
         break;
     case Menu::playmodes:
+    {
         option(loc::gettext("time trials"), !nocompetitive_unless_translator());
         option(loc::gettext("intermissions"), unlock[Unlock_INTERMISSION_REPLAYS]);
         option(loc::gettext("no death mode"), unlock[Unlock_NODEATHMODE] && !nocompetitive());
@@ -7449,7 +7454,58 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         option(loc::gettext("return"));
         menuyoff = 8;
         maxspacing = 20;
+
+        auto_buttons = false;
+
+        if (currentmenuoption == 4)
+        {
+            // TOUCH INPUT: We're trying to show a quick menu of all options, so... do something completely different
+
+            TouchControl* control = touch::create_menu_button(80, 58, 160, 26, loc::gettext("time trials"), 0);
+            control->type = TouchControlType_MENU_BUTTON_OPTION;
+
+            control = touch::create_menu_button(80, 92, 160, 26, loc::gettext("intermissions"), 1);
+            control->type = TouchControlType_MENU_BUTTON_OPTION;
+
+            control = touch::create_menu_button(80, 126, 160, 26, loc::gettext("no death mode"), 2);
+            control->type = TouchControlType_MENU_BUTTON_OPTION;
+
+            control = touch::create_menu_button(80, 160, 160, 26, loc::gettext("flip mode"), 3);
+            control->type = TouchControlType_MENU_BUTTON_OPTION;
+            break;
+        }
+
+        int previous_option = (currentmenuoption == 0) ? 3 : (currentmenuoption - 1);
+        int next_option = (currentmenuoption == 3) ? 0 : (currentmenuoption + 1);
+
+        TouchControl* previous = touch::create_menu_button(30, 166, 60, 26, graphics.grphx.im_button_left, loc::langmeta.rtl ? next_option : previous_option);
+        previous->type = TouchControlType_MENU_BUTTON_OPTION_ICON;
+
+        TouchControl* next = touch::create_menu_button(230, 166, 60, 26, graphics.grphx.im_button_right, loc::langmeta.rtl ? previous_option : next_option);
+        next->type = TouchControlType_MENU_BUTTON_OPTION_ICON;
+
+        switch (currentmenuoption)
+        {
+        case 0:
+            touch::create_menu_button(106, 166, 108, 26, loc::gettext("start"), currentmenuoption, !nocompetitive_unless_translator());
+            break;
+        case 1:
+            touch::create_menu_button(106, 166, 108, 26, loc::gettext("start"), currentmenuoption, unlock[Unlock_INTERMISSION_REPLAYS]);
+            break;
+        case 2:
+            touch::create_menu_button(106, 166, 108, 26, loc::gettext("start"), currentmenuoption, unlock[Unlock_NODEATHMODE] && !nocompetitive());
+            break;
+        case 3:
+            touch::create_menu_button(106, 166, 108, 26, graphics.setflipmode ? loc::gettext("disable") : loc::gettext("enable"), currentmenuoption, unlock[Unlock_FLIPMODE]);
+            break;
+        }
+
+        touch::create_menu_button(loc::langmeta.rtl ? 72 : 30, 200, 218, 26, loc::gettext("return"), 4);
+
+        // Special for touch: show all buttons
+        touch::create_menu_button(loc::langmeta.rtl ? 30 : 264, 200, 26, 26, graphics.grphx.im_button_menu, -1);
         break;
+    }
     case Menu::intermissionmenu:
         option(loc::gettext("play intermission 1"));
         option(loc::gettext("play intermission 2"));

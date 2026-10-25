@@ -34,6 +34,9 @@
     <string english="start new game" translation="بدء لعبة جديدة" explanation="menu option, extra confirmation"/>
     <string english="secret lab" translation="مخبر سري" explanation="menu option"/>
     <string english="play modes" translation="أطوار اللعب" explanation="menu option"/>
+    <string english="start" translation="" explanation="touch input menu button, start the current selected play mode"/>
+    <string english="enable" translation="" explanation="touch input menu button, enable flip mode"/>
+    <string english="disable" translation="" explanation="touch input menu button, disable flip mode"/>
     <string english="ERROR: No levels found." translation="خطأ: لم نجد المراحل." explanation="" max="38*3" max_local="38*3"/>
     <string english="ERROR: This level has no start point!" translation="خطأ: لم نجد نقطة بدء لهذه المرحلة!" explanation="" max="38*5" max_local="38*5"/>
     <string english="ERROR" translation="خطأ" explanation="title" max="20" max_local="20"/>
