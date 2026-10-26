@@ -7578,6 +7578,7 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         menuyoff = 0;
         break;
     case Menu::timetrials:
+    {
         option(loc::gettext(unlock[Unlock_TIMETRIAL_SPACESTATION1] ? "space station 1" : "???"),
             unlock[Unlock_TIMETRIAL_SPACESTATION1]);
         option(loc::gettext(unlock[Unlock_TIMETRIAL_LABORATORY] ? "the laboratory" : "???"),
@@ -7594,7 +7595,67 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         option(loc::gettext("return"));
         menuyoff = 0;
         maxspacing = 15;
+
+        auto_buttons = false;
+
+        if (currentmenuoption == 6)
+        {
+            // TOUCH INPUT: We're trying to show a quick menu of all options, so... do something completely different
+
+            TouchControl* control = touch::create_menu_button(80, 58 - 32, 160, 26, loc::gettext(unlock[Unlock_TIMETRIAL_SPACESTATION1] ? "space station 1" : "???"), 0);
+            control->type = TouchControlType_MENU_BUTTON_OPTION;
+
+            control = touch::create_menu_button(80, 92 - 32, 160, 26, loc::gettext(unlock[Unlock_TIMETRIAL_LABORATORY] ? "the laboratory" : "???"), 1);
+            control->type = TouchControlType_MENU_BUTTON_OPTION;
+
+            control = touch::create_menu_button(80, 126 - 32, 160, 26, loc::gettext(unlock[Unlock_TIMETRIAL_TOWER] ? "the tower" : "???"), 2);
+            control->type = TouchControlType_MENU_BUTTON_OPTION;
+
+            control = touch::create_menu_button(80, 160 - 32, 160, 26, loc::gettext(unlock[Unlock_TIMETRIAL_SPACESTATION2] ? "space station 2" : "???"), 3);
+            control->type = TouchControlType_MENU_BUTTON_OPTION;
+
+            control = touch::create_menu_button(80, 194 - 32, 160, 26, loc::gettext(unlock[Unlock_TIMETRIAL_WARPZONE] ? "the warp zone" : "???"), 4);
+            control->type = TouchControlType_MENU_BUTTON_OPTION;
+
+            control = touch::create_menu_button(80, 228 - 32, 160, 26, loc::gettext(unlock[Unlock_TIMETRIAL_FINALLEVEL] ? "the final level" : "???"), 5);
+            control->type = TouchControlType_MENU_BUTTON_OPTION;
+            break;
+        }
+
+        TouchControl* previous = touch::create_menu_button(30, 166, 60, 26, graphics.grphx.im_button_left, (currentmenuoption == 0) ? 5 : (currentmenuoption - 1));
+        previous->type = TouchControlType_MENU_BUTTON_OPTION_ICON;
+
+        TouchControl* next = touch::create_menu_button(230, 166, 60, 26, graphics.grphx.im_button_right, (currentmenuoption == 5) ? 0 : (currentmenuoption + 1));
+        next->type = TouchControlType_MENU_BUTTON_OPTION_ICON;
+
+        switch (currentmenuoption)
+        {
+        case 0:
+            touch::create_menu_button(106, 166, 108, 26, loc::gettext(unlock[Unlock_TIMETRIAL_SPACESTATION1] ? "start" : "???"), currentmenuoption, unlock[Unlock_TIMETRIAL_SPACESTATION1]);
+            break;
+        case 1:
+            touch::create_menu_button(106, 166, 108, 26, loc::gettext(unlock[Unlock_TIMETRIAL_LABORATORY] ? "start" : "???"), currentmenuoption, unlock[Unlock_TIMETRIAL_LABORATORY]);
+            break;
+        case 2:
+            touch::create_menu_button(106, 166, 108, 26, loc::gettext(unlock[Unlock_TIMETRIAL_TOWER] ? "start" : "???"), currentmenuoption, unlock[Unlock_TIMETRIAL_TOWER]);
+            break;
+        case 3:
+            touch::create_menu_button(106, 166, 108, 26, loc::gettext(unlock[Unlock_TIMETRIAL_SPACESTATION2] ? "start" : "???"), currentmenuoption, unlock[Unlock_TIMETRIAL_SPACESTATION2]);
+            break;
+        case 4:
+            touch::create_menu_button(106, 166, 108, 26, loc::gettext(unlock[Unlock_TIMETRIAL_WARPZONE] ? "start" : "???"), currentmenuoption, unlock[Unlock_TIMETRIAL_WARPZONE]);
+            break;
+        case 5:
+            touch::create_menu_button(106, 166, 108, 26, loc::gettext(unlock[Unlock_TIMETRIAL_FINALLEVEL] ? "start" : "???"), currentmenuoption, unlock[Unlock_TIMETRIAL_FINALLEVEL]);
+            break;
+        }
+
+        touch::create_menu_button(30, 200, 218, 26, loc::gettext("return"), 6);
+
+        // Special for touch: show all buttons
+        touch::create_menu_button(264, 200, 26, 26, graphics.grphx.im_button_menu, -1);
         break;
+    }
     case Menu::nodeathmodecomplete:
         menucountdown = 90;
         menudest = Menu::nodeathmodecomplete2;

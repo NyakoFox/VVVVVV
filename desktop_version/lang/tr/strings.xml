@@ -34,7 +34,7 @@
     <string english="start new game" translation="yeni oyuna başla" explanation="menu option, extra confirmation"/>
     <string english="secret lab" translation="gizli laboratuvar" explanation="menu option"/>
     <string english="play modes" translation="oyun modları" explanation="menu option"/>
-    <string english="start" translation="" explanation="touch input menu button, start the current selected play mode"/>
+    <string english="start" translation="" explanation="touch input menu button, start the current selected play mode or time trial"/>
     <string english="enable" translation="" explanation="touch input menu button, enable flip mode"/>
     <string english="disable" translation="" explanation="touch input menu button, disable flip mode"/>
     <string english="ERROR: No levels found." translation="HATA: Bölüm bulunamadı" explanation="" max="38*3"/>

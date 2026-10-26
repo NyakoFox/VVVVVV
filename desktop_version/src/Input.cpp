@@ -2346,7 +2346,20 @@ void menuactionpress(void)
         map.nexttowercolour();
         break;
     case Menu::timetrials:
-        if (game.currentmenuoption == 0
+        if (game.currentmenuoption == -1)
+        {
+            // Touch input: we're trying to show all menu options in a quick menu
+            // so just reload the menu, basically
+
+            // We'll replace the return menu (option 6) since that wouldn't work right in touch mode, anyway
+            // especially since you can activate touch input whenever
+            game.currentmenuoption = 6;
+
+            music.playef(Sound_VIRIDIAN);
+            game.createmenu(Menu::timetrials, true);
+            map.nexttowercolour();
+        }
+        else if (game.currentmenuoption == 0
             && game.unlock[Unlock_TIMETRIAL_SPACESTATION1])
         {
             music.playef(Sound_VIRIDIAN);

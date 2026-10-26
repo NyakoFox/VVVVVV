@@ -34,7 +34,7 @@
     <string english="start new game" translation="iniciar novo jogo" explanation="menu option, extra confirmation"/>
     <string english="secret lab" translation="laboratório secreto" explanation="menu option"/>
     <string english="play modes" translation="modos" explanation="menu option"/>
-    <string english="start" translation="" explanation="touch input menu button, start the current selected play mode"/>
+    <string english="start" translation="" explanation="touch input menu button, start the current selected play mode or time trial"/>
     <string english="enable" translation="" explanation="touch input menu button, enable flip mode"/>
     <string english="disable" translation="" explanation="touch input menu button, disable flip mode"/>
     <string english="ERROR: No levels found." translation="ERRO: Não há níveis." explanation="" max="38*3"/>
