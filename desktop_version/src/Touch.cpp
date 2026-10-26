@@ -63,18 +63,74 @@ namespace touch
         return control;
     }
 
+    TouchControl* create_menu_toggle(int x, int y, int width, int height, const std::string& text, int option_id, bool checked, bool active)
+    {
+        TouchControl* control = create_control(TouchControlType_MENU_TOGGLE, x, y, width, height);
+        control->checked = checked;
+        control->text = text;
+        control->text_flags = 0;
+        control->option_id = option_id;
+        control->active = active;
+        return control;
+    }
+
+    TouchControl* create_menu_toggle(int x, int y, int width, int height, const std::string& text, int option_id, bool checked)
+    {
+        return create_menu_toggle(x, y, width, height, text, option_id, checked, true);
+    }
+
+    TouchControl* create_slider(int x, int y, int width, int height, const std::string& text, int* var, int min_value, int max_value, bool active)
+    {
+        TouchControl* control = create_control(TouchControlType_SLIDER, x, y, width, height);
+        control->text = text;
+        control->text_flags = 0;
+        control->min_value = min_value;
+        control->max_value = max_value;
+        control->slider_var = var;
+        control->active = active;
+        return control;
+    }
+
+    TouchControl* create_slider(int x, int y, int width, int height, const std::string& text, int* var, int min_value, int max_value)
+    {
+        return create_slider(x, y, width, height, text, var, min_value, max_value, true);
+    }
+
     static void control_press(TouchControl* control)
     {
     }
 
     static void control_update(TouchControl* control)
     {
+        switch (control->type)
+        {
+        case TouchControlType_SLIDER:
+        {
+            int value = *control->slider_var;
+            int range = control->max_value - control->min_value;
+            float percent = (float)(value - control->min_value) / range;
+
+            VVV_Finger* finger = key.getFinger(control->pressed_finger);
+            SDL_Point transformed_finger = gameScreen.transform_screen_to_world(finger->x, finger->y);
+
+            int newvalue = control->min_value + (int)SDL_roundf((transformed_finger.x - control->rect.x) / (float)control->rect.w * range);
+            newvalue = SDL_clamp(newvalue, control->min_value, control->max_value);
+
+            *control->slider_var = newvalue;
+            break;
+        }
+        default:
+            break;
+        }
     }
 
     static void control_release(TouchControl* control)
     {
         switch (control->type)
         {
+        case TouchControlType_MENU_TOGGLE:
+            control->checked = !control->checked;
+            SDL_FALLTHROUGH;
         case TouchControlType_MENU_BUTTON:
         case TouchControlType_MENU_BUTTON_ICON:
         case TouchControlType_MENU_BUTTON_LANGUAGE:
@@ -220,6 +276,65 @@ namespace touch
 
             font::print(PR_CEN | PR_BOR, control->rect.x + (control->rect.w / 2) + offset, control->rect.y + offset + 6, control->text, 196, 196, 255 - help.glow);
             graphics.draw_summary(control->type == TouchControlType_MENU_BUTTON_TELESAVE  ? &game.last_telesave : &game.last_quicksave, offset, control->rect.y + 22 + offset);
+            break;
+        }
+        case TouchControlType_MENU_TOGGLE:
+        {
+            int font_scale = SDL_min((scale - 1), 7);
+            int height = font::height(PR_CJK_LOW | font_scale | control->text_flags);
+            int offset = control->down ? 1 : 0;
+
+            if (!control->active)
+            {
+                r = 127;
+                g = 127;
+                b = 127;
+            }
+
+            graphics.draw_rect(control->rect.x + offset * scale, control->rect.y + offset * scale, 10, 10, r, g, b);
+            if (control->checked)
+            {
+                graphics.fill_rect(control->rect.x + 2 * scale + offset * scale, control->rect.y + 2 * scale + offset * scale, 6, 6, r, g, b);
+            }
+
+            font::print(
+                PR_CJK_LOW | font_scale | control->text_flags,
+                control->rect.x + 16 + offset * scale,
+                control->rect.y + ((control->rect.h - height) / 2 + offset) * scale,
+                control->text,
+                r, g, b
+            );
+
+            break;
+        }
+        case TouchControlType_SLIDER:
+        {
+            if (!control->active)
+            {
+                r = 127;
+                g = 127;
+                b = 127;
+            }
+
+            int font_scale = SDL_min((scale - 1), 7);
+            int height = font::height(PR_CJK_LOW | font_scale | control->text_flags);
+            int offset = control->down ? 1 : 0;
+
+            // Find where the slider position is!
+            int value = *control->slider_var;
+            int range = control->max_value - control->min_value;
+            float percent = (float)(value - control->min_value) / range;
+            int sliderpos = (int)((control->rect.w - 10) * percent);
+
+            // Draw track
+            graphics.fill_rect(control->rect.x * scale + 2, (control->rect.y + (control->rect.h / 2)) * scale, control->rect.w, 4, r / 4, g / 4, b / 4);
+            graphics.fill_rect(control->rect.x * scale, (control->rect.y + (control->rect.h / 2) - 2) * scale, control->rect.w, 4, r / 1.5, g / 1.5, b / 1.5);
+            // Draw slider
+            graphics.fill_rect((control->rect.x + sliderpos + 2) * scale, (control->rect.y + (control->rect.h / 2) - 3) * scale, 10, 10, r / 4, g / 4, b / 4);
+            graphics.fill_rect((control->rect.x + sliderpos) * scale, (control->rect.y + (control->rect.h / 2) - 5) * scale, 10, 10, r, g, b);
+            graphics.fill_rect((control->rect.x + sliderpos + 1) * scale, (control->rect.y + (control->rect.h / 2) - 4) * scale, 8, 8, r / 1.5, g / 1.5, b / 1.5);
+
+            font::print(PR_CEN | PR_CJK_LOW | font_scale | control->text_flags, control->rect.x + (control->rect.w / 2) * scale, control->rect.y * scale, control->text, r, g, b);
             break;
         }
         default:

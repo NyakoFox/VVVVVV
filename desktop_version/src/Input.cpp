@@ -517,7 +517,16 @@ void menuactionpress(void)
         case 2:
             //Options
             music.playef(Sound_VIRIDIAN);
-            game.createmenu(Menu::options);
+
+            if (key.using_touch)
+            {
+                game.createmenu(Menu::gameplayoptions);
+            }
+            else
+            {
+                game.createmenu(Menu::options);
+            }
+
             map.nexttowercolour();
             break;
         case 3:
@@ -712,6 +721,24 @@ void menuactionpress(void)
     {
         int offset = 0;
         bool processed = false;
+
+        if (game.currentmenuoption == -2)
+        {
+            // touch: gameplay menu
+            music.playef(Sound_VIRIDIAN);
+            game.createmenu(Menu::gameplayoptions, true);
+            map.nexttowercolour();
+            processed = true;
+        }
+        if (game.currentmenuoption == -1)
+        {
+            // touch: audio menu
+            music.playef(Sound_VIRIDIAN);
+            game.createmenu(Menu::audiooptions, true);
+            map.nexttowercolour();
+            processed = true;
+        }
+
         if (game.currentmenuoption == offset + 0 && !gameScreen.isForcedFullscreen())
         {
             processed = true;
@@ -942,6 +969,21 @@ void menuactionpress(void)
         break;
     case Menu::accessibility:
     {
+        if (game.currentmenuoption == -2)
+        {
+            // touch: controller options
+            music.playef(Sound_VIRIDIAN);
+            game.createmenu(Menu::controller, true);
+            map.nexttowercolour();
+        }
+        if (game.currentmenuoption == -1)
+        {
+            // touch: gameplay options
+            music.playef(Sound_VIRIDIAN);
+            game.createmenu(Menu::gameplayoptions, true);
+            map.nexttowercolour();
+        }
+
         int accessibilityoffset = 0;
 #if !defined(MAKEANDPLAY)
         accessibilityoffset = 1;
@@ -1026,6 +1068,37 @@ void menuactionpress(void)
     }
     case Menu::gameplayoptions:
     {
+        if (game.currentmenuoption == -2)
+        {
+            // touch: accessibility menu
+            music.playef(Sound_VIRIDIAN);
+            game.createmenu(Menu::accessibility, true);
+            map.nexttowercolour();
+            break;
+        }
+        if (game.currentmenuoption == -1)
+        {
+            // touch: graphics menu
+            music.playef(Sound_VIRIDIAN);
+            game.createmenu(Menu::graphicoptions, true);
+            map.nexttowercolour();
+        }
+
+        if (game.currentmenuoption == -3)
+        {
+            // touch: toggle translucent roomname bg
+            music.playef(Sound_VIRIDIAN);
+            graphics.translucentroomname = !graphics.translucentroomname;
+            game.savestatsandsettings_menu();
+        }
+        if (game.currentmenuoption == -4)
+        {
+            // touch: toggle checkpoint saving
+            music.playef(Sound_VIRIDIAN);
+            game.checkpoint_saving = !game.checkpoint_saving;
+            game.savestatsandsettings_menu();
+        }
+
         int gameplayoptionsoffset = 0;
 #if !defined(MAKEANDPLAY)
         if (game.ingame_titlemode && game.unlock[Unlock_FLIPMODE])
@@ -1163,6 +1236,18 @@ void menuactionpress(void)
     case Menu::audiooptions:
         switch (game.currentmenuoption)
         {
+        case -2:
+            // touch: graphics options
+            music.playef(Sound_VIRIDIAN);
+            game.createmenu(Menu::graphicoptions, true);
+            map.nexttowercolour();
+            break;
+        case -1:
+            // touch: gamepad options
+            music.playef(Sound_VIRIDIAN);
+            game.createmenu(Menu::controller, true);
+            map.nexttowercolour();
+            break;
         case 0:
         case 1:
             music.playef(Sound_VIRIDIAN);
@@ -2102,6 +2187,18 @@ void menuactionpress(void)
     case Menu::controller:
         switch (game.currentmenuoption)
         {
+        case -2:
+            // touch: audio options
+            music.playef(Sound_VIRIDIAN);
+            game.createmenu(Menu::audiooptions, true);
+            map.nexttowercolour();
+            break;
+        case -1:
+            // touch: accessibility options
+            music.playef(Sound_VIRIDIAN);
+            game.createmenu(Menu::accessibility, true);
+            map.nexttowercolour();
+            break;
         case 0:
             key.sensitivity++;
             music.playef(Sound_VIRIDIAN);
@@ -3537,7 +3634,16 @@ static void mapmenuactionpress(const bool version2_2)
 
         // Set this before we create the menu
         game.kludge_ingametemp = game.currentmenuname;
-        game.createmenu(Menu::options);
+
+        if (key.using_touch)
+        {
+            game.createmenu(Menu::gameplayoptions);
+        }
+        else
+        {
+            game.createmenu(Menu::options);
+        }
+
         map.nexttowercolour();
         break;
     case 32:

@@ -70,6 +70,7 @@
     <string english="Toggle between MMMMMM and PPPPPP." translation="Baskuligi inter MMMMMM kaj PPPPPP." explanation="" max="38*2"/>
     <string english="Current soundtrack: PPPPPP" translation="Nuna sontrako: PPPPPP" explanation="" max="38*3"/>
     <string english="Current soundtrack: MMMMMM" translation="Nuna sontrako: MMMMMM" explanation="" max="38*3"/>
+    <string english="MMMMMM soundtrack" translation="" explanation="menu option for touch input, a checkbox for whether the game is using the alternate soundtrack or not"/>
     <string english="toggle fullscreen" translation="baskuligi plenekranecon" explanation="menu option"/>
     <string english="Toggle Fullscreen" translation="Plenekraneco" explanation="title" max="20"/>
     <string english="Change to fullscreen/windowed mode." translation="Ŝanĝi al plenekrana/fenestra reĝimo." explanation="" max="38*3"/>
@@ -98,6 +99,7 @@
     <string english="Change whether the game runs at 30 or over 30 FPS." translation="Ŝanĝi ĉu la ludo ruliĝas je 30 aŭ super 30 kadroj sekunde." explanation="" max="38*3"/>
     <string english="Current mode: 30 FPS" translation="Nuna reĝimo: 30 KS" explanation="" max="38*2"/>
     <string english="Current mode: Over 30 FPS" translation="Nuna reĝimo: Super 30 KS" explanation="" max="38*2"/>
+    <string english="limit to 30 fps" translation="" explanation="menu option for touch input, a checkbox for whether the game runs at 30 or over 30 FPS"/>
     <string english="toggle vsync" translation="v-sinkronigo" explanation="menu option"/>
     <string english="Toggle VSync" translation="Vertikala sinkronigo" explanation="title" max="20"/>
     <string english="Turn VSync on or off." translation="Baskuligi vertikalan sinkronigon." explanation="" max="38*2"/>
@@ -245,6 +247,7 @@
     <string english="Lets you see through what is behind the name at the bottom of the screen." translation="Ebligi vidi tion, kio estas malantaŭ la nomo ĉe la ekranmalsupro" explanation="" max="38*3"/>
     <string english="Room name background is TRANSLUCENT" translation="Ĉambronoma fono estas TRAVIDEBLA" explanation="" max="38*2"/>
     <string english="Room name background is OPAQUE" translation="Ĉambronoma fono estas NETRAVIDEBLA" explanation="" max="38*2"/>
+    <string english="translucent room name bg" translation="" explanation="menu option for touch input, a checkbox for whether translucent room names are enabled"/>
     <string english="checkpoint saving" translation="konserveja konduto" explanation="menu option"/>
     <string english="Checkpoint Saving" translation="Konserveja konduto" explanation="title, makes checkpoints save the game" max="20"/>
     <string english="Toggle if checkpoints should save the game." translation="Baskuligi ĉu la ludo aŭtomate konserviĝu ĉe konservejoj." explanation="" max="38*3"/>
@@ -306,6 +309,7 @@
     <string english="80% speed" translation="rapido 80%" explanation="menu option"/>
     <string english="60% speed" translation="rapido 60%" explanation="menu option"/>
     <string english="40% speed" translation="rapido 40%" explanation="menu option"/>
+    <string english="game speed" translation="" explanation="menu option for touch input, a slider for the game speed"/>
     <string english="play intermission 1" translation="ludi interakton 1" explanation="menu option"/>
     <string english="play intermission 2" translation="ludi interakton 2" explanation="menu option"/>
     <string english="Who do you want to play the level with?" translation="Kun kiu vi volas ludi la nivelon?" explanation="choose your NPC companion" max="38*8"/>

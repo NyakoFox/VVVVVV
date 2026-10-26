@@ -70,6 +70,7 @@
     <string english="Toggle between MMMMMM and PPPPPP." translation="MMMMM과 PPPPPP 중 하나를 토글합니다." explanation="" max="38*2" max_local="30*2"/>
     <string english="Current soundtrack: PPPPPP" translation="현재 사운드 트랙: PPPPPP" explanation="" max="38*3" max_local="30*3"/>
     <string english="Current soundtrack: MMMMMM" translation="현재 사운드 트랙: MMMMMM" explanation="" max="38*3" max_local="30*3"/>
+    <string english="MMMMMM soundtrack" translation="" explanation="menu option for touch input, a checkbox for whether the game is using the alternate soundtrack or not"/>
     <string english="toggle fullscreen" translation="전체화면 전환" explanation="menu option"/>
     <string english="Toggle Fullscreen" translation="전체화면 전환" explanation="title" max="20" max_local="16"/>
     <string english="Change to fullscreen/windowed mode." translation="전체화면/창 모드로 전환합니다." explanation="" max="38*3" max_local="30*3"/>
@@ -98,6 +99,7 @@
     <string english="Change whether the game runs at 30 or over 30 FPS." translation="게임이 30 FPS로 진행될지 아니면 그 이상으로 진행될지를 결정합니다." explanation="" max="38*3" max_local="30*3"/>
     <string english="Current mode: 30 FPS" translation="현재 모드: 30 FPS" explanation="" max="38*2" max_local="30*2"/>
     <string english="Current mode: Over 30 FPS" translation="현재 모드: 30 FPS 이상" explanation="" max="38*2" max_local="30*2"/>
+    <string english="limit to 30 fps" translation="" explanation="menu option for touch input, a checkbox for whether the game runs at 30 or over 30 FPS"/>
     <string english="toggle vsync" translation="수직동기화 전환" explanation="menu option"/>
     <string english="Toggle VSync" translation="수직동기화 전환" explanation="title" max="20" max_local="16"/>
     <string english="Turn VSync on or off." translation="수직동기화를 켜고 끕니다." explanation="" max="38*2" max_local="30*2"/>
@@ -245,6 +247,7 @@
     <string english="Lets you see through what is behind the name at the bottom of the screen." translation="화면 아래에 있는 이름 뒤쪽에 있는 것을 볼 수 있게 합니다." explanation="" max="38*3" max_local="30*3"/>
     <string english="Room name background is TRANSLUCENT" translation="방 이름 배경 투명" explanation="" max="38*2" max_local="30*2"/>
     <string english="Room name background is OPAQUE" translation="방 이름 배경 불투명" explanation="" max="38*2" max_local="30*2"/>
+    <string english="translucent room name bg" translation="" explanation="menu option for touch input, a checkbox for whether translucent room names are enabled"/>
     <string english="checkpoint saving" translation="체크포인트 저장" explanation="menu option"/>
     <string english="Checkpoint Saving" translation="체크포인트 저장" explanation="title, makes checkpoints save the game" max="20" max_local="16"/>
     <string english="Toggle if checkpoints should save the game." translation="체크포인트 저장 기능을 켜거나 끕니다." explanation="" max="38*3" max_local="30*3"/>
@@ -306,6 +309,7 @@
     <string english="80% speed" translation="80% 속도" explanation="menu option"/>
     <string english="60% speed" translation="60% 속도" explanation="menu option"/>
     <string english="40% speed" translation="40% 속도" explanation="menu option"/>
+    <string english="game speed" translation="" explanation="menu option for touch input, a slider for the game speed"/>
     <string english="play intermission 1" translation="인터미션 1 플레이" explanation="menu option"/>
     <string english="play intermission 2" translation="인터미션 2 플레이" explanation="menu option"/>
     <string english="Who do you want to play the level with?" translation="누구와 함께 플레이 하시겠습니까?" explanation="choose your NPC companion" max="38*8" max_local="30*8"/>

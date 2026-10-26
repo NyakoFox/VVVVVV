@@ -6899,11 +6899,15 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         menuyoff = -20;
         break;
     case Menu::gameplayoptions:
+    {
+        int offset = 0;
+
 #if !defined(MAKEANDPLAY)
         if (ingame_titlemode && unlock[Unlock_FLIPMODE])
 #endif
         {
-                option(loc::gettext("flip mode"));
+            option(loc::gettext("flip mode"));
+            offset++;
         }
         option(loc::gettext("toggle fps"));
         option(loc::gettext("speedrun options"));
@@ -6913,16 +6917,39 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         option(loc::gettext("return"));
         menuyoff = -10;
         maxspacing = 15;
+        auto_buttons = false;
+
+        touch::create_menu_toggle(80, 88, 160, 12, loc::gettext("limit to 30 fps"), offset, !over30mode);
+        touch::create_menu_toggle(80, 104, 160, 12, loc::gettext("translucent room name bg"), -3, graphics.translucentroomname);
+        touch::create_menu_toggle(80, 120, 160, 12, loc::gettext("checkpoint saving"), -4, checkpoint_saving);
+
+        if (offset == 1)
+        {
+            // We have flip mode
+            touch::create_menu_toggle(80, 136, 160, 12, loc::gettext("flip mode"), 0, graphics.setflipmode);
+        }
+
+        touch::create_menu_button(30, 200, 60, 26, graphics.grphx.im_button_left, loc::langmeta.rtl ? -1 : -2);
+        touch::create_menu_button(106, 200, 108, 26, loc::gettext("return"), offset + 5);
+        touch::create_menu_button(230, 200, 60, 26, graphics.grphx.im_button_right, loc::langmeta.rtl ? -2 : -1);
+
         break;
+    }
     case Menu::graphicoptions:
+    {
+        int offset = 0;
+        int scalingid = 0;
         if (!gameScreen.isForcedFullscreen())
         {
             option(loc::gettext("toggle fullscreen"));
+            offset++;
+            scalingid++;
         }
         option(loc::gettext("scaling mode"));
         if (!gameScreen.isForcedFullscreen())
         {
             option(loc::gettext("resize to nearest"), gameScreen.isWindowed);
+            offset++;
         }
         option(loc::gettext("toggle filter"));
         option(loc::gettext("toggle analogue"));
@@ -6930,7 +6957,18 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         option(loc::gettext("return"));
         menuyoff = -10;
         maxspacing = 15;
+        auto_buttons = false;
+
+        touch::create_menu_button(80, 88, 160, button_height, loc::gettext("scaling mode"), scalingid);
+        touch::create_menu_toggle(80, 144, 160, 12, loc::gettext("filtered screen"), offset + 1, gameScreen.isFiltered);
+        touch::create_menu_toggle(80, 160, 160, 12, loc::gettext("analogue mode"), offset + 2, gameScreen.badSignalEffect);
+        touch::create_menu_toggle(80, 178, 160, 12, loc::gettext("vsync"), offset + 3, gameScreen.vsync);
+
+        touch::create_menu_button(30, 200, 60, 26, graphics.grphx.im_button_left, loc::langmeta.rtl ? -1 : -2);
+        touch::create_menu_button(106, 200, 108, 26, loc::gettext("return"), offset + 4);
+        touch::create_menu_button(230, 200, 60, 26, graphics.grphx.im_button_right, loc::langmeta.rtl ? -2 : -1);
         break;
+    }
     case Menu::ed_settings:
         option(loc::gettext("change description"));
         option(loc::gettext("edit scripts"));
@@ -6996,6 +7034,17 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         option(loc::gettext("return"));
         menuyoff = 0;
         maxspacing = 15;
+        auto_buttons = false;
+
+        touch::create_menu_button(12, 32, 136, 26, loc::gettext("gameplay"), 0);
+        touch::create_menu_button(12, 66, 136, 26, loc::gettext("graphics"), 1);
+        touch::create_menu_button(12, 100, 136, 26, loc::gettext("audio"), 2);
+        touch::create_menu_button(12, 134, 136, 26, loc::gettext("game pad"), 3);
+
+        touch::create_menu_button(172, 32, 136, 26, loc::gettext("accessibility"), 4);
+        touch::create_menu_button(172, 66, 136, 26, loc::gettext("language"), 5, !translator_cutscene_test);
+
+        touch::create_menu_button(106, 200, 108, 26, loc::gettext("return"), 6);
         break;
     case Menu::speedrunneroptions:
         option(loc::gettext("glitchrunner mode"));
@@ -7030,19 +7079,40 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         maxspacing = 15;
         break;
     case Menu::audiooptions:
+    {
+        int offset = 0;
         option(loc::gettext("music volume"));
         option(loc::gettext("sound volume"));
         if (music.mmmmmm)
         {
+            offset++;
             option(loc::gettext("soundtrack"));
         }
         option(loc::gettext("return"));
         menuyoff = 0;
         maxspacing = 15;
+
+        auto_buttons = false;
+
+        touch::create_slider(80, 88, 160, 48, loc::gettext("music volume"), &music.user_music_volume, 0, USER_VOLUME_MAX);
+        touch::create_slider(80, 152, 160, 48, loc::gettext("sound volume"), &music.user_sound_volume, 0, USER_VOLUME_MAX);
+
+        if (music.mmmmmm)
+        {
+            touch::create_menu_toggle(80, 152, 160, 12, loc::gettext("MMMMMM soundtrack"), offset, music.usingmmmmmm);
+        }
+
+        touch::create_menu_button(30, 200, 60, 26, graphics.grphx.im_button_left, loc::langmeta.rtl ? -1 : -2);
+        touch::create_menu_button(106, 200, 108, 26, loc::gettext("return"), offset + 2);
+        touch::create_menu_button(230, 200, 60, 26, graphics.grphx.im_button_right, loc::langmeta.rtl ? -2 : -1);
         break;
+    }
     case Menu::accessibility:
+    {
+        int offset = 0;
 #if !defined(MAKEANDPLAY)
         option(loc::gettext("unlock play modes"));
+        offset++;
 #endif
         option(loc::gettext("invincibility"), !ingame_titlemode || !incompetitive());
         option(loc::gettext("slowdown"), !ingame_titlemode || !incompetitive());
@@ -7052,7 +7122,19 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         option(loc::gettext("return"));
         menuyoff = 0;
         maxspacing = 15;
+        auto_buttons = false;
+
+        touch::create_menu_toggle(80, 88, 160, 12, loc::gettext("invincibility"), offset, map.invincibility, !ingame_titlemode || !incompetitive());
+        touch::create_slider(80, 104, 160, 48, loc::gettext("game speed"), &slowdown, 12, 30, !ingame_titlemode || !incompetitive());
+        touch::create_menu_toggle(80, 152, 160, 12, loc::gettext("animated backgrounds"), offset + 2, !colourblindmode);
+        touch::create_menu_toggle(80, 168, 160, 12, loc::gettext("screen effects"), offset + 3, !noflashingmode);
+        touch::create_menu_toggle(80, 120 + 64, 160, 12, loc::gettext("text outline"), offset + 4, !graphics.notextoutline);
+
+        touch::create_menu_button(30, 200, 60, 26, graphics.grphx.im_button_left, loc::langmeta.rtl ? -1 : -2);
+        touch::create_menu_button(106, 200, 108, 26, loc::gettext("return"), offset + 5);
+        touch::create_menu_button(230, 200, 60, 26, graphics.grphx.im_button_right, loc::langmeta.rtl ? -2 : -1);
         break;
+    }
     case Menu::controller:
         option(loc::gettext("analog stick sensitivity"));
         option(loc::gettext("bind flip"));
@@ -7063,6 +7145,14 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         option(loc::gettext("return"));
         menuyoff = 12;
         maxspacing = 10;
+
+        auto_buttons = false;
+
+        touch::create_slider(80, 120, 160, 48, loc::gettext("analog stick sensitivity"), &key.sensitivity, 0, 4);
+
+        touch::create_menu_button(30, 200, 60, 26, graphics.grphx.im_button_left, loc::langmeta.rtl ? -1 : -2);
+        touch::create_menu_button(106, 200, 108, 26, loc::gettext("return"), 6);
+        touch::create_menu_button(230, 200, 60, 26, graphics.grphx.im_button_right, loc::langmeta.rtl ? -2 : -1);
         break;
     case Menu::language:
         if (loc::languagelist.empty())

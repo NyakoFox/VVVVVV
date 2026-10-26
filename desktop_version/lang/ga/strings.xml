@@ -70,6 +70,7 @@
     <string english="Toggle between MMMMMM and PPPPPP." translation="Athraigh idir MMMMMM agus PPPPPP." explanation="" max="38*2"/>
     <string english="Current soundtrack: PPPPPP" translation="Fuaimrian reatha: PPPPPP" explanation="" max="38*3"/>
     <string english="Current soundtrack: MMMMMM" translation="Fuaimrian reatha: MMMMMM" explanation="" max="38*3"/>
+    <string english="MMMMMM soundtrack" translation="" explanation="menu option for touch input, a checkbox for whether the game is using the alternate soundtrack or not"/>
     <string english="toggle fullscreen" translation="lánscáileán" explanation="menu option"/>
     <string english="Toggle Fullscreen" translation="Lánscáileán" explanation="title" max="20"/>
     <string english="Change to fullscreen/windowed mode." translation="Modh Lánscáileáin" explanation="" max="38*3"/>
@@ -98,6 +99,7 @@
     <string english="Change whether the game runs at 30 or over 30 FPS." translation="Roghnaigh an ritheann an cluiche ar 30 fps nó níos tapa." explanation="" max="38*3"/>
     <string english="Current mode: 30 FPS" translation="Modh reatha: 30 FPS" explanation="" max="38*2"/>
     <string english="Current mode: Over 30 FPS" translation="Modh reatha: 30 FPS+" explanation="" max="38*2"/>
+    <string english="limit to 30 fps" translation="" explanation="menu option for touch input, a checkbox for whether the game runs at 30 or over 30 FPS"/>
     <string english="toggle vsync" translation="vsync" explanation="menu option"/>
     <string english="Toggle VSync" translation="VSync" explanation="title" max="20"/>
     <string english="Turn VSync on or off." translation="Cuir VSync i bhfeidhm/as feidhm." explanation="" max="38*2"/>
@@ -246,6 +248,7 @@ Déan cóip chúltaca, ar eagla na heagla." explanation="translation maintenance
     <string english="Lets you see through what is behind the name at the bottom of the screen." translation="Beidh tú in ann a fheiceáil céard atá taobh thiar den ainm ag bun an scáileáin." explanation="" max="38*3"/>
     <string english="Room name background is TRANSLUCENT" translation="Cúlra Ainmneacha na Seomraí: TRÉSHOILSEACH" explanation="" max="38*2"/>
     <string english="Room name background is OPAQUE" translation="Cúlra Ainmneacha na Seomraí: TEIMHNEACH" explanation="" max="38*2"/>
+    <string english="translucent room name bg" translation="" explanation="menu option for touch input, a checkbox for whether translucent room names are enabled"/>
     <string english="checkpoint saving" translation="ceadaigh &apos;sábháil seicphointí&apos;" explanation="menu option"/>
     <string english="Checkpoint Saving" translation="Sábháil seicphointí" explanation="title, makes checkpoints save the game" max="20"/>
     <string english="Toggle if checkpoints should save the game." translation="Roghnaigh an sábhálfar seicphointí an chluiche " explanation="" max="38*3"/>
@@ -307,6 +310,7 @@ Déan cóip chúltaca, ar eagla na heagla." explanation="translation maintenance
     <string english="80% speed" translation="luas 80%" explanation="menu option"/>
     <string english="60% speed" translation="luas 60%" explanation="menu option"/>
     <string english="40% speed" translation="luas 40%" explanation="menu option"/>
+    <string english="game speed" translation="" explanation="menu option for touch input, a slider for the game speed"/>
     <string english="play intermission 1" translation="imir idirlinn 1" explanation="menu option"/>
     <string english="play intermission 2" translation="imir idirlinn 2" explanation="menu option"/>
     <string english="Who do you want to play the level with?" translation="Cé leis a bhfuil tú ag iarraidh imirt ar an leibhéal seo?" explanation="choose your NPC companion" max="38*8"/>

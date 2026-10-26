@@ -293,6 +293,13 @@ static void menurender(void)
         break;
     case Menu::gameplayoptions:
     {
+        if (key.using_touch)
+        {
+            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Gameplay Options"), tr, tg, tb);
+            font::print_wrap(PR_CEN, -1, 65, loc::gettext("Adjust various gameplay settings."), tr, tg, tb);
+            break;
+        }
+
         int gameplayoptionsoffset = 0;
 #if !defined(MAKEANDPLAY)
         if (game.ingame_titlemode && game.unlock[Unlock_FLIPMODE])
@@ -356,6 +363,11 @@ static void menurender(void)
         break;
     }
     case Menu::options:
+        if (key.using_touch)
+        {
+            break;
+        }
+
         switch (game.currentmenuoption)
         {
         case 0:
@@ -392,6 +404,27 @@ static void menurender(void)
         break;
     case Menu::graphicoptions:
     {
+        if (key.using_touch)
+        {
+            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Graphics Options"), tr, tg, tb);
+            font::print_wrap(PR_CEN, -1, 65, loc::gettext("Adjust screen settings."), tr, tg, tb);
+
+            switch (gameScreen.scalingMode)
+            {
+            case SCALING_INTEGER:
+                font::print_wrap(PR_CEN, -1, 124, loc::gettext("Current mode: INTEGER"), tr / 2, tg / 2, tb / 2);
+                break;
+            case SCALING_STRETCH:
+                font::print_wrap(PR_CEN, -1, 124, loc::gettext("Current mode: STRETCH"), tr / 2, tg / 2, tb / 2);
+                break;
+            case SCALING_LETTERBOX:
+            default:
+                font::print_wrap(PR_CEN, -1, 124, loc::gettext("Current mode: LETTERBOX"), tr / 2, tg / 2, tb / 2);
+                break;
+            }
+            break;
+        }
+
         int offset = 0;
         if (game.currentmenuoption == offset + 0 && !gameScreen.isForcedFullscreen())
         {
@@ -482,6 +515,22 @@ static void menurender(void)
         break;
     }
     case Menu::audiooptions:
+        if (key.using_touch)
+        {
+            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Audio Options"), tr, tg, tb);
+
+            if (music.mmmmmm)
+            {
+                font::print_wrap(PR_CEN, -1, 65, loc::gettext("Adjust volume settings and soundtrack."), tr, tg, tb);
+            }
+            else
+            {
+                font::print_wrap(PR_CEN, -1, 65, loc::gettext("Adjust volume settings."), tr, tg, tb);
+            }
+
+            break;
+        }
+
         switch (game.currentmenuoption)
         {
         case 0:
@@ -691,6 +740,13 @@ static void menurender(void)
     }
     case Menu::controller:
     {
+        if (key.using_touch)
+        {
+            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Game Pad Options"), tr, tg, tb);
+            font::print_wrap(PR_CEN, -1, 65, loc::gettext("Change the sensitivity of the analog stick."), tr, tg, tb);
+            break;
+        }
+
         int spacing = font::height(0);
         spacing = SDL_max(spacing, 10);
 
@@ -1236,6 +1292,13 @@ static void menurender(void)
         break;
     case Menu::accessibility:
     {
+        if (key.using_touch)
+        {
+            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Accessibility"), tr, tg, tb);
+            font::print_wrap(PR_CEN, -1, 65, loc::gettext("Disable screen effects, enable slowdown modes or invincibility."), tr, tg, tb);
+            break;
+        }
+
 #ifdef MAKEANDPLAY
  #define OFFSET 0
 #else

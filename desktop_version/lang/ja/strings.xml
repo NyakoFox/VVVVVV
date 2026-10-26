@@ -75,6 +75,7 @@
     <string english="Toggle between MMMMMM and PPPPPP." translation="ゲーム内で再生するサウンドトラックを切り替える。" explanation="" max="38*2" max_local="38*1"/>
     <string english="Current soundtrack: PPPPPP" translation="現在のサウンドトラック: PPPPPP" explanation="" max="38*3" max_local="38*2"/>
     <string english="Current soundtrack: MMMMMM" translation="現在のサウンドトラック: MMMMMM" explanation="" max="38*3" max_local="38*2"/>
+    <string english="MMMMMM soundtrack" translation="" explanation="menu option for touch input, a checkbox for whether the game is using the alternate soundtrack or not"/>
     <string english="toggle fullscreen" translation="フルスクリーン" explanation="menu option"/>
     <string english="Toggle Fullscreen" translation="フルスクリーン" explanation="title" max="20" max_local="20"/>
     <string english="Change to fullscreen/windowed mode." translation="フルスクリーンまたはウィンドウモードに変更する。" explanation="" max="38*3" max_local="38*2"/>
@@ -103,6 +104,7 @@
     <string english="Change whether the game runs at 30 or over 30 FPS." translation="1秒あたりのフレーム数を30に制限する。" explanation="" max="38*3" max_local="38*2"/>
     <string english="Current mode: 30 FPS" translation="現在の設定: 30 FPS" explanation="" max="38*2" max_local="38*1"/>
     <string english="Current mode: Over 30 FPS" translation="現在の設定: 制限なし" explanation="" max="38*2" max_local="38*1"/>
+    <string english="limit to 30 fps" translation="" explanation="menu option for touch input, a checkbox for whether the game runs at 30 or over 30 FPS"/>
     <string english="toggle vsync" translation="垂直同期" explanation="menu option"/>
     <string english="Toggle VSync" translation="垂直同期" explanation="title" max="20" max_local="20"/>
     <string english="Turn VSync on or off." translation="垂直同期(V-Sync)の有無を切り替える。" explanation="" max="38*2" max_local="38*1"/>
@@ -259,6 +261,7 @@ Escキーを押すと表示を終了する。" explanation="" max="38*6" max_loc
     <string english="Lets you see through what is behind the name at the bottom of the screen." translation="画面下部に表示されるルームタイトルの背景を半透明にする。" explanation="" max="38*3" max_local="38*2"/>
     <string english="Room name background is TRANSLUCENT" translation="現在の設定: 半透明" explanation="" max="38*2" max_local="38*1"/>
     <string english="Room name background is OPAQUE" translation="現在の設定: 不透明" explanation="" max="38*2" max_local="38*1"/>
+    <string english="translucent room name bg" translation="" explanation="menu option for touch input, a checkbox for whether translucent room names are enabled"/>
     <string english="checkpoint saving" translation="チェックポイントでセーブ" explanation="menu option"/>
     <string english="Checkpoint Saving" translation="チェックポイントでセーブ" explanation="title, makes checkpoints save the game" max="20" max_local="20"/>
     <string english="Toggle if checkpoints should save the game." translation="チェックポイント通過時にゲームを自動セーブするかを切り替える。" explanation="" max="38*3" max_local="38*2"/>
@@ -322,6 +325,7 @@ Escキーを押すと表示を終了する。" explanation="" max="38*6" max_loc
     <string english="80% speed" translation="スピード 80%" explanation="menu option"/>
     <string english="60% speed" translation="スピード 60%" explanation="menu option"/>
     <string english="40% speed" translation="スピード 40%" explanation="menu option"/>
+    <string english="game speed" translation="" explanation="menu option for touch input, a slider for the game speed"/>
     <string english="play intermission 1" translation="インターミッション1をプレイ" explanation="menu option"/>
     <string english="play intermission 2" translation="インターミッション2をプレイ" explanation="menu option"/>
     <string english="Who do you want to play the level with?" translation="どのクルーと一緒にプレイしますか?" explanation="choose your NPC companion" max="38*8" max_local="38*6"/>

@@ -70,6 +70,7 @@
     <string english="Toggle between MMMMMM and PPPPPP." translation="Перемкнутися між MMMMMM і PPPPPP " explanation="" max="38*2"/>
     <string english="Current soundtrack: PPPPPP" translation="Поточний саундтрек: PPPPPP" explanation="" max="38*3"/>
     <string english="Current soundtrack: MMMMMM" translation="Поточний саундтрек: MMMMMM" explanation="" max="38*3"/>
+    <string english="MMMMMM soundtrack" translation="" explanation="menu option for touch input, a checkbox for whether the game is using the alternate soundtrack or not"/>
     <string english="toggle fullscreen" translation="повноекранний режим" explanation="menu option"/>
     <string english="Toggle Fullscreen" translation="Повноекранний режим" explanation="title" max="20"/>
     <string english="Change to fullscreen/windowed mode." translation="Перемкнутися на повний екран/вікно." explanation="" max="38*3"/>
@@ -98,6 +99,7 @@
     <string english="Change whether the game runs at 30 or over 30 FPS." translation="Вибрати показник FPS для гри:|30 або 30+." explanation="" max="38*3"/>
     <string english="Current mode: 30 FPS" translation="Поточний режим: 30 FPS" explanation="" max="38*2"/>
     <string english="Current mode: Over 30 FPS" translation="Поточний режим: 30+ FPS" explanation="" max="38*2"/>
+    <string english="limit to 30 fps" translation="" explanation="menu option for touch input, a checkbox for whether the game runs at 30 or over 30 FPS"/>
     <string english="toggle vsync" translation="перемкнути vsync" explanation="menu option"/>
     <string english="Toggle VSync" translation="Перемкнути vsync" explanation="title" max="20"/>
     <string english="Turn VSync on or off." translation="Увімкнути або вимкнути VSync" explanation="" max="38*2"/>
@@ -245,6 +247,7 @@
     <string english="Lets you see through what is behind the name at the bottom of the screen." translation="Дозволяє побачити те, що розташовано за назвою внизу екрана." explanation="" max="38*3"/>
     <string english="Room name background is TRANSLUCENT" translation="Тло назв кімнат ПРОЗОРЕ" explanation="" max="38*2"/>
     <string english="Room name background is OPAQUE" translation="Тло назв кімнат НЕПРОЗОРЕ" explanation="" max="38*2"/>
+    <string english="translucent room name bg" translation="" explanation="menu option for touch input, a checkbox for whether translucent room names are enabled"/>
     <string english="checkpoint saving" translation="збереження в чекпоінтах" explanation="menu option"/>
     <string english="Checkpoint Saving" translation="Чекпоінт. Збереження" explanation="title, makes checkpoints save the game" max="20"/>
     <string english="Toggle if checkpoints should save the game." translation="Увімкніть для збереження гри в чекпоінтах" explanation="" max="38*3"/>
@@ -306,6 +309,7 @@
     <string english="80% speed" translation="80% швидкості" explanation="menu option"/>
     <string english="60% speed" translation="60% швидкості" explanation="menu option"/>
     <string english="40% speed" translation="40% швидкості" explanation="menu option"/>
+    <string english="game speed" translation="" explanation="menu option for touch input, a slider for the game speed"/>
     <string english="play intermission 1" translation="перерва в грі #1" explanation="menu option"/>
     <string english="play intermission 2" translation="перерва в грі #2" explanation="menu option"/>
     <string english="Who do you want to play the level with?" translation="З ким ви хочете грати на цьому рівні?" explanation="choose your NPC companion" max="38*8"/>

@@ -43,7 +43,9 @@ enum TouchControlType
     TouchControlType_MENU_BUTTON_TELESAVE, // The telesave summary button in the continue menu
     TouchControlType_MENU_BUTTON_QUICKSAVE, // The quicksave summary button in the continue menu
     TouchControlType_MENU_BUTTON_OPTION, // A text button in a menu, which solely changes the current option
-    TouchControlType_MENU_BUTTON_OPTION_ICON // An icon button in a menu, which solely changes the current option
+    TouchControlType_MENU_BUTTON_OPTION_ICON, // An icon button in a menu, which solely changes the current option
+    TouchControlType_MENU_TOGGLE, // A checkbox toggle in the menu system
+    TouchControlType_SLIDER // A slider control
 };
 
 struct TouchControl
@@ -59,6 +61,14 @@ struct TouchControl
     Uint8 text_flags;
     int option_id;
     SDL_Texture* image;
+
+    // Menu toggles
+    bool checked;
+
+    // Sliders
+    int min_value;
+    int max_value;
+    int* slider_var;
 };
 
 namespace touch
@@ -77,6 +87,11 @@ namespace touch
     TouchControl* create_menu_button(int x, int y, int width, int height, const std::string& text, int option_id, bool active);
     TouchControl* create_menu_button(int x, int y, int width, int height, const std::string& text, int option_id);
     TouchControl* create_menu_button(int x, int y, int width, int height, SDL_Texture* icon, int option_id);
+    TouchControl* create_menu_toggle(int x, int y, int width, int height, const std::string& text, int option_id, bool checked, bool active);
+    TouchControl* create_menu_toggle(int x, int y, int width, int height, const std::string& text, int option_id, bool checked);
+
+    TouchControl* create_slider(int x, int y, int width, int height, const std::string& text, int* var, int min_value, int max_value, bool active);
+    TouchControl* create_slider(int x, int y, int width, int height, const std::string& text, int* var, int min_value, int max_value);
 }
 
 #endif /* TOUCH_H */

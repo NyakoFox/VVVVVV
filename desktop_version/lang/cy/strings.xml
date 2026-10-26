@@ -70,6 +70,7 @@
     <string english="Toggle between MMMMMM and PPPPPP." translation="Toglo rhwng MMMMMM a PPPPPP." explanation="" max="38*2"/>
     <string english="Current soundtrack: PPPPPP" translation="Trac sain cyfredol: PPPPPP" explanation="" max="38*3"/>
     <string english="Current soundtrack: MMMMMM" translation="Trac sain cyfredol: MMMMMM" explanation="" max="38*3"/>
+    <string english="MMMMMM soundtrack" translation="" explanation="menu option for touch input, a checkbox for whether the game is using the alternate soundtrack or not"/>
     <string english="toggle fullscreen" translation="toglo sgrin lawn" explanation="menu option"/>
     <string english="Toggle Fullscreen" translation="Toglo Sgrin Lawn" explanation="title" max="20"/>
     <string english="Change to fullscreen/windowed mode." translation="Newid i sgrin lawn / modd ffenestr." explanation="" max="38*3"/>
@@ -98,6 +99,7 @@
     <string english="Change whether the game runs at 30 or over 30 FPS." translation="Newid p&apos;un a yw&apos;r gêm yn rhedeg ar 30 neu dros 30 FPS." explanation="" max="38*3"/>
     <string english="Current mode: 30 FPS" translation="Modd presennol: 30 FPS" explanation="" max="38*2"/>
     <string english="Current mode: Over 30 FPS" translation="Modd presennol: Dros 30 FPS" explanation="" max="38*2"/>
+    <string english="limit to 30 fps" translation="" explanation="menu option for touch input, a checkbox for whether the game runs at 30 or over 30 FPS"/>
     <string english="toggle vsync" translation="toglo vsync" explanation="menu option"/>
     <string english="Toggle VSync" translation="Toglo VSync" explanation="title" max="20"/>
     <string english="Turn VSync on or off." translation="Trowch VSync ymlaen neu i ffwrdd." explanation="" max="38*2"/>
@@ -245,6 +247,7 @@
     <string english="Lets you see through what is behind the name at the bottom of the screen." translation="Yn gadael i chi weld trwy&apos;r hyn sydd y tu ôl i&apos;r enw ar waelod y sgrin." explanation="" max="38*3"/>
     <string english="Room name background is TRANSLUCENT" translation="Mae cefndir enw ystafell yn TRYLOYW" explanation="" max="38*2"/>
     <string english="Room name background is OPAQUE" translation="Mae cefndir enw ystafell yn DI-DRAIDD" explanation="" max="38*2"/>
+    <string english="translucent room name bg" translation="" explanation="menu option for touch input, a checkbox for whether translucent room names are enabled"/>
     <string english="checkpoint saving" translation="siecbwyntiau yn arbed" explanation="menu option"/>
     <string english="Checkpoint Saving" translation="Arbed-Awto" explanation="title, makes checkpoints save the game" max="20"/>
     <string english="Toggle if checkpoints should save the game." translation="Toglwch os dylai siecbwynt arbed y gêm." explanation="" max="38*3"/>
@@ -306,6 +309,7 @@
     <string english="80% speed" translation="80% cyflymder" explanation="menu option"/>
     <string english="60% speed" translation="60% cyflymder" explanation="menu option"/>
     <string english="40% speed" translation="40% cyflymder" explanation="menu option"/>
+    <string english="game speed" translation="" explanation="menu option for touch input, a slider for the game speed"/>
     <string english="play intermission 1" translation="egwyl chwarae 1" explanation="menu option"/>
     <string english="play intermission 2" translation="egwyl chwarae 2" explanation="menu option"/>
     <string english="Who do you want to play the level with?" translation="Gyda phwy wyt ti eisiau chwarae&apos;r lefel?" explanation="choose your NPC companion" max="38*8"/>

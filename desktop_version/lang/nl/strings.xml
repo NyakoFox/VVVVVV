@@ -70,6 +70,7 @@
     <string english="Toggle between MMMMMM and PPPPPP." translation="Schakel tussen MMMMMM en PPPPPP." explanation="" max="38*2"/>
     <string english="Current soundtrack: PPPPPP" translation="Huidige soundtrack: PPPPPP" explanation="" max="38*3"/>
     <string english="Current soundtrack: MMMMMM" translation="Huidige soundtrack: MMMMMM" explanation="" max="38*3"/>
+    <string english="MMMMMM soundtrack" translation="" explanation="menu option for touch input, a checkbox for whether the game is using the alternate soundtrack or not"/>
     <string english="toggle fullscreen" translation="volledig scherm" explanation="menu option"/>
     <string english="Toggle Fullscreen" translation="Volledig scherm" explanation="title" max="20"/>
     <string english="Change to fullscreen/windowed mode." translation="Schakel tussen venster en volledig scherm." explanation="" max="38*3"/>
@@ -98,6 +99,7 @@
     <string english="Change whether the game runs at 30 or over 30 FPS." translation="Wijzig of het spel met 30 FPS of met meer dan 30 FPS moet draaien." explanation="" max="38*3"/>
     <string english="Current mode: 30 FPS" translation="Huidige modus: 30 FPS" explanation="" max="38*2"/>
     <string english="Current mode: Over 30 FPS" translation="Huidige modus: meer dan 30 FPS" explanation="" max="38*2"/>
+    <string english="limit to 30 fps" translation="" explanation="menu option for touch input, a checkbox for whether the game runs at 30 or over 30 FPS"/>
     <string english="toggle vsync" translation="vsync aan/uit" explanation="menu option"/>
     <string english="Toggle VSync" translation="VSync aan/uit" explanation="title" max="20"/>
     <string english="Turn VSync on or off." translation="Schakel VSync in of uit." explanation="" max="38*2"/>
@@ -245,6 +247,7 @@
     <string english="Lets you see through what is behind the name at the bottom of the screen." translation="Laat zien wat er achter de naam van een kamer zit onder in beeld." explanation="" max="38*3"/>
     <string english="Room name background is TRANSLUCENT" translation="Kamernaamachtergrond is DOORZICHTIG" explanation="" max="38*2"/>
     <string english="Room name background is OPAQUE" translation="Kamernaamachtergrond is ONDOORZICHTIG" explanation="" max="38*2"/>
+    <string english="translucent room name bg" translation="" explanation="menu option for touch input, a checkbox for whether translucent room names are enabled"/>
     <string english="checkpoint saving" translation="opslaan bij checkpoints" explanation="menu option"/>
     <string english="Checkpoint Saving" translation="Checkpoint-opslaan" explanation="title, makes checkpoints save the game" max="20"/>
     <string english="Toggle if checkpoints should save the game." translation="Bepaal of checkpoints het spel op moeten slaan." explanation="" max="38*3"/>
@@ -306,6 +309,7 @@
     <string english="80% speed" translation="80% snelheid" explanation="menu option"/>
     <string english="60% speed" translation="60% snelheid" explanation="menu option"/>
     <string english="40% speed" translation="40% snelheid" explanation="menu option"/>
+    <string english="game speed" translation="" explanation="menu option for touch input, a slider for the game speed"/>
     <string english="play intermission 1" translation="intermissie 1 spelen" explanation="menu option"/>
     <string english="play intermission 2" translation="intermissie 2 spelen" explanation="menu option"/>
     <string english="Who do you want to play the level with?" translation="Met wie wil je het level spelen?" explanation="choose your NPC companion" max="38*8"/>

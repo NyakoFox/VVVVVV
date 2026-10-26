@@ -70,6 +70,7 @@
     <string english="Toggle between MMMMMM and PPPPPP." translation="Przepinej postrzōd MMMMMM i PPPPPP." explanation="" max="38*2"/>
     <string english="Current soundtrack: PPPPPP" translation="Terŏźno ściyżka: PPPPPP" explanation="" max="38*3"/>
     <string english="Current soundtrack: MMMMMM" translation="Terŏźno ściyżka: MMMMMM" explanation="" max="38*3"/>
+    <string english="MMMMMM soundtrack" translation="" explanation="menu option for touch input, a checkbox for whether the game is using the alternate soundtrack or not"/>
     <string english="toggle fullscreen" translation="tryb fol ekranu" explanation="menu option"/>
     <string english="Toggle Fullscreen" translation="Tryb Fol Ekranu" explanation="title" max="20"/>
     <string english="Change to fullscreen/windowed mode." translation="Przepnij postrzōd ôknym a fol ekranym." explanation="" max="38*3"/>
@@ -98,6 +99,7 @@
     <string english="Change whether the game runs at 30 or over 30 FPS." translation="Wyłōncz abo załōncz ukrōcynie|klŏtek za sekunda." explanation="" max="38*3"/>
     <string english="Current mode: 30 FPS" translation="Terŏźnie: 30 FPS" explanation="" max="38*2"/>
     <string english="Current mode: Over 30 FPS" translation="Terŏźnie: Wiyncyj co 30 FPS" explanation="" max="38*2"/>
+    <string english="limit to 30 fps" translation="" explanation="menu option for touch input, a checkbox for whether the game runs at 30 or over 30 FPS"/>
     <string english="toggle vsync" translation="synchrōnizacyjo piōnowo" explanation="menu option"/>
     <string english="Toggle VSync" translation="Synch. Piōnowo" explanation="title" max="20"/>
     <string english="Turn VSync on or off." translation="Wyłōncz abo załōncz synchrōnizacyjo piōnowo (VSync)." explanation="" max="38*2"/>
@@ -245,6 +247,7 @@
     <string english="Lets you see through what is behind the name at the bottom of the screen." translation="Dozwŏlo widzieć, co je za mianami izbōw." explanation="" max="38*3"/>
     <string english="Room name background is TRANSLUCENT" translation="Tło za mianami je PRZEZDZIYRNE" explanation="" max="38*2"/>
     <string english="Room name background is OPAQUE" translation="Tło za mianami je NIYPRZEZDZIYRNE" explanation="" max="38*2"/>
+    <string english="translucent room name bg" translation="" explanation="menu option for touch input, a checkbox for whether translucent room names are enabled"/>
     <string english="checkpoint saving" translation="zapis ôd pōnktōw przywrōcynio" explanation="menu option"/>
     <string english="Checkpoint Saving" translation="Pōnkty Przywrōcynio" explanation="title, makes checkpoints save the game" max="20"/>
     <string english="Toggle if checkpoints should save the game." translation="Nasztaluj, eli szpil bydzie zachowywany bez pōnkty przywrōcynio." explanation="" max="38*3"/>
@@ -306,6 +309,7 @@
     <string english="80% speed" translation="gibkoś 80%" explanation="menu option"/>
     <string english="60% speed" translation="gibkoś 60%" explanation="menu option"/>
     <string english="40% speed" translation="gibkoś 40%" explanation="menu option"/>
+    <string english="game speed" translation="" explanation="menu option for touch input, a slider for the game speed"/>
     <string english="play intermission 1" translation="zagrej w przerywnik 1" explanation="menu option"/>
     <string english="play intermission 2" translation="zagrej w przerywnik 2" explanation="menu option"/>
     <string english="Who do you want to play the level with?" translation="Z kim chcesz zagrać w tyn poziōm?" explanation="choose your NPC companion" max="38*8"/>

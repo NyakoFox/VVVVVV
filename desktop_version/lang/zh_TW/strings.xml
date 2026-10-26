@@ -70,6 +70,7 @@
     <string english="Toggle between MMMMMM and PPPPPP." translation="在MMMMMM和PPPPPP之間切換。" explanation="" max="38*2" max_local="25*1"/>
     <string english="Current soundtrack: PPPPPP" translation="當前音軌：PPPPPP" explanation="" max="38*3" max_local="25*2"/>
     <string english="Current soundtrack: MMMMMM" translation="當前音軌：MMMMMM" explanation="" max="38*3" max_local="25*2"/>
+    <string english="MMMMMM soundtrack" translation="" explanation="menu option for touch input, a checkbox for whether the game is using the alternate soundtrack or not"/>
     <string english="toggle fullscreen" translation="切換全屏" explanation="menu option"/>
     <string english="Toggle Fullscreen" translation="切換全屏" explanation="title" max="20" max_local="13"/>
     <string english="Change to fullscreen/windowed mode." translation="切換為全屏/窗口模式" explanation="" max="38*3" max_local="25*2"/>
@@ -98,6 +99,7 @@
     <string english="Change whether the game runs at 30 or over 30 FPS." translation="選擇遊戲是否鎖定30幀，還是以更高幀數運行。" explanation="" max="38*3" max_local="25*2"/>
     <string english="Current mode: 30 FPS" translation="當前模式：30 FPS" explanation="" max="38*2" max_local="25*1"/>
     <string english="Current mode: Over 30 FPS" translation="當前模式：可超過30 FPS" explanation="" max="38*2" max_local="25*1"/>
+    <string english="limit to 30 fps" translation="" explanation="menu option for touch input, a checkbox for whether the game runs at 30 or over 30 FPS"/>
     <string english="toggle vsync" translation="切換垂直同步" explanation="menu option"/>
     <string english="Toggle VSync" translation="切換垂直同步" explanation="title" max="20" max_local="13"/>
     <string english="Turn VSync on or off." translation="切換垂直同步的開關。" explanation="" max="38*2" max_local="25*1"/>
@@ -251,6 +253,7 @@
     <string english="Lets you see through what is behind the name at the bottom of the screen." translation="讓你可以看見屏幕底端房間名後面的背景。" explanation="" max="38*3" max_local="25*2"/>
     <string english="Room name background is TRANSLUCENT" translation="房間名背景 透明" explanation="" max="38*2" max_local="25*1"/>
     <string english="Room name background is OPAQUE" translation="房間名背景 不透明" explanation="" max="38*2" max_local="25*1"/>
+    <string english="translucent room name bg" translation="" explanation="menu option for touch input, a checkbox for whether translucent room names are enabled"/>
     <string english="checkpoint saving" translation="檢查點保存" explanation="menu option"/>
     <string english="Checkpoint Saving" translation="檢查點保存" explanation="title, makes checkpoints save the game" max="20" max_local="13"/>
     <string english="Toggle if checkpoints should save the game." translation="設置檢查點是否可以保存遊戲。" explanation="" max="38*3" max_local="25*2"/>
@@ -313,6 +316,7 @@
     <string english="80% speed" translation="80%速度" explanation="menu option"/>
     <string english="60% speed" translation="60%速度" explanation="menu option"/>
     <string english="40% speed" translation="40%速度" explanation="menu option"/>
+    <string english="game speed" translation="" explanation="menu option for touch input, a slider for the game speed"/>
     <string english="play intermission 1" translation="遊玩間奏關卡1" explanation="menu option"/>
     <string english="play intermission 2" translation="遊玩間奏關卡2" explanation="menu option"/>
     <string english="Who do you want to play the level with?" translation="你想和誰一起進行本關？" explanation="choose your NPC companion" max="38*8" max_local="25*6"/>

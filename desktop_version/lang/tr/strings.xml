@@ -70,6 +70,7 @@
     <string english="Toggle between MMMMMM and PPPPPP." translation="MMMMMM ve PPPPPP arasında geçiş yap." explanation="" max="38*2"/>
     <string english="Current soundtrack: PPPPPP" translation="Şu anki oyun müziği: PPPPPP" explanation="" max="38*3"/>
     <string english="Current soundtrack: MMMMMM" translation="Şu anki oyun müziği: MMMMMM" explanation="" max="38*3"/>
+    <string english="MMMMMM soundtrack" translation="" explanation="menu option for touch input, a checkbox for whether the game is using the alternate soundtrack or not"/>
     <string english="toggle fullscreen" translation="Tam ekran/pencere" explanation="menu option"/>
     <string english="Toggle Fullscreen" translation="Tam Ekran/Pencere" explanation="title" max="20"/>
     <string english="Change to fullscreen/windowed mode." translation="Tam ekran/pencere arasında geçiş yap." explanation="" max="38*3"/>
@@ -98,6 +99,7 @@
     <string english="Change whether the game runs at 30 or over 30 FPS." translation="30 FPS/30 FPS+ arasında seçim yap." explanation="" max="38*3"/>
     <string english="Current mode: 30 FPS" translation="Şu anki mod: 30 FPS" explanation="" max="38*2"/>
     <string english="Current mode: Over 30 FPS" translation="Şu anki mod: 30 FPS+" explanation="" max="38*2"/>
+    <string english="limit to 30 fps" translation="" explanation="menu option for touch input, a checkbox for whether the game runs at 30 or over 30 FPS"/>
     <string english="toggle vsync" translation="vsync&apos;i aç/kapat" explanation="menu option"/>
     <string english="Toggle VSync" translation="Vsync&apos;i Aç/Kapat" explanation="title" max="20"/>
     <string english="Turn VSync on or off." translation="Vsync&apos;i aç ya da kapat." explanation="" max="38*2"/>
@@ -245,6 +247,7 @@
     <string english="Lets you see through what is behind the name at the bottom of the screen." translation="Ekranın altında oda adı yazılı olan|panelin arkasını görmeni sağlar." explanation="" max="38*3"/>
     <string english="Room name background is TRANSLUCENT" translation="Oda adı arka planı SAYDAM" explanation="" max="38*2"/>
     <string english="Room name background is OPAQUE" translation="Oda adı arka planı OPAK" explanation="" max="38*2"/>
+    <string english="translucent room name bg" translation="" explanation="menu option for touch input, a checkbox for whether translucent room names are enabled"/>
     <string english="checkpoint saving" translation="kayıt noktasında kayıt" explanation="menu option"/>
     <string english="Checkpoint Saving" translation="K. Noktasında Kayıt" explanation="title, makes checkpoints save the game" max="20"/>
     <string english="Toggle if checkpoints should save the game." translation="Kayıt noktaları oyunu kaydetsin/kaydetmesin." explanation="" max="38*3"/>
@@ -306,6 +309,7 @@
     <string english="80% speed" translation="%80 hız" explanation="menu option"/>
     <string english="60% speed" translation="%60 hız" explanation="menu option"/>
     <string english="40% speed" translation="%40 hız" explanation="menu option"/>
+    <string english="game speed" translation="" explanation="menu option for touch input, a slider for the game speed"/>
     <string english="play intermission 1" translation="1. ara bölümü oyna" explanation="menu option"/>
     <string english="play intermission 2" translation="2. ara bölümü oyna" explanation="menu option"/>
     <string english="Who do you want to play the level with?" translation="Bölümü hangi karakterle oynamak istiyorsun?" explanation="choose your NPC companion" max="38*8"/>

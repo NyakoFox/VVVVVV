@@ -70,6 +70,7 @@
     <string english="Toggle between MMMMMM and PPPPPP." translation="Alterna entre MMMMMM e PPPPPP." explanation="" max="38*2"/>
     <string english="Current soundtrack: PPPPPP" translation="Banda sonora atual: PPPPPP" explanation="" max="38*3"/>
     <string english="Current soundtrack: MMMMMM" translation="Banda sonora atual: MMMMMM" explanation="" max="38*3"/>
+    <string english="MMMMMM soundtrack" translation="" explanation="menu option for touch input, a checkbox for whether the game is using the alternate soundtrack or not"/>
     <string english="toggle fullscreen" translation="ativar ecrã inteiro" explanation="menu option"/>
     <string english="Toggle Fullscreen" translation="Ativar Ecrã Inteiro" explanation="title" max="20"/>
     <string english="Change to fullscreen/windowed mode." translation="Alterna entre o modo de janela e ecrã inteiro." explanation="" max="38*3"/>
@@ -98,6 +99,7 @@
     <string english="Change whether the game runs at 30 or over 30 FPS." translation="Define se o jogo corre a 30 ou mais fotogramas por segundo." explanation="" max="38*3"/>
     <string english="Current mode: 30 FPS" translation="Modo atual: 30 FPS" explanation="" max="38*2"/>
     <string english="Current mode: Over 30 FPS" translation="Modo atual: &gt;30 FPS" explanation="" max="38*2"/>
+    <string english="limit to 30 fps" translation="" explanation="menu option for touch input, a checkbox for whether the game runs at 30 or over 30 FPS"/>
     <string english="toggle vsync" translation="ativar sinc. vertical" explanation="menu option"/>
     <string english="Toggle VSync" translation="Ativar S. Vertical" explanation="title" max="20"/>
     <string english="Turn VSync on or off." translation="Ativa ou desativa o sincronismo vertical." explanation="" max="38*2"/>
@@ -245,6 +247,7 @@
     <string english="Lets you see through what is behind the name at the bottom of the screen." translation="Define se é possível ver o que está por detrás do nome das salas na parte inferior do ecrã." explanation="" max="38*3"/>
     <string english="Room name background is TRANSLUCENT" translation="Fundo do nome da sala: TRANSPARENTE" explanation="" max="38*2"/>
     <string english="Room name background is OPAQUE" translation="Fundo do nome da sala: OPACO" explanation="" max="38*2"/>
+    <string english="translucent room name bg" translation="" explanation="menu option for touch input, a checkbox for whether translucent room names are enabled"/>
     <string english="checkpoint saving" translation="guardar nos pontos de controlo" explanation="menu option"/>
     <string english="Checkpoint Saving" translation="Guardar nos pontos" explanation="title, makes checkpoints save the game" max="20"/>
     <string english="Toggle if checkpoints should save the game." translation="Liga/desliga a função de guardar nos pontos de controlo." explanation="" max="38*3"/>
@@ -306,6 +309,7 @@
     <string english="80% speed" translation="80% da velocidade" explanation="menu option"/>
     <string english="60% speed" translation="60% da velocidade" explanation="menu option"/>
     <string english="40% speed" translation="40% da velocidade" explanation="menu option"/>
+    <string english="game speed" translation="" explanation="menu option for touch input, a slider for the game speed"/>
     <string english="play intermission 1" translation="jogar interpolados 1" explanation="menu option"/>
     <string english="play intermission 2" translation="jogar interpolados 2" explanation="menu option"/>
     <string english="Who do you want to play the level with?" translation="Com quem pretendes jogar o nível?" explanation="choose your NPC companion" max="38*8"/>
