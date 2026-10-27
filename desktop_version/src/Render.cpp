@@ -1391,7 +1391,7 @@ static void menurender(void)
     }
     case Menu::playint1:
     case Menu::playint2:
-        font::print_wrap(PR_CEN, -1, 65, loc::gettext("Who do you want to play the level with?"), tr, tg, tb);
+        font::print_wrap(PR_CEN, -1, key.using_touch ? 24 : 65, loc::gettext("Who do you want to play the level with?"), tr, tg, tb);
         break;
     case Menu::playmodes:
         switch (game.currentmenuoption)

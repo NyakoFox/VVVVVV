@@ -7241,6 +7241,7 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         option(loc::gettext("next page"));
         option(loc::gettext("return"));
         menuyoff = 64;
+        button_y_offset = -40;
         break;
     case Menu::translator_options_stats:
         option(loc::gettext("return"));
@@ -7326,6 +7327,7 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         option(loc::gettext("60% speed"));
         option(loc::gettext("40% speed"));
         menuyoff = 16;
+        button_y_offset = -40;
         break;
     case Menu::unlockmenu:
         option(loc::gettext("unlock time trials"));
@@ -7610,6 +7612,7 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         option(loc::gettext_case("Victoria", 1));
         option(loc::gettext("return"));
         menuyoff = 10;
+        button_y_offset = -72;
         break;
     case Menu::playint2:
         start_translator_exploring = false;
@@ -7619,6 +7622,7 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         option(loc::gettext_case("Victoria", 1));
         option(loc::gettext("return"));
         menuyoff = 10;
+        button_y_offset = -72;
         break;
     case Menu::continuemenu:
     {
