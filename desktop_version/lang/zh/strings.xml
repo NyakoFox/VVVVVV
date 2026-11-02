@@ -54,9 +54,11 @@
     <string english="Language" translation="语言" explanation="title" max="20" max_local="13"/>
     <string english="Change the language." translation="变更语言。" explanation="" max="38*2" max_local="25*1"/>
     <string english="Can not change the language while a textbox is displayed in-game." translation="无法在游戏中正有对话框显示时改变语言。" explanation="" max="38*3" max_local="25*2"/>
+    <string english="clear data" translation="" explanation="menu option"/>
     <string english="clear main game data" translation="清除主游戏数据" explanation="menu option"/>
     <string english="clear custom level data" translation="清除自制关卡数据" explanation="menu option"/>
     <string english="Clear Data" translation="清除数据" explanation="title" max="20" max_local="13"/>
+    <string english="Delete your save data." translation="" explanation="" max="38*5" max_local="25*4"/>
     <string english="Delete your main game save data and unlocked play modes." translation="删除你在主游戏模式中的存档数据和已解锁的游玩模式。" explanation="" max="38*5" max_local="25*4"/>
     <string english="Delete your custom level save data and completion stars." translation="删除你的自制关卡存档数据和完成星星数。" explanation="completion stars: when completing a level you get either 1 or 2 stars" max="38*5" max_local="25*4"/>
     <string english="Are you sure? This will delete your current saves..." translation="你确定吗？这将删除你现在的存档……" explanation="" max="38*7" max_local="25*5"/>
@@ -209,9 +211,9 @@
     <string english="If new strings were added to the English template language files, this feature will insert them in the translation files for all languages. Make a backup, just in case." translation="如果英语模板语言文件中加入了新字符串，这个功能会把它们插入到所有语言中。为防万一，请先备份。" explanation="translation maintenance menu" max="38*7" max_local="25*5"/>
     <string english="Full syncing EN→All:" translation="全面同步EN-&gt;所有" explanation="translation maintenance menu. The following list of language files can be fully synced from English to all other languages by pressing this button - new strings will be inserted in all languages" max="40" max_local="26"/>
     <string english="Syncing not supported:" translation="同步不支持：" explanation="translation maintenance menu. The following list of language files are untouched by the sync button" max="40" max_local="26"/>
-    <string english="advanced options" translation="高级选项" explanation="menu option"/>
+    <string english="advanced" translation="" explanation="menu option"/>
     <string english="Advanced Options" translation="高级选项" explanation="title" max="20" max_local="13"/>
-    <string english="All other gameplay settings." translation="所有其他玩法设置。" explanation="description for advanced options" max="38*5" max_local="25*4"/>
+    <string english="Various options which don&apos;t fit elsewhere." translation="" explanation="description for advanced options" max="38*5" max_local="25*4"/>
     <string english="unfocus pause" translation="非当前窗口暂停" explanation="menu option. Turns the pause screen on/off, which shows up when the window is unfocused/inactive (only one window is normally in focus/active at a time). Possible alternative: auto pause screen"/>
     <string english="Unfocus Pause" translation="非当前窗口暂停" explanation="title. Turns the pause screen on/off, which shows up when the window is unfocused/inactive (only one window is normally in focus/active at a time). Possible alternative: auto pause screen" max="20" max_local="13"/>
     <string english="Toggle if the game will pause when the window is unfocused." translation="切换在游戏不是当前窗口时是否暂停。" explanation="" max="38*3" max_local="25*2"/>

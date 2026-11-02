@@ -869,18 +869,12 @@ void menuactionpress(void)
             game.savestatsandsettings_menu();
             break;
         case 3:
-            // toggle fake load screen
-            game.skipfakeload = !game.skipfakeload;
-            game.savestatsandsettings_menu();
-            music.playef(Sound_VIRIDIAN);
-            break;
-        case 4:
             // toggle in game timer
             game.showingametimer = !game.showingametimer;
             game.savestatsandsettings_menu();
             music.playef(Sound_VIRIDIAN);
             break;
-        case 5:
+        case 4:
             // english sprites
             loc::english_sprites = !loc::english_sprites;
             if (!loc::english_sprites)
@@ -915,25 +909,20 @@ void menuactionpress(void)
             music.playef(Sound_VIRIDIAN);
             break;
         case 1:
-            /* toggle unfocus music pause */
+            // toggle unfocus music pause
             game.disableaudiopause = !game.disableaudiopause;
             game.savestatsandsettings_menu();
             music.playef(Sound_VIRIDIAN);
             break;
         case 2:
-            // toggle translucent roomname BG
-            graphics.translucentroomname = !graphics.translucentroomname;
+            // toggle fake load screen
+            game.skipfakeload = !game.skipfakeload;
             game.savestatsandsettings_menu();
             music.playef(Sound_VIRIDIAN);
             break;
-        case 3:
-            // toggle checkpoint saving
-            game.checkpoint_saving = !game.checkpoint_saving;
-            game.savestatsandsettings_menu();
-            music.playef(Sound_VIRIDIAN);
             break;
         default:
-            //back
+            // back
             music.playef(Sound_VIRIDIAN);
             game.returnmenu();
             map.nexttowercolour();
@@ -1063,32 +1052,26 @@ void menuactionpress(void)
         }
         else if (game.currentmenuoption == gameplayoptionsoffset + 1)
         {
+            // toggle translucent roomname BG
+            graphics.translucentroomname = !graphics.translucentroomname;
+            game.savestatsandsettings_menu();
+            music.playef(Sound_VIRIDIAN);
+        }
+        else if (game.currentmenuoption == gameplayoptionsoffset + 2)
+        {
+            // toggle checkpoint saving
+            game.checkpoint_saving = !game.checkpoint_saving;
+            game.savestatsandsettings_menu();
+            music.playef(Sound_VIRIDIAN);
+        }
+        else if (game.currentmenuoption == gameplayoptionsoffset + 3)
+        {
             //Speedrunner options
             music.playef(Sound_VIRIDIAN);
             game.createmenu(Menu::speedrunneroptions);
             map.nexttowercolour();
         }
-        else if (game.currentmenuoption == gameplayoptionsoffset + 2)
-        {
-            //Advanced options
-            music.playef(Sound_VIRIDIAN);
-            game.createmenu(Menu::advancedoptions);
-            map.nexttowercolour();
-        }
-        else if (game.currentmenuoption == gameplayoptionsoffset + 3)
-        {
-            //Clear Data
-            music.playef(Sound_VIRIDIAN);
-            game.createmenu(Menu::cleardatamenu);
-            map.nexttowercolour();
-        }
-        else if (game.currentmenuoption == gameplayoptionsoffset + 4)
-        {
-            music.playef(Sound_VIRIDIAN);
-            game.createmenu(Menu::clearcustomdatamenu);
-            map.nexttowercolour();
-        }
-        else if (game.currentmenuoption == gameplayoptionsoffset + 5) {
+        else if (game.currentmenuoption == gameplayoptionsoffset + 4) {
             //return to previous menu
             music.playef(Sound_VIRIDIAN);
             game.returnmenu();
@@ -1131,6 +1114,12 @@ void menuactionpress(void)
             map.nexttowercolour();
             break;
         case 5:
+            // advanced options
+            music.playef(Sound_VIRIDIAN);
+            game.createmenu(Menu::advancedoptions);
+            map.nexttowercolour();
+            break;
+        case 6:
             //language options
             if (game.translator_cutscene_test)
             {
@@ -1143,6 +1132,12 @@ void menuactionpress(void)
             loc::pre_title_lang_menu = false;
             game.createmenu(Menu::language);
             game.currentmenuoption = loc::languagelist_curlang;
+            map.nexttowercolour();
+            break;
+        case 7:
+            // clear data
+            music.playef(Sound_VIRIDIAN);
+            game.createmenu(Menu::cleardata);
             map.nexttowercolour();
             break;
         default:
@@ -2117,6 +2112,28 @@ void menuactionpress(void)
             game.returnmenu();
             map.nexttowercolour();
             break;
+        }
+        break;
+    case Menu::cleardata:
+        if (game.currentmenuoption == 0)
+        {
+            //Clear Data
+            music.playef(Sound_VIRIDIAN);
+            game.createmenu(Menu::cleardatamenu);
+            map.nexttowercolour();
+        }
+        else if (game.currentmenuoption == 1)
+        {
+            music.playef(Sound_VIRIDIAN);
+            game.createmenu(Menu::clearcustomdatamenu);
+            map.nexttowercolour();
+        }
+        else
+        {
+            // back
+            music.playef(Sound_VIRIDIAN);
+            game.returnmenu();
+            map.nexttowercolour();
         }
         break;
     case Menu::cleardatamenu:

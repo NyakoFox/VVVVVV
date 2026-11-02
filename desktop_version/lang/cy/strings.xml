@@ -54,9 +54,11 @@
     <string english="Language" translation="Iaith" explanation="title" max="20"/>
     <string english="Change the language." translation="Newid yr iaith." explanation="" max="38*2"/>
     <string english="Can not change the language while a textbox is displayed in-game." translation="Methu newid yr iaith tra bod blwch testun yn cael ei arddangos yn y gêm." explanation="" max="38*3"/>
+    <string english="clear data" translation="" explanation="menu option"/>
     <string english="clear main game data" translation="clirio data prif gêm" explanation="menu option"/>
     <string english="clear custom level data" translation="clirio data lefel cwstwm" explanation="menu option"/>
     <string english="Clear Data" translation="Clirio Data" explanation="title" max="20"/>
+    <string english="Delete your save data." translation="" explanation="" max="38*5"/>
     <string english="Delete your main game save data and unlocked play modes." translation="Dileu eich data arbed prif gêm a dulliau chwarae sydd wedi&apos;i datgloi ." explanation="" max="38*5"/>
     <string english="Delete your custom level save data and completion stars." translation="Dileu eich arbed data lefel cwstwm a sêr wedi&apos;i gwblhau." explanation="completion stars: when completing a level you get either 1 or 2 stars" max="38*5"/>
     <string english="Are you sure? This will delete your current saves..." translation="Wyt ti&apos;n siwr? Bydd hyn yn dileu eich arbediadau cyfredol..." explanation="" max="38*7"/>
@@ -203,9 +205,9 @@
     <string english="If new strings were added to the English template language files, this feature will insert them in the translation files for all languages. Make a backup, just in case." translation="Pe bai llinynnau newydd yn cael eu hychwanegu at y ffeiliau iaith templed Saesneg, bydd y nodwedd hon yn eu mewnosod yn y ffeiliau cyfieithu ar gyfer pob iaith. Gwnewch gopi wrth gefn, rhag ofn." explanation="translation maintenance menu" max="38*7"/>
     <string english="Full syncing EN→All:" translation="Cysoni llawn EN→Popeth :" explanation="translation maintenance menu. The following list of language files can be fully synced from English to all other languages by pressing this button - new strings will be inserted in all languages" max="40"/>
     <string english="Syncing not supported:" translation="Ni chefnogir cysoni:" explanation="translation maintenance menu. The following list of language files are untouched by the sync button" max="40"/>
-    <string english="advanced options" translation="uwch opsiynau " explanation="menu option"/>
+    <string english="advanced" translation="" explanation="menu option"/>
     <string english="Advanced Options" translation="Uwch Opsiynau" explanation="title" max="20"/>
-    <string english="All other gameplay settings." translation="Pob gosodiad chwarae gêm arall." explanation="description for advanced options" max="38*5"/>
+    <string english="Various options which don&apos;t fit elsewhere." translation="" explanation="description for advanced options" max="38*5"/>
     <string english="unfocus pause" translation="saib heb ffocws" explanation="menu option. Turns the pause screen on/off, which shows up when the window is unfocused/inactive (only one window is normally in focus/active at a time). Possible alternative: auto pause screen"/>
     <string english="Unfocus Pause" translation="Saib Heb Ffocws" explanation="title. Turns the pause screen on/off, which shows up when the window is unfocused/inactive (only one window is normally in focus/active at a time). Possible alternative: auto pause screen" max="20"/>
     <string english="Toggle if the game will pause when the window is unfocused." translation="Toglo os bydd y gêm yn seibio pan fydd y ffenestr heb ffocws." explanation="" max="38*3"/>

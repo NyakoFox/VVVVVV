@@ -315,7 +315,7 @@ static void menurender(void)
 
         if (game.currentmenuoption == gameplayoptionsoffset + 0)
         {
-            //Toggle FPS
+            // Toggle FPS
             font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Toggle 30+ FPS"), tr, tg, tb);
             int next_y = font::print_wrap(PR_CEN, -1, 65, loc::gettext("Change whether the game runs at 30 or over 30 FPS."), tr, tg, tb);
 
@@ -331,26 +331,37 @@ static void menurender(void)
         }
         else if (game.currentmenuoption == gameplayoptionsoffset + 1)
         {
-            //Speedrunner options
-            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Speedrunner Options"), tr, tg, tb);
-            font::print_wrap(PR_CEN, -1, 65, loc::gettext("Access some advanced settings that might be of interest to speedrunners."), tr, tg, tb);
+            // translucent room name bg
+            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Room Name BG"), tr, tg, tb);
+            int next_y = font::print_wrap(PR_CEN, -1, 65, loc::gettext("Lets you see through what is behind the name at the bottom of the screen."), tr, tg, tb);
+            if (graphics.translucentroomname)
+            {
+                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Room name background is TRANSLUCENT"), tr / 2, tg / 2, tb / 2);
+            }
+            else
+            {
+                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Room name background is OPAQUE"), tr, tg, tb);
+            }
         }
         else if (game.currentmenuoption == gameplayoptionsoffset + 2)
         {
-            //Advanced options
-            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Advanced Options"), tr, tg, tb);
-            font::print_wrap(PR_CEN, -1, 65, loc::gettext("All other gameplay settings."), tr, tg, tb);
+            // checkpoint saving
+            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Checkpoint Saving"), tr, tg, tb);
+            int next_y = font::print_wrap(PR_CEN, -1, 65, loc::gettext("Toggle if checkpoints should save the game."), tr, tg, tb);
+            if (!game.checkpoint_saving)
+            {
+                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Checkpoint saving is OFF"), tr / 2, tg / 2, tb / 2);
+            }
+            else
+            {
+                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Checkpoint saving is ON"), tr, tg, tb);
+            }
         }
         else if (game.currentmenuoption == gameplayoptionsoffset + 3)
         {
-            //Clear Data
-            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Clear Data"), tr, tg, tb);
-            font::print_wrap(PR_CEN, -1, 65, loc::gettext("Delete your main game save data and unlocked play modes."), tr, tg, tb);
-        }
-        else if (game.currentmenuoption == gameplayoptionsoffset + 4)
-        {
-            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Clear Data"), tr, tg, tb);
-            font::print_wrap(PR_CEN, -1, 65, loc::gettext("Delete your custom level save data and completion stars."), tr, tg, tb);
+            // Speedrunner options
+            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Speedrunner Options"), tr, tg, tb);
+            font::print_wrap(PR_CEN, -1, 65, loc::gettext("Access some advanced settings that might be of interest to speedrunners."), tr, tg, tb);
         }
 
         break;
@@ -386,8 +397,17 @@ static void menurender(void)
             font::print_wrap(PR_CEN, -1, 65, loc::gettext("Disable screen effects, enable slowdown modes or invincibility."), tr, tg, tb);
             break;
         case 5:
+            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Advanced Options"), tr, tg, tb);
+            font::print_wrap(PR_CEN, -1, 65, loc::gettext("Various options which don't fit elsewhere."), tr, tg, tb);
+            break;
+        case 6:
             font::print(PR_2X | PR_CEN,  -1, 30, loc::gettext("Language"), tr, tg, tb);
             font::print_wrap(PR_CEN, -1, 65, loc::gettext("Change the language."), tr, tg, tb);
+            break;
+        case 7:
+            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Clear Data"), tr, tg, tb);
+            font::print_wrap(PR_CEN, -1, 65, loc::gettext("Delete your save data."), tr, tg, tb);
+            break;
         }
         break;
     case Menu::graphicoptions:
@@ -673,6 +693,19 @@ static void menurender(void)
     }
     case Menu::newgamewarning:
         font::print_wrap(PR_CEN, -1, 100, loc::gettext("Are you sure? This will delete your current saves..."), tr, tg, tb);
+        break;
+    case Menu::cleardata:
+        if (game.currentmenuoption == 0)
+        {
+            //Clear Data
+            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Clear Data"), tr, tg, tb);
+            font::print_wrap(PR_CEN, -1, 65, loc::gettext("Delete your main game save data and unlocked play modes."), tr, tg, tb);
+        }
+        else if (game.currentmenuoption == 1)
+        {
+            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Clear Data"), tr, tg, tb);
+            font::print_wrap(PR_CEN, -1, 65, loc::gettext("Delete your custom level save data and completion stars."), tr, tg, tb);
+        }
         break;
     case Menu::cleardatamenu:
     case Menu::clearcustomdatamenu:
@@ -1132,16 +1165,6 @@ static void menurender(void)
         }
         case 3:
         {
-            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Fake Load Screen"), tr, tg, tb);
-            int next_y = font::print_wrap(PR_CEN, -1, 65, loc::gettext("Disable the fake loading screen which appears on game launch."), tr, tg, tb);
-            if (game.skipfakeload)
-                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Fake loading screen is OFF"), tr / 2, tg / 2, tb / 2);
-            else
-                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Fake loading screen is ON"), tr, tg, tb);
-            break;
-        }
-        case 4:
-        {
             font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("In-Game Timer"), tr, tg, tb);
             int next_y = font::print_wrap(PR_CEN, -1, 65, loc::gettext("Toggle the in-game timer outside of time trials."), tr, tg, tb);
             if (game.showingametimer)
@@ -1154,7 +1177,7 @@ static void menurender(void)
             }
             break;
         }
-        case 5:
+        case 4:
         {
             font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("English Sprites"), tr, tg, tb);
             int next_y = font::print_wrap(PR_CEN, -1, 65, loc::gettext("Show the original English word enemies regardless of your language setting."), tr, tg, tb);
@@ -1178,15 +1201,17 @@ static void menurender(void)
         break;
     }
     case Menu::advancedoptions:
+    {
         switch (game.currentmenuoption)
         {
         case 0:
         {
+            // Unfocus pause
             font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Unfocus Pause"), tr, tg, tb);
             int next_y = font::print_wrap(PR_CEN, -1, 65, loc::gettext("Toggle if the game will pause when the window is unfocused."), tr, tg, tb);
             if (game.disablepause)
             {
-                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Unfocus pause is OFF"), tr/2, tg/2, tb/2);
+                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Unfocus pause is OFF"), tr / 2, tg / 2, tb / 2);
             }
             else
             {
@@ -1196,11 +1221,12 @@ static void menurender(void)
         }
         case 1:
         {
+            // Unfocus audio pause
             font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Unfocus Audio"), tr, tg, tb);
             int next_y = font::print_wrap(PR_CEN, -1, 65, loc::gettext("Toggle if the audio will pause when the window is unfocused."), tr, tg, tb);
             if (game.disableaudiopause)
             {
-                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Unfocus audio pause is OFF"), tr/2, tg/2, tb/2);
+                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Unfocus audio pause is OFF"), tr / 2, tg / 2, tb / 2);
             }
             else
             {
@@ -1210,30 +1236,18 @@ static void menurender(void)
         }
         case 2:
         {
-            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Room Name BG"), tr, tg, tb);
-            int next_y = font::print_wrap(PR_CEN, -1, 65, loc::gettext("Lets you see through what is behind the name at the bottom of the screen."), tr, tg, tb);
-            if (graphics.translucentroomname)
-                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Room name background is TRANSLUCENT"), tr/2, tg/2, tb/2);
+            // Fake load screen
+            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Fake Load Screen"), tr, tg, tb);
+            int next_y = font::print_wrap(PR_CEN, -1, 65, loc::gettext("Disable the fake loading screen which appears on game launch."), tr, tg, tb);
+            if (game.skipfakeload)
+                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Fake loading screen is OFF"), tr / 2, tg / 2, tb / 2);
             else
-                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Room name background is OPAQUE"), tr, tg, tb);
-            break;
-        }
-        case 3:
-        {
-            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Checkpoint Saving"), tr, tg, tb);
-            int next_y = font::print_wrap(PR_CEN, -1, 65, loc::gettext("Toggle if checkpoints should save the game."), tr, tg, tb);
-            if (!game.checkpoint_saving)
-            {
-                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Checkpoint saving is OFF"), tr / 2, tg / 2, tb / 2);
-            }
-            else
-            {
-                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Checkpoint saving is ON"), tr, tg, tb);
-            }
+                font::print_wrap(PR_CEN, -1, next_y, loc::gettext("Fake loading screen is ON"), tr, tg, tb);
             break;
         }
         }
         break;
+    }
     case Menu::accessibility:
     {
 #ifdef MAKEANDPLAY

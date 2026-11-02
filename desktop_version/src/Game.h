@@ -74,6 +74,7 @@ namespace Menu
         translator_maintenance,
         translator_maintenance_sync,
         translator_error_setlangwritedir,
+        cleardata,
         cleardatamenu,
         clearcustomdatamenu,
         setinvincibility,

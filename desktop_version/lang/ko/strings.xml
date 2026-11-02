@@ -54,9 +54,11 @@
     <string english="Language" translation="언어" explanation="title" max="20" max_local="16"/>
     <string english="Change the language." translation="언어를 변경합니다." explanation="" max="38*2" max_local="30*2"/>
     <string english="Can not change the language while a textbox is displayed in-game." translation="게임 중 텍스트 상자가 표시되는 동안에는 언어를 변경할 수 없습니다." explanation="" max="38*3" max_local="30*3"/>
+    <string english="clear data" translation="" explanation="menu option"/>
     <string english="clear main game data" translation="주 게임 데이터 제거" explanation="menu option"/>
     <string english="clear custom level data" translation="커스텀 레벨 데이터 제거" explanation="menu option"/>
     <string english="Clear Data" translation="데이터 제거" explanation="title" max="20" max_local="16"/>
+    <string english="Delete your save data." translation="" explanation="" max="38*5" max_local="30*5"/>
     <string english="Delete your main game save data and unlocked play modes." translation="전체 게임 저장 데이터와 해금된 플레이 모드를 제거합니다." explanation="" max="38*5" max_local="30*5"/>
     <string english="Delete your custom level save data and completion stars." translation="커스텀 레벨 저장 데이터와 획득한 별을 제거합니다." explanation="completion stars: when completing a level you get either 1 or 2 stars" max="38*5" max_local="30*5"/>
     <string english="Are you sure? This will delete your current saves..." translation="정말이십니까? 현재 저장 파일을 삭제하게 됩니다..." explanation="" max="38*7" max_local="30*7"/>
@@ -203,9 +205,9 @@
     <string english="If new strings were added to the English template language files, this feature will insert them in the translation files for all languages. Make a backup, just in case." translation="새 스트링이 영문 템플릿 언어 파일에 추가되었다면, 해당 기능이 새 스트링을 모든 언어의 번역 파일에 추가합니다. 혹시를 대비해 백업 파일을 만들어두세요." explanation="translation maintenance menu" max="38*7" max_local="30*7"/>
     <string english="Full syncing EN→All:" translation="EN→All 전체 동기화 중:" explanation="translation maintenance menu. The following list of language files can be fully synced from English to all other languages by pressing this button - new strings will be inserted in all languages" max="40" max_local="32"/>
     <string english="Syncing not supported:" translation="동기화 지원되지 않음:" explanation="translation maintenance menu. The following list of language files are untouched by the sync button" max="40" max_local="32"/>
-    <string english="advanced options" translation="고급 설정" explanation="menu option"/>
+    <string english="advanced" translation="" explanation="menu option"/>
     <string english="Advanced Options" translation="고급 설정" explanation="title" max="20" max_local="16"/>
-    <string english="All other gameplay settings." translation="모든 기타 게임플레이 설정입니다." explanation="description for advanced options" max="38*5" max_local="30*5"/>
+    <string english="Various options which don&apos;t fit elsewhere." translation="" explanation="description for advanced options" max="38*5" max_local="30*5"/>
     <string english="unfocus pause" translation="창 벗어날 시 일시정지" explanation="menu option. Turns the pause screen on/off, which shows up when the window is unfocused/inactive (only one window is normally in focus/active at a time). Possible alternative: auto pause screen"/>
     <string english="Unfocus Pause" translation="창 벗어날 시 일시정지" explanation="title. Turns the pause screen on/off, which shows up when the window is unfocused/inactive (only one window is normally in focus/active at a time). Possible alternative: auto pause screen" max="20" max_local="16"/>
     <string english="Toggle if the game will pause when the window is unfocused." translation="게임 창에서 벗어날 시 게임을 일시정지할지 토글합니다." explanation="" max="38*3" max_local="30*3"/>

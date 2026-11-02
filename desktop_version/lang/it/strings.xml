@@ -54,9 +54,11 @@
     <string english="Language" translation="Lingua" explanation="title" max="20"/>
     <string english="Change the language." translation="Cambia la lingua." explanation="" max="38*2"/>
     <string english="Can not change the language while a textbox is displayed in-game." translation="Impossibile cambiare lingua mentre una finestra di dialogo è mostrata sullo schermo." explanation="" max="38*3"/>
+    <string english="clear data" translation="" explanation="menu option"/>
     <string english="clear main game data" translation="cancella dati gioco principale" explanation="menu option"/>
     <string english="clear custom level data" translation="cancella dati livelli personalizzati" explanation="menu option"/>
     <string english="Clear Data" translation="Cancella dati" explanation="title" max="20"/>
+    <string english="Delete your save data." translation="" explanation="" max="38*5"/>
     <string english="Delete your main game save data and unlocked play modes." translation="Elimina il salvataggio del gioco principale e le modalità di gioco sbloccate." explanation="" max="38*5"/>
     <string english="Delete your custom level save data and completion stars." translation="Elimina i dati di salvataggio dei livelli personalizzati e le stelle di completamento." explanation="completion stars: when completing a level you get either 1 or 2 stars" max="38*5"/>
     <string english="Are you sure? This will delete your current saves..." translation="Confermi? Questo eliminerà i salvataggi attuali..." explanation="" max="38*7"/>
@@ -203,9 +205,9 @@
     <string english="If new strings were added to the English template language files, this feature will insert them in the translation files for all languages. Make a backup, just in case." translation="Se sono state aggiunte nuove stringhe ai file di template della lingua inglese, questa funzione le inserirà nei file di traduzione per tutte le lingue. Fai un backup, non si sa mai." explanation="translation maintenance menu" max="38*7"/>
     <string english="Full syncing EN→All:" translation="Sincronizzazione completa EN→Tutte:" explanation="translation maintenance menu. The following list of language files can be fully synced from English to all other languages by pressing this button - new strings will be inserted in all languages" max="40"/>
     <string english="Syncing not supported:" translation="Sincronizzazione non supportata:" explanation="translation maintenance menu. The following list of language files are untouched by the sync button" max="40"/>
-    <string english="advanced options" translation="opzioni avanzate" explanation="menu option"/>
+    <string english="advanced" translation="" explanation="menu option"/>
     <string english="Advanced Options" translation="Opzioni avanzate" explanation="title" max="20"/>
-    <string english="All other gameplay settings." translation="Tutte le altre impostazioni di gioco." explanation="description for advanced options" max="38*5"/>
+    <string english="Various options which don&apos;t fit elsewhere." translation="" explanation="description for advanced options" max="38*5"/>
     <string english="unfocus pause" translation="pausa inattività" explanation="menu option. Turns the pause screen on/off, which shows up when the window is unfocused/inactive (only one window is normally in focus/active at a time). Possible alternative: auto pause screen"/>
     <string english="Unfocus Pause" translation="Pausa inattività" explanation="title. Turns the pause screen on/off, which shows up when the window is unfocused/inactive (only one window is normally in focus/active at a time). Possible alternative: auto pause screen" max="20"/>
     <string english="Toggle if the game will pause when the window is unfocused." translation="Scegli se mettere il gioco in pausa quando la finestra non è più attiva." explanation="" max="38*3"/>
