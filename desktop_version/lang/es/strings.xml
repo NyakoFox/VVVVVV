@@ -54,9 +54,11 @@
     <string english="Language" translation="Idioma" explanation="title" max="20"/>
     <string english="Change the language." translation="Cambia el idioma." explanation="" max="38*2"/>
     <string english="Can not change the language while a textbox is displayed in-game." translation="No es posible cambiar el idioma mientras se muestra un cuadro de texto en el juego." explanation="" max="38*3"/>
+    <string english="clear data" translation="" explanation="menu option"/>
     <string english="clear main game data" translation="borrar datos de juego" explanation="menu option"/>
     <string english="clear custom level data" translation="borrar datos de niveles" explanation="menu option"/>
     <string english="Clear Data" translation="Borrar datos" explanation="title" max="20"/>
+    <string english="Delete your save data." translation="" explanation="" max="38*5"/>
     <string english="Delete your main game save data and unlocked play modes." translation="Elimina los datos guardados de tu partida principal y los modos de juego desbloqueados." explanation="" max="38*5"/>
     <string english="Delete your custom level save data and completion stars." translation="Elimina los datos guardados de tu nivel personalizado y las estrellas de superación." explanation="completion stars: when completing a level you get either 1 or 2 stars" max="38*5"/>
     <string english="Are you sure? This will delete your current saves..." translation="¿Seguro? Se eliminarán tus guardados actuales..." explanation="" max="38*7"/>

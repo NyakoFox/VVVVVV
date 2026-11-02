@@ -54,9 +54,11 @@
     <string english="Language" translation="언어" explanation="title" max="20" max_local="16"/>
     <string english="Change the language." translation="언어를 변경합니다." explanation="" max="38*2" max_local="30*2"/>
     <string english="Can not change the language while a textbox is displayed in-game." translation="게임 중 텍스트 상자가 표시되는 동안에는 언어를 변경할 수 없습니다." explanation="" max="38*3" max_local="30*3"/>
+    <string english="clear data" translation="" explanation="menu option"/>
     <string english="clear main game data" translation="주 게임 데이터 제거" explanation="menu option"/>
     <string english="clear custom level data" translation="커스텀 레벨 데이터 제거" explanation="menu option"/>
     <string english="Clear Data" translation="데이터 제거" explanation="title" max="20" max_local="16"/>
+    <string english="Delete your save data." translation="" explanation="" max="38*5" max_local="30*5"/>
     <string english="Delete your main game save data and unlocked play modes." translation="전체 게임 저장 데이터와 해금된 플레이 모드를 제거합니다." explanation="" max="38*5" max_local="30*5"/>
     <string english="Delete your custom level save data and completion stars." translation="커스텀 레벨 저장 데이터와 획득한 별을 제거합니다." explanation="completion stars: when completing a level you get either 1 or 2 stars" max="38*5" max_local="30*5"/>
     <string english="Are you sure? This will delete your current saves..." translation="정말이십니까? 현재 저장 파일을 삭제하게 됩니다..." explanation="" max="38*7" max_local="30*7"/>

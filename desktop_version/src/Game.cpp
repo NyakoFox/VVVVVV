@@ -6906,10 +6906,11 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
                 option(loc::gettext("flip mode"));
         }
         option(loc::gettext("toggle fps"));
+        option(loc::gettext("unfocus pause"));
+        option(loc::gettext("unfocus audio pause"));
+        option(loc::gettext("room name background"));
+        option(loc::gettext("checkpoint saving"));
         option(loc::gettext("speedrun options"));
-        option(loc::gettext("advanced options"));
-        option(loc::gettext("clear main game data"));
-        option(loc::gettext("clear custom level data"));
         option(loc::gettext("return"));
         menuyoff = -10;
         maxspacing = 15;
@@ -6993,8 +6994,9 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         option(loc::gettext("game pad"));
         option(loc::gettext("accessibility"));
         option(loc::gettext("language"), !translator_cutscene_test);
+        option(loc::gettext("clear data"));
         option(loc::gettext("return"));
-        menuyoff = 0;
+        menuyoff = -16;
         maxspacing = 15;
         break;
     case Menu::speedrunneroptions:
@@ -7020,15 +7022,6 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         }
         break;
     }
-    case Menu::advancedoptions:
-        option(loc::gettext("unfocus pause"));
-        option(loc::gettext("unfocus audio pause"));
-        option(loc::gettext("room name background"));
-        option(loc::gettext("checkpoint saving"));
-        option(loc::gettext("return"));
-        menuyoff = 0;
-        maxspacing = 15;
-        break;
     case Menu::audiooptions:
         option(loc::gettext("music volume"));
         option(loc::gettext("sound volume"));
@@ -7217,6 +7210,13 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
     case Menu::translator_error_setlangwritedir:
         option(loc::gettext("ok"));
         menuyoff = 10;
+        break;
+    case Menu::cleardata:
+        option(loc::gettext("clear main game data"));
+        option(loc::gettext("clear custom level data"));
+        option(loc::gettext("return"));
+        menuyoff = 32;
+        button_y_offset = -32;
         break;
     case Menu::cleardatamenu:
     case Menu::clearcustomdatamenu:

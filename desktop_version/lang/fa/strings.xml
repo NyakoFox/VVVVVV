@@ -54,9 +54,11 @@
     <string english="Language" translation="زبان" explanation="title" max="20" max_local="20"/>
     <string english="Change the language." translation="تغییر زبان." explanation="" max="38*2" max_local="38*2"/>
     <string english="Can not change the language while a textbox is displayed in-game." translation="تا وقتی که کادر متنی در بازی باز است نمی‌توان زبان را تغییر داد." explanation="" max="38*3" max_local="38*3"/>
+    <string english="clear data" translation="" explanation="menu option"/>
     <string english="clear main game data" translation="پاک کردن داده‌های اصلی بازی" explanation="menu option"/>
     <string english="clear custom level data" translation="پاک کردن داده‌های مرحله‌ی ساختگی" explanation="menu option"/>
     <string english="Clear Data" translation="پاک کردن داده‌ها" explanation="title" max="20" max_local="20"/>
+    <string english="Delete your save data." translation="" explanation="" max="38*5" max_local="38*5"/>
     <string english="Delete your main game save data and unlocked play modes." translation="پاک کردن ذخیره‌ی بازی اصلی و باز کردن حالت‌های بازی." explanation="" max="38*5" max_local="38*5"/>
     <string english="Delete your custom level save data and completion stars." translation="پاک کردن ذخیره‌ی مراحل ساختگی و ستاره‌های تکمیلی." explanation="completion stars: when completing a level you get either 1 or 2 stars" max="38*5" max_local="38*5"/>
     <string english="Are you sure? This will delete your current saves..." translation="مطمئنید؟ تمام فایل‌های ذخیره پاک خواهند شد..." explanation="" max="38*7" max_local="38*7"/>

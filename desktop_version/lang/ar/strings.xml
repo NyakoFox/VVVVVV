@@ -55,9 +55,11 @@
     <string english="Language" translation="اللغة" explanation="title" max="20" max_local="20"/>
     <string english="Change the language." translation="تغيير اللغة." explanation="" max="38*2" max_local="38*2"/>
     <string english="Can not change the language while a textbox is displayed in-game." translation="لا يمكن تغيير اللغة أثناء ظهور نص في اللعبة." explanation="" max="38*3" max_local="38*3"/>
+    <string english="clear data" translation="" explanation="menu option"/>
     <string english="clear main game data" translation="حذف بيانات اللعبة الأساسية" explanation="menu option"/>
     <string english="clear custom level data" translation="حذف بيانات المراحل الاختيارية" explanation="menu option"/>
     <string english="Clear Data" translation="حذف البيانات" explanation="title" max="20" max_local="20"/>
+    <string english="Delete your save data." translation="" explanation="" max="38*5" max_local="38*5"/>
     <string english="Delete your main game save data and unlocked play modes." translation="حذف بيانات حفظ اللعبة الأساسية وما يخص أطوار اللعب المفتوحة." explanation="" max="38*5" max_local="38*5"/>
     <string english="Delete your custom level save data and completion stars." translation="حذف بيانات المراحل الاختيارية وما يخص نجوم الإكمال." explanation="completion stars: when completing a level you get either 1 or 2 stars" max="38*5" max_local="38*5"/>
     <string english="Are you sure? This will delete your current saves..." translation="أحقا قررت ذلك؟
