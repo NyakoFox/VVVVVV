@@ -367,6 +367,11 @@ static void menurender(void)
         break;
     }
     case Menu::options:
+        if (key.using_touch)
+        {
+            break;
+        }
+
         switch (game.currentmenuoption)
         {
         case 0:

@@ -6997,6 +6997,20 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         option(loc::gettext("return"));
         menuyoff = -20;
         maxspacing = 15;
+        auto_buttons = false;
+
+        touch::create_menu_button(12, 32, 136, 26, loc::gettext("gameplay"), 0);
+        touch::create_menu_button(12, 66, 136, 26, loc::gettext("graphics"), 1);
+        touch::create_menu_button(12, 100, 136, 26, loc::gettext("audio"), 2);
+        touch::create_menu_button(12, 134, 136, 26, loc::gettext("game pad"), 3);
+
+        touch::create_menu_button(172, 32, 136, 26, loc::gettext("accessibility"), 4);
+        touch::create_menu_button(172, 66, 136, 26, loc::gettext("advanced"), 5);
+        touch::create_menu_button(172, 100, 136, 26, loc::gettext("language"), 6, !translator_cutscene_test);
+        touch::create_menu_button(172, 134, 136, 26, loc::gettext("clear data"), 7);
+
+        touch::create_menu_button(106, 200, 108, 26, loc::gettext("return"), 8);
+
         break;
     case Menu::speedrunneroptions:
         option(loc::gettext("glitchrunner mode"));
