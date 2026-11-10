@@ -96,6 +96,7 @@
     <string english="Analogue Mode" translation="Modd Analog" explanation="title, analogue mode simulates distortion from bad signal" max="20"/>
     <string english="There is nothing wrong with your television set. Do not attempt to adjust the picture." translation="Does dim byd o&apos;i le ar eich set deledu. Peidiwch â cheisio addasu&apos;r llun." explanation="" max="38*5"/>
     <string english="toggle fps" translation="toglo fps" explanation="menu option, kind of a misnomer, toggle between 30 FPS and more than 30 FPS"/>
+    <string english="limit to 30 fps" translation="" explanation="menu option, a checkbox for touch input, toggle between 30 FPS and more than 30 FPS"/>
     <string english="Toggle 30+ FPS" translation="Toglo 30+ FPS" explanation="title" max="20"/>
     <string english="Change whether the game runs at 30 or over 30 FPS." translation="Newid p&apos;un a yw&apos;r gêm yn rhedeg ar 30 neu dros 30 FPS." explanation="" max="38*3"/>
     <string english="Current mode: 30 FPS" translation="Modd presennol: 30 FPS" explanation="" max="38*2"/>
@@ -243,6 +244,7 @@
     <string english="Fake loading screen is OFF" translation="Sgrin llwytho ffug i FFWRDD" explanation="allows the loading screen which counts to 100% to be turned off" max="38*2"/>
     <string english="Fake loading screen is ON" translation="Mae sgrin llwytho ffug YMLAEN" explanation="allows the loading screen which counts to 100% to be turned off" max="38*2"/>
     <string english="room name background" translation="cefndir enw ystafell" explanation="menu option, background behind room names"/>
+    <string english="translucent room name bg" translation="" explanation="menu option for touch input, background behind room names"/>
     <string english="Room Name BG" translation="Cefndir Enw Ystafell" explanation="title, background behind room names" max="20"/>
     <string english="Lets you see through what is behind the name at the bottom of the screen." translation="Yn gadael i chi weld trwy&apos;r hyn sydd y tu ôl i&apos;r enw ar waelod y sgrin." explanation="" max="38*3"/>
     <string english="Room name background is TRANSLUCENT" translation="Mae cefndir enw ystafell yn TRYLOYW" explanation="" max="38*2"/>

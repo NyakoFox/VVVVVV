@@ -6899,12 +6899,20 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         menuyoff = -20;
         break;
     case Menu::gameplayoptions:
+    {
+        int offset = 0;
+        int toggle_start = 88;
+
 #if !defined(MAKEANDPLAY)
         if (ingame_titlemode && unlock[Unlock_FLIPMODE])
 #endif
         {
-                option(loc::gettext("flip mode"));
+            option(loc::gettext("flip mode"));
+            offset++;
+            touch::create_menu_toggle(80, 80, 160, loc::gettext("flip mode"), 0, graphics.setflipmode);
+            toggle_start = 100;
         }
+
         option(loc::gettext("toggle fps"));
         option(loc::gettext("room name background"));
         option(loc::gettext("checkpoint saving"));
@@ -6912,7 +6920,17 @@ void Game::createmenu( enum Menu::MenuName t, bool samemenu/*= false*/ )
         option(loc::gettext("return"));
         menuyoff = 6;
         maxspacing = 15;
+        auto_buttons = false;
+
+        touch::create_menu_toggle(80, toggle_start, 160, loc::gettext("limit to 30 fps"), offset, !over30mode);
+        touch::create_menu_toggle(80, toggle_start + 20, 160, loc::gettext("translucent room name bg"), offset + 1, graphics.translucentroomname);
+        touch::create_menu_toggle(80, toggle_start + 40, 160, loc::gettext("checkpoint saving"), offset + 2, checkpoint_saving);
+
+        touch::create_menu_button(80, 168, 160, 26, loc::gettext("speedrun options"), offset + 3);
+        touch::create_menu_button(80, 200, 160, 26, loc::gettext("return"), offset + 4);
+
         break;
+    }
     case Menu::graphicoptions:
         if (!gameScreen.isForcedFullscreen())
         {

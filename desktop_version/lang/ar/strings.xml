@@ -99,6 +99,7 @@
     <string english="Analogue Mode" translation="صورة البث التناظري" explanation="title, analogue mode simulates distortion from bad signal" max="20" max_local="20"/>
     <string english="There is nothing wrong with your television set. Do not attempt to adjust the picture." translation="تلفازك بخير. لا تحاول تصحيح صورته." explanation="" max="38*5" max_local="38*5"/>
     <string english="toggle fps" translation="تفعيل حد الإطارات" explanation="menu option, kind of a misnomer, toggle between 30 FPS and more than 30 FPS"/>
+    <string english="limit to 30 fps" translation="" explanation="menu option, a checkbox for touch input, toggle between 30 FPS and more than 30 FPS"/>
     <string english="Toggle 30+ FPS" translation="تجاوز 30 إطار/ثانية" explanation="title" max="20" max_local="20"/>
     <string english="Change whether the game runs at 30 or over 30 FPS." translation="هل تعرض صور اللعبة بنسق
 	30 إطار/ثانية أو أكثر." explanation="" max="38*3" max_local="38*3"/>
@@ -247,6 +248,7 @@
     <string english="Fake loading screen is OFF" translation="شاشة التحميل المزيفة معطلة" explanation="allows the loading screen which counts to 100% to be turned off" max="38*2" max_local="38*2"/>
     <string english="Fake loading screen is ON" translation="شاشة التحميل المزيفة تعمل" explanation="allows the loading screen which counts to 100% to be turned off" max="38*2" max_local="38*2"/>
     <string english="room name background" translation="خلفية اسم الغرفة" explanation="menu option, background behind room names"/>
+    <string english="translucent room name bg" translation="" explanation="menu option for touch input, background behind room names"/>
     <string english="Room Name BG" translation="خلفية اسم الغرفة" explanation="title, background behind room names" max="20" max_local="20"/>
     <string english="Lets you see through what is behind the name at the bottom of the screen." translation="وضوح رؤية ما وراء اسم الغرفة أسفل الشاشة." explanation="" max="38*3" max_local="38*3"/>
     <string english="Room name background is TRANSLUCENT" translation="خلفية اسم الغرفة شفافة" explanation="" max="38*2" max_local="38*2"/>

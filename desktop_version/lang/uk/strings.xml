@@ -96,6 +96,7 @@
     <string english="Analogue Mode" translation="Аналоговий режим" explanation="title, analogue mode simulates distortion from bad signal" max="20"/>
     <string english="There is nothing wrong with your television set. Do not attempt to adjust the picture." translation="З вашим телевізором усе в порядку.|Не намагайтеся настроїти зображення." explanation="" max="38*5"/>
     <string english="toggle fps" translation="перемкнути fps" explanation="menu option, kind of a misnomer, toggle between 30 FPS and more than 30 FPS"/>
+    <string english="limit to 30 fps" translation="" explanation="menu option, a checkbox for touch input, toggle between 30 FPS and more than 30 FPS"/>
     <string english="Toggle 30+ FPS" translation="Перемкнути 30+ FPS" explanation="title" max="20"/>
     <string english="Change whether the game runs at 30 or over 30 FPS." translation="Вибрати показник FPS для гри:|30 або 30+." explanation="" max="38*3"/>
     <string english="Current mode: 30 FPS" translation="Поточний режим: 30 FPS" explanation="" max="38*2"/>
@@ -243,6 +244,7 @@
     <string english="Fake loading screen is OFF" translation="Псевдоекран завантаження ВИМК." explanation="allows the loading screen which counts to 100% to be turned off" max="38*2"/>
     <string english="Fake loading screen is ON" translation="Псевдоекран завантаження УВІМК." explanation="allows the loading screen which counts to 100% to be turned off" max="38*2"/>
     <string english="room name background" translation="тло назв кімнат" explanation="menu option, background behind room names"/>
+    <string english="translucent room name bg" translation="" explanation="menu option for touch input, background behind room names"/>
     <string english="Room Name BG" translation="Тло назв кімнат" explanation="title, background behind room names" max="20"/>
     <string english="Lets you see through what is behind the name at the bottom of the screen." translation="Дозволяє побачити те, що розташовано за назвою внизу екрана." explanation="" max="38*3"/>
     <string english="Room name background is TRANSLUCENT" translation="Тло назв кімнат ПРОЗОРЕ" explanation="" max="38*2"/>

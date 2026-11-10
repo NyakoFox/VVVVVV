@@ -96,6 +96,7 @@
     <string english="Analogue Mode" translation="Analoge modus" explanation="title, analogue mode simulates distortion from bad signal" max="20"/>
     <string english="There is nothing wrong with your television set. Do not attempt to adjust the picture." translation="Er is niets mis met je televisie. Probeer niet het beeld bij te stellen." explanation="" max="38*5"/>
     <string english="toggle fps" translation="fps" explanation="menu option, kind of a misnomer, toggle between 30 FPS and more than 30 FPS"/>
+    <string english="limit to 30 fps" translation="" explanation="menu option, a checkbox for touch input, toggle between 30 FPS and more than 30 FPS"/>
     <string english="Toggle 30+ FPS" translation="30+ FPS aan/uit" explanation="title" max="20"/>
     <string english="Change whether the game runs at 30 or over 30 FPS." translation="Wijzig of het spel met 30 FPS of met meer dan 30 FPS moet draaien." explanation="" max="38*3"/>
     <string english="Current mode: 30 FPS" translation="Huidige modus: 30 FPS" explanation="" max="38*2"/>
@@ -243,6 +244,7 @@
     <string english="Fake loading screen is OFF" translation="Nep-laadscherm staat UIT" explanation="allows the loading screen which counts to 100% to be turned off" max="38*2"/>
     <string english="Fake loading screen is ON" translation="Nep-laadscherm staat AAN" explanation="allows the loading screen which counts to 100% to be turned off" max="38*2"/>
     <string english="room name background" translation="kamernaamachtergrond" explanation="menu option, background behind room names"/>
+    <string english="translucent room name bg" translation="" explanation="menu option for touch input, background behind room names"/>
     <string english="Room Name BG" translation="Kamernaamachtergrond" explanation="title, background behind room names" max="20"/>
     <string english="Lets you see through what is behind the name at the bottom of the screen." translation="Laat zien wat er achter de naam van een kamer zit onder in beeld." explanation="" max="38*3"/>
     <string english="Room name background is TRANSLUCENT" translation="Kamernaamachtergrond is DOORZICHTIG" explanation="" max="38*2"/>

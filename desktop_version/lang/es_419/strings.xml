@@ -96,6 +96,7 @@
     <string english="Analogue Mode" translation="Modo analógico" explanation="title, analogue mode simulates distortion from bad signal" max="20"/>
     <string english="There is nothing wrong with your television set. Do not attempt to adjust the picture." translation="No le pasa nada a tu pantalla. No intentes ajustar la imagen." explanation="" max="38*5"/>
     <string english="toggle fps" translation="configurar fps" explanation="menu option, kind of a misnomer, toggle between 30 FPS and more than 30 FPS"/>
+    <string english="limit to 30 fps" translation="" explanation="menu option, a checkbox for touch input, toggle between 30 FPS and more than 30 FPS"/>
     <string english="Toggle 30+ FPS" translation="Más de 30 FPS" explanation="title" max="20"/>
     <string english="Change whether the game runs at 30 or over 30 FPS." translation="Cambia si el juego funciona a 30 o a más de 30 FPS." explanation="" max="38*3"/>
     <string english="Current mode: 30 FPS" translation="Modo actual: 30 FPS" explanation="" max="38*2"/>
@@ -243,6 +244,7 @@
     <string english="Fake loading screen is OFF" translation="Pantalla de carga DESACTIVADA" explanation="allows the loading screen which counts to 100% to be turned off" max="38*2"/>
     <string english="Fake loading screen is ON" translation="Pantalla de carga ACTIVADA" explanation="allows the loading screen which counts to 100% to be turned off" max="38*2"/>
     <string english="room name background" translation="fondos de nombres de sala" explanation="menu option, background behind room names"/>
+    <string english="translucent room name bg" translation="" explanation="menu option for touch input, background behind room names"/>
     <string english="Room Name BG" translation="Fondos nombres sala" explanation="title, background behind room names" max="20"/>
     <string english="Lets you see through what is behind the name at the bottom of the screen." translation="Permite ver qué hay detrás del nombre que aparece en la parte inferior de la pantalla." explanation="" max="38*3"/>
     <string english="Room name background is TRANSLUCENT" translation="El fondo de los nombres de sala es TRASLÚCIDO" explanation="" max="38*2"/>

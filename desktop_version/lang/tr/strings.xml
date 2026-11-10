@@ -96,6 +96,7 @@
     <string english="Analogue Mode" translation="Analog Mod" explanation="title, analogue mode simulates distortion from bad signal" max="20"/>
     <string english="There is nothing wrong with your television set. Do not attempt to adjust the picture." translation="Ekranında bir sorun yok.|Görüntüyü düzeltmeye çalışma." explanation="" max="38*5"/>
     <string english="toggle fps" translation="fps değerini değiştir" explanation="menu option, kind of a misnomer, toggle between 30 FPS and more than 30 FPS"/>
+    <string english="limit to 30 fps" translation="" explanation="menu option, a checkbox for touch input, toggle between 30 FPS and more than 30 FPS"/>
     <string english="Toggle 30+ FPS" translation="30 FPS+ Aç/Kapat" explanation="title" max="20"/>
     <string english="Change whether the game runs at 30 or over 30 FPS." translation="30 FPS/30 FPS+ arasında seçim yap." explanation="" max="38*3"/>
     <string english="Current mode: 30 FPS" translation="Şu anki mod: 30 FPS" explanation="" max="38*2"/>
@@ -243,6 +244,7 @@
     <string english="Fake loading screen is OFF" translation="Sahte yükleme ekranı KAPALI" explanation="allows the loading screen which counts to 100% to be turned off" max="38*2"/>
     <string english="Fake loading screen is ON" translation="Sahte yükleme ekranı AÇIK" explanation="allows the loading screen which counts to 100% to be turned off" max="38*2"/>
     <string english="room name background" translation="oda adı arka planı" explanation="menu option, background behind room names"/>
+    <string english="translucent room name bg" translation="" explanation="menu option for touch input, background behind room names"/>
     <string english="Room Name BG" translation="Oda Adı Arka Planı" explanation="title, background behind room names" max="20"/>
     <string english="Lets you see through what is behind the name at the bottom of the screen." translation="Ekranın altında oda adı yazılı olan|panelin arkasını görmeni sağlar." explanation="" max="38*3"/>
     <string english="Room name background is TRANSLUCENT" translation="Oda adı arka planı SAYDAM" explanation="" max="38*2"/>

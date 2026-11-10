@@ -96,6 +96,7 @@
     <string english="Analogue Mode" translation="An Modh Analóige" explanation="title, analogue mode simulates distortion from bad signal" max="20"/>
     <string english="There is nothing wrong with your television set. Do not attempt to adjust the picture." translation="Níl dada cearr le do theilifíseán. Ná déan iarracht é a athrú." explanation="" max="38*5"/>
     <string english="toggle fps" translation="cuir fps thar 30 i ~b~hfeidhm" explanation="menu option, kind of a misnomer, toggle between 30 FPS and more than 30 FPS"/>
+    <string english="limit to 30 fps" translation="" explanation="menu option, a checkbox for touch input, toggle between 30 FPS and more than 30 FPS"/>
     <string english="Toggle 30+ FPS" translation="FPS thar 30" explanation="title" max="20"/>
     <string english="Change whether the game runs at 30 or over 30 FPS." translation="Roghnaigh an ritheann an cluiche ar 30 fps nó níos tapa." explanation="" max="38*3"/>
     <string english="Current mode: 30 FPS" translation="Modh reatha: 30 FPS" explanation="" max="38*2"/>
@@ -244,6 +245,7 @@ Déan cóip chúltaca, ar eagla na heagla." explanation="translation maintenance
     <string english="Fake loading screen is OFF" translation="NÍ BHEIDH an scáileán lódála bréagach ann." explanation="allows the loading screen which counts to 100% to be turned off" max="38*2"/>
     <string english="Fake loading screen is ON" translation="BEIDH an scáileán lódála bréagach ann." explanation="allows the loading screen which counts to 100% to be turned off" max="38*2"/>
     <string english="room name background" translation="cúlra ainmneacha na seomraí" explanation="menu option, background behind room names"/>
+    <string english="translucent room name bg" translation="" explanation="menu option for touch input, background behind room names"/>
     <string english="Room Name BG" translation="Cúlra na Seomraí" explanation="title, background behind room names" max="20"/>
     <string english="Lets you see through what is behind the name at the bottom of the screen." translation="Beidh tú in ann a fheiceáil céard atá taobh thiar den ainm ag bun an scáileáin." explanation="" max="38*3"/>
     <string english="Room name background is TRANSLUCENT" translation="Cúlra Ainmneacha na Seomraí: TRÉSHOILSEACH" explanation="" max="38*2"/>

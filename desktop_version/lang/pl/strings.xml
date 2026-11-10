@@ -96,6 +96,7 @@
     <string english="Analogue Mode" translation="Tryb Analogowy" explanation="title, analogue mode simulates distortion from bad signal" max="20"/>
     <string english="There is nothing wrong with your television set. Do not attempt to adjust the picture." translation="Nie reguluj odbiornika -|- to prawdziwy obraz!" explanation="" max="38*5"/>
     <string english="toggle fps" translation="ogranicz fps" explanation="menu option, kind of a misnomer, toggle between 30 FPS and more than 30 FPS"/>
+    <string english="limit to 30 fps" translation="" explanation="menu option, a checkbox for touch input, toggle between 30 FPS and more than 30 FPS"/>
     <string english="Toggle 30+ FPS" translation="Ogranicz FPS" explanation="title" max="20"/>
     <string english="Change whether the game runs at 30 or over 30 FPS." translation="Wyłącz lub włącz|ograniczenie klatek na sekundę." explanation="" max="38*3"/>
     <string english="Current mode: 30 FPS" translation="Obecnie: 30 FPS" explanation="" max="38*2"/>
@@ -243,6 +244,7 @@
     <string english="Fake loading screen is OFF" translation="Ekran ładowania jest WYŁĄCZONY" explanation="allows the loading screen which counts to 100% to be turned off" max="38*2"/>
     <string english="Fake loading screen is ON" translation="Ekran ładowania jest WŁĄCZONY" explanation="allows the loading screen which counts to 100% to be turned off" max="38*2"/>
     <string english="room name background" translation="tło za nazwami pokoi" explanation="menu option, background behind room names"/>
+    <string english="translucent room name bg" translation="" explanation="menu option for touch input, background behind room names"/>
     <string english="Room Name BG" translation="Tło za Nazwami" explanation="title, background behind room names" max="20"/>
     <string english="Lets you see through what is behind the name at the bottom of the screen." translation="Pozwala widzieć przestrzeń za nazwami pokoi." explanation="" max="38*3"/>
     <string english="Room name background is TRANSLUCENT" translation="Tło za nazwami jest PRZEZROCZYSTE" explanation="" max="38*2"/>

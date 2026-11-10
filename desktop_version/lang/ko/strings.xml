@@ -96,6 +96,7 @@
     <string english="Analogue Mode" translation="아날로그 모드" explanation="title, analogue mode simulates distortion from bad signal" max="20" max_local="16"/>
     <string english="There is nothing wrong with your television set. Do not attempt to adjust the picture." translation="귀하의 TV에는 아무런 이상이 없습니다. 화면을 조정하지 말아주세요." explanation="" max="38*5" max_local="30*5"/>
     <string english="toggle fps" translation="FPS 전환" explanation="menu option, kind of a misnomer, toggle between 30 FPS and more than 30 FPS"/>
+    <string english="limit to 30 fps" translation="" explanation="menu option, a checkbox for touch input, toggle between 30 FPS and more than 30 FPS"/>
     <string english="Toggle 30+ FPS" translation="30+ FPS 전환" explanation="title" max="20" max_local="16"/>
     <string english="Change whether the game runs at 30 or over 30 FPS." translation="게임이 30 FPS로 진행될지 아니면 그 이상으로 진행될지를 결정합니다." explanation="" max="38*3" max_local="30*3"/>
     <string english="Current mode: 30 FPS" translation="현재 모드: 30 FPS" explanation="" max="38*2" max_local="30*2"/>
@@ -243,6 +244,7 @@
     <string english="Fake loading screen is OFF" translation="가짜 불러오기 화면 꺼짐" explanation="allows the loading screen which counts to 100% to be turned off" max="38*2" max_local="30*2"/>
     <string english="Fake loading screen is ON" translation="가짜 불러오기 화면 켜짐" explanation="allows the loading screen which counts to 100% to be turned off" max="38*2" max_local="30*2"/>
     <string english="room name background" translation="방 이름 배경" explanation="menu option, background behind room names"/>
+    <string english="translucent room name bg" translation="" explanation="menu option for touch input, background behind room names"/>
     <string english="Room Name BG" translation="방 이름 배경" explanation="title, background behind room names" max="20" max_local="16"/>
     <string english="Lets you see through what is behind the name at the bottom of the screen." translation="화면 아래에 있는 이름 뒤쪽에 있는 것을 볼 수 있게 합니다." explanation="" max="38*3" max_local="30*3"/>
     <string english="Room name background is TRANSLUCENT" translation="방 이름 배경 투명" explanation="" max="38*2" max_local="30*2"/>

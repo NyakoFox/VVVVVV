@@ -293,10 +293,21 @@ static void menurender(void)
         break;
     case Menu::gameplayoptions:
     {
-        int gameplayoptionsoffset = 0;
 #if !defined(MAKEANDPLAY)
-        if (game.ingame_titlemode && game.unlock[Unlock_FLIPMODE])
+        bool show_flipmode = game.ingame_titlemode && game.unlock[Unlock_FLIPMODE];
+#else
+        bool show_flipmode = true;
 #endif
+
+        if (key.using_touch)
+        {
+            font::print(PR_2X | PR_CEN, -1, 30, loc::gettext("Gameplay Options"), tr, tg, tb);
+            font::print_wrap(PR_CEN, -1, 65, loc::gettext("Adjust various gameplay settings."), tr, tg, tb);
+            break;
+        }
+
+        int gameplayoptionsoffset = 0;
+        if (show_flipmode)
         {
             gameplayoptionsoffset = 1;
             if (game.currentmenuoption == 0) {
