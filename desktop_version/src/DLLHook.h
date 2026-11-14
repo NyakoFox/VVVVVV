@@ -4,7 +4,7 @@
 #define DLL_EXPORT
 
 #include <stdint.h>
-#include <SDL.h>
+#include <SDL3/SDL.h>
 #include <vector>
 #include <string>
 
@@ -36,7 +36,7 @@ enum VVV_EventType
 struct VVV_Event
 {
     VVV_EventType type;
-    SDL_Keysym keysym;
+    SDL_Scancode keysym;
     int button;
     int x;
     int y;
@@ -51,33 +51,33 @@ static std::vector<VVV_Event> events;
 void VVV_DestroyTexture(VVV_Texture* texture);
 VVV_Texture* VVV_CreateTexture(int width, int height);
 
-extern "C" DECLSPEC void SDLCALL clear_input(void);
-extern "C" DECLSPEC bool SDLCALL get_flag(int flag);
-extern "C" DECLSPEC void SDLCALL set_flag(int flag, bool value);
-extern "C" DECLSPEC void SDLCALL set_invincibility(bool invincible);
-extern "C" DECLSPEC void SDLCALL set_roomname_bg(bool translucent);
-extern "C" DECLSPEC void SDLCALL set_volume(int volume);
-extern "C" DECLSPEC void SDLCALL set_sound_volume(int volume);
+extern "C" SDL_DECLSPEC void SDLCALL clear_input(void);
+extern "C" SDL_DECLSPEC bool SDLCALL get_flag(int flag);
+extern "C" SDL_DECLSPEC void SDLCALL set_flag(int flag, bool value);
+extern "C" SDL_DECLSPEC void SDLCALL set_invincibility(bool invincible);
+extern "C" SDL_DECLSPEC void SDLCALL set_roomname_bg(bool translucent);
+extern "C" SDL_DECLSPEC void SDLCALL set_volume(int volume);
+extern "C" SDL_DECLSPEC void SDLCALL set_sound_volume(int volume);
 
-extern "C" DECLSPEC int SDLCALL version(void);
+extern "C" SDL_DECLSPEC int SDLCALL version(void);
 
-extern "C" DECLSPEC int SDLCALL get_ghost_count(void);
-extern "C" DECLSPEC GhostInfo SDLCALL get_ghost_info(int index);
+extern "C" SDL_DECLSPEC int SDLCALL get_ghost_count(void);
+extern "C" SDL_DECLSPEC GhostInfo SDLCALL get_ghost_info(int index);
 
-extern "C" DECLSPEC void SDLCALL return_to_idlemode(void);
-extern "C" DECLSPEC bool SDLCALL should_vvvvvv_exit(void);
+extern "C" SDL_DECLSPEC void SDLCALL return_to_idlemode(void);
+extern "C" SDL_DECLSPEC bool SDLCALL should_vvvvvv_exit(void);
 
-extern "C" DECLSPEC int SDLCALL mainLoop(int argc, char* argv[]);
-extern "C" DECLSPEC const char* SDLCALL get_state(void);
-extern "C" DECLSPEC void SDLCALL set_base_path(const char* path);
+extern "C" SDL_DECLSPEC int SDLCALL mainLoop(int argc, char* argv[]);
+extern "C" SDL_DECLSPEC const char* SDLCALL get_state(void);
+extern "C" SDL_DECLSPEC void SDLCALL set_base_path(const char* path);
 
-extern "C" DECLSPEC void SDLCALL play_level_init(void);
-extern "C" DECLSPEC void SDLCALL set_texture_size(const char* texture, int w, int h);
-extern "C" DECLSPEC void SDLCALL play_level(const char* level_data, const char* playassets);
+extern "C" SDL_DECLSPEC void SDLCALL play_level_init(void);
+extern "C" SDL_DECLSPEC void SDLCALL set_texture_size(const char* texture, int w, int h);
+extern "C" SDL_DECLSPEC void SDLCALL play_level(const char* level_data, const char* playassets);
 
-extern "C" DECLSPEC void SDLCALL simulate_keyevent(const char* event_type, const char* new_key, bool repeat);
-extern "C" DECLSPEC void SDLCALL simulate_mouseevent(const char* event_type, int button, int x, int y);
-extern "C" DECLSPEC void SDLCALL simulate_mousemoveevent(int x, int y);
+extern "C" SDL_DECLSPEC void SDLCALL simulate_keyevent(const char* event_type, const char* new_key, bool repeat);
+extern "C" SDL_DECLSPEC void SDLCALL simulate_mouseevent(const char* event_type, int button, int x, int y);
+extern "C" SDL_DECLSPEC void SDLCALL simulate_mousemoveevent(int x, int y);
 
 typedef enum {
     DRAW_NONE = -1,
@@ -147,7 +147,7 @@ static std::vector<draw_message> draw_messages;
 
 static std::vector<VVV_Texture*> textures;
 
-extern "C" DECLSPEC draw_message SDLCALL pop_draw_messages(void);
+extern "C" SDL_DECLSPEC draw_message SDLCALL pop_draw_messages(void);
 
 void push_draw_message(draw_message message);
 

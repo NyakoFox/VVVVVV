@@ -1,10 +1,13 @@
 #define DLL_EXPORT
 
 #define SDL_MAIN_HANDLED
-#include <SDL.h>
-#ifdef __EMSCRIPTEN__
+
+#include <SDL3/SDL.h>
+#ifdef SDL_PLATFORM_EMSCRIPTEN
 #include <emscripten.h>
 #include <emscripten/html5.h>
+#elif defined(SDL_PLATFORM_WINDOWS) || defined(SDL_PLATFORM_ANDROID)
+#include <SDL3/SDL_main.h>
 #endif
 
 #include "ButtonGlyphs.h"
@@ -71,7 +74,7 @@ static volatile Uint64 time_ = 0;
 static volatile Uint64 timePrev = 0;
 static volatile Uint32 accumulator = 0;
 
-#ifndef __EMSCRIPTEN__
+#ifndef SDL_PLATFORM_EMSCRIPTEN
 static volatile Uint64 f_time = 0;
 static volatile Uint64 f_timePrev = 0;
 #endif
@@ -396,11 +399,11 @@ extern "C" DECLSPEC void SDLCALL deltaloop(void);
 
 static void cleanup(void);
 
-#ifdef __EMSCRIPTEN__
+#ifdef SDL_PLATFORM_EMSCRIPTEN
 static void emscriptenloop(void)
 {
     timePrev = time_;
-    time_ = SDL_GetTicks64();
+    time_ = SDL_GetTicks();
     deltaloop();
 }
 #endif
@@ -582,15 +585,11 @@ extern "C" DECLSPEC int SDLCALL mainLoop(int argc, char *argv[])
 
     if (invalid_arg > 0)
     {
-        vlog_error("Error: invalid option: %s", argv[invalid_arg]);
-        keep_console_open(open_console);
-        VVV_exit(1);
+        vlog_warn("Warning: invalid option: %s", argv[invalid_arg]);
     }
     else if (invalid_partial_arg > 0)
     {
-        vlog_error("%s option requires one argument.", argv[invalid_partial_arg]);
-        keep_console_open(open_console);
-        VVV_exit(1);
+        vlog_warn("%s option requires one argument.", argv[invalid_partial_arg]);
     }
 
     if (print_version)
@@ -628,12 +627,7 @@ extern "C" DECLSPEC int SDLCALL mainLoop(int argc, char *argv[])
         VVV_exit(0);
     }
 
-    SDL_SetHintWithPriority(SDL_HINT_IME_SHOW_UI, "1", SDL_HINT_OVERRIDE);
-    SDL_SetHintWithPriority(SDL_HINT_IME_SUPPORT_EXTENDED_TEXT, "1", SDL_HINT_OVERRIDE);
-
-    /* We already do the button swapping in ButtonGlyphs, disable SDL's swapping */
-    SDL_SetHintWithPriority(SDL_HINT_GAMECONTROLLER_USE_BUTTON_LABELS, "0", SDL_HINT_OVERRIDE);
-
+    SDL_SetHintWithPriority(SDL_HINT_IME_IMPLEMENTED_UI, "1", SDL_HINT_OVERRIDE);
     SDL_SetHintWithPriority(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight", SDL_HINT_OVERRIDE);
 
     if(!FILESYSTEM_init(argv[0], baseDir, assetsPath, langDir, fontsDir))
@@ -647,7 +641,7 @@ extern "C" DECLSPEC int SDLCALL mainLoop(int argc, char *argv[])
         SDL_INIT_VIDEO |
         SDL_INIT_AUDIO |
         SDL_INIT_JOYSTICK |
-        SDL_INIT_GAMECONTROLLER
+        SDL_INIT_GAMEPAD
     );
 
     NETWORK_init();
@@ -895,12 +889,12 @@ extern "C" DECLSPEC int SDLCALL mainLoop(int argc, char *argv[])
     gamestate_funcs = get_gamestate_funcs(game.gamestate, &num_gamestate_funcs);
     loop_assign_active_funcs();
 
-#ifdef __EMSCRIPTEN__
+#ifdef SDL_PLATFORM_EMSCRIPTEN
     emscripten_set_main_loop(emscriptenloop, 0, 0);
 #else
     /*while (true)
     {
-        f_time = SDL_GetTicks64();
+        f_time = SDL_GetTicks();
 
         const Uint64 f_timetaken = f_time - f_timePrev;
         const int timestep = game.get_timestep();
@@ -908,13 +902,13 @@ extern "C" DECLSPEC int SDLCALL mainLoop(int argc, char *argv[])
         {
             const volatile Uint64 f_delay = timestep - f_timetaken;
             SDL_Delay((Uint32) f_delay);
-            f_time = SDL_GetTicks64();
+            f_time = SDL_GetTicks();
         }
 
         f_timePrev = f_time;
 
         timePrev = time_;
-        time_ = SDL_GetTicks64();
+        time_ = SDL_GetTicks();
 
         deltaloop();
     }
@@ -1084,7 +1078,7 @@ static void unfocused_run(void)
     }
     graphics.render();
     //We are minimised, so lets put a bit of a delay to save CPU
-#ifndef __EMSCRIPTEN__
+#ifndef SDL_PLATFORM_EMSCRIPTEN
     SDL_Delay(100);
 #endif
 }

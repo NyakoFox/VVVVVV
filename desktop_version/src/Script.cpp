@@ -2,7 +2,7 @@
 #include "Script.h"
 
 #include <limits.h>
-#include <SDL_timer.h>
+#include <SDL3/SDL_timer.h>
 
 #include "Alloc.h"
 #include "Constants.h"
@@ -1048,6 +1048,47 @@ void scriptclass::run(void)
                 words[8] = word8;
                 words[9] = word9;
             }
+            else if (words[0] == "createcollision")
+            {
+                obj.createblock(BLOCK, ss_toi(words[1]), ss_toi(words[2]), ss_toi(words[3]), ss_toi(words[4]));
+            }
+            else if (words[0] == "createtrigger")
+            {
+                obj.createblock(TRIGGER, ss_toi(words[1]), ss_toi(words[2]), ss_toi(words[3]), ss_toi(words[4]), ss_toi(words[5]));
+            }
+            else if (words[0] == "createscript")
+            {
+                if (INBOUNDS_ARR(map.tempscriptbox, game.customscript))
+                {
+                    game.customscript[map.tempscriptbox] = words[5];
+                }
+
+                obj.createblock(TRIGGER, ss_toi(words[1]), ss_toi(words[2]), ss_toi(words[3]), ss_toi(words[4]), 300 + map.tempscriptbox, "custom_" + words[5]);
+                map.tempscriptbox++;
+            }
+            else if (words[0] == "createdamage")
+            {
+                obj.createblock(DAMAGE, ss_toi(words[1]), ss_toi(words[2]), ss_toi(words[3]), ss_toi(words[4]));
+            }
+            else if (words[0] == "createdirectional")
+            {
+                obj.createblock(DIRECTIONAL, ss_toi(words[1]), ss_toi(words[2]), ss_toi(words[3]), ss_toi(words[4]), ss_toi(words[5]));
+            }
+            else if (words[0] == "createsafe")
+            {
+                obj.createblock(SAFE, ss_toi(words[1]), ss_toi(words[2]), ss_toi(words[3]), ss_toi(words[4]));
+            }
+            else if (words[0] == "createactivity")
+            {
+                int id = 35;
+                if (argexists[6])
+                {
+                    id = ss_toi(words[6]);
+                }
+
+                obj.customscript = words[5];
+                obj.createblock(ACTIVITY, ss_toi(words[1]), ss_toi(words[2]), ss_toi(words[3]), ss_toi(words[4]), id, words[5], ActivityContext_CUSTOM);
+            }
             else if (words[0] == "createcrewman")
             {
                 // Note: Do not change the "r" variable, it's used in custom levels
@@ -1894,11 +1935,11 @@ void scriptclass::run(void)
                 int crewman = obj.getcrewman(crew_color);
                 if (INBOUNDS_VEC(crewman, obj.entities) && crew_color == EntityColour_CREW_GREEN)
                 {
-                    obj.createblock(5, obj.entities[crewman].xp - 32, obj.entities[crewman].yp-20, 96, 60, i, "", (i == 35));
+                    obj.createblock(5, obj.entities[crewman].xp - 32, obj.entities[crewman].yp-20, 96, 60, i, "", (i == 35) ? ActivityContext_INTERACT : ActivityContext_NORMAL);
                 }
                 else if (INBOUNDS_VEC(crewman, obj.entities))
                 {
-                    obj.createblock(5, obj.entities[crewman].xp - 32, 0, 96, 240, i, "", (i == 35));
+                    obj.createblock(5, obj.entities[crewman].xp - 32, 0, 96, 240, i, "", (i == 35) ? ActivityContext_INTERACT : ActivityContext_NORMAL);
                 }
             }
             else if (words[0] == "setactivitycolour")
@@ -2770,6 +2811,7 @@ void scriptclass::startgamemode(const enum StartMode mode)
         add_default_colours();
         cl.onewaycol_override = false;
         cl.player_colour = 0;
+        cl.custom_activity_zones.clear();
         break;
     }
 
@@ -3253,7 +3295,7 @@ void scriptclass::hardreset(void)
     if (game.seed_use_sdl_getticks)
     {
         /* The RNG is 32-bit. We don't _really_ need 64-bit... */
-        xoshiro_seed((Uint32) SDL_GetTicks64());
+        xoshiro_seed((Uint32) SDL_GetTicks());
     }
     else
     {

@@ -111,8 +111,7 @@ jobs:
     runs-on: windows-latest
 
     env:
-      VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
-      SDL_VERSION: 2.26.0
+      SDL_VERSION: 3.4.0
 
     steps:
     - uses: actions/checkout@v4
@@ -122,22 +121,23 @@ jobs:
     - name: Export GitHub Actions cache environment variables
       uses: actions/github-script@v6
       with:
-        script: |
-          core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
-          core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
+        path: C:\SDL3-*
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ env.SDL_VERSION }}
 
     - name: Install SDL
       run: |
-        vcpkg install sdl2:x86-windows-static sdl2:x64-windows-static
+        Invoke-WebRequest "https://github.com/libsdl-org/SDL/releases/download/release-$env:SDL_VERSION/SDL3-devel-$env:SDL_VERSION-VC.zip" -OutFile C:\SDL.zip
+        Expand-Archive C:\SDL.zip -DestinationPath C:\
 
     - name: CMake initial configure/generate
       run: |
         mkdir $env:SRC_DIR_PATH/build
         cd $env:SRC_DIR_PATH/build
+        $env:LDFLAGS =  "/LIBPATH:C:\SDL3-$env:SDL_VERSION\lib\x86 "
         cmake -G "Visual Studio 18 2026" -A Win32 `
-              -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT\scripts\buildsystems\vcpkg.cmake" `
-              -DVCPKG_TARGET_TRIPLET=x86-windows-static `
+              -DSDL3_INCLUDE_DIRS="C:\SDL3-$env:SDL_VERSION\include" `
               -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded `
+              -DSDL3_LIBRARIES="SDL3" `
               -DCMAKE_BUILD_TYPE=Release ..
 
     - name: CMake configure (Win32)

@@ -1,17 +1,21 @@
 VVVVVV's source code is made available under a [custom license](LICENSE.md), which states that you must not distribute any materials from the game (i.e. the game's assets) which are not included in this repo unless approved by us in writing. In general, if you're interested in creating something that falls outside the license terms, get in touch with [Terry](http://distractionware.com/email/)!
 
-There is an important general exception: if you're compiling a [Make
+There are three important general exceptions:
+ - If you're compiling a [Make
 and Play](https://thelettervsixtim.es/makeandplay/) version of the game, then you can you freely distribute the game's assets.
+ - If you are making a non-commercial "total conversion", that is, a modified version of VVVVVV that does not contain the game's original levels, then you can freely distribute the game's assets.
+ - If you're making a non-commercial port of the game for a platform that doesn't already have an official build (currently: Windows, Mac, Linux, iOS, Android, Nintendo 3DS, Nintendo Switch, Sony PS4, Sony PS5, Sony PSVita, OUYA), then you can freely distribute the game's assets.
 
 The following is a list of projects which have been given permission by Terry to distribute the assets with distributions of the game, and under what conditions.
 
 Exceptions granted to the VVVVVV source code license
 -------
-Last updated on January 23rd, 2024.
 
 | Project | Creator | Description | Conditions | Link |
 |---|---|---|---|---|
 | Any distribution of the VVVVVV: Make and Play edition | | All distributions and packages of the Make and Play edition can freely distribute the data assets, so long as they compile with the makeandplay define and do not distribute the original levels.| Must compile with the makeandplay define set, cannot distribute the original levels. | |
+| Non-Commercial Total conversions of VVVVVV | | Non-Commercial Total conversions of VVVVVV can freely distribute the data assets, so long as they do not distribute the original levels.| Cannot distribute the original levels. | |
+| Non-Commercial ports to platforms that don't have an official version of the game | | Non-Commercial ports of VVVVVV can freely distribute the data assets, so long as they are not for platforms that already have an official build (currently: Windows, Mac, Linux, iOS, Android, Nintendo 3DS, Nintendo Switch, Sony PS4, Sony PS5, Sony PSVita, OUYA).| Platform must not have an official build already. | |
 | VVVVVV: Make and Play Edition |[Terry Cavanagh](http://distractionware.com/)|The free and official version of VVVVVV that includes player levels, and the tools to create your own levels, but does not include the original levels from the game.| Must compile with the makeandplay define set, cannot distribute the original levels. | [download](https://thelettervsixtim.es/makeandplay/) |
 | Ved | [Dav999 and InfoTeddy](https://github.com/Daaaav/Ved/graphs/contributors) | An external editor for VVVVVV levels. | No conditions. | [download](https://tolp.nl/ved/), [github repo](https://github.com/Daaaav/Ved) |
 | VVVVVV: Community Edition | https://github.com/v6cord/VVVVVV-CE/graphs/contributors | Community fork of VVVVVV focused on expanding the capabilities of player levels. | Must compile with the makeandplay define set, cannot distribute the original levels. | [github repo](https://github.com/v6cord/VVVVVV-CE) |
@@ -24,3 +28,5 @@ Last updated on January 23rd, 2024.
 | PortMaster distributions of the game for Linux Handheld devices  | [portmaster](https://portmaster.games/) | A port manager GUI for Linux handheld devices | Permission is for non commercial use only. Display the following text in the readme to make it clear that this is an exception: "VVVVVV is a commercial game! The author has given special permission to make this port available for free. If you enjoy the game, please consider purchasing a copy at [thelettervsixtim.es](http://thelettervsixtim.es)."| [website](https://portmaster.games/detail.html?name=vvvvvv) |
 | Wii Port | [Alberto Mardegan](https://github.com/mardy/) | Port for the Nintendo Wii. | Permission is given to distribute a ready-to-use build for the Nintendo Wii containing the data.zip assets for non commercial use only. | [github repo](https://github.com/mardy/VVVVVV/tree/wii) |
 | Recalbox Port | [digitalLumberjack](https://gitlab.com/recalbox/recalbox) | Port for Recalbox project. | Display the following text in the readme to make it clear that this is an exception: "VVVVVV is a commercial game! The author has given special permission to make this port available for free. If you enjoy the game, please consider purchasing a copy at [thelettervsixtim.es](http://thelettervsixtim.es)." | [website](https://recalbox.com/) |
+| Super Gravitron for the Pebble smart watch | [Eli Weiss](https://www.eli-weiss.com/) | Port of Super Gravitron for the Pebble smart watch, based on VVVVVV source code. | Cannot distribute the original levels. | [github](https://github.com/eliwss0/super-gravitron-pebble), [pebble appstore](https://apps.repebble.com/30755d3528b34509bb0b5107) |
+| PSP Port | [dntrnk](https://github.com/dntrnk) | Port for the Sony PSP. | Permission is given to distribute a ready-to-use build for the Sony PSP containing the data.zip assets for non commercial use only. | [github repo](https://github.com/dntrnk/VVVVVV-PSP) |

@@ -1,7 +1,7 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 #include <string>
 #include <vector>
 
@@ -18,6 +18,13 @@ enum
     DIRECTIONAL = 3,
     SAFE = 4,
     ACTIVITY = 5
+};
+
+enum ActivityContext
+{
+    ActivityContext_NORMAL = 0,
+    ActivityContext_INTERACT = 1,
+    ActivityContext_CUSTOM = 2
 };
 
 class entityclass
@@ -52,7 +59,7 @@ public:
 
     void generateswnwave(int t);
 
-    void createblock(int t, int xp, int yp, int w, int h, int trig = 0, const std::string& script = "", bool custom = false);
+    void createblock(int t, int xp, int yp, int w, int h, int trig = 0, const std::string& script = "", ActivityContext context = ActivityContext_NORMAL);
 
     bool disableentity(int t);
 

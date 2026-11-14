@@ -41,13 +41,13 @@ editorclass::editorclass(void)
     register_tool(EditorTool_MOVING_PLATFORMS, "Moving Platforms", "8", SDLK_8, false);
     register_tool(EditorTool_ENEMIES, "Enemies", "9", SDLK_9, false);
     register_tool(EditorTool_GRAVITY_LINES, "Gravity Lines", "0", SDLK_0, false);
-    register_tool(EditorTool_ROOMTEXT, "Roomtext", "R", SDLK_r, false);
-    register_tool(EditorTool_TERMINALS, "Terminals", "T", SDLK_t, false);
-    register_tool(EditorTool_SCRIPTS, "Script Boxes", "Y", SDLK_y, false);
-    register_tool(EditorTool_WARP_TOKENS, "Warp Tokens", "U", SDLK_u, false);
-    register_tool(EditorTool_WARP_LINES, "Warp Lines", "I", SDLK_i, false);
-    register_tool(EditorTool_CREWMATES, "Crewmates", "O", SDLK_o, false);
-    register_tool(EditorTool_START_POINT, "Start Point", "P", SDLK_p, false);
+    register_tool(EditorTool_ROOMTEXT, "Roomtext", "R", SDLK_R, false);
+    register_tool(EditorTool_TERMINALS, "Terminals", "T", SDLK_T, false);
+    register_tool(EditorTool_SCRIPTS, "Script Boxes", "Y", SDLK_Y, false);
+    register_tool(EditorTool_WARP_TOKENS, "Warp Tokens", "U", SDLK_U, false);
+    register_tool(EditorTool_WARP_LINES, "Warp Lines", "I", SDLK_I, false);
+    register_tool(EditorTool_CREWMATES, "Crewmates", "O", SDLK_O, false);
+    register_tool(EditorTool_START_POINT, "Start Point", "P", SDLK_P, false);
 
     static const short basic[] = {
         121, 121, 121, 121, 121, 121, 121, 160, 121, 121, 121, 121, 121, 121, 121,
@@ -425,7 +425,7 @@ void editorclass::show_note(const char* text)
     note = text;
 }
 
-void editorclass::register_tool(EditorTools tool, const char* name, const char* keychar, const SDL_KeyCode key, const bool shift)
+void editorclass::register_tool(EditorTools tool, const char* name, const char* keychar, const SDL_Keycode key, const bool shift)
 {
     tool_names[tool] = name;
     tool_key_chars[tool] = keychar;
@@ -1117,6 +1117,96 @@ static void draw_entities(void)
                     font::print(PR_FONT_LEVEL | PR_BOR | PR_CJK_HIGH, x, y - 8, entity->scriptname, 210, 210, 255);
                 }
                 break;
+            case 20: // Activity Zones
+                graphics.draw_rect(x, y, entity->p1 * 8, entity->p2 * 8, graphics.getRGB(164, 164, 255));
+                graphics.draw_rect(x, y, 8, 8, graphics.getRGB(255, 255, 255));
+                if (i == edent_under_cursor)
+                {
+                    font::print(PR_FONT_LEVEL | PR_BOR | PR_CJK_HIGH, x, y - 8, entity->scriptname, 210, 210, 255);
+                }
+                break;
+            case 21: // Collision Boxes
+                graphics.draw_rect(x, y, entity->p1 * 8, entity->p2 * 8, graphics.getRGB(255, 255, 255));
+                graphics.draw_rect(x, y, 8, 8, graphics.getRGB(255, 255, 255));
+                break;
+            case 22: // Damage Boxes
+            {
+                int draw_y = y;
+                int height = entity->p2 * 8;
+
+                switch (entity->p3)
+                {
+                default:
+                    break;
+                case 1:
+                    // Top Spikes
+                    draw_y += 4;
+                    height -= 4;
+                    break;
+                case 2:
+                    // Bottom Spikes
+                    height -= 4;
+                    break;
+                case 3:
+                    // Side Spikes
+                    draw_y += 3;
+                    height -= 6;
+                    break;
+                }
+
+                int skull_x = x + (entity->p1 - 1) * 4;
+                int skull_y = draw_y + (height - 8) / 2;
+
+                font::print(PR_FONT_8X8 | PR_BOR, skull_x, skull_y, "\xE2\x98\xA0", 255, 255, 255);
+
+                graphics.draw_rect(x, draw_y, entity->p1 * 8, height, graphics.getRGB(255, 164, 164));
+                graphics.draw_rect(x, y, 8, 8, graphics.getRGB(255, 255, 255));
+                break;
+            }
+            case 23: // Directional Boxes
+            {
+                // Move x and y to the center of the box
+                int arrow_x = x + (entity->p1 - 1) * 4;
+                int arrow_y = y + (entity->p2 - 1) * 4;
+
+                if (customentities[i].p3 == 0)
+                {
+                    // UP ARROW
+                    font::print(PR_FONT_8X8 | PR_BOR, arrow_x, arrow_y, "\xE2\x86\x91", 255, 255, 255);
+                }
+                else if (customentities[i].p3 == 1)
+                {
+                    // DOWN ARROW
+                    font::print(PR_FONT_8X8 | PR_BOR, arrow_x, arrow_y, "\xE2\x86\x93", 255, 255, 255);
+                }
+                else if (customentities[i].p3 == 2)
+                {
+                    // LEFT ARROW
+                    font::print(PR_FONT_8X8 | PR_BOR, arrow_x, arrow_y, "\xE2\x86\x90", 255, 255, 255);
+                }
+                else if (customentities[i].p3 == 3)
+                {
+                    // RIGHT ARROW
+                    font::print(PR_FONT_8X8 | PR_BOR, arrow_x, arrow_y, "\xE2\x86\x92", 255, 255, 255);
+                }
+                graphics.draw_rect(x, y, entity->p1 * 8, entity->p2 * 8, graphics.getRGB(255, 255, 164));
+                break;
+            }
+            case 24: // Safe Boxes
+                graphics.draw_rect(x, y, entity->p1 * 8, entity->p2 * 8, graphics.getRGB(164, 255, 255));
+                graphics.draw_rect(x, y, 8, 8, graphics.getRGB(255, 255, 255));
+                break;
+            case 25: // Gamestate Triggers
+            {
+                graphics.draw_rect(x, y, entity->p1 * 8, entity->p2 * 8, graphics.getRGB(164, 255, 164));
+                graphics.draw_rect(x, y, 8, 8, graphics.getRGB(255, 255, 255));
+
+                int arrow_x = x + (entity->p1 - 1) * 4;
+                int arrow_y = y + (entity->p2 - 1) * 4;
+
+                font::print(PR_FONT_LEVEL | PR_BOR | PR_CJK_HIGH, arrow_x, arrow_y, help.String(entity->p3), 255, 255, 255);
+                break;
+            }
             case 50: // Warp Lines
                 if (entity->p1 >= 2) // Horizontal
                 {
@@ -1313,35 +1403,35 @@ static void draw_cursor(void)
                 {
                     top_left = false;
                     bottom_left = false;
-                    SDL_RenderDrawLine(gameScreen.m_renderer, x * 8, y * 8, x * 8, y * 8 + 7);
+                    SDL_RenderLine(gameScreen.m_renderer, x * 8, y * 8, x * 8, y * 8 + 7);
                 }
                 if (!check_point(connected, x + 1, y))
                 {
                     top_right = false;
                     bottom_right = false;
-                    SDL_RenderDrawLine(gameScreen.m_renderer, x * 8 + 7, y * 8, x * 8 + 7, y * 8 + 7);
+                    SDL_RenderLine(gameScreen.m_renderer, x * 8 + 7, y * 8, x * 8 + 7, y * 8 + 7);
                 }
                 if (!check_point(connected, x, y - 1))
                 {
                     top_left = false;
                     top_right = false;
-                    SDL_RenderDrawLine(gameScreen.m_renderer, x * 8, y * 8, x * 8 + 7, y * 8);
+                    SDL_RenderLine(gameScreen.m_renderer, x * 8, y * 8, x * 8 + 7, y * 8);
                 }
                 if (!check_point(connected, x, y + 1))
                 {
                     bottom_left = false;
                     bottom_right = false;
-                    SDL_RenderDrawLine(gameScreen.m_renderer, x * 8, y * 8 + 7, x * 8 + 7, y * 8 + 7);
+                    SDL_RenderLine(gameScreen.m_renderer, x * 8, y * 8 + 7, x * 8 + 7, y * 8 + 7);
                 }
 
                 if (!check_point(connected, x - 1, y - 1) && top_left)
-                    SDL_RenderDrawPoint(gameScreen.m_renderer, x * 8, y * 8);
+                    SDL_RenderPoint(gameScreen.m_renderer, x * 8, y * 8);
                 if (!check_point(connected, x - 1, y + 1) && top_right)
-                    SDL_RenderDrawPoint(gameScreen.m_renderer, x * 8, y * 8 + 7);
+                    SDL_RenderPoint(gameScreen.m_renderer, x * 8, y * 8 + 7);
                 if (!check_point(connected, x + 1, y - 1) && bottom_left)
-                    SDL_RenderDrawPoint(gameScreen.m_renderer, x * 8 + 7, y * 8);
+                    SDL_RenderPoint(gameScreen.m_renderer, x * 8 + 7, y * 8);
                 if (!check_point(connected, x + 1, y + 1) && bottom_right)
-                    SDL_RenderDrawPoint(gameScreen.m_renderer, x * 8 + 7, y * 8 + 7);
+                    SDL_RenderPoint(gameScreen.m_renderer, x * 8 + 7, y * 8 + 7);
             }
         }
         else if (ed.b_modifier) graphics.draw_rect(x, 0, 8, 240, blue); // Vertical
@@ -1414,7 +1504,7 @@ static void draw_tile_drawer(int tileset)
         int texturewidth;
         int textureheight;
 
-        if (graphics.query_texture(graphics.grphx.im_tiles, NULL, NULL, &texturewidth, &textureheight) != 0)
+        if (!graphics.query_texture(graphics.grphx.im_tiles, NULL, NULL, &texturewidth, &textureheight))
         {
             return;
         }
@@ -3200,20 +3290,20 @@ static void handle_draw_input()
             }
         }
 
-        if (key.keymap[SDLK_w])
+        if (key.keymap[SDLK_W])
         {
             commit_roomdata_change();
             ed.switch_warpdir(shift_down);
             ed.keydelay = 6;
         }
-        if (key.keymap[SDLK_e])
+        if (key.keymap[SDLK_E])
         {
             commit_roomdata_change();
             ed.keydelay = 6;
             ed.get_input_line(TEXT_ROOMNAME, "Enter new room name:", const_cast<std::string*>(&(cl.getroomprop(ed.levx, ed.levy)->roomname)));
             game.mapheld = true;
         }
-        if (key.keymap[SDLK_g])
+        if (key.keymap[SDLK_G])
         {
             ed.keydelay = 6;
             ed.get_input_line(TEXT_GOTOROOM, "Enter room coordinates x,y:", NULL);
@@ -3221,27 +3311,27 @@ static void handle_draw_input()
         }
 
         //Save and load
-        if (key.keymap[SDLK_s])
+        if (key.keymap[SDLK_S])
         {
             ed.keydelay = 6;
             ed.get_input_line(TEXT_SAVE, "Enter map filename to save as:", &(ed.filename));
             game.mapheld = true;
         }
 
-        if (key.keymap[SDLK_l])
+        if (key.keymap[SDLK_L])
         {
             ed.keydelay = 6;
             ed.get_input_line(TEXT_LOAD, "Enter map filename to load:", &(ed.filename));
             game.mapheld = true;
         }
 
-        ed.f_modifier = key.keymap[SDLK_f];
-        ed.h_modifier = key.keymap[SDLK_h];
-        ed.v_modifier = key.keymap[SDLK_v];
-        ed.b_modifier = key.keymap[SDLK_b];
-        ed.c_modifier = key.keymap[SDLK_c];
-        ed.x_modifier = key.keymap[SDLK_x];
-        ed.z_modifier = key.keymap[SDLK_z];
+        ed.f_modifier = key.keymap[SDLK_F];
+        ed.h_modifier = key.keymap[SDLK_H];
+        ed.v_modifier = key.keymap[SDLK_V];
+        ed.b_modifier = key.keymap[SDLK_B];
+        ed.c_modifier = key.keymap[SDLK_C];
+        ed.x_modifier = key.keymap[SDLK_X];
+        ed.z_modifier = key.keymap[SDLK_Z];
 
         const int room = ed.levx + ed.levy * cl.maxwidth;
         const int plat_speed = cl.roomproperties[room].platv;
@@ -3485,10 +3575,10 @@ void editorinput(void)
     ed.tilex = SDL_clamp(key.mousex, 0, SCREEN_WIDTH_PIXELS - 1) / 8;
     ed.tiley = SDL_clamp(key.mousey, 0, SCREEN_HEIGHT_PIXELS - 1) / 8;
 
-    bool up_pressed = key.isDown(SDLK_UP) || key.isDown(SDL_CONTROLLER_BUTTON_DPAD_UP);
-    bool down_pressed = key.isDown(SDLK_DOWN) || key.isDown(SDL_CONTROLLER_BUTTON_DPAD_DOWN);
-    bool left_pressed = key.isDown(SDLK_LEFT) || key.isDown(SDL_CONTROLLER_BUTTON_DPAD_LEFT);
-    bool right_pressed = key.isDown(SDLK_RIGHT) || key.isDown(SDL_CONTROLLER_BUTTON_DPAD_RIGHT);
+    bool up_pressed = key.isDown(SDLK_UP) || key.isDown(SDL_GAMEPAD_BUTTON_DPAD_UP);
+    bool down_pressed = key.isDown(SDLK_DOWN) || key.isDown(SDL_GAMEPAD_BUTTON_DPAD_DOWN);
+    bool left_pressed = key.isDown(SDLK_LEFT) || key.isDown(SDL_GAMEPAD_BUTTON_DPAD_LEFT);
+    bool right_pressed = key.isDown(SDLK_RIGHT) || key.isDown(SDL_GAMEPAD_BUTTON_DPAD_RIGHT);
 
     game.press_left = false;
     game.press_right = false;
@@ -3515,7 +3605,7 @@ void editorinput(void)
         undo_pressed = true;
     }
 
-    if (key.isDown(SDLK_y) && ctrl_down && (ed.keydelay == 0))
+    if (key.isDown(SDLK_Y) && ctrl_down && (ed.keydelay == 0))
     {
         ed.keydelay = 6;
         redo_pressed = true;
@@ -3603,7 +3693,7 @@ void editorinput(void)
 
                     bool tiles1 = (cl.getroomprop(ed.levx, ed.levy)->tileset == 0);
 
-                    if (graphics.query_texture(tiles1 ? graphics.grphx.im_tiles : graphics.grphx.im_tiles2, NULL, NULL, &texturewidth, &textureheight) != 0)
+                    if (!graphics.query_texture(tiles1 ? graphics.grphx.im_tiles : graphics.grphx.im_tiles2, NULL, NULL, &texturewidth, &textureheight))
                         return;
 
                     const int numtiles = (int)(texturewidth / 8) * (textureheight / 8);

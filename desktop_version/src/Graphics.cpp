@@ -1,7 +1,7 @@
 #define GRAPHICS_DEFINITION
 #include "Graphics.h"
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 #include "Alloc.h"
 #include "Constants.h"
@@ -158,7 +158,7 @@ void Graphics::destroy(void)
 #define CLEAR_ARRAY(name) \
     for (size_t i = 0; i < name.size(); i += 1) \
     { \
-        VVV_freefunc(SDL_FreeSurface, name[i]); \
+        VVV_freefunc(SDL_DestroySurface, name[i]); \
     } \
     name.clear();
 
@@ -201,12 +201,12 @@ void Graphics::create_buffers(void)
 
     SDL_SetTextureScaleMode(
         gameTexture,
-        gameScreen.isFiltered ? SDL_ScaleModeLinear : SDL_ScaleModeNearest
+        gameScreen.isFiltered ? SDL_SCALEMODE_LINEAR : SDL_SCALEMODE_NEAREST
     );
 
     SDL_SetTextureScaleMode(
         tempShakeTexture,
-        gameScreen.isFiltered ? SDL_ScaleModeLinear : SDL_ScaleModeNearest
+        gameScreen.isFiltered ? SDL_SCALEMODE_LINEAR : SDL_SCALEMODE_NEAREST
     );
 
     gameTexture->id = "gameTexture";
@@ -233,10 +233,10 @@ void Graphics::destroy_buffers(void)
     VVV_freefunc(SDL_DestroyTexture, tempScrollingTexture);
     VVV_freefunc(SDL_DestroyTexture, towerbg.texture);
     VVV_freefunc(SDL_DestroyTexture, titlebg.texture);
-    VVV_freefunc(SDL_FreeSurface, tempFilterSrc);
-    VVV_freefunc(SDL_FreeSurface, tempFilterDest);
-    VVV_freefunc(SDL_FreeSurface, tempScreenshot);
-    VVV_freefunc(SDL_FreeSurface, tempScreenshot2x);
+    VVV_freefunc(SDL_DestroySurface, tempFilterSrc);
+    VVV_freefunc(SDL_DestroySurface, tempFilterDest);
+    VVV_freefunc(SDL_DestroySurface, tempScreenshot);
+    VVV_freefunc(SDL_DestroySurface, tempScreenshot2x);
 }
 
 void Graphics::drawspritesetcol(int x, int y, int t, int c)
@@ -458,6 +458,7 @@ void Graphics::print_level_creator(
     font::print(print_flags, text_x, y, creator, r, g, b);
 }
 
+<<<<<<< HEAD
 std::string Graphics::get_texture_id(SDL_Texture* texture)
 {
     if (texture == NULL)
@@ -473,7 +474,7 @@ SDL_Texture* Graphics::get_render_target(void)
     return render_target;
 }
 
-int Graphics::set_render_target(SDL_Texture* texture)
+bool Graphics::set_render_target(SDL_Texture* texture)
 {
     render_target = texture;
     draw_message message;
@@ -483,7 +484,7 @@ int Graphics::set_render_target(SDL_Texture* texture)
     return 0;
 }
 
-int Graphics::set_texture_color_mod(SDL_Texture* texture, const Uint8 r, const Uint8 g, const Uint8 b)
+bool Graphics::set_texture_color_mod(SDL_Texture* texture, const Uint8 r, const Uint8 g, const Uint8 b)
 {
     draw_message message;
     message.type = DRAW_SET_TINT_COLOR;
@@ -495,7 +496,7 @@ int Graphics::set_texture_color_mod(SDL_Texture* texture, const Uint8 r, const U
     return 0;
 }
 
-int Graphics::set_texture_alpha_mod(SDL_Texture* texture, const Uint8 alpha)
+bool Graphics::set_texture_alpha_mod(SDL_Texture* texture, const Uint8 alpha)
 {
     draw_message message;
     message.type = DRAW_SET_TINT_ALPHA;
@@ -505,14 +506,14 @@ int Graphics::set_texture_alpha_mod(SDL_Texture* texture, const Uint8 alpha)
     return 0;
 }
 
-int Graphics::query_texture(SDL_Texture* texture, Uint32* format, int* access, int* w, int* h)
+bool Graphics::query_texture(SDL_Texture* texture, Uint32* format, int* access, int* w, int* h)
 {
     if (w != NULL) *w = texture->w;
     if (h != NULL) *h = texture->h;
     return 0;
 }
 
-int Graphics::set_blendmode(const SDL_BlendMode blendmode)
+bool Graphics::set_blendmode(const SDL_BlendMode blendmode)
 {
     // TODO: This WORKS, but we shouldn't do it yet, as LOVE2D 11 doesn't support custom blend modes.
 
@@ -523,7 +524,7 @@ int Graphics::set_blendmode(const SDL_BlendMode blendmode)
     return 0;
 }
 
-int Graphics::set_blendmode(SDL_Texture* texture, const SDL_BlendMode blendmode)
+bool Graphics::set_blendmode(SDL_Texture* texture, const SDL_BlendMode blendmode)
 {
     // TODO: This WORKS, but we shouldn't do it yet, as LOVE2D 11 doesn't support custom blend modes.
 
@@ -534,7 +535,7 @@ int Graphics::set_blendmode(SDL_Texture* texture, const SDL_BlendMode blendmode)
     return 0;
 }
 
-int Graphics::clear(const int r, const int g, const int b, const int a)
+bool Graphics::clear(const int r, const int g, const int b, const int a)
 {
     set_color(r, g, b, a);
 
@@ -544,7 +545,7 @@ int Graphics::clear(const int r, const int g, const int b, const int a)
     return 0;
 }
 
-int Graphics::clear(void)
+bool Graphics::clear(void)
 {
     return clear(0, 0, 0, 255);
 }
@@ -594,13 +595,14 @@ void Graphics::post_substitute(SDL_Texture* subst)
     set_texture_alpha_mod(subst, 255);
 }
 
-int Graphics::copy_texture(SDL_Texture* texture, const SDL_Rect* src, const SDL_Rect* dest)
+bool Graphics::copy_texture(SDL_Texture* texture, const SDL_FRect* src, const SDL_FRect* dest)
 {
     //bool is_substituted = substitute(&texture);
 
     draw_message message;
     message.type = DRAW_TEXTURE;
     SDL_strlcpy(message.texture, get_texture_id(texture).c_str(), sizeof(message.texture));
+
     if (src == NULL)
     {
         message.src_whole = true;
@@ -632,10 +634,10 @@ int Graphics::copy_texture(SDL_Texture* texture, const SDL_Rect* src, const SDL_
     //    post_substitute(texture);
     //}
 
-    return 0;
+    return true;
 }
 
-int Graphics::copy_texture(SDL_Texture* texture, const SDL_Rect* src, const SDL_Rect* dest, const double angle, const SDL_Point* center, const SDL_RendererFlip flip)
+bool Graphics::copy_texture(SDL_Texture* texture, const SDL_FRect* src, const SDL_FRect* dest, const double angle, const SDL_FPoint* center, const SDL_FlipMode flip)
 {
     //bool is_substituted = substitute(&texture);
 
@@ -689,7 +691,7 @@ int Graphics::copy_texture(SDL_Texture* texture, const SDL_Rect* src, const SDL_
     return 0;
 }
 
-int Graphics::set_color(const Uint8 r, const Uint8 g, const Uint8 b, const Uint8 a)
+bool Graphics::set_color(const Uint8 r, const Uint8 g, const Uint8 b, const Uint8 a)
 {
     draw_message message;
     message.type = DRAW_SET_COLOR;
@@ -701,17 +703,17 @@ int Graphics::set_color(const Uint8 r, const Uint8 g, const Uint8 b, const Uint8
     return 0;
 }
 
-int Graphics::set_color(const Uint8 r, const Uint8 g, const Uint8 b)
+bool Graphics::set_color(const Uint8 r, const Uint8 g, const Uint8 b)
 {
     return set_color(r, g, b, 255);
 }
 
-int Graphics::set_color(const SDL_Color color)
+bool Graphics::set_color(const SDL_Color color)
 {
     return set_color(color.r, color.g, color.b, color.a);
 }
 
-int Graphics::fill_rect(const SDL_Rect* rect)
+bool Graphics::fill_rect(const SDL_FRect* rect)
 {
     draw_message message;
     message.type = DRAW_FILL_RECT;
@@ -731,49 +733,54 @@ int Graphics::fill_rect(const SDL_Rect* rect)
     return 0;
 }
 
-int Graphics::fill_rect(const SDL_Rect* rect, const int r, const int g, const int b, const int a)
+bool Graphics::fill_rect(const SDL_FRect* rect, const int r, const int g, const int b, const int a)
 {
     set_color(r, g, b, a);
     return fill_rect(rect);
 }
 
-int Graphics::fill_rect(const SDL_Rect* rect, const int r, const int g, const int b)
+bool Graphics::fill_rect(const SDL_FRect* rect, const int r, const int g, const int b)
 {
     return fill_rect(rect, r, g, b, 255);
 }
 
-int Graphics::fill_rect(const int r, const int g, const int b)
+bool Graphics::fill_rect(const int r, const int g, const int b)
 {
     return fill_rect(NULL, r, g, b, 255);
 }
 
-int Graphics::fill_rect(const SDL_Rect* rect, const SDL_Color color)
+bool Graphics::fill_rect(const SDL_FRect* rect, const SDL_Color color)
 {
     return fill_rect(rect, color.r, color.g, color.b, color.a);
 }
 
-int Graphics::fill_rect(const int x, const int y, const int w, const int h, const int r, const int g, const int b, const int a)
+bool Graphics::fill_rect(const int x, const int y, const int w, const int h, const int r, const int g, const int b, const int a)
 {
-    const SDL_Rect rect = {x, y, w, h};
+    const SDL_FRect rect = {
+        static_cast<float>(x),
+        static_cast<float>(y),
+        static_cast<float>(w),
+        static_cast<float>(h)
+    };
     return fill_rect(&rect, r, g, b, a);
 }
 
-int Graphics::fill_rect(const int x, const int y, const int w, const int h, const int r, const int g, const int b)
+bool Graphics::fill_rect(const int x, const int y, const int w, const int h, const int r, const int g, const int b)
 {
     return fill_rect(x, y, w, h, r, g, b, 255);
 }
 
-int Graphics::fill_rect(const SDL_Color color)
+bool Graphics::fill_rect(const SDL_Color color)
 {
     return fill_rect(NULL, color);
 }
 
-int Graphics::fill_rect(const int x, const int y, const int w, const int h, const SDL_Color color)
+bool Graphics::fill_rect(const int x, const int y, const int w, const int h, const SDL_Color color)
 {
     return fill_rect(x, y, w, h, color.r, color.g, color.b, color.a);
 }
 
-int Graphics::draw_rect(const SDL_Rect* rect)
+bool Graphics::draw_rect(const SDL_FRect* rect)
 {
     draw_message message;
     message.type = DRAW_RECT;
@@ -793,39 +800,44 @@ int Graphics::draw_rect(const SDL_Rect* rect)
     return 0;
 }
 
-int Graphics::draw_rect(const SDL_Rect* rect, const int r, const int g, const int b, const int a)
+bool Graphics::draw_rect(const SDL_FRect* rect, const int r, const int g, const int b, const int a)
 {
     set_color(r, g, b, a);
     return draw_rect(rect);
 }
 
-int Graphics::draw_rect(const SDL_Rect* rect, const int r, const int g, const int b)
+bool Graphics::draw_rect(const SDL_FRect* rect, const int r, const int g, const int b)
 {
     return draw_rect(rect, r, g, b, 255);
 }
 
-int Graphics::draw_rect(const SDL_Rect* rect, const SDL_Color color)
+bool Graphics::draw_rect(const SDL_FRect* rect, const SDL_Color color)
 {
     return draw_rect(rect, color.r, color.g, color.b, color.a);
 }
 
-int Graphics::draw_rect(const int x, const int y, const int w, const int h, const int r, const int g, const int b, const int a)
+bool Graphics::draw_rect(const int x, const int y, const int w, const int h, const int r, const int g, const int b, const int a)
 {
-    const SDL_Rect rect = {x, y, w, h};
+    const SDL_FRect rect = {
+        static_cast<float>(x),
+        static_cast<float>(y),
+        static_cast<float>(w),
+        static_cast<float>(h)
+    };
     return draw_rect(&rect, r, g, b, a);
 }
 
-int Graphics::draw_rect(const int x, const int y, const int w, const int h, const int r, const int g, const int b)
+bool Graphics::draw_rect(const int x, const int y, const int w, const int h, const int r, const int g, const int b)
 {
     return draw_rect(x, y, w, h, r, g, b, 255);
 }
 
-int Graphics::draw_rect(const int x, const int y, const int w, const int h, const SDL_Color color)
+bool Graphics::draw_rect(const int x, const int y, const int w, const int h, const SDL_Color color)
 {
     return draw_rect(x, y, w, h, color.r, color.g, color.b, color.a);
 }
 
-int Graphics::draw_line(const int x, const int y, const int x2, const int y2)
+bool Graphics::draw_line(const int x, const int y, const int x2, const int y2)
 {
     draw_message message;
     message.type = DRAW_LINE;
@@ -839,7 +851,7 @@ int Graphics::draw_line(const int x, const int y, const int x2, const int y2)
     return 0;
 }
 
-int Graphics::draw_points(const SDL_Point* points, const int count)
+bool Graphics::draw_points(const SDL_FPoint* points, const int count)
 {
     for (int i = 0; i < count; i += 1)
     {
@@ -856,7 +868,7 @@ int Graphics::draw_points(const SDL_Point* points, const int count)
     return 0;
 }
 
-int Graphics::draw_points(const SDL_Point* points, const int count, const int r, const int g, const int b)
+bool Graphics::draw_points(const SDL_FPoint* points, const int count, const int r, const int g, const int b)
 {
     set_color(r, g, b);
     return draw_points(points, count);
@@ -883,8 +895,18 @@ void Graphics::scroll_texture(SDL_Texture* texture, SDL_Texture* temp, const int
     SDL_Rect texture_rect = {0, 0, 0, 0};
     query_texture(texture, NULL, NULL, &texture_rect.w, &texture_rect.h);
 
-    const SDL_Rect src = {0, 0, texture_rect.w, texture_rect.h};
-    const SDL_Rect dest = {x, y, texture_rect.w, texture_rect.h};
+    const SDL_FRect src = {
+        0.0f,
+        0.0f,
+        static_cast<float>(texture_rect.w),
+        static_cast<float>(texture_rect.h)
+    };
+    const SDL_FRect dest = {
+        static_cast<float>(x),
+        static_cast<float>(y),
+        static_cast<float>(texture_rect.w),
+        static_cast<float>(texture_rect.h)
+    };
 
     set_render_target(temp);
     clear();
@@ -933,7 +955,7 @@ void Graphics::drawtile3(int x, int y, int t, int off, int height_subtract /*= 0
     // so do the logic ourselves (except include height_subtract in the final call)
 
     int width;
-    if (query_texture(grphx.im_tiles3, NULL, NULL, &width, NULL) != 0)
+    if (!query_texture(grphx.im_tiles3, NULL, NULL, &width, NULL))
     {
         return;
     }
@@ -1240,7 +1262,7 @@ void Graphics::drawimagecol( int t, int xp, int yp, const SDL_Color ct, bool cen
     trect.x = xp;
     trect.y = yp;
 
-    if (query_texture(images[t], NULL, NULL, &trect.w, &trect.h) != 0)
+    if (!query_texture(images[t], NULL, NULL, &trect.w, &trect.h))
     {
         return;
     }
@@ -1267,7 +1289,7 @@ void Graphics::drawimage( int t, int xp, int yp, bool cent/*=false*/ )
     trect.x = xp;
     trect.y = yp;
 
-    if (query_texture(images[t], NULL, NULL, &trect.w, &trect.h) != 0)
+    if (!query_texture(images[t], NULL, NULL, &trect.w, &trect.h))
     {
         return;
     }
@@ -1293,19 +1315,29 @@ void Graphics::draw_texture(SDL_Texture* image, const int x, const int y)
 {
     int w, h;
 
-    if (query_texture(image, NULL, NULL, &w, &h) != 0)
+    if (!query_texture(image, NULL, NULL, &w, &h))
     {
         return;
     }
 
-    const SDL_Rect dstrect = {x, y, w, h};
+    const SDL_FRect dstrect = {
+        static_cast<float>(x),
+        static_cast<float>(y),
+        static_cast<float>(w),
+        static_cast<float>(h)
+    };
 
     copy_texture(image, NULL, &dstrect);
 }
 
 void Graphics::draw_texture_part(SDL_Texture* image, const int x, const int y, const int x2, const int y2, const int w, const int h, const int scalex, const int scaley)
 {
-    const SDL_Rect srcrect = {x2, y2, w, h};
+    const SDL_FRect srcrect = {
+        static_cast<float>(x2),
+        static_cast<float>(y2),
+        static_cast<float>(w),
+        static_cast<float>(h)
+    };
 
     int flip = SDL_FLIP_NONE;
 
@@ -1318,16 +1350,21 @@ void Graphics::draw_texture_part(SDL_Texture* image, const int x, const int y, c
         flip |= SDL_FLIP_VERTICAL;
     }
 
-    const SDL_Rect dstrect = {x, y, w * SDL_abs(scalex), h * SDL_abs(scaley)};
+    const SDL_FRect dstrect = {
+        static_cast<float>(x),
+        static_cast<float>(y),
+        static_cast<float>(w * SDL_abs(scalex)),
+        static_cast<float>(h * SDL_abs(scaley))
+    };
 
-    copy_texture(image, &srcrect, &dstrect, 0, NULL, (SDL_RendererFlip) flip);
+    copy_texture(image, &srcrect, &dstrect, 0, NULL, (SDL_FlipMode) flip);
 }
 
 void Graphics::draw_grid_tile(SDL_Texture* texture, const int t, const int x, const int y, const int width, const int height, const int scalex, const int scaley)
 {
     int tex_width;
 
-    if (query_texture(texture, NULL, NULL, &tex_width, NULL) != 0)
+    if (!query_texture(texture, NULL, NULL, &tex_width, NULL))
     {
         return;
     }
@@ -2449,7 +2486,8 @@ void Graphics::drawbackground( int t )
         fill_rect(0, 0, 0);
         for (int i = 0; i < numstars; i++)
         {
-            SDL_Rect star_rect = stars[i];
+            SDL_FRect star_rect = {0};
+            SDL_RectToFRect(&stars[i], &star_rect);
             star_rect.x = lerp(star_rect.x + starsspeed[i], star_rect.x);
             if (starsspeed[i] <= 6)
             {
@@ -2602,7 +2640,8 @@ void Graphics::drawbackground( int t )
                 break;
             }
 
-            SDL_Rect backboxrect = backboxes[i];
+            SDL_FRect backboxrect = {0};
+            SDL_RectToFRect(&backboxes[i], &backboxrect);
             backboxrect.x = lerp(backboxes[i].x - backboxvx[i], backboxes[i].x);
             backboxrect.y = lerp(backboxes[i].y - backboxvy[i], backboxes[i].y);
 
@@ -2620,7 +2659,12 @@ void Graphics::drawbackground( int t )
         clear();
 
         const int offset = (int) lerp(-3, 0);
-        const SDL_Rect srcRect = {8 + offset, 0, SCREEN_WIDTH_PIXELS, SCREEN_HEIGHT_PIXELS};
+        const SDL_FRect srcRect = {
+            8.0f + offset,
+            0.0f,
+            static_cast<float>(SCREEN_WIDTH_PIXELS),
+            static_cast<float>(SCREEN_HEIGHT_PIXELS)
+        };
 
         copy_texture(backgroundTexture, &srcRect, NULL);
         break;
@@ -2630,7 +2674,12 @@ void Graphics::drawbackground( int t )
         clear();
 
         const int offset = (int) lerp(-3, 0);
-        const SDL_Rect srcRect = {0, 8 + offset, SCREEN_WIDTH_PIXELS, SCREEN_HEIGHT_PIXELS};
+        const SDL_FRect srcRect = {
+            0.0f,
+            8.0f + offset,
+            static_cast<float>(SCREEN_WIDTH_PIXELS),
+            static_cast<float>(SCREEN_HEIGHT_PIXELS)
+        };
 
         copy_texture(backgroundTexture, &srcRect, NULL);
         break;
@@ -2680,7 +2729,12 @@ void Graphics::drawbackground( int t )
         for (int i = 10; i >= 0; i--)
         {
             const int temp = (i * 16) + backoffset;
-            const SDL_Rect warprect = {160 - temp, 120 - temp, temp * 2, temp * 2};
+            const SDL_FRect warprect = {
+                160.0f - temp,
+                120.0f - temp,
+                temp * 2.0f,
+                temp * 2.0f
+            };
             if (i % 2 == warpskip)
             {
                 fill_rect(&warprect, warpbcol);
@@ -2697,7 +2751,8 @@ void Graphics::drawbackground( int t )
         fill_rect(0, 0, 0);
         for (int i = 0; i < numstars; i++)
         {
-            SDL_Rect star_rect = stars[i];
+            SDL_FRect star_rect = {0};
+            SDL_RectToFRect(&stars[i], &star_rect);
             star_rect.y = lerp(star_rect.y + starsspeed[i], star_rect.y);
             if (starsspeed[i] <= 8)
             {
@@ -3029,7 +3084,12 @@ void Graphics::drawtowerbackground(const TowerBG& bg_obj)
     clear();
 
     const int offset = (int) lerp(-bg_obj.bscroll, 0);
-    const SDL_Rect srcRect = {0, 8 + offset, SCREEN_WIDTH_PIXELS, SCREEN_HEIGHT_PIXELS};
+    const SDL_FRect srcRect = {
+        0.0f,
+        8.0f + offset,
+        static_cast<float>(SCREEN_WIDTH_PIXELS),
+        static_cast<float>(SCREEN_HEIGHT_PIXELS)
+    };
 
     copy_texture(bg_obj.texture, &srcRect, NULL);
 }
@@ -3310,15 +3370,20 @@ SDL_Color Graphics::getcol( int t )
 
 void Graphics::menuoffrender(void)
 {
-    if (copy_texture(gameplayTexture, NULL, NULL) != 0)
+    if (copy_texture(gameplayTexture, NULL, NULL) == 0)
     {
         return;
     }
 
     const int offset = (int) lerp(oldmenuoffset, menuoffset);
-    const SDL_Rect offsetRect = {0, offset, SCREEN_WIDTH_PIXELS, SCREEN_HEIGHT_PIXELS};
+    const SDL_FRect offsetRect = {
+        0.0f,
+        static_cast<float>(offset),
+        static_cast<float>(SCREEN_WIDTH_PIXELS),
+        static_cast<float>(SCREEN_HEIGHT_PIXELS)
+    };
 
-    if (copy_texture(menuTexture, NULL, &offsetRect) != 0)
+    if (copy_texture(menuTexture, NULL, &offsetRect) == 0)
     {
         return;
     }
@@ -3586,7 +3651,12 @@ void Graphics::screenshake(void)
     set_blendmode(SDL_BLENDMODE_NONE);
     clear();
 
-    const SDL_Rect shake = {screenshake_x, screenshake_y, SCREEN_WIDTH_PIXELS, SCREEN_HEIGHT_PIXELS};
+    const SDL_FRect shake = {
+        static_cast<float>(screenshake_x),
+        static_cast<float>(screenshake_y),
+        static_cast<float>(SCREEN_WIDTH_PIXELS),
+        static_cast<float>(SCREEN_HEIGHT_PIXELS)
+    };
 
     copy_texture(gameTexture, NULL, &shake);
 
@@ -3606,7 +3676,7 @@ void Graphics::screenshake(void)
     set_blendmode(SDL_BLENDMODE_NONE);
     draw_window_background();
 
-    SDL_Rect rect;
+    SDL_FRect rect;
     get_stretch_info(&rect);
 
     copy_texture(tempShakeTexture, NULL, &rect, 0, NULL, flipmode ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE);
@@ -3623,7 +3693,7 @@ void Graphics::draw_window_background(void)
     clear();
 }
 
-void Graphics::get_stretch_info(SDL_Rect* rect)
+void Graphics::get_stretch_info(SDL_FRect* rect)
 {
     int width;
     int height;
@@ -3691,7 +3761,7 @@ void Graphics::render(void)
 
     draw_window_background();
 
-    SDL_Rect stretch_info;
+    SDL_FRect stretch_info;
     get_stretch_info(&stretch_info);
 
     ime_set_rect(&stretch_info);
@@ -3758,13 +3828,17 @@ void Graphics::draw_screenshot_border(void)
 
     int width = 0;
     int height = 0;
-    int result = query_texture(gameTexture, NULL, NULL, &width, &height);
-    if (result != 0)
+    if (!query_texture(gameTexture, NULL, NULL, &width, &height))
     {
         return;
     }
 
-    const SDL_Rect rect_inner = {1, 1, width - 2, height - 2};
+    const SDL_FRect rect_inner = {
+        1.0f,
+        1.0f,
+        width - 2.0f,
+        height - 2.0f
+    };
 
     if (game.screenshot_saved_success)
     {
@@ -3827,7 +3901,7 @@ bool Graphics::checktexturesize(
     int texturewidth;
     int textureheight;
 
-    if (query_texture(texture, NULL, NULL, &texturewidth, &textureheight) != 0)
+    if (!query_texture(texture, NULL, NULL, &texturewidth, &textureheight))
     {
         /* Just give it the benefit of the doubt. */
         vlog_warn(

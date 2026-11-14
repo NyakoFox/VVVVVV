@@ -90,6 +90,8 @@ mapclass::mapclass(void)
 
     currentregion = 0;
     SDL_zeroa(region);
+
+    tempscriptbox = 0;
 }
 
 static char roomname_static[SCREEN_WIDTH_CHARS];
@@ -1815,7 +1817,9 @@ void mapclass::loadlevel(int rx, int ry)
 
         // Entities have to be created HERE, akwardly
         int tempcheckpoints = 0;
-        int tempscriptbox = 0;
+
+        tempscriptbox = 0;
+
         for (size_t edi = 0; edi < customentities.size(); edi++)
         {
             // If entity is in this room, create it
@@ -1953,6 +1957,50 @@ void mapclass::loadlevel(int rx, int ry)
                 }
                 obj.createblock(TRIGGER, ex, ey, ent.p1 * 8, ent.p2 * 8, 300 + tempscriptbox, "custom_" + ent.scriptname);
                 tempscriptbox++;
+                break;
+            case 20: // Activity Zone
+                obj.customscript = ent.scriptname;
+                obj.createblock(ACTIVITY, ex, ey, ent.p1 * 8, ent.p2 * 8, ent.p3, "custom_" + ent.scriptname, ActivityContext_CUSTOM);
+                break;
+            case 21: // Collision Box
+                obj.createblock(BLOCK, ex, ey, ent.p1 * 8, ent.p2 * 8);
+                break;
+            case 22: // Damage Box
+            {
+                int y = ey;
+                int height = ent.p2 * 8;
+
+                switch (ent.p3)
+                {
+                default:
+                    break;
+                case 1:
+                    // Top Spikes
+                    y += 4;
+                    height -= 4;
+                    break;
+                case 2:
+                    // Bottom Spikes
+                    height -= 4;
+                    break;
+                case 3:
+                    // Side Spikes
+                    y += 3;
+                    height -= 6;
+                    break;
+                }
+
+                obj.createblock(DAMAGE, ex, y, ent.p1 * 8, height);
+                break;
+            }
+            case 23: // Directional Box
+                obj.createblock(DIRECTIONAL, ex, ey, ent.p1 * 8, ent.p2 * 8, ent.p3);
+                break;
+            case 24: // Safe Box
+                obj.createblock(SAFE, ex, ey, ent.p1 * 8, ent.p2 * 8);
+                break;
+            case 25: // Trigger
+                obj.createblock(TRIGGER, ex, ey, ent.p1 * 8, ent.p2 * 8, ent.p3);
                 break;
             case 50: // Warp Lines
                 obj.customwarpmode=true;
