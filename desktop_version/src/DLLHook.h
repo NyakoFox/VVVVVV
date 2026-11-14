@@ -36,7 +36,7 @@ enum VVV_EventType
 struct VVV_Event
 {
     VVV_EventType type;
-    SDL_Scancode keysym;
+    SDL_Keycode keysym;
     int button;
     int x;
     int y;

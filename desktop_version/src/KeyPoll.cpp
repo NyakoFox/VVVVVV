@@ -239,9 +239,9 @@ void KeyPoll::Poll(void)
         /* Keyboard Input */
         case VVV_EventType_KEYDOWN:
         {
-            keymap[evt.keysym.sym] = true;
+            keymap[evt.keysym] = true;
 
-            if (evt.keysym.sym == SDLK_BACKSPACE)
+            if (evt.keysym == SDLK_BACKSPACE)
             {
                 pressedbackspace = true;
             }
@@ -251,15 +251,15 @@ void KeyPoll::Poll(void)
 #else
             altpressed = keymap[SDLK_LALT] || keymap[SDLK_RALT];
 #endif
-            bool returnpressed = evt.keysym.sym == SDLK_RETURN;
-            bool fpressed = evt.keysym.sym == SDLK_F;
-            bool f11pressed = evt.keysym.sym == SDLK_F11;
+            bool returnpressed = evt.keysym == SDLK_RETURN;
+            bool fpressed = evt.keysym == SDLK_F;
+            bool f11pressed = evt.keysym == SDLK_F11;
             if ((altpressed && (returnpressed || fpressed)) || f11pressed)
             {
                 fullscreenkeybind = true;
             }
 
-            if (loc::show_translator_menu && evt.keysym.sym == SDLK_F8 && !evt.repeat)
+            if (loc::show_translator_menu && evt.keysym == SDLK_F8 && !evt.repeat)
             {
                 if (keymap[SDLK_LCTRL])
                 {
@@ -287,7 +287,7 @@ void KeyPoll::Poll(void)
 
             if (textentry())
             {
-                if (evt.keysym.sym == SDLK_BACKSPACE && !keybuffer.empty())
+                if (evt.keysym == SDLK_BACKSPACE && !keybuffer.empty())
                 {
                     keybuffer.erase(UTF8_backspace(keybuffer.c_str(), keybuffer.length()));
                     if (keybuffer.empty())
@@ -295,7 +295,7 @@ void KeyPoll::Poll(void)
                         linealreadyemptykludge = true;
                     }
                 }
-                else if (    evt.keysym.sym == SDLK_V &&
+                else if (    evt.keysym == SDLK_V &&
                         keymap[SDLK_LCTRL]    )
                 {
                     char* text = SDL_GetClipboardText();
@@ -305,7 +305,7 @@ void KeyPoll::Poll(void)
                         VVV_free(text);
                     }
                 }
-                else if (    evt.keysym.sym == SDLK_X &&
+                else if (    evt.keysym == SDLK_X &&
                         keymap[SDLK_LCTRL]    )
                 {
                     if (SDL_SetClipboardText(keybuffer.c_str()))
@@ -317,8 +317,8 @@ void KeyPoll::Poll(void)
             break;
         }
         case VVV_EventType_KEYUP:
-            keymap[evt.keysym.sym] = false;
-            if (evt.keysym.sym == SDLK_BACKSPACE)
+            keymap[evt.keysym] = false;
+            if (evt.keysym == SDLK_BACKSPACE)
             {
                 pressedbackspace = false;
             }

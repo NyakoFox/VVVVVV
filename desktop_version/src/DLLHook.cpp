@@ -63,24 +63,24 @@ void VVV_PushEvent(VVV_Event* event)
     events.push_back(*event);
 }
 
-extern "C" DECLSPEC int SDLCALL version(void)
+extern "C" SDL_DECLSPEC int SDLCALL version(void)
 {
     return 1;
 }
 
-extern "C" DECLSPEC int SDLCALL get_ghost_count(void)
+extern "C" SDL_DECLSPEC int SDLCALL get_ghost_count(void)
 {
     return ed.ghosts.size();
 }
 
-extern "C" DECLSPEC GhostInfo SDLCALL get_ghost_info(int index)
+extern "C" SDL_DECLSPEC GhostInfo SDLCALL get_ghost_info(int index)
 {
     SDL_assert(INBOUNDS_VEC(index, ed.ghosts));
 
     return ed.ghosts[index];
 }
 
-extern "C" DECLSPEC void SDLCALL clear_input(void)
+extern "C" SDL_DECLSPEC void SDLCALL clear_input(void)
 {
     key.keymap.clear();
     key.leftbutton = 0;
@@ -88,7 +88,7 @@ extern "C" DECLSPEC void SDLCALL clear_input(void)
     key.middlebutton = 0;
 }
 
-extern "C" DECLSPEC bool SDLCALL get_flag(int flag)
+extern "C" SDL_DECLSPEC bool SDLCALL get_flag(int flag)
 {
     if (INBOUNDS_ARR(flag, obj.flags))
     {
@@ -97,7 +97,7 @@ extern "C" DECLSPEC bool SDLCALL get_flag(int flag)
     return false;
 }
 
-extern "C" DECLSPEC void SDLCALL set_flag(int flag, bool value)
+extern "C" SDL_DECLSPEC void SDLCALL set_flag(int flag, bool value)
 {
     if (INBOUNDS_ARR(flag, obj.flags))
     {
@@ -105,34 +105,34 @@ extern "C" DECLSPEC void SDLCALL set_flag(int flag, bool value)
     }
 }
 
-extern "C" DECLSPEC void SDLCALL set_invincibility(bool invincible)
+extern "C" SDL_DECLSPEC void SDLCALL set_invincibility(bool invincible)
 {
     map.invincibility = invincible;
 }
 
-extern "C" DECLSPEC void SDLCALL set_roomname_bg(bool translucent)
+extern "C" SDL_DECLSPEC void SDLCALL set_roomname_bg(bool translucent)
 {
     graphics.translucentroomname = translucent;
 }
 
-extern "C" DECLSPEC void SDLCALL set_volume(int volume)
+extern "C" SDL_DECLSPEC void SDLCALL set_volume(int volume)
 {
     music.user_music_volume = volume;
 }
 
-extern "C" DECLSPEC void SDLCALL set_sound_volume(int volume)
+extern "C" SDL_DECLSPEC void SDLCALL set_sound_volume(int volume)
 {
     music.user_sound_volume = volume;
 }
 
-extern "C" DECLSPEC void SDLCALL return_to_idlemode(void)
+extern "C" SDL_DECLSPEC void SDLCALL return_to_idlemode(void)
 {
     music.haltdasmusik();
     music.currentsong = -1;
     game.quittomenu();
 }
 
-extern "C" DECLSPEC draw_message SDLCALL pop_draw_messages(void)
+extern "C" SDL_DECLSPEC draw_message SDLCALL pop_draw_messages(void)
 {
     draw_message message;
 
@@ -152,12 +152,12 @@ void push_draw_message(draw_message message)
     draw_messages.push_back(message);
 }
 
-extern "C" DECLSPEC void SDLCALL set_base_path(const char* path)
+extern "C" SDL_DECLSPEC void SDLCALL set_base_path(const char* path)
 {
     game.base_path = path;
 }
 
-extern "C" DECLSPEC const char* SDLCALL get_state(void)
+extern "C" SDL_DECLSPEC const char* SDLCALL get_state(void)
 {
     switch (game.gamestate)
     {
@@ -184,7 +184,7 @@ extern "C" DECLSPEC const char* SDLCALL get_state(void)
     }
 }
 
-extern "C" DECLSPEC void SDLCALL simulate_keyevent(const char* event_type, const char* new_key, bool repeat)
+extern "C" SDL_DECLSPEC void SDLCALL simulate_keyevent(const char* event_type, const char* new_key, bool repeat)
 {
     VVV_Event event;
     SDL_zero(event);
@@ -203,13 +203,13 @@ extern "C" DECLSPEC void SDLCALL simulate_keyevent(const char* event_type, const
         return;
     }
 
-    event.keysym.sym = SDL_GetKeyFromName(new_key);
+    event.keysym = SDL_GetKeyFromName(new_key);
     event.repeat = repeat;
 
     VVV_PushEvent(&event);
 }
 
-extern "C" DECLSPEC void SDLCALL simulate_mouseevent(const char* event_type, int button, int x, int y)
+extern "C" SDL_DECLSPEC void SDLCALL simulate_mouseevent(const char* event_type, int button, int x, int y)
 {
     VVV_Event event;
     SDL_zero(event);
@@ -235,7 +235,7 @@ extern "C" DECLSPEC void SDLCALL simulate_mouseevent(const char* event_type, int
     VVV_PushEvent(&event);
 }
 
-extern "C" DECLSPEC void SDLCALL simulate_mousemoveevent(int x, int y)
+extern "C" SDL_DECLSPEC void SDLCALL simulate_mousemoveevent(int x, int y)
 {
     VVV_Event event;
     SDL_zero(event);
@@ -247,11 +247,11 @@ extern "C" DECLSPEC void SDLCALL simulate_mousemoveevent(int x, int y)
     VVV_PushEvent(&event);
 }
 
-extern "C" DECLSPEC void SDLCALL play_level_init(void)
+extern "C" SDL_DECLSPEC void SDLCALL play_level_init(void)
 {
 }
 
-extern "C" DECLSPEC void SDLCALL set_texture_size(const char* texture, int w, int h)
+extern "C" SDL_DECLSPEC void SDLCALL set_texture_size(const char* texture, int w, int h)
 {
     for (int i = 0; i < textures.size(); i++)
     {
@@ -267,7 +267,7 @@ extern "C" DECLSPEC void SDLCALL set_texture_size(const char* texture, int w, in
     return;
 }
 
-extern "C" DECLSPEC void SDLCALL play_level(const char* level_data, const char* playassets)
+extern "C" SDL_DECLSPEC void SDLCALL play_level(const char* level_data, const char* playassets)
 {
     cl.injected_level = (unsigned char*)SDL_malloc(SDL_strlen(level_data) + 1);
 

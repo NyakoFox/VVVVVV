@@ -130,7 +130,7 @@ static void idleinput(void)
     }
 }
 
-extern "C" DECLSPEC bool SDLCALL should_vvvvvv_exit(void)
+extern "C" SDL_DECLSPEC bool SDLCALL should_vvvvvv_exit(void)
 {
     if (should_exit)
     {
@@ -395,7 +395,7 @@ static void inline fixedloop(void)
     }
 }
 
-extern "C" DECLSPEC void SDLCALL deltaloop(void);
+extern "C" SDL_DECLSPEC void SDLCALL deltaloop(void);
 
 static void cleanup(void);
 
@@ -413,7 +413,7 @@ static void keep_console_open(const bool open_console)
     return;
 }
 
-extern "C" DECLSPEC int SDLCALL mainLoop(int argc, char *argv[])
+extern "C" SDL_DECLSPEC int SDLCALL mainLoop(int argc, char *argv[])
 {
     char* baseDir = NULL;
     char* assetsPath = NULL;
@@ -947,7 +947,7 @@ SDL_NORETURN void VVV_exit(const int exit_code)
     exit(exit_code);
 }
 
-extern "C" DECLSPEC void SDLCALL deltaupdate(void)
+extern "C" SDL_DECLSPEC void SDLCALL deltaupdate(void)
 {
     enum IndexCode index_code = increment_func_index();
 
@@ -961,7 +961,7 @@ extern "C" DECLSPEC void SDLCALL deltaupdate(void)
     fixedloop();
 }
 
-extern "C" DECLSPEC void SDLCALL deltadraw(float delta)
+extern "C" SDL_DECLSPEC void SDLCALL deltadraw(float delta)
 {
     graphics.alpha = delta;
 
@@ -987,7 +987,7 @@ extern "C" DECLSPEC void SDLCALL deltadraw(float delta)
     }
 }
 
-extern "C" DECLSPEC void SDLCALL deltaloop(void)
+extern "C" SDL_DECLSPEC void SDLCALL deltaloop(void)
 {
     //timestep limit to 30
     const float rawdeltatime = static_cast<float>(time_ - timePrev);

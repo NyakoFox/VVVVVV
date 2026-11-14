@@ -45,10 +45,11 @@ jobs:
       if: steps.cache-brew.outputs.cache-hit != 'true'
       run: |
         brew install ninja
-        curl -JLO https://github.com/libsdl-org/SDL/releases/download/release-2.28.5/SDL2-2.28.5.dmg
-        hdiutil attach SDL2-2.28.5.dmg
+        curl -JLO https://github.com/libsdl-org/SDL/releases/download/release-3.4.0/SDL3-3.4.0.dmg
+        hdiutil attach SDL3-3.4.0.dmg
         mkdir -p ~/Library/Frameworks
-        cp -r /Volumes/SDL2/SDL2.framework ~/Library/Frameworks/
+        cp -r /Volumes/SDL3/SDL3.xcframework ~/Library/Frameworks/
+        cp -r /Volumes/SDL3/share ~/Library/Frameworks/
 
     - name: Cache CMake build folder
       id: cache-cmake-build
@@ -118,8 +119,11 @@ jobs:
       with:
         submodules: true
 
-    - name: Export GitHub Actions cache environment variables
-      uses: actions/github-script@v6
+    - name: Cache SDL
+      id: cache-windows-sdl
+      uses: actions/cache@v3
+      env:
+        cache-name: cache-sdl
       with:
         path: C:\SDL3-*
         key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ env.SDL_VERSION }}
@@ -171,10 +175,11 @@ jobs:
       run: |
         mkdir $env:SRC_DIR_PATH/build-64
         cd $env:SRC_DIR_PATH/build-64
+        $env:LDFLAGS =  "/LIBPATH:C:\SDL3-$env:SDL_VERSION\lib\x64 "
         cmake -G "Visual Studio 18 2026" -A x64 `
-              -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT\scripts\buildsystems\vcpkg.cmake" `
-              -DVCPKG_TARGET_TRIPLET=x64-windows-static `
+              -DSDL3_INCLUDE_DIRS="C:\SDL3-$env:SDL_VERSION\include" `
               -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded `
+              -DSDL3_LIBRARIES="SDL3" `
               -DCMAKE_BUILD_TYPE=Release ..
 
     - name: CMake configure (x64)

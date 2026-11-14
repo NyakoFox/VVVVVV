@@ -458,7 +458,6 @@ void Graphics::print_level_creator(
     font::print(print_flags, text_x, y, creator, r, g, b);
 }
 
-<<<<<<< HEAD
 std::string Graphics::get_texture_id(SDL_Texture* texture)
 {
     if (texture == NULL)
