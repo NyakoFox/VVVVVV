@@ -131,7 +131,7 @@ jobs:
     - name: Install SDL
       run: |
         Invoke-WebRequest "https://github.com/libsdl-org/SDL/releases/download/release-$env:SDL_VERSION/SDL3-devel-$env:SDL_VERSION-VC.zip" -OutFile C:\SDL.zip
-        Expand-Archive C:\SDL.zip -DestinationPath C:\
+        Expand-Archive C:\SDL.zip -DestinationPath C:\ -Force
 
     - name: CMake initial configure/generate
       run: |
