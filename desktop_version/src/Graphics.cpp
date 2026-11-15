@@ -480,7 +480,7 @@ bool Graphics::set_render_target(SDL_Texture* texture)
     message.type = DRAW_SET_TARGET;
     SDL_strlcpy(message.texture, get_texture_id(texture).c_str(), sizeof(message.texture));
     push_draw_message(message);
-    return 0;
+    return true;
 }
 
 bool Graphics::set_texture_color_mod(SDL_Texture* texture, const Uint8 r, const Uint8 g, const Uint8 b)
@@ -492,7 +492,7 @@ bool Graphics::set_texture_color_mod(SDL_Texture* texture, const Uint8 r, const 
     message.color.g = g;
     message.color.b = b;
     push_draw_message(message);
-    return 0;
+    return true;
 }
 
 bool Graphics::set_texture_alpha_mod(SDL_Texture* texture, const Uint8 alpha)
@@ -502,14 +502,14 @@ bool Graphics::set_texture_alpha_mod(SDL_Texture* texture, const Uint8 alpha)
     SDL_strlcpy(message.texture, get_texture_id(texture).c_str(), sizeof(message.texture));
     message.color.a = alpha;
     push_draw_message(message);
-    return 0;
+    return true;
 }
 
 bool Graphics::query_texture(SDL_Texture* texture, Uint32* format, int* access, int* w, int* h)
 {
     if (w != NULL) *w = texture->w;
     if (h != NULL) *h = texture->h;
-    return 0;
+    return true;
 }
 
 bool Graphics::set_blendmode(const SDL_BlendMode blendmode)
@@ -520,7 +520,7 @@ bool Graphics::set_blendmode(const SDL_BlendMode blendmode)
     //message.type = DRAW_SET_BLENDMODE;
     //message.blendmode = get_blend_mode(blendmode);
     //push_draw_message(message);
-    return 0;
+    return true;
 }
 
 bool Graphics::set_blendmode(SDL_Texture* texture, const SDL_BlendMode blendmode)
@@ -531,7 +531,7 @@ bool Graphics::set_blendmode(SDL_Texture* texture, const SDL_BlendMode blendmode
     //message.type = DRAW_SET_TEXTURE_BLENDMODE;
     //SDL_strlcpy(message.texture, get_texture_id(texture).c_str(), sizeof(message.texture));
     //message.blendmode = get_blend_mode(blendmode);
-    return 0;
+    return true;
 }
 
 bool Graphics::clear(const int r, const int g, const int b, const int a)
@@ -541,7 +541,7 @@ bool Graphics::clear(const int r, const int g, const int b, const int a)
     draw_message message;
     message.type = DRAW_CLEAR;
     push_draw_message(message);
-    return 0;
+    return true;
 }
 
 bool Graphics::clear(void)
@@ -687,7 +687,7 @@ bool Graphics::copy_texture(SDL_Texture* texture, const SDL_FRect* src, const SD
     //    post_substitute(texture);
     //}
 
-    return 0;
+    return true;
 }
 
 bool Graphics::set_color(const Uint8 r, const Uint8 g, const Uint8 b, const Uint8 a)
@@ -699,7 +699,7 @@ bool Graphics::set_color(const Uint8 r, const Uint8 g, const Uint8 b, const Uint
     message.color.b = b;
     message.color.a = a;
     push_draw_message(message);
-    return 0;
+    return true;
 }
 
 bool Graphics::set_color(const Uint8 r, const Uint8 g, const Uint8 b)
@@ -729,7 +729,7 @@ bool Graphics::fill_rect(const SDL_FRect* rect)
         message.dest_whole = false;
     }
     push_draw_message(message);
-    return 0;
+    return true;
 }
 
 bool Graphics::fill_rect(const SDL_FRect* rect, const int r, const int g, const int b, const int a)
@@ -796,7 +796,7 @@ bool Graphics::draw_rect(const SDL_FRect* rect)
         message.dest_whole = false;
     }
     push_draw_message(message);
-    return 0;
+    return true;
 }
 
 bool Graphics::draw_rect(const SDL_FRect* rect, const int r, const int g, const int b, const int a)
@@ -847,7 +847,7 @@ bool Graphics::draw_line(const int x, const int y, const int x2, const int y2)
 
     push_draw_message(message);
 
-    return 0;
+    return true;
 }
 
 bool Graphics::draw_points(const SDL_FPoint* points, const int count)
@@ -864,7 +864,7 @@ bool Graphics::draw_points(const SDL_FPoint* points, const int count)
         push_draw_message(message);
     }
 
-    return 0;
+    return true;
 }
 
 bool Graphics::draw_points(const SDL_FPoint* points, const int count, const int r, const int g, const int b)
