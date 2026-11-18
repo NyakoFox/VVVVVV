@@ -365,7 +365,14 @@ endif()
 IF (NINTENDO_SWITCH)
     add_definitions(-D__SWITCH__)
 
-    include_directories($ENV{DEVKITPRO}/portlibs/switch/include)
+    if (NINTENDO_SWITCH2)
+        message(STATUS "Including Switch 2 portlibs...")
+        include_directories($ENV{DEVKITPRO}/portlibs/switch2/include)
+    else()
+        include_directories($ENV{DEVKITPRO}/portlibs/switch/include)
+    endif()
+
+    # switch portlib SDL2 is used on both switch 1 and 2
     include_directories($ENV{DEVKITPRO}/portlibs/switch/include/SDL2)
 
     target_link_libraries(VVVVVV SDL2 physfs png jpeg webp z)
