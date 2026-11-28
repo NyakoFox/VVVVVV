@@ -144,10 +144,11 @@ void UpdateFilter(void)
     }
 }
 
-static bool disabled_filter = false;
+//static bool disabled_filter = false;
 
 void ApplyFilter(SDL_Surface** src, SDL_Surface** dest)
 {
+    /*
     if (disabled_filter)
     {
         return;
@@ -215,7 +216,7 @@ void ApplyFilter(SDL_Surface** src, SDL_Surface** dest)
             Uint8 red = pixel_offset.r;
 
             double mult;
-            int tmp; /* needed to avoid char overflow */
+            int tmp;
             if (isscrolling && sampley > 220 && ((rand() % 10) < 4))
             {
                 mult = 0.6;
@@ -252,6 +253,7 @@ void ApplyFilter(SDL_Surface** src, SDL_Surface** dest)
     }
 
     //SDL_UpdateTexture(graphics.gameTexture, NULL, (*dest)->pixels, (*dest)->pitch);
+    */
 }
 
 bool TakeScreenshot(SDL_Surface** surface)
