@@ -66,6 +66,7 @@ mapclass::mapclass(void)
     SDL_memset(roomdeaths, 0, sizeof(roomdeaths));
     SDL_memset(roomdeathsfinal, 0, sizeof(roomdeathsfinal));
     resetmap();
+    savedwarpdirs.clear();
 
     setroomname("");
     hiddenname = "";
@@ -728,6 +729,18 @@ int mapclass::area(int _rx, int _ry)
             return 6;
         }
     }
+}
+
+void mapclass::savewarpdir(const int rx, const int ry, const int dir)
+{
+    const int roomnum = rx + ry*20;
+    savedwarpdirs[roomnum] = dir;
+}
+
+void mapclass::unsavewarpdir(const int rx, const int ry)
+{
+    const int roomnum = rx + ry*20;
+    savedwarpdirs.erase(roomnum);
 }
 
 bool mapclass::isexplored(const int rx, const int ry)
@@ -2267,18 +2280,28 @@ void mapclass::twoframedelayfix(void)
     int block_idx = -1;
     // obj.checktrigger() sets block_idx
     int activetrigger = obj.checktrigger(&block_idx);
-    if (activetrigger <= -1
-        || !INBOUNDS_VEC(block_idx, obj.blocks)
-        || activetrigger < 300)
+
+    if (!INBOUNDS_VEC(block_idx, obj.blocks) || activetrigger <= -1)
     {
         return;
     }
 
-    game.newscript = obj.blocks[block_idx].script;
-    obj.removetrigger(activetrigger);
-    game.setstate(0);
+    // Load the block's script if exists
+    // No range check, because we want to run scripts either way
+    if (obj.blocks[block_idx].script != "")
+    {
+        game.newscript = obj.blocks[block_idx].script;
+        obj.removetrigger(activetrigger);
+        game.setstate(0);
+        script.load(game.newscript);
+    }
+    else
+    {
+        // Just a trigger, so run its gamestate
+        game.setstate(activetrigger);
+    }
+
     game.setstatedelay(0);
-    script.load(game.newscript);
 }
 
 MapRenderData mapclass::get_render_data(void)

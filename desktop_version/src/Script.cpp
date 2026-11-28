@@ -289,6 +289,21 @@ void scriptclass::run(void)
                     position--;
                 }
             }
+            if (words[0] == "savewarpdir")
+            {
+                int temprx = ss_toi(words[1]) - 1;
+                int tempry = ss_toi(words[2]) - 1;
+
+                const RoomProperty* const room = cl.getroomprop(temprx, tempry);
+                map.savewarpdir(temprx, tempry, room->warpdir);
+            }
+            if (words[0] == "unsavewarpdir")
+            {
+                int temprx = ss_toi(words[1]) - 1;
+                int tempry = ss_toi(words[2]) - 1;
+
+                map.unsavewarpdir(temprx, tempry);
+            }
             if (words[0] == "destroy")
             {
                 if (words[1] == "gravitylines")
@@ -1060,10 +1075,10 @@ void scriptclass::run(void)
             {
                 if (INBOUNDS_ARR(map.tempscriptbox, game.customscript))
                 {
-                    game.customscript[map.tempscriptbox] = words[5];
+                    game.customscript[map.tempscriptbox] = raw_words[5];
                 }
 
-                obj.createblock(TRIGGER, ss_toi(words[1]), ss_toi(words[2]), ss_toi(words[3]), ss_toi(words[4]), 300 + map.tempscriptbox, "custom_" + words[5]);
+                obj.createblock(TRIGGER, ss_toi(words[1]), ss_toi(words[2]), ss_toi(words[3]), ss_toi(words[4]), 300 + map.tempscriptbox, "custom_" + raw_words[5]);
                 map.tempscriptbox++;
             }
             else if (words[0] == "createdamage")
@@ -1087,7 +1102,7 @@ void scriptclass::run(void)
                 }
 
                 obj.customscript = words[5];
-                obj.createblock(ACTIVITY, ss_toi(words[1]), ss_toi(words[2]), ss_toi(words[3]), ss_toi(words[4]), id, words[5], ActivityContext_CUSTOM);
+                obj.createblock(ACTIVITY, ss_toi(words[1]), ss_toi(words[2]), ss_toi(words[3]), ss_toi(words[4]), id, raw_words[5], ActivityContext_CUSTOM);
             }
             else if (words[0] == "createcrewman")
             {
@@ -2810,6 +2825,7 @@ void scriptclass::startgamemode(const enum StartMode mode)
         textbox_colours.clear();
         add_default_colours();
         cl.onewaycol_override = false;
+        cl.textboxlimit_fix = true;
         cl.player_colour = 0;
         cl.custom_activity_zones.clear();
         break;
@@ -3466,6 +3482,7 @@ void scriptclass::hardreset(void)
     SDL_memset(map.roomdeaths, 0, sizeof(map.roomdeaths));
     SDL_memset(map.roomdeathsfinal, 0, sizeof(map.roomdeathsfinal));
     map.resetmap();
+    map.savedwarpdirs.clear();
     map.currentregion = 0;
     SDL_zeroa(map.region);
     //entityclass
@@ -3697,6 +3714,12 @@ bool scriptclass::loadcustom(const std::string& t)
             if(customtextmode==1){ add("endtext"); customtextmode=0;}
             add(lines[i]);
         }else if(words[0] == "ifwarp"){
+            if(customtextmode==1){ add("endtext"); customtextmode=0;}
+            add(lines[i]);
+        }else if(words[0] == "savewarpdir"){
+            if(customtextmode==1){ add("endtext"); customtextmode=0;}
+            add(lines[i]);
+        }else if(words[0] == "unsavewarpdir"){
             if(customtextmode==1){ add("endtext"); customtextmode=0;}
             add(lines[i]);
         }else if(words[0] == "iftrinkets"){
